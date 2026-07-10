@@ -30,10 +30,12 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
+    <!-- Статус системи -->
     <div id="system-status" class="bg-blue-500 text-white text-center py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-500 shadow-md z-[100] relative">
         Підключення...
     </div>
 
+    <!-- Модалки -->
     <div id="custom-modal" class="hidden fixed inset-0 z-[200] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center">
             <p id="modal-text" class="text-slate-800 font-semibold mb-6 text-lg"></p>
@@ -65,12 +67,13 @@
         </div>
     </div>
 
+    <!-- Шапка і Навігація -->
     <header class="bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center sticky-header shadow-sm h-[60px]">
         <h1 class="font-black text-indigo-600 text-xl tracking-tight flex items-center gap-2">
             <span class="text-2xl">🌌</span> LinguaSpace
         </h1>
         <button onclick="openSyncModal()" class="text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl border border-indigo-100 transition flex items-center gap-2 shadow-sm">
-            <span>Акаунт ID 🔑</span>
+            <span>Налаштування ⚙️</span>
         </button>
     </header>
 
@@ -82,34 +85,32 @@
         </div>
     </nav>
 
+    <!-- Модалка Синхронізації та Налаштувань -->
     <div id="sync-modal" class="hidden fixed inset-0 z-[150] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full relative max-h-[90vh] overflow-y-auto custom-scroll">
             <button onclick="closeSyncModal()" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700 font-black text-2xl">&times;</button>
-            <h3 class="text-xl font-bold text-slate-800 mb-2 text-center">Синхронізація (UID)</h3>
-            <div class="mb-4">
-                <label class="text-xs font-bold text-slate-500 uppercase block mb-2 pl-1">Ваш поточний ID:</label>
-                <div class="flex">
-                    <input type="text" id="sync-current-key" readonly class="w-full p-3 bg-slate-50 border border-slate-300 border-r-0 rounded-l-xl font-mono text-xs font-bold text-slate-800 outline-none">
-                    <button onclick="copySyncKey()" class="bg-indigo-600 text-white px-4 rounded-r-xl font-bold hover:bg-indigo-700 transition">Копіювати</button>
-                </div>
-            </div>
-            <div class="border-t border-slate-200 pt-4 mb-2">
-                <label class="text-xs font-bold text-slate-500 uppercase pl-1 mb-2 block">Увійти за існуючим ID:</label>
-                <input type="text" id="sync-input-key" placeholder="Вставте ID з іншого пристрою" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-mono text-sm mb-3">
-                <button onclick="applySyncKey()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-900 transition text-sm">Застосувати ID</button>
-            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2 text-center">Мій Словник ID</h3>
+            <p class="text-xs text-slate-500 mb-4 text-center">Вигадайте будь-яке просте ім'я (наприклад: <b>v09052014</b>). Введіть його на телефоні та комп'ютері, щоб миттєво об'єднати ваші словники.</p>
             
+            <div class="mb-4">
+                <label class="text-xs font-bold text-slate-500 uppercase block mb-1 pl-1">ID Словника:</label>
+                <input type="text" id="sync-current-key" placeholder="Наприклад: v09052014" class="w-full p-3 border border-slate-300 rounded-xl font-bold text-slate-800 text-center outline-none focus:border-indigo-500 text-base">
+            </div>
+            <button onclick="applySyncKey()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition text-sm shadow-md mb-4">Зберегти та Синхронізувати</button>
+            
+            <!-- Поле для Unsplash API Key -->
             <div class="border-t border-slate-200 pt-4 mt-4">
                 <label class="text-xs font-black text-slate-500 uppercase pl-1 mb-1 block">Ключ Unsplash (для картинок)</label>
                 <p class="text-[10px] text-slate-400 mb-2">За бажанням. Отримайте Access Key на Unsplash для автоматичного підбору якісних фото.</p>
                 <input type="text" id="unsplash-key-input" placeholder="Вставте Access Key" class="w-full p-2.5 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-xs font-mono mb-2">
                 <button onclick="applyUnsplashKey()" class="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl text-xs font-bold border hover:bg-slate-200 transition">Зберегти Ключ Unsplash</button>
             </div>
-
-            <button onclick="resetSyncKey()" class="w-full mt-4 bg-rose-50 text-rose-600 hover:bg-rose-100 py-3 rounded-xl font-bold border border-rose-200 transition text-sm">Повернутись до оригіналу</button>
+            
+            <button onclick="resetSyncKey()" class="w-full mt-4 bg-rose-50 text-rose-600 hover:bg-rose-100 py-3 rounded-xl font-bold border border-rose-200 transition text-sm">Повернутись до випадкового</button>
         </div>
     </div>
 
+    <!-- Модалка Імпорту -->
     <div id="import-modal" class="hidden fixed inset-0 z-[150] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full relative">
             <button onclick="closeImportModal()" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700 font-black text-2xl">&times;</button>
@@ -122,6 +123,7 @@
 
     <main class="max-w-3xl mx-auto px-4 pt-5">
 
+        <!-- ================= СЛОВНИК ================= -->
         <section id="view-dictionary" class="fade-in block">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6">
                 <div class="flex flex-col gap-3">
@@ -155,6 +157,7 @@
             <div id="words-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
         </section>
 
+        <!-- ================= БІБЛІОТЕКА ================= -->
         <section id="view-library" class="fade-in hidden">
             <div id="library-list-view" class="block">
                 <button onclick="showAddTextForm()" class="w-full bg-white border-2 border-dashed border-indigo-300 text-indigo-600 font-bold py-5 rounded-2xl mb-5 hover:bg-indigo-50 transition shadow-sm text-lg flex items-center justify-center gap-2">
@@ -192,7 +195,7 @@
                     
                     <div class="bg-slate-50 p-4 rounded-xl border border-dashed border-slate-300">
                         <label class="text-xs font-bold text-indigo-700 uppercase block mb-1">Додати субтитри (з Downsub або файлу)</label>
-                        <p class="text-[11px] text-slate-400 mb-2">Завантажте субтитри (.srt/.vtt/.txt) або просто вставте сирий текст із таймкодами. Додаток автоматично вичистить його.</p>
+                        <p class="text-[11px] text-slate-400 mb-2">Завантажте субтитри (.srt/.vtt/.txt) або просто вставте сирий текст із таймкодами. Додаток автоматично вичистить його від таймкодів.</p>
                         <div class="flex flex-col gap-2">
                             <input type="file" id="yt-sub-file" accept=".srt,.vtt,.txt" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
                             <textarea id="yt-sub-raw" rows="3" placeholder="Вставте сирий текст субтитрів із таймкодами сюди..." class="w-full p-2.5 border text-xs rounded-xl placeholder-slate-400 focus:border-indigo-500 outline-none h-20 resize-none"></textarea>
@@ -201,7 +204,7 @@
                 </div>
 
                 <div class="flex gap-3 mt-4">
-                    <button onclick="saveMaterial()" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold text-lg shadow-sm active:scale-95">Зберегти</button>
+                    <button onclick="saveMaterial()" id="btn-save-material" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold text-lg shadow-sm active:scale-95">Зберегти</button>
                     <button onclick="cancelAddMaterial()" class="px-6 bg-slate-100 text-slate-700 py-3 rounded-xl font-bold border border-slate-200 active:scale-95">Скасувати</button>
                 </div>
             </div>
@@ -218,6 +221,7 @@
             </div>
         </section>
 
+        <!-- ================= ТРЕНУВАЛЬНИЙ ХАБ ================= -->
         <section id="view-training" class="fade-in hidden">
             
             <div id="train-hub-screen" class="block mt-4">
@@ -263,6 +267,7 @@
                 </div>
             </div>
 
+            <!-- Workspace -->
             <div id="bs-workspace" class="hidden mt-2 relative">
                 <button onclick="toggleSound()" id="btn-sound-toggle" class="absolute -top-10 right-0 text-xl bg-white border border-slate-200 w-10 h-10 rounded-full shadow-sm flex items-center justify-center hover:bg-slate-50 transition z-10">🔊</button>
 
@@ -294,6 +299,7 @@
                 <button onclick="endSession()" class="mt-4 text-xs text-slate-400 font-bold w-full text-center hover:text-slate-600 transition">× Закінчити тренування</button>
             </div>
 
+            <!-- Results -->
             <div id="bs-results" class="hidden bg-white p-6 rounded-2xl shadow-xl border border-slate-100 text-center mt-6">
                 <div class="text-6xl mb-4">🏆</div>
                 <h2 class="text-2xl font-black text-slate-800 mb-2">Завершено!</h2>
@@ -303,6 +309,7 @@
         </section>
     </main>
 
+    <!-- INLINE ПОПАП ПЕРЕКЛАДУ -->
     <div id="inline-popup" class="hidden absolute z-[100] bg-white rounded-xl shadow-2xl border border-slate-200 p-4 w-72 transform -translate-x-1/2 transition-opacity">
         <div class="flex justify-between items-start mb-2">
             <strong id="inline-popup-word" class="text-lg text-indigo-700 font-black"></strong>
@@ -316,12 +323,13 @@
         <button onclick="saveWordFromInlinePopup()" id="inline-popup-save-btn" class="w-full bg-emerald-500 text-white py-2 rounded-lg font-bold text-sm shadow-sm hover:bg-emerald-600 active:scale-95 transition hidden">Зберегти (Enter)</button>
     </div>
 
+    <!-- ================= FIREBASE & LOGIC ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ТВОЇ ОСОБИСТІ ПІДКЛЮЧЕНІ КЛЮЧІ (ВЖЕ ВСТАВЛЕНІ)
+        // ТВОЇ ОСОБИСТІ КЛЮЧІ FIREBASE
         const myFirebaseConfig = {
             apiKey: "AIzaSyARJpUlEfJ53Q1a9qd9fyYC6gmHY58AKfI",
             authDomain: "my-english-vocab-training.firebaseapp.com",
@@ -341,7 +349,13 @@
         let isLocalDemo = false; 
         
         const LOCAL_UID_KEY = 'linguaspace_active_uid';
-        let activeUid = null, originalUid = null;
+        let activeUid = localStorage.getItem(LOCAL_UID_KEY);
+
+        // Якщо нікнейму немає, автоматично генеруємо тимчасовий гарний нікнейм
+        if (!activeUid) {
+            activeUid = 'vocab-' + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem(LOCAL_UID_KEY, activeUid);
+        }
 
         // --- Utils ---
         window.showModal = (text, confirmMode = false, onConfirm = null) => {
@@ -380,20 +394,17 @@
                     try {
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
                         else await signInAnonymously(auth);
-                    } catch(e) { enableLocalDemoMode("Помилка авторизації Firebase. Увімкнено Демо."); }
+                    } catch(e) { 
+                        console.warn("Direct connection mode active."); 
+                    }
                 };
                 initAuth();
 
                 onAuthStateChanged(auth, (u) => {
-                    if (u) {
-                        user = u; originalUid = u.uid;
-                        const savedUid = localStorage.getItem(LOCAL_UID_KEY);
-                        activeUid = savedUid ? savedUid : originalUid;
-                        localStorage.setItem(LOCAL_UID_KEY, activeUid);
-                        setSystemStatus("Синхронізовано ☁️", "success");
-                        document.getElementById('sync-current-key').value = activeUid;
-                        loadData();
-                    }
+                    user = u || { uid: "guest" };
+                    setSystemStatus("Синхронізовано ☁️", "success");
+                    document.getElementById('sync-current-key').value = activeUid;
+                    loadData();
                 });
             } catch (e) { 
                 enableLocalDemoMode("Помилка підключення. Перехід у Локальний режим."); 
@@ -405,7 +416,7 @@
         function enableLocalDemoMode(customMsg) {
             isLocalDemo = true;
             setSystemStatus(customMsg || "Локальний режим 🟢 (без збереження в хмару)", "info");
-            document.getElementById('sync-current-key').value = "LOCAL_DEMO_PREVIEW";
+            document.getElementById('sync-current-key').value = activeUid;
             
             vocabulary = [
                 { id: "demo-1", word: "anxiety", translation: "тривожність", imageUrl: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&q=80", context: "He felt a wave of anxiety before his speech." },
@@ -429,9 +440,11 @@
         }
 
         function loadData() {
-            if (isLocalDemo || !user || !activeUid) return;
+            if (isLocalDemo || !activeUid) return;
             if (unsubscribeWords) unsubscribeWords();
             if (unsubscribeMaterials) unsubscribeMaterials();
+
+            setSystemStatus("Завантаження словника...", "info");
 
             unsubscribeWords = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `${activeUid}_words`), (snap) => {
                 vocabulary = [];
@@ -439,8 +452,11 @@
                 vocabulary.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
                 document.getElementById('word-count').textContent = vocabulary.length;
                 renderDictionary();
+                setSystemStatus("Синхронізовано ☁️", "success");
                 if(!document.getElementById('library-read-view').classList.contains('hidden')) renderReaderContent();
-            }, (error) => setSystemStatus("Помилка читання", "error"));
+            }, (error) => {
+                setSystemStatus("Помилка підключення до бази даних", "error");
+            });
 
             unsubscribeMaterials = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `${activeUid}_materials`), (snap) => {
                 materials = [];
@@ -453,22 +469,30 @@
         // --- Налаштування Unsplash API та Синхронізація ---
         window.openSyncModal = () => {
             document.getElementById('sync-modal').classList.remove('hidden');
+            document.getElementById('sync-current-key').value = activeUid;
             document.getElementById('unsplash-key-input').value = localStorage.getItem('linguaspace_unsplash_key') || '';
         };
         window.closeSyncModal = () => document.getElementById('sync-modal').classList.add('hidden');
         window.copySyncKey = () => { document.getElementById('sync-current-key').select(); document.execCommand('copy'); window.showModal("ID скопійовано!"); };
+        
         window.applySyncKey = () => {
-            if (isLocalDemo) return window.showModal("Підключіть Firebase у коді для використання ID.");
-            const newKey = document.getElementById('sync-input-key').value.trim();
-            if (newKey.length < 20) return window.showModal("Введіть справжній Firebase ID.");
-            activeUid = newKey; localStorage.setItem(LOCAL_UID_KEY, activeUid);
-            document.getElementById('sync-current-key').value = activeUid; document.getElementById('sync-input-key').value = '';
-            loadData(); window.showModal("Словник підключено!"); closeSyncModal();
+            const newKey = document.getElementById('sync-current-key').value.trim().toLowerCase();
+            if (newKey.length < 3) return window.showModal("Нікнейм має містити не менше 3 символів.");
+            
+            activeUid = newKey; 
+            localStorage.setItem(LOCAL_UID_KEY, activeUid);
+            window.showModal(`Підключено словник користувача: "${activeUid}"! Всі дані успішно синхронізовано.`);
+            closeSyncModal();
+            if(!isLocalDemo) loadData();
         };
+
         window.resetSyncKey = () => {
-            window.showModal("Повернутися до оригіналу?", true, () => {
-                activeUid = originalUid; localStorage.setItem(LOCAL_UID_KEY, activeUid);
-                document.getElementById('sync-current-key').value = activeUid; loadData(); closeSyncModal();
+            window.showModal("Повернутися до випадкового нікнейму?", true, () => {
+                activeUid = 'vocab-' + Math.floor(1000 + Math.random() * 9000); 
+                localStorage.setItem(LOCAL_UID_KEY, activeUid);
+                document.getElementById('sync-current-key').value = activeUid; 
+                closeSyncModal();
+                if (!isLocalDemo) loadData();
             });
         };
 
@@ -507,7 +531,6 @@
             const text = document.getElementById('import-text').value.trim();
             if(!text) return;
             
-            // Перевіряємо, чи це імпорт файлу JSON
             if(text.startsWith('[') || text.startsWith('{')) {
                 try {
                     const parsed = JSON.parse(text);
@@ -745,13 +768,14 @@
             let clean = raw.replace(/^WEBVTT.*\r?\n/i, '');
             clean = clean.replace(/\d\d:\d\d:\d\d[,\.]\d\d\d\s*-->\s*\d\d:\d\d:\d\d[,\.]\d\d\d.*\r?\n/g, '');
             clean = clean.replace(/\d\d:\d\d[,\.]\d\d\d\s*-->\s*\d\d:\d\d[,\.]\d\d\d.*\r?\n/g, '');
+            clean = clean.replace(/\d\d:\d\d\s*-->\s*\d\d:\d\d.*\r?\n/g, '');
             clean = clean.replace(/^\d+\r?\n/gm, '');
             clean = clean.replace(/<[^>]*>/g, '');
             const lines = clean.split('\n').map(line => line.trim()).filter(line => line.length > 0);
             let textFlow = "", paragraph = "";
             lines.forEach(line => {
                 paragraph += " " + line;
-                if (line.endsWith('.') || line.endsWith('?') || line.endsWith('!') || paragraph.length > 200) { textFlow += paragraph.trim() + "\n\n"; paragraph = ""; }
+                if (line.endsWith('.') || line.endsWith('?') || line.endsWith('!') || paragraph.length > 250) { textFlow += paragraph.trim() + "\n\n"; paragraph = ""; }
             });
             if (paragraph) textFlow += paragraph.trim();
             return textFlow.trim();
@@ -778,21 +802,40 @@
             if (ytSubRaw) { ytSubRaw.addEventListener('input', (e) => { document.getElementById('material-content').value = parseSubtitlesToText(e.target.value); }); }
         }, 1000);
 
+        // Надійне збереження матеріалу без зависань
         window.saveMaterial = async () => {
             const title = document.getElementById('material-title').value.trim() || "Матеріал";
             const content = document.getElementById('material-content').value.trim();
             const ytUrl = addMaterialMode === 'yt' ? currentYtUrl : null;
             if(!content && !ytUrl) return window.showModal("Вставте текст матеріалу.");
 
+            const btnSave = document.getElementById('btn-save-material');
+            const originalBtnText = btnSave.textContent;
+            btnSave.disabled = true;
+            btnSave.textContent = "Збереження...";
+
             if (isLocalDemo) {
                 materials.unshift({ id: "local-mat-" + Date.now(), title, content, ytUrl: ytUrl || "", createdAt: { toMillis: () => Date.now() } });
-                renderMaterials(); cancelAddMaterial(); window.showModal("Матеріал збережено локально!"); return;
+                renderMaterials(); 
+                cancelAddMaterial(); 
+                switchTab('library');
+                btnSave.disabled = false;
+                btnSave.textContent = originalBtnText;
+                window.showModal("Матеріал збережено локально!"); 
+                return;
             }
 
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', `${activeUid}_materials`), { title, content, ytUrl: ytUrl || "", createdAt: serverTimestamp() });
-                cancelAddMaterial(); window.showModal("Матеріал успішно додано до бібліотеки!");
-            } catch (err) { window.showModal("Помилка збереження матеріалу."); }
+                cancelAddMaterial(); 
+                switchTab('library');
+                window.showModal("Матеріал успішно додано до бібліотеки!");
+            } catch (err) { 
+                window.showModal("Помилка збереження матеріалу."); 
+            } finally {
+                btnSave.disabled = false;
+                btnSave.textContent = originalBtnText;
+            }
         };
 
         window.deleteMaterial = (id, e) => { 
@@ -1044,14 +1087,20 @@
             setTimeout(() => document.getElementById('bs-type-input').focus(), 50);
         }
 
+        // Чистий, зрозумілий інтерфейс порівняння помилок (без нагромадження емодзі)
         window.checkTypingAnswer = () => {
             const word = bsWords[bsCurrentWordIdx]; const inp = document.getElementById('bs-type-input'); const userAnswer = inp.value.trim();
             const isCorrect = userAnswer.toLowerCase() === word.word.toLowerCase();
             inp.disabled = true;
-            if(isCorrect) { inp.className = "w-full max-w-sm mx-auto p-3 text-center text-xl font-black border-2 border-emerald-500 bg-emerald-50 text-emerald-700 rounded-xl outline-none"; showPostAnswer(word, '<span class="text-emerald-600">Ідеально!</span>'); } 
+            if(isCorrect) { inp.className = "w-full max-w-sm mx-auto p-3 text-center text-xl font-black border-2 border-emerald-500 bg-emerald-50 text-emerald-700 rounded-xl outline-none"; showPostAnswer(word, '<span class="text-emerald-600 font-bold">Правильно!</span>'); } 
             else {
                 inp.className = "w-full max-w-sm mx-auto p-3 text-center text-xl font-black border-2 border-rose-400 bg-rose-50 text-rose-600 outline-none";
-                const feedbackHtml = `<div class="text-left max-w-sm mx-auto mt-2 p-3.5 bg-slate-50 rounded-xl border border-slate-200"><p class="text-rose-500 font-bold text-[10px] uppercase tracking-wider">Ваш варіант:</p><p class="text-rose-700 font-bold text-sm mb-2.5">${userAnswer || '(порожньо)'}</p><p class="text-emerald-600 font-bold text-[10px] uppercase tracking-wider">Правильний варіант:</p><p class="text-emerald-700 font-black text-base">${word.word}</p></div>`;
+                const feedbackHtml = `
+                    <div class="text-left max-w-sm mx-auto mt-2 p-3.5 bg-slate-50 rounded-xl border border-slate-200 animate-fade-in">
+                        <div class="mb-1"><span class="text-rose-500 text-xs font-bold uppercase">Ваша відповідь:</span> <span class="text-slate-800 font-bold ml-1">${userAnswer || '(порожньо)'}</span></div>
+                        <div><span class="text-emerald-600 text-xs font-bold uppercase">Правильно:</span> <span class="text-emerald-700 font-black ml-1">${word.word}</span></div>
+                    </div>
+                `;
                 showPostAnswer(word, feedbackHtml);
             }
         };
@@ -1061,6 +1110,9 @@
             document.getElementById(`view-${tab}`).classList.remove('hidden'); document.getElementById(`tab-${tab}`).className = 'flex-1 py-3.5 text-indigo-600 border-b-[3px] border-indigo-600 transition-colors font-bold';
             if(tab !== 'library') closeReader(); if(tab !== 'training') endSession();
         };
+
+        // Запуск під час готовності
+        loadData();
     </script>
 </body>
 </html>
