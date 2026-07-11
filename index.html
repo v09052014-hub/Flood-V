@@ -501,24 +501,39 @@
             return fallbackImg;
         }
 
-        async function fetchTranslationOptions(query) {
-            try {
-                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(query)}&langpair=en|uk`);
-                const data = await res.json();
-                if(data.responseData?.translatedText) {
-                    let options = [];
-                    if(data.matches && data.matches.length > 0) {
-                        const unique = new Map();
-                        data.matches.forEach(m => {
-                            const t = m.translation.toLowerCase().trim();
-                            if(!unique.has(t) && t !== query.toLowerCase() && t.length > 0) unique.set(t, parseFloat(m.match));
-                        });
-                        options = Array.from(unique.entries()).sort((a,b) => b[1] - a[1]).slice(0, 4).map(e => ({ text: e[0], score: e[1] }));
-                    }
-                    if(options.length === 0) options = [{ text: data.responseData.translatedText.toLowerCase(), score: 1 }];
-                    return options;
-                }
-                return null;
+       async function fetchTranslationOptions(query) {
+
+    try {
+
+        const res = await fetch(
+            "https://translator-proxy.v09052014.workers.dev/",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    text: query,
+                    from: "en",
+                    to: "uk"
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        if (!data[0]?.translations?.length) return null;
+
+        return [{
+            text: data[0].translations[0].text.toLowerCase(),
+            score: 1
+        }];
+
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
             } catch (e) { return null; }
         }
 
