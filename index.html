@@ -22,9 +22,9 @@
         .word-saved:hover { background-color: #bbf7d0; border: none; }
         
         /* YouTube Subs & PiP */
-        .yt-sub-line { transition: all 0.3s ease; border-radius: 8px; padding: 6px 10px; margin: 2px 0; display: block; border-left: 3px solid transparent; cursor: pointer; }
-        .yt-sub-line:hover { background-color: #f8fafc; border-left-color: #cbd5e1; }
-        .yt-sub-line.active-sub { background-color: #eef2ff; border-left-color: #4f46e5; color: #1e1b4b; font-weight: 500; transform: scale(1.01); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .yt-sub-line { transition: all 0.2s ease; border-radius: 4px; padding: 0 4px; display: inline; cursor: pointer; line-height: 2; border-bottom: 2px solid transparent; }
+        .yt-sub-line:hover { background-color: #f8fafc; border-bottom-color: #cbd5e1; }
+        .yt-sub-line.active-sub { background-color: #eef2ff; border-bottom-color: #4f46e5; color: #1e1b4b; font-weight: 500; box-shadow: inset 0 -2px 0 #4f46e5; }
         
         /* PiP Mode Class */
         .yt-pip-mode {
@@ -90,9 +90,9 @@
     </div>
 
     <!-- Modal: Edit Word -->
-    <div id="edit-word-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="edit-word-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeEditModal()">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full relative">
-            <button onclick="closeEditModal()" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700 font-bold text-2xl">&times;</button>
+            <button type="button" onclick="closeEditModal()" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700 font-bold text-3xl z-20">&times;</button>
             <h3 class="text-xl font-bold text-slate-800 mb-4">Редагувати слово</h3>
             
             <input type="hidden" id="edit-word-id">
@@ -109,7 +109,18 @@
                 <textarea id="edit-word-ctx" rows="3" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm custom-scroll"></textarea>
             </div>
             
-            <button onclick="saveEditedWord()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold shadow-sm transition">Зберегти зміни</button>
+            <div class="mb-4 border-t border-slate-100 pt-3">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Зображення</label>
+                    <button type="button" onclick="searchEditImages()" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1 rounded font-bold transition shadow-sm border border-indigo-100 z-10 relative">Шукати інші</button>
+                </div>
+                <img id="edit-word-img-preview" class="w-full h-28 rounded-xl object-cover mb-2 hidden bg-slate-100 shadow-inner" onerror="imgError(this)">
+                <div id="edit-img-options" class="grid grid-cols-4 gap-2 hidden mb-2"></div>
+                <p id="edit-img-status" class="text-xs text-slate-500 hidden font-bold"></p>
+                <input type="hidden" id="edit-word-new-imgUrl">
+            </div>
+            
+            <button type="button" onclick="saveEditedWord()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold shadow-sm transition relative z-10">Зберегти зміни</button>
         </div>
     </div>
 
@@ -443,7 +454,8 @@
     </main>
 
     <!-- Inline Popup -->
-    <div id="inline-popup" class="hidden absolute z-[100] bg-white rounded-xl shadow-2xl border border-slate-200 p-4 w-72 transform -translate-x-1/2 transition-opacity">
+    <!-- ЗМІНЕНО: Прибрано transform -translate-x-1/2 та додано max-w-[90vw] -->
+    <div id="inline-popup" class="hidden absolute z-[100] bg-white rounded-xl shadow-2xl border border-slate-200 p-4 w-72 max-w-[90vw] transition-opacity">
         <div class="flex justify-between items-start mb-2">
             <strong id="inline-popup-word" class="text-lg text-indigo-700 font-bold break-words pr-2"></strong>
             <button onclick="closeInlinePopup()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
@@ -497,6 +509,9 @@
 
         const MAX_SRS_LEVEL = 4;
         const SRS_INTERVALS = [0, 3 * 3600000, 12 * 3600000, 24 * 3600000, 72 * 3600000];
+
+        // ЗМІНЕНО: Ініціалізуємо звук завершення тренування
+        const sessionEndAudio = new Audio("https://files.catbox.moe/lkmm5l.mp3");
 
         let app, auth, db;
         let activeUid = null;
@@ -592,7 +607,7 @@
             const fallbackImg = `https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&auto=format&fit=crop&q=60`;
             if(!UNSPLASH_ACCESS_KEY || UNSPLASH_ACCESS_KEY.includes("ТВІЙ_КЛЮЧ")) return fallbackImg;
             try {
-                const cleanWord = word.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
+                const cleanWord = word.trim();
                 const res = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(cleanWord)}&per_page=1&client_id=${UNSPLASH_ACCESS_KEY}`);
                 if (!res.ok) return fallbackImg;
                 const data = await res.json();
@@ -652,17 +667,72 @@
             const word = vocabulary.find(v => v.id === id); if(!word) return;
             document.getElementById('edit-word-id').value = id; document.getElementById('edit-word-en').value = word.word;
             document.getElementById('edit-word-uk').value = word.translation; document.getElementById('edit-word-ctx').value = word.context || '';
+            
+            const imgPreview = document.getElementById('edit-word-img-preview');
+            document.getElementById('edit-word-new-imgUrl').value = word.imageUrl || '';
+            if (word.imageUrl) { imgPreview.src = word.imageUrl; imgPreview.classList.remove('hidden'); } else { imgPreview.classList.add('hidden'); }
+            document.getElementById('edit-img-options').classList.add('hidden');
+            document.getElementById('edit-img-status').classList.add('hidden');
+
             document.getElementById('edit-word-modal').classList.remove('hidden');
         };
         window.closeEditModal = () => document.getElementById('edit-word-modal').classList.add('hidden');
         
+        window.searchEditImages = async () => {
+            const word = document.getElementById('edit-word-en').value.trim();
+            const status = document.getElementById('edit-img-status');
+            const optionsContainer = document.getElementById('edit-img-options');
+            if(!word) return;
+            
+            status.textContent = "Шукаємо..."; status.classList.remove('hidden');
+            optionsContainer.innerHTML = ''; optionsContainer.classList.add('hidden');
+
+            const fallbackImg = `https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&auto=format&fit=crop&q=60`;
+            if(!UNSPLASH_ACCESS_KEY || UNSPLASH_ACCESS_KEY.includes("ТВІЙ_КЛЮЧ")) {
+                status.textContent = "Немає ключа Unsplash. Показано стандартне.";
+                optionsContainer.innerHTML = `<img src="${fallbackImg}" class="w-full h-16 object-cover rounded-lg cursor-pointer col-span-4" onclick="selectEditImage('${fallbackImg}')">`;
+                optionsContainer.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const cleanWord = word.trim();
+                const res = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(cleanWord)}&per_page=4&client_id=${UNSPLASH_ACCESS_KEY}`);
+                if (!res.ok) throw new Error("API Limit");
+                const data = await res.json();
+                
+                if(data.results && data.results.length > 0) {
+                    optionsContainer.innerHTML = data.results.map(r => `
+                        <img src="${r.urls.regular}" class="w-full h-16 object-cover rounded-lg cursor-pointer hover:border-2 hover:border-indigo-500 transition shadow-sm" 
+                             onclick="selectEditImage('${r.urls.regular}')" onerror="imgError(this)">
+                    `).join('');
+                    optionsContainer.classList.remove('hidden');
+                    status.classList.add('hidden');
+                } else {
+                    status.textContent = "Нічого не знайдено.";
+                }
+            } catch(e) {
+                status.textContent = "Ліміт запитів вичерпано. Використовуйте стандартне.";
+                optionsContainer.innerHTML = `<img src="${fallbackImg}" class="w-full h-16 object-cover rounded-lg cursor-pointer col-span-4 shadow-sm" onclick="selectEditImage('${fallbackImg}')">`;
+                optionsContainer.classList.remove('hidden');
+            }
+        };
+
+        window.selectEditImage = (url) => {
+            document.getElementById('edit-word-new-imgUrl').value = url;
+            const imgPreview = document.getElementById('edit-word-img-preview');
+            imgPreview.src = url;
+            imgPreview.classList.remove('hidden');
+        };
+
         window.saveEditedWord = async () => {
             const id = document.getElementById('edit-word-id').value;
             const word = document.getElementById('edit-word-en').value.trim(); 
             const translation = document.getElementById('edit-word-uk').value.trim(); 
             const context = document.getElementById('edit-word-ctx').value.trim();
+            const imageUrl = document.getElementById('edit-word-new-imgUrl').value;
             if(!word || !translation || !activeUid) return;
-            try { await updateDoc(doc(db, 'users', activeUid, 'words', id), { word, translation, context }); closeEditModal(); } catch(e) {}
+            try { await updateDoc(doc(db, 'users', activeUid, 'words', id), { word, translation, context, imageUrl }); closeEditModal(); } catch(e) {}
         };
 
         window.exportWordsJSON = () => {
@@ -1073,8 +1143,8 @@
             if(!currentMaterial) return; const container = document.getElementById('reader-content'); const savedWordsMap = new Set(vocabulary.map(v => v.word.toLowerCase()));
             if (currentMaterial.subtitles) {
                 const subs = JSON.parse(currentMaterial.subtitles); let finalHtml = '';
-                subs.forEach(sub => finalHtml += `<div class="yt-sub-line" data-start="${sub.start}" data-end="${sub.end}" onclick="seekVideo(${sub.start})">${wrapWords(sub.text, savedWordsMap)}</div>`);
-                container.innerHTML = finalHtml;
+                subs.forEach(sub => finalHtml += `<span class="yt-sub-line" data-start="${sub.start}" data-end="${sub.end}" onclick="seekVideo(${sub.start})">${wrapWords(sub.text, savedWordsMap)}</span> `);
+                container.innerHTML = `<div class="leading-[2.2] text-justify">${finalHtml}</div>`;
             } else {
                 const lines = currentMaterial.content.split('\n'); let finalHtml = '';
                 lines.forEach(lineText => { if(!lineText.trim()) return; finalHtml += `<div class="mb-4">${wrapWords(lineText, savedWordsMap)}</div>`; });
@@ -1086,7 +1156,16 @@
         document.getElementById('reader-content').addEventListener('click', (e) => {
             if (e.target.classList.contains('word-clickable') && window.getSelection().toString().trim().length === 0) {
                 e.stopPropagation(); const word = e.target.getAttribute('data-word'); const rect = e.target.getBoundingClientRect();
-                inlinePopup.style.top = `${window.scrollY + rect.bottom + 8}px`; inlinePopup.style.left = `${Math.max(10, rect.left + rect.width/2 - 144)}px`; 
+                
+                // ЗМІНЕНО: тепер ширина береться фактична, але не більше 90% екрану, щоб уникнути обрізання
+                const popupWidth = Math.min(288, window.innerWidth * 0.9);
+                const padding = 10;
+                const maxLeft = window.innerWidth - popupWidth - padding;
+                let calculatedLeft = rect.left + (rect.width / 2) - (popupWidth / 2);
+                calculatedLeft = Math.max(padding, Math.min(calculatedLeft, maxLeft));
+                
+                inlinePopup.style.top = `${window.scrollY + rect.bottom + 8}px`; 
+                inlinePopup.style.left = `${calculatedLeft}px`; 
                 processInlineTranslationRequest(word, currentMaterial.content);
             }
         });
@@ -1115,7 +1194,8 @@
                 document.getElementById('inline-popup-save-btn').textContent = "Зберегти (Enter)";
             }
             document.getElementById('inline-popup-loader').classList.add('hidden'); document.getElementById('inline-popup-trans-input').value = transText; document.getElementById('inline-popup-save-btn').classList.remove('hidden');
-            pendingInlineSaveData = { word: queryStr, context: sentence }; document.getElementById('inline-popup-trans-input').focus();
+            pendingInlineSaveData = { word: queryStr, context: sentence }; document.getElementById('inline-popup-trans-input')
+            //.focus(); ФОКУС ПРИБРАНО
         }
 
         window.selectInlineTranslation = (text) => { document.getElementById('inline-popup-trans-input').value = text; }
@@ -1262,6 +1342,13 @@
             } catch(e) { console.error(e); }
 
             document.getElementById('bs-results').classList.remove('hidden');
+
+            // ЗМІНЕНО: Програвання звуку при завершенні тренування
+            if (!isGlobalAudioMuted) {
+                sessionEndAudio.currentTime = 0;
+                sessionEndAudio.play().catch(e => console.log("Audio play error:", e));
+            }
+
             document.getElementById('bs-results-list').innerHTML = bsWords.map(w => {
                 let currentLevel = 0;
                 if (activeSessionMode === 'all' || activeSessionMode === 'review') currentLevel = w.srsLevel || 0;
