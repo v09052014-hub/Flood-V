@@ -17,7 +17,7 @@
         .word-clickable { cursor: pointer; border-radius: 4px; transition: all 0.2s; padding: 0 2px; border-bottom: 1px dotted transparent; }
         .word-clickable:hover { background-color: #e0e7ff; color: #4338ca; border-bottom-color: #4338ca; }
         
-        /* Легкий світло-зелений фон, без зміни товщини шрифту та кольору тексту */
+        /* Saved Word Class */
         .word-saved { background-color: #d1fae5; padding: 2px 4px; border-radius: 4px; border: none; font-weight: inherit; color: inherit; }
         .word-saved:hover { background-color: #bbf7d0; border: none; }
         
@@ -503,7 +503,7 @@
             Зберегти (Enter)
         </button>
 
-        <!-- Collapsible English Dictionary Section -->
+        <!-- Collapsible Dictionary Section -->
         <div id="inline-dict-section" class="mt-2 pt-2 border-t border-slate-100 hidden">
             <button onclick="toggleInlineDict()" class="w-full flex justify-between items-center text-xs font-bold text-slate-500 hover:text-indigo-600 transition outline-none">
                 <span class="flex items-center gap-1">📖 Англійське тлумачення</span>
@@ -550,6 +550,23 @@
         const SRS_INTERVALS = [0, 3 * 3600000, 12 * 3600000, 24 * 3600000, 72 * 3600000];
 
         const sessionEndAudio = new Audio("https://files.catbox.moe/lkmm5l.mp3");
+
+        // PROACTIVE PRELOADING FOR AUDIO BUFFERS (To avoid latency during gameplay)
+        const sprintCorrectAudio = new Audio("https://file.garden/alYiOQx5lAiBA0qQ/Correct%20Answer%20Light%20Sound.mp3");
+        sprintCorrectAudio.preload = "auto";
+        sprintCorrectAudio.load();
+
+        const sprintWrongAudio = new Audio("https://file.garden/alYiOQx5lAiBA0qQ/Wrong%20Answer%20Short%20Light%20Sound.mp3");
+        sprintWrongAudio.preload = "auto";
+        sprintWrongAudio.load();
+
+        const sprintCountdownAudio = new Audio("https://file.garden/alYiOQx5lAiBA0qQ/Three%20Short%20Sounds%20Countdown.mp3");
+        sprintCountdownAudio.preload = "auto";
+        sprintCountdownAudio.load();
+
+        const sprintGongAudio = new Audio("https://file.garden/alYiOQx5lAiBA0qQ/kave_msri-ding-sfx-330333.mp3");
+        sprintGongAudio.preload = "auto";
+        sprintGongAudio.load();
 
         let app, auth, db;
         let activeUid = null;
@@ -993,7 +1010,7 @@
         window.fetchArticleText = async (e) => {
             const url = document.getElementById('material-url').value.trim(); if(!url) return;
             const btn = e ? e.currentTarget : document.querySelector('#mode-url-area button');
-            const originalBtnText = btn ? btn.textContent : 'Витягнути text';
+            const originalBtnText = btn ? btn.textContent : 'Витягнути текст';
             if (btn) btn.textContent = 'Обробка...';
             
             try {
@@ -1252,13 +1269,12 @@
             }
         });
 
-        // Додано підтримку перекладу виділених фраз (selection)
+        // Selection support for phrases/expressions
         const handleTextSelection = (e) => {
             setTimeout(() => {
                 const selection = window.getSelection();
                 const text = selection.toString().trim();
                 
-                // Перевіряємо, чи виділено валідний фрагмент (обмеження в 150 символів)
                 if (text.length > 0 && text.length <= 150 && !text.includes('\n\n')) {
                     const range = selection.getRangeAt(0);
                     const rect = range.getBoundingClientRect();
@@ -1327,7 +1343,7 @@
             dictContent.innerHTML = '';
             dictArrow.textContent = '▼';
 
-            let sentence = ""; const pureText = currentMaterial.subtitles ? JSON.parse(currentMaterial.subtitles).map(s=>s.text).join(' ') : fullText;
+            let sentence = ""; const pureText = currentMaterial && currentMaterial.subtitles ? JSON.parse(currentMaterial.subtitles).map(s=>s.text).join(' ') : fullText;
             const idx = pureText.toLowerCase().indexOf(query);
             if(idx !== -1) { const start = Math.max(0, pureText.lastIndexOf('.', idx) + 1); let end = pureText.indexOf('.', idx); if(end === -1) end = pureText.length; sentence = pureText.substring(start, end + 1).trim(); }
 
@@ -1344,9 +1360,7 @@
             }
             document.getElementById('inline-popup-loader').classList.add('hidden'); document.getElementById('inline-popup-trans-input').value = transText; document.getElementById('inline-popup-save-btn').classList.remove('hidden');
             pendingInlineSaveData = { word: queryStr, context: sentence }; 
-            // document.getElementById('inline-popup-trans-input').focus(); /* Вимкнено автоматичний фокус для мобільних */
 
-            // Пошук у безкоштовному Dictionary API
             fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(query)}`)
                 .then(res => res.ok ? res.json() : null)
                 .then(data => {
@@ -1411,7 +1425,6 @@
             modal.classList.remove('hidden');
         };
 
-        // ТРЕНУВАННЯ ТА КРОСВОРД
         let bsWords = [], bsCurrentWordIdx = 0, bsCurrentStage = 0, bsTotalSteps = 0, bsCompletedSteps = 0;
         let activeSessionMode = 'all'; 
         let currentCrossword = null;
@@ -1495,6 +1508,16 @@
                 extClues.classList.remove('hidden');
             } else {
                 if (mode === 'sprint') {
+                    // Reset Sprint variables
+                    window._sprintCountdownActive = true;
+                    sprintTimeLeft = 60;
+                    sprintScore = 0;
+                    sprintStreak = 0;
+                    sprintWordsStats = {};
+                    if (sprintTimer) {
+                        clearInterval(sprintTimer);
+                        sprintTimer = null;
+                    }
                     bsWords = pool.sort(() => 0.5 - Math.random()).slice(0, 40);
                     if (bsWords.length < 8) {
                         let extras = vocabulary.filter(w => !bsWords.includes(w)).sort(() => 0.5 - Math.random());
@@ -1665,7 +1688,7 @@
             const feedback = document.getElementById('bs-feedback');
             
             document.querySelectorAll('#bs-test-opts button').forEach(x => x.disabled = true);
-            const inp = document.getElementById('bs-type-input') || document.getElementById('ctx-type-input'); if(inp) inp.disabled = true;
+            const inp = document.getElementById('bs-type-input') || document.getElementById('ctx-type-input') || document.getElementById('bs-pic-input'); if(inp) inp.disabled = true;
 
             feedback.innerHTML = `<span class="text-rose-500 font-bold text-base bg-rose-50 px-3 py-1 rounded border border-rose-100">Правильно: ${word.word}</span>`; 
             triggerSuccessReveal(word);
@@ -1713,7 +1736,7 @@
             if (bsCurrentStage === 6) renderStageContext(word, area, btnNext, feedback);
             if (bsCurrentStage === 7) { renderStageCrossword(area, btnNext, feedback); document.getElementById('bs-btn-dont-know').classList.add('hidden'); }
             if (bsCurrentStage === 8) { renderStageSprint(area, btnNext, feedback); }
-            if (bsCurrentStage === 9) renderStagePicture(word, area, btnNext, feedback);
+            if (bsCurrentStage === 9) { renderStagePicture(word, area, btnNext, feedback); }
             
             if((bsCurrentStage === 0 || bsCurrentStage === 5) && !isGlobalAudioMuted) playAudioWord(word.word);
         }
@@ -1858,7 +1881,7 @@
                 </div>`;
                 
             const inp = document.getElementById('bs-pic-input'); 
-            setTimeout(()=>inp.focus(), 50); // Фокус при тренуванні зазвичай прийнятний, бо клавіатура вже відкрита або необхідна
+            setTimeout(()=>inp.focus(), 50);
             
             inp.addEventListener('keydown', (e) => {
                 if(e.key === 'Enter') {
@@ -1914,7 +1937,7 @@
                         }
                     } else {
                         if (i === 0 && startY > 0 && grid[startY - 1][x] !== null) return false;
-                        if (i === word.length - 1 && startY + word.length < size && grid[startY + word.length][x] !== null) return false;
+                        if (i === word.length - 1 && startY + word.length < size && grid[startY + word.length] !== null) return false;
                         if (currentCell === null) {
                             if (x > 0 && grid[y][x - 1] !== null) return false;
                             if (x < size - 1 && grid[y][x + 1] !== null) return false;
@@ -2276,53 +2299,87 @@
             document.getElementById('bs-btn-dont-know').classList.add('hidden');
             document.getElementById('bs-btn-next').classList.add('hidden');
 
+            // Play countdown sound and display beautiful countdown page before the game starts
+            if (window._sprintCountdownActive) {
+                if (!isGlobalAudioMuted) {
+                    sprintCountdownAudio.currentTime = 0;
+                    sprintCountdownAudio.play().catch(e => console.log("Audio play blocked", e));
+                }
+
+                area.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-12 select-none h-64">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 animate-pulse">Приготуйтеся до старту</div>
+                        <div id="sprint-countdown-number" class="text-9xl font-black text-indigo-600 transition-all duration-300 transform scale-100">3</div>
+                    </div>
+                `;
+
+                let count = 3;
+                const numEl = document.getElementById('sprint-countdown-number');
+                const interval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        if (numEl) {
+                            numEl.classList.remove('scale-100');
+                            numEl.classList.add('scale-50', 'opacity-0');
+                            setTimeout(() => {
+                                numEl.textContent = count;
+                                numEl.classList.remove('scale-50', 'opacity-0');
+                                numEl.classList.add('scale-100');
+                            }, 100);
+                        }
+                    } else {
+                        clearInterval(interval);
+                        if (!isGlobalAudioMuted) {
+                            sprintGongAudio.currentTime = 0;
+                            sprintGongAudio.play().catch(e => console.log("Gong error", e));
+                        }
+                        window._sprintCountdownActive = false;
+                        renderStageSprint(area, btnNext, feedback); // Render game board
+                    }
+                }, 1000);
+                return;
+            }
+
+            // Sprint gameplay screen - clean, elegant, professional layout
             area.innerHTML = `
                 <div class="flex flex-col items-center justify-center w-full max-w-md mx-auto py-2">
                     <!-- Dashboard Indicators -->
-                    <div class="flex justify-between items-center w-full mb-5 px-3 bg-slate-50 p-3 rounded-2xl border border-slate-200/50 shadow-inner">
-                        <div class="flex items-center gap-1.5 bg-white py-1 px-3.5 rounded-full border border-slate-100 shadow-sm">
-                            <span class="text-xl">⏳</span>
-                            <span id="sprint-timer-val" class="font-extrabold text-2xl text-indigo-600 tabular-nums">60s</span>
+                    <div class="flex justify-between items-center w-full mb-6 px-4 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/50 shadow-inner">
+                        <div class="flex items-center gap-2 bg-white py-1.5 px-4 rounded-full border border-slate-100 shadow-sm">
+                            <span class="text-lg">⏳</span>
+                            <span id="sprint-timer-val" class="font-extrabold text-xl text-slate-700 tabular-nums">${sprintTimeLeft}s</span>
                         </div>
                         <div class="flex flex-col items-end">
                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Рахунок</span>
-                            <span id="sprint-score-val" class="font-black text-3xl text-indigo-700 tabular-nums">0</span>
+                            <span id="sprint-score-val" class="font-black text-2xl text-indigo-600 tabular-nums">${sprintScore}</span>
                         </div>
                     </div>
 
-                    <!-- Interactive Streak Board -->
-                    <div id="sprint-streak-container" class="mb-5 transform transition-all duration-300 scale-100 flex items-center gap-2 bg-indigo-50 border border-indigo-100 px-5 py-2 rounded-full shadow-sm">
-                        <span class="text-lg">🔥</span>
-                        <span id="sprint-streak-val" class="text-sm font-bold text-indigo-700">Стрік: 0 (x1 за відповідь)</span>
+                    <!-- Minimalist Streak flames -->
+                    <div id="sprint-streak-container" class="${sprintStreak > 0 ? '' : 'invisible'} mb-5 flex items-center gap-2 bg-amber-50 border border-amber-200/60 px-4 py-1.5 rounded-full shadow-sm transition-all duration-300">
+                        <span class="text-sm">🔥</span>
+                        <span id="sprint-streak-val" class="text-xs font-bold text-amber-700">Серія: ${sprintStreak}</span>
                     </div>
 
-                    <!-- Cards Displaying Words -->
-                    <div id="sprint-q-card" class="w-full bg-slate-50 border border-slate-200/60 rounded-2xl p-6 sm:p-8 min-h-[190px] flex flex-col justify-center items-center mb-6 transition-all duration-200 shadow-sm relative">
-                        <h3 id="sprint-q-word" class="text-3xl sm:text-4xl font-extrabold text-slate-800 tracking-tight mb-2 select-none"></h3>
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">це означає?</div>
-                        <p id="sprint-q-translation" class="text-2xl sm:text-3xl font-black text-indigo-600 italic select-none"></p>
+                    <!-- Clean Word Card -->
+                    <div id="sprint-q-card" class="w-full bg-white border border-slate-100 rounded-3xl p-8 min-h-[160px] flex flex-col justify-center items-center mb-8 transition-all duration-300 shadow-sm relative">
+                        <h3 id="sprint-q-word" class="text-3xl font-bold text-slate-800 tracking-tight mb-4 select-none"></h3>
+                        <p id="sprint-q-translation" class="text-2xl font-medium text-slate-500 italic select-none"></p>
                     </div>
 
-                    <!-- Touch Actions -->
-                    <div class="grid grid-cols-2 gap-4 w-full">
-                        <button onclick="submitSprintAnswer(false)" class="bg-rose-500 hover:bg-rose-600 text-white font-extrabold py-4 px-3 sm:px-6 rounded-2xl shadow-md active:scale-95 transition flex flex-col items-center justify-center gap-1">
-                            <span class="text-lg sm:text-xl">❌ Неправильно</span>
-                            <span class="text-[9px] text-rose-100 font-bold tracking-widest opacity-80 uppercase">[← Вліво]</span>
+                    <!-- Professional Touch Actions with arrow guides -->
+                    <div class="grid grid-cols-2 gap-4 w-full px-1">
+                        <button onclick="submitSprintAnswer(false)" class="bg-white hover:bg-rose-50/30 border border-slate-200 hover:border-rose-200 py-4 px-6 rounded-2xl font-bold text-slate-700 transition flex items-center justify-center gap-2 active:scale-95 shadow-sm text-base">
+                            <span class="text-lg text-rose-500">←</span> Неправильно
                         </button>
-                        <button onclick="submitSprintAnswer(true)" class="bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold py-4 px-3 sm:px-6 rounded-2xl shadow-md active:scale-95 transition flex flex-col items-center justify-center gap-1">
-                            <span class="text-lg sm:text-xl">Правильно ✅</span>
-                            <span class="text-[9px] text-emerald-100 font-bold tracking-widest opacity-80 uppercase">[Вправо →]</span>
+                        <button onclick="submitSprintAnswer(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white py-4 px-6 rounded-2xl font-bold transition flex items-center justify-center gap-2 active:scale-95 shadow-md text-base">
+                            Правильно <span class="text-lg text-indigo-200">→</span>
                         </button>
                     </div>
                 </div>
             `;
 
             if (!sprintTimer) {
-                sprintTimeLeft = 60;
-                sprintScore = 0;
-                sprintStreak = 0;
-                sprintWordsStats = {};
-                
                 sprintTimer = setInterval(() => {
                     sprintTimeLeft--;
                     bsCompletedSteps = 60 - sprintTimeLeft;
@@ -2380,6 +2437,12 @@
             const cardEl = document.getElementById('sprint-q-card');
 
             if (isCorrectAnswer) {
+                // Play correct audio answer
+                if (!isGlobalAudioMuted) {
+                    sprintCorrectAudio.currentTime = 0;
+                    sprintCorrectAudio.play().catch(e => console.log(e));
+                }
+
                 sprintWordsStats[wordId].correct++;
                 sprintStreak++;
                 
@@ -2387,41 +2450,40 @@
                 sprintScore += multiplier;
 
                 if (cardEl) {
-                    cardEl.classList.remove('border-slate-200/60');
-                    cardEl.classList.add('bg-emerald-50', 'border-emerald-400');
+                    cardEl.classList.remove('border-slate-100');
+                    cardEl.classList.add('bg-emerald-50/30', 'border-emerald-300');
                     setTimeout(() => {
-                        cardEl.classList.remove('bg-emerald-50', 'border-emerald-400');
-                        cardEl.classList.add('border-slate-200/60');
-                    }, 180);
+                        cardEl.classList.remove('bg-emerald-50/30', 'border-emerald-300');
+                        cardEl.classList.add('border-slate-100');
+                    }, 200);
                 }
 
                 if (streakContainer) {
+                    streakContainer.classList.remove('invisible');
                     const streakValEl = document.getElementById('sprint-streak-val');
-                    if (streakValEl) streakValEl.textContent = `Стрік: ${sprintStreak} (x${multiplier} за відповідь)`;
-                    
-                    if (sprintStreak > 0 && sprintStreak % 10 === 0) {
-                        streakContainer.classList.add('scale-110', 'bg-amber-100', 'border-amber-300');
-                        setTimeout(() => {
-                            streakContainer.classList.remove('scale-110', 'bg-amber-100', 'border-amber-300');
-                        }, 400);
-                    }
+                    if (streakValEl) streakValEl.textContent = `Серія: ${sprintStreak}`;
                 }
             } else {
+                // Play wrong audio answer
+                if (!isGlobalAudioMuted) {
+                    sprintWrongAudio.currentTime = 0;
+                    sprintWrongAudio.play().catch(e => console.log(e));
+                }
+
                 sprintWordsStats[wordId].wrong++;
                 sprintStreak = 0; 
 
                 if (cardEl) {
-                    cardEl.classList.remove('border-slate-200/60');
-                    cardEl.classList.add('bg-rose-50', 'border-rose-400', 'animate-shake');
+                    cardEl.classList.remove('border-slate-100');
+                    cardEl.classList.add('bg-rose-50/30', 'border-rose-300', 'animate-shake');
                     setTimeout(() => {
-                        cardEl.classList.remove('bg-rose-50', 'border-rose-400', 'animate-shake');
-                        cardEl.classList.add('border-slate-200/60');
-                    }, 180);
+                        cardEl.classList.remove('bg-rose-50/30', 'border-rose-300', 'animate-shake');
+                        cardEl.classList.add('border-slate-100');
+                    }, 250);
                 }
 
                 if (streakContainer) {
-                    const streakValEl = document.getElementById('sprint-streak-val');
-                    if (streakValEl) streakValEl.textContent = `Стрік: 0 (x1 за відповідь)`;
+                    streakContainer.classList.add('invisible');
                 }
             }
 
