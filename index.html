@@ -280,6 +280,13 @@
                     <span class="text-2xl">+</span> Додати новий матеріал
                 </button>
                 <div id="materials-grid" class="space-y-4"></div>
+                
+                <!-- Пагінація бібліотеки -->
+                <div id="library-pagination" class="flex justify-between items-center mt-6 pt-4 border-t border-slate-200 hidden">
+                    <button onclick="changeLibraryPage(-1)" id="btn-lib-prev" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-xl font-bold text-sm shadow-sm hover:bg-slate-50 disabled:opacity-50 transition flex items-center gap-1">← Назад</button>
+                    <span id="lib-page-info" class="text-sm font-bold text-slate-500">Сторінка 1 з 1</span>
+                    <button onclick="changeLibraryPage(1)" id="btn-lib-next" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-xl font-bold text-sm shadow-sm hover:bg-slate-50 disabled:opacity-50 transition flex items-center gap-1">Вперед →</button>
+                </div>
             </div>
 
             <!-- Add Mode -->
@@ -346,8 +353,15 @@
                     <div id="reader-yt-player" class="w-full h-full"></div>
                 </div>
                 
-                <div id="reader-content-wrapper" class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 relative">
+                <div id="reader-content-wrapper" class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 relative mb-4">
                     <div id="reader-content" class="text-reader text-lg leading-[2]"></div>
+                </div>
+
+                <!-- Навігація читача сторінок -->
+                <div id="reader-pagination" class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
+                    <button onclick="changeReaderPage(-1)" id="btn-reader-prev" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition">← Попередня сторінка</button>
+                    <span id="reader-page-info" class="text-sm font-bold text-slate-500">Сторінка 1 з 1</span>
+                    <button onclick="changeReaderPage(1)" id="btn-reader-next" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition">Наступна сторінка →</button>
                 </div>
             </div>
         </section>
@@ -479,6 +493,13 @@
             <div id="bs-results" class="hidden bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-100 text-center mt-6">
                 <div class="text-6xl mb-4">🏆</div>
                 <h2 class="text-2xl font-bold text-slate-800 mb-2">Завершено!</h2>
+                
+                <!-- Топ-3 Спринт результати (показується тільки у Спринті) -->
+                <div id="sprint-leaderboard" class="hidden mb-6 bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-left max-w-sm mx-auto">
+                    <h4 class="font-bold text-indigo-800 text-sm uppercase mb-2 flex items-center gap-1.5">⚡ Топ-3 Рекорди:</h4>
+                    <ol id="sprint-leaderboard-list" class="space-y-1.5 text-slate-700 font-bold text-sm"></ol>
+                </div>
+
                 <div id="bs-results-list" class="text-left bg-slate-50 p-4 sm:p-5 rounded-xl mb-8 max-h-60 overflow-y-auto space-y-3 border border-slate-200 custom-scroll"></div>
                 <button onclick="endSession()" class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg w-full shadow-lg active:scale-95 transition">До вибору тренувань</button>
             </div>
@@ -509,7 +530,7 @@
                 <span class="flex items-center gap-1">📖 Англійське тлумачення</span>
                 <span id="inline-dict-arrow">▼</span>
             </button>
-            <div id="inline-dict-content" class="hidden mt-2 text-xs text-slate-600 max-h-40 overflow-y-auto custom-scroll space-y-1.5 text-left"></div>
+            <div id="inline-dict-content" class="hidden mt-2 text-slate-600 max-h-40 overflow-y-auto custom-scroll space-y-1.5 text-left"></div>
         </div>
     </div>
 
@@ -531,7 +552,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARJpUlEfJ53Q1a9qd9fyYC6gmHY58AKfI",
@@ -551,7 +572,7 @@
 
         const sessionEndAudio = new Audio("https://files.catbox.moe/lkmm5l.mp3");
 
-        // PROACTIVE PRELOADING FOR AUDIO BUFFERS (To avoid latency during gameplay)
+        // PROACTIVE PRELOADING FOR AUDIO BUFFERS
         const sprintCorrectAudio = new Audio("https://file.garden/alYiOQx5lAiBA0qQ/Correct%20Answer%20Light%20Sound.mp3");
         sprintCorrectAudio.preload = "auto";
         sprintCorrectAudio.load();
@@ -577,12 +598,22 @@
         let currentDictFilter = 'all'; 
         let specificMaterialName = '';
 
+        // Пагінація бібліотеки
+        let libraryCurrentPage = 1;
+        const MATERIALS_PER_PAGE = 20;
+
+        // Пагінація читалки
+        let readerCurrentPage = 1;
+        let readerTotalPages = 1;
+        let readerPages = [];
+
         let sprintTimer = null;
         let sprintTimeLeft = 60;
         let sprintScore = 0;
         let sprintStreak = 0;
         let sprintWordsStats = {};
         let currentSprintQ = null;
+        let sprintHighScores = [];
 
         window.showModal = (text, confirmMode = false, onConfirm = null) => {
             document.getElementById('custom-modal').classList.remove('hidden');
@@ -646,6 +677,16 @@
                 snap.forEach(d => materials.push({ id: d.id, ...d.data() }));
                 materials.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
                 renderMaterials();
+            });
+
+            // Підписка на рекорди Спринту
+            const statsDocRef = doc(db, 'users', activeUid, 'stats', 'sprint');
+            onSnapshot(statsDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    sprintHighScores = docSnap.data().topScores || [];
+                } else {
+                    sprintHighScores = [];
+                }
             });
         }
 
@@ -933,6 +974,7 @@
                             c = p1.replace(/^["'«]|["'»]$/g, '');
                             const opts = await fetchTranslationOptions(w);
                             t = (opts && opts.length > 0) ? opts[0].text : "переклад";
+                            sprintWordsStats
                         } else {
                             t = p1;
                         }
@@ -988,8 +1030,22 @@
         };
 
         let addMaterialMode = 'text'; 
-        window.showAddTextForm = () => { document.getElementById('library-list-view').classList.add('hidden'); document.getElementById('library-add-view').classList.remove('hidden'); setAddMode('text'); };
-        window.cancelAddMaterial = () => { document.getElementById('library-add-view').classList.add('hidden'); document.getElementById('library-list-view').classList.remove('hidden'); document.getElementById('material-title').value=''; document.getElementById('material-content').value=''; document.getElementById('yt-preview-container').innerHTML = ''; currentYtId = ""; document.getElementById('yt-sub-raw').value = ''; document.getElementById('yt-sub-raw').classList.add('hidden'); };
+        window.showAddTextForm = () => { 
+            document.getElementById('library-list-view').classList.add('hidden'); 
+            document.getElementById('library-add-view').classList.remove('hidden'); 
+            setAddMode('text'); 
+        };
+        
+        window.cancelAddMaterial = () => { 
+            document.getElementById('library-add-view').classList.add('hidden'); 
+            document.getElementById('library-list-view').classList.remove('hidden'); 
+            document.getElementById('material-title').value=''; 
+            document.getElementById('material-content').value=''; 
+            document.getElementById('yt-preview-container').innerHTML = ''; 
+            currentYtId = ""; 
+            document.getElementById('yt-sub-raw').value = ''; 
+            document.getElementById('yt-sub-raw').classList.add('hidden'); 
+        };
         
         window.setAddMode = (mode) => {
             addMaterialMode = mode;
@@ -1104,20 +1160,62 @@
             } catch (err) { window.showModal("Помилка збереження."); }
         };
 
+        window.changeLibraryPage = (direction) => {
+            const totalPages = Math.ceil(materials.length / MATERIALS_PER_PAGE);
+            const newPage = libraryCurrentPage + direction;
+            if (newPage >= 1 && newPage <= totalPages) {
+                libraryCurrentPage = newPage;
+                renderMaterials();
+            }
+        };
+
         function renderMaterials() {
-            document.getElementById('materials-grid').innerHTML = materials.map(m => `
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 cursor-pointer hover:border-indigo-400 transition flex justify-between items-center group relative overflow-hidden" onclick="openReader('${m.id}')">
+            const totalPages = Math.ceil(materials.length / MATERIALS_PER_PAGE) || 1;
+            if (libraryCurrentPage > totalPages) libraryCurrentPage = totalPages;
+
+            const startIdx = (libraryCurrentPage - 1) * MATERIALS_PER_PAGE;
+            const currentItems = materials.slice(startIdx, startIdx + MATERIALS_PER_PAGE);
+            
+            let html = currentItems.map(m => {
+                const isRead = m.isRead;
+                const readDate = isRead && m.readAt ? new Date(m.readAt).toLocaleString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+                return `
+                <div class="bg-white p-5 rounded-2xl shadow-sm border ${isRead ? 'border-slate-300 bg-slate-50' : 'border-slate-200'} cursor-pointer hover:border-indigo-400 transition flex justify-between items-center group relative overflow-hidden" onclick="openReader('${m.id}')">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${m.ytId ? 'bg-red-500' : 'bg-indigo-500'} opacity-0 group-hover:opacity-100 transition"></div>
-                    <div class="flex-1 truncate pl-2">
-                        <h3 class="font-bold text-slate-800 truncate text-lg flex items-center gap-2">${m.ytId ? '<span class="text-red-500">📺</span>' : ''} ${m.title}</h3>
-                        <p class="text-sm text-slate-500 mt-1 truncate font-medium">${m.content ? m.content.substring(0, 80) + '...' : 'Відео матеріал'}</p>
+                    <div class="flex-1 truncate pl-2 ${isRead ? 'opacity-80' : ''}">
+                        <h3 class="font-bold ${isRead ? 'text-slate-600' : 'text-slate-800'} truncate text-lg flex items-center gap-2">
+                            ${isRead ? '<span class="text-slate-400" title="Опрацьовано">✅</span>' : ''} 
+                            ${m.ytId ? '<span class="text-red-500">📺</span>' : ''} ${m.title}
+                        </h3>
+                        <p class="text-sm text-slate-500 mt-1 truncate font-medium">
+                            ${isRead && readDate ? `<span class="text-slate-500 text-xs font-medium mr-2 border border-slate-200 bg-slate-100 px-1.5 py-0.5 rounded shadow-sm">Опрацьовано: ${readDate}</span>` : ''}
+                            ${m.content ? m.content.substring(0, 80) + '...' : 'Відео матеріал'}
+                        </p>
                     </div>
                     <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition ml-3">
                         <button onclick="event.stopPropagation(); openEditMaterialModal('${m.id}')" class="text-slate-400 hover:text-indigo-600 p-2 text-xl font-bold bg-white rounded-full">✏️</button>
                         <button onclick="event.stopPropagation(); deleteMaterial('${m.id}')" class="text-slate-300 hover:text-rose-500 p-2 text-2xl font-bold bg-white rounded-full">&times;</button>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
+
+            if (materials.length === 0) {
+                html = `<p class="text-slate-500 text-center font-bold py-10">Тут ще немає доданих матеріалів. Створіть перший!</p>`;
+            }
+
+            document.getElementById('materials-grid').innerHTML = html;
+
+            // Рендер навігації
+            const pagPanel = document.getElementById('library-pagination');
+            if (materials.length > MATERIALS_PER_PAGE) {
+                pagPanel.classList.remove('hidden');
+                document.getElementById('lib-page-info').textContent = `Сторінка ${libraryCurrentPage} з ${totalPages}`;
+                document.getElementById('btn-lib-prev').disabled = (libraryCurrentPage === 1);
+                document.getElementById('btn-lib-next').disabled = (libraryCurrentPage === totalPages);
+            } else {
+                pagPanel.classList.add('hidden');
+            }
         }
 
         window.deleteMaterial = (id) => { window.showModal("Видалити матеріал?", true, async () => await deleteDoc(doc(db, 'users', activeUid, 'materials', id))); };
@@ -1136,12 +1234,79 @@
 
         let ytPlayer = null; let syncInterval = null;
 
+        // Розбиття великих матеріалів на сторінки (сторінка ~ 10 хвилин читання)
+        // Швидкість читання ~ 180 слів за хвилину. 10 хвилин = 1800 слів = ~10000 символів.
+        function paginateTextMaterial(content, limit = 8000) {
+            if (!content) return [""];
+            const paragraphs = content.split('\n');
+            const pages = [];
+            let currentPageStr = "";
+
+            paragraphs.forEach(para => {
+                if ((currentPageStr.length + para.length) > limit && currentPageStr.trim().length > 0) {
+                    pages.push(currentPageStr.trim());
+                    currentPageStr = para + "\n";
+                } else {
+                    currentPageStr += para + "\n";
+                }
+            });
+
+            if (currentPageStr.trim().length > 0) {
+                pages.push(currentPageStr.trim());
+            }
+
+            return pages;
+        }
+
+        function paginateSubtitlesMaterial(subtitlesStr, limit = 8000) {
+            if (!subtitlesStr) return [[]];
+            try {
+                const subs = JSON.parse(subtitlesStr);
+                const pages = [];
+                let currentPageSubs = [];
+                let currentLength = 0;
+
+                subs.forEach(sub => {
+                    const subTextLen = sub.text.length;
+                    if ((currentLength + subTextLen) > limit && currentPageSubs.length > 0) {
+                        pages.push(currentPageSubs);
+                        currentPageSubs = [sub];
+                        currentLength = subTextLen;
+                    } else {
+                        currentPageSubs.push(sub);
+                        currentLength += subTextLen;
+                    }
+                });
+
+                if (currentPageSubs.length > 0) {
+                    pages.push(currentPageSubs);
+                }
+
+                return pages;
+            } catch (e) {
+                return [[]];
+            }
+        }
+
         window.openReader = (id) => {
             const m = materials.find(x => x.id === id); if(!m) return;
             currentMaterial = m;
-            document.getElementById('library-list-view').classList.add('hidden'); document.getElementById('library-read-view').classList.remove('hidden');
+            document.getElementById('library-list-view').classList.add('hidden'); 
+            document.getElementById('library-add-view').classList.add('hidden');
+            document.getElementById('library-read-view').classList.remove('hidden');
             document.getElementById('reader-title').textContent = m.title;
             const ytWrapper = document.getElementById('reader-yt-wrapper');
+
+            // Розрахунок пагінації тексту
+            if (m.subtitles) {
+                readerPages = paginateSubtitlesMaterial(m.subtitles, 8000);
+            } else {
+                readerPages = paginateTextMaterial(m.content, 8000);
+            }
+            readerTotalPages = readerPages.length;
+            
+            // Відкриваємо останню сторінку, на якій користувач зупинився
+            readerCurrentPage = m.lastPage && m.lastPage <= readerTotalPages ? m.lastPage : 1;
 
             if(m.ytId) {
                 ytWrapper.classList.remove('hidden'); ytWrapper.classList.remove('yt-pip-mode'); initYouTubePlayer(m.ytId);
@@ -1151,8 +1316,19 @@
             window.scrollTo({top: 0});
         };
 
-        window.closeReader = () => { 
-            document.getElementById('library-read-view').classList.add('hidden'); document.getElementById('library-list-view').classList.remove('hidden'); 
+        window.closeReader = async () => { 
+            // Збереження прогресу читання перед виходом
+            if (activeUid && currentMaterial) {
+                try {
+                    await updateDoc(doc(db, 'users', activeUid, 'materials', currentMaterial.id), {
+                        lastPage: readerCurrentPage
+                    });
+                    currentMaterial.lastPage = readerCurrentPage;
+                } catch (e) { console.error("Error saving reading position: ", e); }
+            }
+
+            document.getElementById('library-read-view').classList.add('hidden'); 
+            document.getElementById('library-list-view').classList.remove('hidden'); 
             if(ytPlayer && typeof ytPlayer.destroy === 'function') { ytPlayer.destroy(); ytPlayer = null; }
             if(syncInterval) clearInterval(syncInterval); closeInlinePopup(); 
             window.removeEventListener('scroll', handlePiPScroll);
@@ -1203,13 +1379,56 @@
             } return html;
         }
 
+        window.changeReaderPage = (direction) => {
+            const newPage = readerCurrentPage + direction;
+            if (newPage >= 1 && newPage <= readerTotalPages) {
+                // Зберігаємо поточну сторінку у базі при зміні
+                if (activeUid && currentMaterial) {
+                    updateDoc(doc(db, 'users', activeUid, 'materials', currentMaterial.id), {
+                        lastPage: newPage
+                    }).catch(err => console.error(err));
+                    currentMaterial.lastPage = newPage;
+                }
+                readerCurrentPage = newPage;
+                renderReaderContent();
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+        };
+
+        window.markCurrentAsRead = async () => {
+            if (!activeUid || !currentMaterial) return;
+            try {
+                await updateDoc(doc(db, 'users', activeUid, 'materials', currentMaterial.id), {
+                    isRead: true,
+                    readAt: Date.now()
+                });
+                currentMaterial.isRead = true;
+                currentMaterial.readAt = Date.now();
+                renderReaderContent();
+                window.showModal("Відмінно! Матеріал відмічено як опрацьований. 🎉");
+                closeReader();
+                renderMaterials();
+            } catch(e) {
+                console.error(e);
+            }
+        };
+
+        function renderMarkAsReadBtn() {
+            if (currentMaterial.isRead) {
+                return `<div class="mt-8 text-center p-4 bg-slate-100 rounded-xl border border-slate-200 text-slate-500 font-bold flex items-center justify-center gap-2 shadow-sm"><span>✅</span> Матеріал опрацьовано</div>`;
+            }
+            return `<button onclick="markCurrentAsRead()" class="mt-10 w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold font-sans text-lg shadow-md transition flex justify-center items-center gap-2 active:scale-95"><span>✅Позначити матеріал як опрацьований</span></button>`;
+        }
+
         function renderReaderContent() {
             if(!currentMaterial) return; 
             const container = document.getElementById('reader-content'); 
             const savedWordsMap = new Set(vocabulary.map(v => v.word.toLowerCase()));
             
+            const currentPageData = readerPages[readerCurrentPage - 1];
+
             if (currentMaterial.subtitles) {
-                const subs = JSON.parse(currentMaterial.subtitles); 
+                const subs = currentPageData || []; 
                 let finalHtml = '';
                 let paragraphTemp = '';
                 let linesInPara = 0;
@@ -1245,11 +1464,23 @@
                 });
                 container.innerHTML = `<div class="text-reader">${finalHtml}</div>`;
             } else {
-                const lines = currentMaterial.content.split('\n'); 
+                const pageText = currentPageData || "";
+                const lines = pageText.split('\n'); 
                 let finalHtml = '';
                 lines.forEach(lineText => { if(!lineText.trim()) return; finalHtml += `<div class="mb-4">${wrapWords(lineText, savedWordsMap)}</div>`; });
                 container.innerHTML = finalHtml;
             }
+
+            // Рендер кнопки опрацювання матеріалу (тільки на останній сторінці)
+            if (readerCurrentPage === readerTotalPages) {
+                container.innerHTML += renderMarkAsReadBtn();
+            }
+
+            // Оновлення блоку навігації по сторінках тексту
+            document.getElementById('reader-page-info').textContent = `Сторінка ${readerCurrentPage} з ${readerTotalPages}`;
+            document.getElementById('btn-reader-prev').disabled = (readerCurrentPage === 1);
+            document.getElementById('btn-reader-next').disabled = (readerCurrentPage === readerTotalPages);
+            document.getElementById('reader-pagination').classList.toggle('hidden', readerTotalPages <= 1);
         }
 
         const inlinePopup = document.getElementById('inline-popup');
@@ -1371,16 +1602,16 @@
                             const partOfSpeech = meaning.partOfSpeech;
                             const definitions = meaning.definitions.slice(0, 2);
                             html += `<div class="border-b border-slate-100 pb-1 mb-1 last:border-0">`;
-                            html += `<span class="font-bold text-indigo-600 italic uppercase text-[10px]">${partOfSpeech}</span>`;
+                            html += `<span class="font-bold text-indigo-600 italic uppercase text-[11px]">${partOfSpeech}</span>`;
                             definitions.forEach(def => {
-                                html += `<p class="mt-0.5 text-[11px] text-slate-600 leading-normal">• ${def.definition}</p>`;
+                                html += `<p class="mt-0.5 text-xs text-slate-600 leading-normal">• ${def.definition}</p>`;
                                 if (def.example) {
-                                    html += `<p class="text-[10px] text-slate-400 italic pl-3 leading-normal">"${def.example}"</p>`;
+                                    html += `<p class="text-[11px] text-slate-400 italic pl-3 leading-normal">"${def.example}"</p>`;
                                 }
                             });
                             html += `</div>`;
                         });
-                        dictContent.innerHTML = html || '<p class="text-slate-400 text-[11px]">Визначень не знайдено.</p>';
+                        dictContent.innerHTML = html || '<p class="text-slate-400 text-xs">Визначень не знайдено.</p>';
                         dictSection.classList.remove('hidden');
                     }
                 })
@@ -1508,7 +1739,6 @@
                 extClues.classList.remove('hidden');
             } else {
                 if (mode === 'sprint') {
-                    // Reset Sprint variables
                     window._sprintCountdownActive = true;
                     sprintTimeLeft = 60;
                     sprintScore = 0;
@@ -1594,7 +1824,7 @@
 
             bsCompletedSteps++; bsCurrentWordIdx++;
             if (bsCurrentWordIdx >= bsWords.length) {
-                bsCurrentWordIdx = 0; const stages = activeSessionMode==='review'? [1] : MODE_STAGES[activeSessionMode]; const currentStageIndex = stages.indexOf(bsCurrentStage);
+                const stages = activeSessionMode==='review'? [1] : MODE_STAGES[activeSessionMode]; const currentStageIndex = stages.indexOf(bsCurrentStage);
                 if(currentStageIndex + 1 < stages.length) bsCurrentStage = stages[currentStageIndex + 1]; else return finishBrainstorm(); 
             } updateBsProgress(); renderBsStage();
         };
@@ -1644,11 +1874,36 @@
             let resultsIcon = "🏆";
             let resultsTitle = "Завершено!";
             let resultsSubtitle = "";
+            const lbdSection = document.getElementById('sprint-leaderboard');
             
             if (activeSessionMode === 'sprint') {
                 resultsIcon = "⚡🏃‍♂️";
                 resultsTitle = "Спринт завершено!";
                 resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100">Ваш рахунок: ${sprintScore} балів!</div>`;
+                
+                // Зберігання рекорду Спринту у Firestore
+                try {
+                    let updatedScores = [...sprintHighScores];
+                    updatedScores.push({ score: sprintScore, date: Date.now() });
+                    updatedScores.sort((a, b) => b.score - a.score);
+                    updatedScores = updatedScores.slice(0, 3); // Залишаємо Топ-3
+                    
+                    const statsDocRef = doc(db, 'users', activeUid, 'stats', 'sprint');
+                    await setDoc(statsDocRef, { topScores: updatedScores });
+                    sprintHighScores = updatedScores;
+                } catch (e) { console.error("Error saving sprint score:", e); }
+
+                // Рендер лідерборду
+                lbdSection.classList.remove('hidden');
+                const listEl = document.getElementById('sprint-leaderboard-list');
+                listEl.innerHTML = sprintHighScores.map((s, idx) => `
+                    <li class="flex justify-between items-center py-1 border-b border-indigo-100 last:border-0">
+                        <span>${idx + 1}. Рекорд: ${s.score} балів</span>
+                        <span class="text-xs text-slate-400 font-medium">${new Date(s.date).toLocaleDateString()}</span>
+                    </li>
+                `).join('');
+            } else {
+                lbdSection.classList.add('hidden');
             }
             
             const resultsDiv = document.getElementById('bs-results');
@@ -2299,7 +2554,6 @@
             document.getElementById('bs-btn-dont-know').classList.add('hidden');
             document.getElementById('bs-btn-next').classList.add('hidden');
 
-            // Play countdown sound and display beautiful countdown page before the game starts
             if (window._sprintCountdownActive) {
                 if (!isGlobalAudioMuted) {
                     sprintCountdownAudio.currentTime = 0;
@@ -2334,16 +2588,14 @@
                             sprintGongAudio.play().catch(e => console.log("Gong error", e));
                         }
                         window._sprintCountdownActive = false;
-                        renderStageSprint(area, btnNext, feedback); // Render game board
+                        renderStageSprint(area, btnNext, feedback); 
                     }
                 }, 1000);
                 return;
             }
 
-            // Sprint gameplay screen - clean, elegant, professional layout
             area.innerHTML = `
                 <div class="flex flex-col items-center justify-center w-full max-w-md mx-auto py-2">
-                    <!-- Dashboard Indicators -->
                     <div class="flex justify-between items-center w-full mb-6 px-4 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/50 shadow-inner">
                         <div class="flex items-center gap-2 bg-white py-1.5 px-4 rounded-full border border-slate-100 shadow-sm">
                             <span class="text-lg">⏳</span>
@@ -2355,19 +2607,16 @@
                         </div>
                     </div>
 
-                    <!-- Minimalist Streak flames -->
                     <div id="sprint-streak-container" class="${sprintStreak > 0 ? '' : 'invisible'} mb-5 flex items-center gap-2 bg-amber-50 border border-amber-200/60 px-4 py-1.5 rounded-full shadow-sm transition-all duration-300">
                         <span class="text-sm">🔥</span>
                         <span id="sprint-streak-val" class="text-xs font-bold text-amber-700">Серія: ${sprintStreak}</span>
                     </div>
 
-                    <!-- Clean Word Card -->
                     <div id="sprint-q-card" class="w-full bg-white border border-slate-100 rounded-3xl p-8 min-h-[160px] flex flex-col justify-center items-center mb-8 transition-all duration-300 shadow-sm relative">
                         <h3 id="sprint-q-word" class="text-3xl font-bold text-slate-800 tracking-tight mb-4 select-none"></h3>
                         <p id="sprint-q-translation" class="text-2xl font-medium text-slate-500 italic select-none"></p>
                     </div>
 
-                    <!-- Professional Touch Actions with arrow guides -->
                     <div class="grid grid-cols-2 gap-4 w-full px-1">
                         <button onclick="submitSprintAnswer(false)" class="bg-white hover:bg-rose-50/30 border border-slate-200 hover:border-rose-200 py-4 px-6 rounded-2xl font-bold text-slate-700 transition flex items-center justify-center gap-2 active:scale-95 shadow-sm text-base">
                             <span class="text-lg text-rose-500">←</span> Неправильно
@@ -2437,7 +2686,6 @@
             const cardEl = document.getElementById('sprint-q-card');
 
             if (isCorrectAnswer) {
-                // Play correct audio answer
                 if (!isGlobalAudioMuted) {
                     sprintCorrectAudio.currentTime = 0;
                     sprintCorrectAudio.play().catch(e => console.log(e));
@@ -2464,7 +2712,6 @@
                     if (streakValEl) streakValEl.textContent = `Серія: ${sprintStreak}`;
                 }
             } else {
-                // Play wrong audio answer
                 if (!isGlobalAudioMuted) {
                     sprintWrongAudio.currentTime = 0;
                     sprintWrongAudio.play().catch(e => console.log(e));
@@ -2536,6 +2783,14 @@
             });
             document.getElementById(`view-${tab}`).classList.remove('hidden'); 
             document.getElementById(`tab-${tab}`).className = 'flex-1 py-3.5 text-indigo-600 border-b-[3px] border-indigo-600 transition-colors font-bold';
+            
+            // Захист від накладання вікон у вкладці Бібліотека
+            if (tab === 'library') {
+                document.getElementById('library-add-view').classList.add('hidden');
+                document.getElementById('library-read-view').classList.add('hidden');
+                document.getElementById('library-list-view').classList.remove('hidden');
+            }
+
             if(tab !== 'library') closeReader(); 
             if(tab !== 'training') endSession();
         };
