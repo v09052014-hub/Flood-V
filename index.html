@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LinguaSpace</title>
+    <!-- Додано емодзі як іконку вкладки (Favicon) та для ярликів на телефоні -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌌</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌌</text></svg>">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { padding-bottom: 140px; -webkit-tap-highlight-color: transparent; }
@@ -19,7 +23,6 @@
         /* Reader Styles - Baseline, dynamically overridden by JS */
         .text-reader { line-height: 1.8; color: #334155; transition: font-size 0.2s, font-family 0.2s; }
         @media (max-width: 640px) {
-            .text-reader { font-size: 1rem !important; }
             #reader-content-wrapper { padding-left: 0.75rem; padding-right: 0.75rem; }
         }
         
@@ -139,7 +142,7 @@
         </div>
     </div>
 
-    <!-- Modal: Edit Material (INCREASED SIZE) -->
+    <!-- Modal: Edit Material -->
     <div id="edit-material-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-4xl w-full relative flex flex-col h-[85vh] max-h-[90vh]">
             <button onclick="closeEditMaterialModal()" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700 font-bold text-2xl">&times;</button>
@@ -208,7 +211,7 @@
         </div>
     </div>
 
-    <header class="bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center bg-white shadow-sm h-[60px]">
+    <header class="bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center shadow-sm h-[60px]">
         <h1 class="font-bold text-indigo-600 text-xl tracking-tight flex items-center gap-2">
             <span class="text-2xl">🌌</span> LinguaSpace
         </h1>
@@ -217,7 +220,7 @@
         </button>
     </header>
 
-    <nav class="border-b border-slate-200 sticky-nav shadow-sm">
+    <nav id="main-tabs-nav" class="border-b border-slate-200 sticky-nav shadow-sm transition-all duration-300">
         <div class="max-w-3xl mx-auto flex justify-between items-center text-sm font-bold text-slate-500">
             <button onclick="switchTab('dictionary')" id="tab-dictionary" class="flex-1 py-3.5 text-indigo-600 border-b-[3px] border-indigo-600 transition-colors font-bold">Словник</button>
             <button onclick="switchTab('library')" id="tab-library" class="flex-1 py-3.5 hover:text-indigo-500 transition-colors border-b-[3px] border-transparent">Бібліотека</button>
@@ -272,7 +275,6 @@
                 </div>
             </div>
 
-            <!-- Changed to grid-cols-2 for mobile -->
             <div id="words-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 w-full"></div>
         </section>
 
@@ -292,10 +294,9 @@
                 </div>
             </div>
 
-            <!-- Add Mode -->
             <div id="library-add-view" class="hidden bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex flex-wrap gap-2 mb-4 border-b border-slate-100 pb-2">
-                    <button onclick="setAddMode('text')" id="tab-add-text" class="px-3 sm:px-4 py-2 bg-indigo-50 text-indigo-700 font-bold rounded-lg text-sm transition">Текст</button>
+                    <button onclick="setAddMode('text')" id="tab-add-text" class="px-3 sm:px-4 py-2 bg-indigo-50 text-indigo-700 font-bold rounded-lg text-sm transition flex items-center gap-1">Текст</button>
                     <button onclick="setAddMode('url')" id="tab-add-url" class="px-3 sm:px-4 py-2 text-slate-500 font-bold rounded-lg hover:bg-slate-50 text-sm transition flex items-center gap-1">
                         <svg viewBox="0 0 50 50" class="w-4 h-4 fill-current"><path d="M25 0C11.193 0 0 11.193 0 25s11.193 25 25 25 25-11.193 25-25S38.807 0 25 0zm0 47.917C12.365 47.917 2.083 37.635 2.083 25S12.365 2.083 25 2.083 47.917 12.365 47.917 25 37.635 47.917 25 47.917zm-4.708-14.542l-5.667-16h2.958l4.125 12.542 4.083-12.542h2.917l4.083 12.542 4.125-12.542h2.958l-5.667 16h-3.042l-3.958-11.833-3.958 11.833h-3.042z"/></svg> Стаття (URL)
                     </button>
@@ -369,8 +370,12 @@
                         <p class="text-xs text-slate-500 mt-1">або натисніть, щоб вибрати файл</p>
                         <input type="file" id="yt-sub-file" accept=".srt,.txt" class="hidden" onchange="handleSubFileUpload(event)">
                         
-                        <div class="mt-4 pt-4 border-t border-slate-200">
-                            <button onclick="event.stopPropagation(); toggleManualSubInput()" class="text-sm font-bold text-indigo-600 hover:text-indigo-800">або вставити текст вручну</button>
+                        <div class="mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-3 justify-center items-center">
+                            <button type="button" onclick="event.stopPropagation(); toggleManualSubInput()" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition">📝 Вставити текст вручну</button>
+                            <span class="hidden sm:inline text-slate-300">|</span>
+                            <button type="button" onclick="event.stopPropagation(); openDownsub()" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition flex items-center gap-1">
+                                <span>⬇️</span> Завантажити з DownSub
+                            </button>
                         </div>
                     </div>
                     <textarea id="yt-sub-raw" rows="6" placeholder="1\n00:00:05,000 --> 00:00:08,000\nHello, world!" class="w-full p-3 mt-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-xs font-mono custom-scroll hidden"></textarea>
@@ -382,7 +387,6 @@
                 </div>
             </div>
 
-            <!-- Read Mode -->
             <div id="library-read-view" class="hidden relative">
                 <div id="reader-sticky-bar" class="flex items-center justify-between mb-4 py-2 w-full rounded-b-xl shadow-sm px-2">
                     <div class="flex items-center gap-3 overflow-hidden">
@@ -393,7 +397,6 @@
                         <h2 id="reader-title" class="font-bold text-base sm:text-lg text-slate-800 truncate"></h2>
                     </div>
                     
-                    <!-- Added stopPropagation inside the font panel to avoid immediate closing -->
                     <div class="relative flex-shrink-0 ml-2">
                         <button onclick="toggleReaderSettings()" class="p-2 text-slate-500 hover:text-indigo-600 transition bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -454,7 +457,6 @@
                     <div class="flex flex-col flex-1 w-full">
                         <label class="font-bold text-slate-600 text-xs uppercase mb-1">Джерело слів:</label>
                         <select id="train-source-select" class="p-2 border border-slate-300 rounded-lg bg-white font-bold text-indigo-700 outline-none text-sm cursor-pointer w-full">
-                            <!-- Опції генеруються через JS -->
                         </select>
                     </div>
                 </div>
@@ -556,7 +558,7 @@
                 
                 <!-- Топ-3 Спринт результати -->
                 <div id="sprint-leaderboard" class="hidden mb-6 bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-left max-w-sm mx-auto">
-                    <h4 class="font-bold text-indigo-800 text-sm uppercase mb-2 flex items-center gap-1.5">⚡ Топ-3 Рекорди:</h4>
+                    <h4 class="font-bold text-indigo-800 text-sm uppercase mb-2 flex items-center gap-1.5">⚡ Рекорди:</h4>
                     <ol id="sprint-leaderboard-list" class="space-y-1.5 text-slate-700 font-bold text-sm"></ol>
                 </div>
 
@@ -677,7 +679,7 @@
             
             if (currentScroll > lastScrollTop && currentScroll > 60) {
                 header.style.top = '-60px';
-                if(nav) nav.style.top = '0px';
+                if(nav && !nav.classList.contains('hidden')) nav.style.top = '0px';
                 
                 if (isReadMode && readerBar) {
                     readerBar.style.top = '-100px'; 
@@ -685,7 +687,7 @@
                 }
             } else {
                 header.style.top = '0px';
-                if(nav) nav.style.top = '60px';
+                if(nav && !nav.classList.contains('hidden')) nav.style.top = '60px';
                 if (isReadMode && readerBar) {
                     readerBar.style.top = '0px'; 
                 }
@@ -1126,7 +1128,7 @@
             document.getElementById('article-search-query').value = '';
             document.getElementById('yt-search-query').value = '';
         };
-        
+
         window.setAddMode = (mode) => {
             addMaterialMode = mode;
             ['text', 'url', 'yt'].forEach(m => {
@@ -1153,13 +1155,22 @@
             try {
                 const res = await fetch("https://r.jina.ai/" + urlInput);
                 if (!res.ok) throw new Error("API Error");
-                const text = await res.text();
+                let text = await res.text();
                 
+                // Агресивне очищення від Markdown та іншого сміття
+                text = text.replace(/!\[.*?\]\(.*?\)/g, ''); // Видаляє картинки: ![alt](url)
+                text = text.replace(/\[.*?\]\(.*?\)/g, '$1'); // Залишає текст посилання, але видаляє саме посилання: [text](url) -> text
+                text = text.replace(/Image:.*?$/gm, ''); // Видаляє рядки, які починаються на "Image:"
+                text = text.replace(/Photo:.*?$/gm, ''); // Видаляє рядки "Photo:"
+                text = text.replace(/^[ \t]*>[ \t]?/gm, ''); // Видаляє маркери цитат
+                text = text.replace(/\n{3,}/g, '\n\n'); // Заміняє множинні відступи на один абзацний
+                text = text.trim();
+
                 document.getElementById('material-title').value = "Стаття з Інтернету";
                 document.getElementById('material-content').value = text;
                 setAddMode('text');
                 document.getElementById('custom-modal').classList.add('hidden');
-                window.showModal("Текст успішно витягнуто!");
+                window.showModal("Текст успішно витягнуто та очищено!");
             } catch (e) {
                 window.showModal("Помилка витягування тексту. Перевірте посилання.");
             } finally {
@@ -1345,6 +1356,15 @@
             reader.readAsText(file);
         };
         window.toggleManualSubInput = () => { document.getElementById('yt-sub-raw').classList.toggle('hidden'); document.getElementById('yt-sub-raw').focus(); };
+
+        window.openDownsub = () => {
+            if (!currentYtId) {
+                window.showModal("Будь ласка, спочатку додайте відео або виберіть його з пошуку.");
+                return;
+            }
+            const url = `https://downsub.com/?url=https://www.youtube.com/watch?v=${currentYtId}`;
+            window.open(url, '_blank');
+        };
 
         function parseCleanSRT(raw) {
             const blocks = raw.replace(/\r\n/g, '\n').split('\n\n'); const subs = [];
@@ -1539,6 +1559,7 @@
             document.getElementById('library-list-view').classList.add('hidden'); 
             document.getElementById('library-add-view').classList.add('hidden');
             document.getElementById('library-read-view').classList.remove('hidden');
+            document.getElementById('main-tabs-nav').classList.add('hidden');
             document.getElementById('reader-title').textContent = m.title;
             const ytWrapper = document.getElementById('reader-yt-wrapper');
 
@@ -1573,6 +1594,7 @@
 
             document.getElementById('library-read-view').classList.add('hidden'); 
             document.getElementById('library-list-view').classList.remove('hidden'); 
+            document.getElementById('main-tabs-nav').classList.remove('hidden');
             document.getElementById('reader-settings-panel').classList.add('hidden');
             if(ytPlayer && typeof ytPlayer.destroy === 'function') { ytPlayer.destroy(); ytPlayer = null; }
             if(syncInterval) clearInterval(syncInterval); closeInlinePopup(); 
@@ -1661,7 +1683,7 @@
             if (currentMaterial.isRead) {
                 return `<div class="mt-10 text-center p-4 bg-slate-100 rounded-xl border border-slate-200 text-slate-500 font-bold flex items-center justify-center gap-2 shadow-sm font-sans text-base"><span>✅</span> Матеріал опрацьовано</div>`;
             }
-            return `<button onclick="markCurrentAsRead()" class="mt-10 w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold font-sans text-base sm:text-lg shadow-md transition flex justify-center items-center gap-2 active:scale-95"><span>✅ Позначити матеріал як опрацьований</span></button>`;
+            return `<button onclick="markCurrentAsRead()" class="mt-10 w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold font-sans shadow-md text-base sm:text-lg transition flex justify-center items-center gap-2 active:scale-95"><span>✅ Позначити матеріал як опрацьований</span></button>`;
         }
 
         function renderReaderContent() {
@@ -2148,7 +2170,7 @@
                     let updatedScores = [...sprintHighScores];
                     updatedScores.push({ score: sprintScore, date: Date.now() });
                     updatedScores.sort((a, b) => b.score - a.score);
-                    updatedScores = updatedScores.slice(0, 3); 
+                    updatedScores = updatedScores.slice(0, 100); 
                     
                     const statsDocRef = doc(db, 'users', activeUid, 'stats', 'sprint');
                     await setDoc(statsDocRef, { topScores: updatedScores }, { merge: true });
@@ -2159,19 +2181,22 @@
                 const listEl = document.getElementById('sprint-leaderboard-list');
                 const medals = ['🥇', '🥈', '🥉'];
                 
-                let html = sprintHighScores.map((s, idx) => `
+                let html = sprintHighScores.slice(0, 3).map((s, idx) => `
                     <li class="flex justify-between items-center py-1.5 border-b border-indigo-100 last:border-0">
-                        <span class="font-bold text-slate-800 text-base flex items-center gap-2"><span class="text-xl">${medals[idx] || (idx+1)+'.'}</span> ${s.score} балів</span>
+                        <span class="font-bold text-slate-800 text-base flex items-center gap-2"><span class="text-xl font-black">${medals[idx] || `<span class="text-slate-400 font-medium opacity-50">#</span>${idx+1}`}</span> ${s.score} балів</span>
                         <span class="text-xs text-slate-400 font-medium">${new Date(s.date).toLocaleDateString()}</span>
                     </li>
                 `).join('');
 
-                const madeItToTop3 = sprintHighScores.some(s => s.score === sprintScore && s.date >= Date.now() - 5000);
+                const currentScoreIndex = sprintHighScores.findIndex(s => s.score === sprintScore && s.date >= Date.now() - 5000);
+                const madeItToTop3 = currentScoreIndex !== -1 && currentScoreIndex < 3;
+                
                 if (!madeItToTop3 && sprintHighScores.length >= 3) {
+                    const displayIndex = currentScoreIndex !== -1 ? currentScoreIndex + 1 : "-";
                     html += `
                         <li class="text-center text-slate-300 font-black py-0.5 leading-none mt-1">...</li>
                         <li class="flex justify-between items-center py-1.5 px-3 bg-indigo-100/50 rounded-lg mt-1 border border-indigo-100">
-                            <span class="font-bold text-indigo-700 text-sm">Ваш результат:</span>
+                            <span class="font-bold text-indigo-700 text-sm">Ваш результат (№${displayIndex}):</span>
                             <span class="font-bold text-indigo-700 text-sm">${sprintScore} балів</span>
                         </li>
                     `;
