@@ -15,7 +15,7 @@
         /* Smooth scrolling transitions for headers */
         header { position: sticky; top: 0px; z-index: 60; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .sticky-nav { position: sticky; top: 60px; z-index: 50; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(5px); transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        #reader-sticky-bar { position: sticky; top: 0px; z-index: 70; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(248, 250, 252, 0.98); backdrop-filter: blur(5px); }
+        #reader-sticky-bar { position: sticky; top: 60px; z-index: 70; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(248, 250, 252, 0.98); backdrop-filter: blur(5px); }
 
         .fade-in { animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -32,9 +32,10 @@
         .word-saved { background-color: #d1fae5; padding: 2px 4px; border-radius: 4px; border: none; font-weight: inherit; color: inherit; }
         .word-saved:hover { background-color: #bbf7d0; border: none; }
         
-        .yt-sub-line { transition: all 0.2s ease; border-radius: 4px; padding: 0 4px; display: inline; cursor: pointer; line-height: 2; border-bottom: 2px solid transparent; }
-        .yt-sub-line:hover { background-color: #f8fafc; border-bottom-color: #cbd5e1; }
-        .yt-sub-line.active-sub { background-color: #eef2ff; border-bottom-color: #4f46e5; color: #1e1b4b; font-weight: 500; box-shadow: inset 0 -2px 0 #4f46e5; }
+        /* Виправлено стиль субтитрів: м'який фон без нижньої межі */
+        .yt-sub-line { transition: all 0.2s ease; border-radius: 4px; padding: 0 4px; display: inline; cursor: pointer; line-height: 2; border-bottom: none; }
+        .yt-sub-line:hover { background-color: #f8fafc; }
+        .yt-sub-line.active-sub { background-color: #e0f2fe; color: #0c4a6e; font-weight: 500; }
         
         .yt-pip-mode {
             position: fixed !important;
@@ -398,11 +399,8 @@
                     </div>
                     
                     <div class="relative flex-shrink-0 ml-2">
-                        <button onclick="toggleReaderSettings()" class="p-2 text-slate-500 hover:text-indigo-600 transition bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
+                        <button onclick="toggleReaderSettings(event)" class="p-2 text-slate-500 hover:text-indigo-600 transition bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
+                            <span class="text-xl leading-none">⚙️</span>
                         </button>
                         <div id="reader-settings-panel" onclick="event.stopPropagation()" class="hidden absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 p-3 z-[150]">
                             <p class="text-xs font-bold text-slate-400 uppercase mb-2">Розмір тексту</p>
@@ -424,7 +422,7 @@
                     <div id="reader-yt-player" class="w-full h-full"></div>
                 </div>
                 
-                <div id="reader-content-wrapper" class="bg-white px-2 py-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 relative mb-4 overflow-hidden">
+                <div id="reader-content-wrapper" class="bg-white px-3 py-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 relative mb-4 overflow-hidden">
                     <div id="reader-content" class="text-reader" style="font-size: 18px; font-family: 'Georgia', serif;"></div>
                 </div>
 
@@ -678,18 +676,21 @@
             const isReadMode = !document.getElementById('library-read-view').classList.contains('hidden');
             
             if (currentScroll > lastScrollTop && currentScroll > 60) {
+                // Scroll Down
                 header.style.top = '-60px';
                 if(nav && !nav.classList.contains('hidden')) nav.style.top = '0px';
                 
                 if (isReadMode && readerBar) {
-                    readerBar.style.top = '-100px'; 
+                    readerBar.style.top = '0px'; // Pins reader bar to the very top
                     document.getElementById('reader-settings-panel').classList.add('hidden');
                 }
             } else {
+                // Scroll Up
                 header.style.top = '0px';
                 if(nav && !nav.classList.contains('hidden')) nav.style.top = '60px';
+                
                 if (isReadMode && readerBar) {
-                    readerBar.style.top = '0px'; 
+                    readerBar.style.top = '60px'; // Sits exactly under the main header
                 }
             }
             lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
@@ -1157,13 +1158,12 @@
                 if (!res.ok) throw new Error("API Error");
                 let text = await res.text();
                 
-                // Агресивне очищення від Markdown та іншого сміття
-                text = text.replace(/!\[.*?\]\(.*?\)/g, ''); // Видаляє картинки: ![alt](url)
-                text = text.replace(/\[.*?\]\(.*?\)/g, '$1'); // Залишає текст посилання, але видаляє саме посилання: [text](url) -> text
-                text = text.replace(/Image:.*?$/gm, ''); // Видаляє рядки, які починаються на "Image:"
-                text = text.replace(/Photo:.*?$/gm, ''); // Видаляє рядки "Photo:"
-                text = text.replace(/^[ \t]*>[ \t]?/gm, ''); // Видаляє маркери цитат
-                text = text.replace(/\n{3,}/g, '\n\n'); // Заміняє множинні відступи на один абзацний
+                text = text.replace(/!\[.*?\]\(.*?\)/g, ''); 
+                text = text.replace(/\[.*?\]\(.*?\)/g, '$1'); 
+                text = text.replace(/Image:.*?$/gm, ''); 
+                text = text.replace(/Photo:.*?$/gm, ''); 
+                text = text.replace(/^[ \t]*>[ \t]?/gm, ''); 
+                text = text.replace(/\n{3,}/g, '\n\n'); 
                 text = text.trim();
 
                 document.getElementById('material-title').value = "Стаття з Інтернету";
@@ -1427,7 +1427,7 @@
                     <div class="flex-1 truncate pl-2 ${isRead ? 'opacity-80' : ''}">
                         <h3 class="font-bold ${isRead ? 'text-slate-600' : 'text-slate-800'} truncate text-lg flex items-center gap-2">
                             ${isRead ? '<span class="text-slate-400" title="Опрацьовано">✅</span>' : ''} 
-                            ${m.ytId ? '<span class="text-red-500">📺</span>' : ''} ${m.title}
+                            ${m.ytId ? '<span class="text-red-500">📺</span>' : '<span class="text-amber-600">📜</span>'} ${m.title}
                         </h3>
                         <p class="text-sm text-slate-500 mt-1 truncate font-medium">
                             ${isRead && readDate ? `<span class="text-slate-400 text-xs font-medium mr-2 bg-slate-100 px-1.5 py-0.5 rounded shadow-sm border border-slate-200">Опрацьовано: ${readDate}</span>` : ''}
@@ -1527,7 +1527,8 @@
             }
         }
         
-        window.toggleReaderSettings = () => {
+        window.toggleReaderSettings = (e) => {
+            if (e) e.stopPropagation();
             document.getElementById('reader-settings-panel').classList.toggle('hidden');
         };
 
@@ -1541,7 +1542,7 @@
         window.changeFontFamily = (font) => {
             currentReaderFontFamily = font;
             applyReaderStyles();
-            toggleReaderSettings();
+            document.getElementById('reader-settings-panel').classList.add('hidden');
         };
 
         function applyReaderStyles() {
@@ -1705,7 +1706,7 @@
                     
                     const isLast = i === subs.length - 1;
                     if (isLast) {
-                        finalHtml += `<p class="mb-6 leading-[2.2] text-justify">${paragraphTemp}</p>`;
+                        finalHtml += `<p class="mb-4 leading-[2.2] text-justify">${paragraphTemp}</p>`;
                         return;
                     }
 
@@ -1716,13 +1717,14 @@
                     const nextText = nextSub ? nextSub.text.trim() : '';
                     const startsWithCapital = /^[A-Z"'«“]/.test(nextText);
 
-                    if (linesInPara >= 6 && endsWithSentence && startsWithCapital) {
-                        finalHtml += `<p class="mb-6 leading-[2.2] text-justify">${paragraphTemp}</p>`;
+                    // Зменшено кількість рядків для частішого розбиття абзаців
+                    if (linesInPara >= 2 && endsWithSentence && startsWithCapital) {
+                        finalHtml += `<p class="mb-4 leading-[2.2] text-justify">${paragraphTemp}</p>`;
                         paragraphTemp = '';
                         linesInPara = 0;
-                    } else if (linesInPara >= 12) {
+                    } else if (linesInPara >= 4) {
                         if (endsWithSentence) {
-                            finalHtml += `<p class="mb-6 leading-[2.2] text-justify">${paragraphTemp}</p>`;
+                            finalHtml += `<p class="mb-4 leading-[2.2] text-justify">${paragraphTemp}</p>`;
                             paragraphTemp = '';
                             linesInPara = 0;
                         }
@@ -1766,10 +1768,13 @@
         });
 
         let selectionTimeout;
+        let lastSelectedText = "";
+
         document.addEventListener('selectionchange', () => {
             if (document.getElementById('library-read-view').classList.contains('hidden')) return;
             
             clearTimeout(selectionTimeout);
+            
             selectionTimeout = setTimeout(() => {
                 const selection = window.getSelection();
                 const text = selection.toString().trim();
@@ -1778,6 +1783,8 @@
                 if (!readerContent) return;
                 
                 if (text.length > 0 && text.length <= 150 && !text.includes('\n\n')) {
+                    if (text === lastSelectedText) return; 
+
                     if (selection.rangeCount === 0) return;
                     const range = selection.getRangeAt(0);
                     
@@ -1786,6 +1793,8 @@
                     const rect = range.getBoundingClientRect();
                     if(rect.width === 0 && rect.height === 0) return;
                     
+                    lastSelectedText = text;
+
                     const popupWidth = Math.min(288, window.innerWidth * 0.9);
                     const padding = 10;
                     const maxLeft = window.innerWidth - popupWidth - padding;
@@ -1795,12 +1804,20 @@
                     inlinePopup.style.top = `${window.scrollY + rect.bottom + 8}px`; 
                     inlinePopup.style.left = `${calculatedLeft}px`; 
                     processInlineTranslationRequest(text, currentMaterial ? currentMaterial.content : '');
+                } else {
+                    if (text.length === 0) {
+                        lastSelectedText = "";
+                    }
                 }
-            }, 500); 
+            }, 800); 
         });
 
         document.addEventListener('click', (e) => { 
             if(!inlinePopup.classList.contains('hidden') && !inlinePopup.contains(e.target) && !e.target.classList.contains('word-clickable')) {
+                const selectionText = window.getSelection().toString().trim();
+                if (selectionText.length > 0 && document.getElementById('reader-content').contains(e.target)) {
+                    return; 
+                }
                 closeInlinePopup(); 
             }
         });
@@ -1808,7 +1825,7 @@
         document.getElementById('inline-popup-trans-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') { e.preventDefault(); saveWordFromInlinePopup(); } });
 
         window.selectInlineTranslation = (text) => { document.getElementById('inline-popup-trans-input').value = text; }
-        window.closeInlinePopup = () => { inlinePopup.classList.add('hidden'); pendingInlineSaveData = null; window.getSelection().removeAllRanges(); };
+        window.closeInlinePopup = () => { inlinePopup.classList.add('hidden'); pendingInlineSaveData = null; lastSelectedText = ""; };
 
         window.toggleInlineDict = () => {
             const content = document.getElementById('inline-dict-content');
@@ -2196,7 +2213,7 @@
                     html += `
                         <li class="text-center text-slate-300 font-black py-0.5 leading-none mt-1">...</li>
                         <li class="flex justify-between items-center py-1.5 px-3 bg-indigo-100/50 rounded-lg mt-1 border border-indigo-100">
-                            <span class="font-bold text-indigo-700 text-sm flex items-center gap-1"><span class="text-slate-400 font-medium opacity-50">#</span>${displayIndex}</span>
+                            <span class="font-bold text-slate-400 text-sm flex items-center gap-1"><span class="text-slate-400 font-medium opacity-60">#</span>${displayIndex}</span>
                             <span class="font-bold text-indigo-700 text-sm">${sprintScore} балів</span>
                         </li>
                     `;
@@ -2232,7 +2249,7 @@
                     </div>
                     <div class="flex flex-col items-end">
                         <span class="text-indigo-600 font-bold text-sm">${w.translation}</span>
-                        ${activeSessionMode === 'sprint' ? `<span class="text-[12px] font-bold ${w.failed ? 'text-rose-500' : 'text-emerald-500'} mt-0.5">${w.failed ? '❌' : '✅'}</span>` : ''}
+                        <span class="text-base font-bold mt-0.5">${w.failed ? '❌' : '✅'}</span>
                     </div>
                 </div>`;
             }).join('');
