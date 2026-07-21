@@ -15,7 +15,7 @@
         /* Smooth scrolling transitions for headers */
         header { position: sticky; top: 0px; z-index: 60; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .sticky-nav { position: sticky; top: 60px; z-index: 50; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(5px); transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        #reader-sticky-bar { position: sticky; top: 60px; z-index: 70; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(248, 250, 252, 0.98); backdrop-filter: blur(5px); }
+        #reader-sticky-bar { position: sticky; top: 0px; z-index: 70; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(248, 250, 252, 0.98); backdrop-filter: blur(5px); }
 
         .fade-in { animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -32,10 +32,10 @@
         .word-saved { background-color: #d1fae5; padding: 2px 4px; border-radius: 4px; border: none; font-weight: inherit; color: inherit; }
         .word-saved:hover { background-color: #bbf7d0; border: none; }
         
-        /* Виправлено стиль субтитрів: м'який фон без нижньої межі */
-        .yt-sub-line { transition: all 0.2s ease; border-radius: 4px; padding: 0 4px; display: inline; cursor: pointer; line-height: 2; border-bottom: none; }
-        .yt-sub-line:hover { background-color: #f8fafc; }
-        .yt-sub-line.active-sub { background-color: #e0f2fe; color: #0c4a6e; font-weight: 500; }
+        /* Субтитри: легкий блакитний фон при відтворенні, без підкреслень */
+        .yt-sub-line { transition: all 0.2s ease; border-radius: 6px; padding: 2px 4px; display: inline; cursor: pointer; line-height: 2; border-bottom: none; }
+        .yt-sub-line:hover { background-color: #f1f5f9; }
+        .yt-sub-line.active-sub { background-color: #e0f2fe; color: #0369a1; font-weight: 500; }
         
         .yt-pip-mode {
             position: fixed !important;
@@ -129,7 +129,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
                     <label class="text-xs font-bold text-slate-500 uppercase">Зображення</label>
                     <div class="flex gap-1.5 w-full sm:w-auto">
-                        <input type="text" id="edit-img-query" placeholder="Інше слово для пошуку..." class="text-xs p-1.5 border border-slate-300 rounded-lg outline-none focus:border-indigo-500 w-full sm:w-44 font-medium">
+                        <input type="text" id="edit-img-query" placeholder="Інше слово для пошуку..." class="text-xs p-1.5 border border-slate-300 rounded-lg outline-none focus:border-indigo-500 w-full sm:w-44 font-medium" onkeydown="if(event.key==='Enter') { event.preventDefault(); searchEditImages(); }">
                         <button type="button" onclick="searchEditImages()" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg font-bold transition shadow-sm border border-indigo-100 shrink-0 relative z-10">Шукати</button>
                     </div>
                 </div>
@@ -212,7 +212,7 @@
         </div>
     </div>
 
-    <header class="bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center shadow-sm h-[60px]">
+    <header id="main-app-header" class="bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center shadow-sm h-[60px]">
         <h1 class="font-bold text-indigo-600 text-xl tracking-tight flex items-center gap-2">
             <span class="text-2xl">🌌</span> LinguaSpace
         </h1>
@@ -262,6 +262,12 @@
                     </div>
                 </div>
 
+                <!-- Строка пошуку по словнику -->
+                <div class="mb-4 relative px-1">
+                    <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400">🔍</span>
+                    <input type="text" id="dict-search-input" oninput="handleDictSearchInput()" onkeydown="if(event.key==='Enter') { event.preventDefault(); executeDictSearch(); }" placeholder="Пошук слів чи перекладу..." class="w-full p-3 pl-10 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-bold text-slate-700 bg-white shadow-sm transition">
+                </div>
+
                 <div class="flex gap-2 overflow-x-auto custom-scroll pb-2 mb-4" id="dict-filters">
                     <button onclick="setDictFilter('all')" id="filter-btn-all" class="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-white shadow-sm transition">Усі слова</button>
                     <button onclick="setDictFilter('manual')" id="filter-btn-manual" class="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">Словник</button>
@@ -269,8 +275,8 @@
                     <button onclick="setDictFilter('materials')" id="filter-btn-materials" class="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition flex items-center gap-1">📁 Матеріали</button>
                 </div>
                 
-                <div id="dict-back-btn-container" class="hidden mb-4">
-                    <button onclick="setDictFilter('materials')" class="text-sm text-indigo-600 font-bold bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition flex items-center gap-1">
+                <div id="dict-back-btn-container" class="hidden mb-4 px-1">
+                    <button onclick="setDictFilter('materials')" class="text-sm text-indigo-600 font-bold bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition flex items-center gap-1 shadow-sm">
                         ← Назад до папок
                     </button>
                 </div>
@@ -296,13 +302,13 @@
             </div>
 
             <div id="library-add-view" class="hidden bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200">
-                <div class="flex flex-wrap gap-2 mb-4 border-b border-slate-100 pb-2">
+                <div class="flex flex-col sm:flex-row gap-2 mb-4 border-b border-slate-100 pb-2">
                     <button onclick="setAddMode('text')" id="tab-add-text" class="px-3 sm:px-4 py-2 bg-indigo-50 text-indigo-700 font-bold rounded-lg text-sm transition flex items-center gap-1">Текст</button>
                     <button onclick="setAddMode('url')" id="tab-add-url" class="px-3 sm:px-4 py-2 text-slate-500 font-bold rounded-lg hover:bg-slate-50 text-sm transition flex items-center gap-1">
-                        <svg viewBox="0 0 50 50" class="w-4 h-4 fill-current"><path d="M25 0C11.193 0 0 11.193 0 25s11.193 25 25 25 25-11.193 25-25S38.807 0 25 0zm0 47.917C12.365 47.917 2.083 37.635 2.083 25S12.365 2.083 25 2.083 47.917 12.365 47.917 25 37.635 47.917 25 47.917zm-4.708-14.542l-5.667-16h2.958l4.125 12.542 4.083-12.542h2.917l4.083 12.542 4.125-12.542h2.958l-5.667 16h-3.042l-3.958-11.833-3.958 11.833h-3.042z"/></svg> Стаття (URL)
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Wikipedia%27s_W.svg" class="w-4 h-4 opacity-70"> Стаття (URL)
                     </button>
                     <button onclick="setAddMode('yt')" id="tab-add-yt" class="px-3 sm:px-4 py-2 text-slate-500 font-bold rounded-lg hover:bg-slate-50 text-sm transition flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-red-500 fill-current"><path d="M21.582 6.186a2.665 2.665 0 0 0-1.875-1.884C18.053 3.86 12 3.86 12 3.86s-6.053 0-7.707.442a2.665 2.665 0 0 0-1.875 1.884C1.97 7.85 1.97 12 1.97 12s0 4.15.448 5.814a2.665 2.665 0 0 0 1.875 1.884C5.947 20.14 12 20.14 12 20.14s6.053 0 7.707-.442a2.665 2.665 0 0 0 1.875-1.884C22.03 16.15 22.03 12 22.03 12s0-4.15-.448-5.814zM9.993 15.48V8.52l6.561 3.48-6.561 3.48z"/></svg> YouTube
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="w-5 h-4 opacity-90"> YouTube
                     </button>
                 </div>
 
@@ -317,7 +323,7 @@
                 <div id="mode-url-area" class="hidden">
                     <div class="mb-2 bg-indigo-50/50 p-3 sm:p-4 rounded-xl border border-indigo-100">
                         <label class="text-xs font-bold text-indigo-800 uppercase mb-2 flex items-center gap-1.5">
-                            <svg viewBox="0 0 50 50" class="w-5 h-5 fill-current"><path d="M25 0C11.193 0 0 11.193 0 25s11.193 25 25 25 25-11.193 25-25S38.807 0 25 0zm0 47.917C12.365 47.917 2.083 37.635 2.083 25S12.365 2.083 25 2.083 47.917 12.365 47.917 25 37.635 47.917 25 47.917zm-4.708-14.542l-5.667-16h2.958l4.125 12.542 4.083-12.542h2.917l4.083 12.542 4.125-12.542h2.958l-5.667 16h-3.042l-3.958-11.833-3.958 11.833h-3.042z"/></svg> 
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Wikipedia%27s_W.svg" class="w-5 h-5 opacity-80"> 
                             Пошук статей
                         </label>
                         <div class="flex flex-col sm:flex-row gap-2 mb-2 w-full">
@@ -339,14 +345,14 @@
                         <input type="url" id="material-url" placeholder="https://example.com/article" class="flex-1 min-w-0 p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm w-full">
                         <button onclick="fetchArticleText(event)" class="bg-slate-100 text-slate-700 border border-slate-200 px-4 py-3 rounded-xl font-bold hover:bg-slate-200 text-sm whitespace-nowrap shadow-sm w-full sm:w-auto shrink-0">Витягнути текст</button>
                     </div>
-                    <p class="text-xs text-slate-500 mb-4 px-1">Розумний екстрактор витягне чистий текст статті, відкинувши меню та рекламу.</p>
+                    <p class="text-xs text-slate-500 mb-4 px-1">Розумний екстрактор агресивно очистить статтю від меню, реклами та посилань на зображення.</p>
                 </div>
 
                 <!-- Tab: YouTube -->
                 <div id="mode-yt-area" class="hidden mb-4">
                     <div class="mb-4 bg-red-50 p-3 sm:p-4 rounded-xl border border-red-100 shadow-sm w-full">
                         <label class="text-xs font-bold text-red-800 uppercase mb-2 flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" class="w-5 h-5 text-red-500 fill-current"><path d="M21.582 6.186a2.665 2.665 0 0 0-1.875-1.884C18.053 3.86 12 3.86 12 3.86s-6.053 0-7.707.442a2.665 2.665 0 0 0-1.875 1.884C1.97 7.85 1.97 12 1.97 12s0 4.15.448 5.814a2.665 2.665 0 0 0 1.875 1.884C5.947 20.14 12 20.14 12 20.14s6.053 0 7.707-.442a2.665 2.665 0 0 0 1.875-1.884C22.03 16.15 22.03 12 22.03 12s0-4.15-.448-5.814zM9.993 15.48V8.52l6.561 3.48-6.561 3.48z"/></svg>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="w-6 h-5">
                             Пошук відео
                         </label>
                         <div class="flex flex-col sm:flex-row gap-2 w-full mb-2">
@@ -374,7 +380,7 @@
                         <div class="mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-3 justify-center items-center">
                             <button type="button" onclick="event.stopPropagation(); toggleManualSubInput()" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition">📝 Вставити текст вручну</button>
                             <span class="hidden sm:inline text-slate-300">|</span>
-                            <button type="button" onclick="event.stopPropagation(); openDownsub()" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition flex items-center gap-1">
+                            <button type="button" onclick="event.stopPropagation(); openDownsub()" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition flex items-center gap-1 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-100 shadow-sm">
                                 <span>⬇️</span> Завантажити з DownSub
                             </button>
                         </div>
@@ -404,10 +410,10 @@
                         </button>
                         <div id="reader-settings-panel" onclick="event.stopPropagation()" class="hidden absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 p-3 z-[150]">
                             <p class="text-xs font-bold text-slate-400 uppercase mb-2">Розмір тексту</p>
-                            <div class="flex justify-between items-center mb-4 bg-slate-50 rounded-lg p-1 border border-slate-100">
-                                <button onclick="event.stopPropagation(); changeFontSize(-1)" class="px-4 py-1.5 font-bold text-slate-600 hover:text-indigo-600 hover:bg-white rounded shadow-sm transition">A-</button>
+                            <div class="flex justify-between items-center mb-4 bg-slate-50 rounded-lg p-1 border border-slate-100" onclick="event.stopPropagation()">
+                                <button onclick="event.stopPropagation(); changeFontSize(-1)" class="px-4 py-1.5 font-bold text-slate-600 hover:text-indigo-600 hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200">A-</button>
                                 <span id="font-size-display" class="text-sm font-bold text-slate-700">18px</span>
-                                <button onclick="event.stopPropagation(); changeFontSize(1)" class="px-4 py-1.5 font-bold text-slate-600 hover:text-indigo-600 hover:bg-white rounded shadow-sm transition">A+</button>
+                                <button onclick="event.stopPropagation(); changeFontSize(1)" class="px-4 py-1.5 font-bold text-slate-600 hover:text-indigo-600 hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200">A+</button>
                             </div>
                             <p class="text-xs font-bold text-slate-400 uppercase mb-2">Шрифт</p>
                             <div class="flex flex-col gap-1">
@@ -597,11 +603,13 @@
     <!-- Info Status Modal -->
     <div id="srs-status-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center relative">
-            <button onclick="document.getElementById('srs-status-modal').classList.add('hidden')" class="absolute top-3 right-4 text-slate-400 hover:text-slate-700 font-bold text-2xl">&times;</button>
+            <button onclick="closeSrsModal()" class="absolute top-3 right-4 text-slate-400 hover:text-slate-700 font-bold text-2xl">&times;</button>
             <div class="flex justify-center mb-4" id="srs-status-icon"></div>
             <h3 class="text-xl font-bold text-slate-800 mb-2" id="srs-status-word"></h3>
             <p class="text-sm font-bold text-indigo-600 mb-4" id="srs-status-trans"></p>
-            <p class="text-sm text-slate-500 mb-6 font-medium" id="srs-status-text"></p>
+            <div class="h-16 flex items-center justify-center mb-6" id="srs-status-text-container">
+                <p class="text-sm text-slate-500 font-medium" id="srs-status-text"></p>
+            </div>
             <button id="btn-reset-srs" class="hidden w-full bg-rose-100 text-rose-600 hover:bg-rose-200 py-3 rounded-xl font-bold transition border border-rose-200">Скинути прогрес</button>
         </div>
     </div>
@@ -627,8 +635,9 @@
         const LOCAL_UID_KEY = 'linguaspace_active_uid';
         const DEFAULT_SHARED_UID = "linguaspace"; 
 
-        const MAX_SRS_LEVEL = 4;
-        const SRS_INTERVALS = [0, 3 * 3600000, 12 * 3600000, 24 * 3600000, 72 * 3600000];
+        const MAX_SRS_LEVEL = 5;
+        // Інтервали: 0, 4 години, 24 години, 72 години, 7 днів, 21 день
+        const SRS_INTERVALS = [0, 4 * 3600000, 24 * 3600000, 72 * 3600000, 7 * 24 * 3600000, 21 * 24 * 3600000];
 
         const sessionEndAudio = new Audio("https://files.catbox.moe/lkmm5l.mp3");
         const sprintCorrectAudio = new Audio("https://file.garden/alYiOQx5lAiBA0qQ/Correct%20Answer%20Light%20Sound.mp3");
@@ -670,27 +679,28 @@
         let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
         window.addEventListener('scroll', function() {
             let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-            const header = document.querySelector('header');
+            const header = document.getElementById('main-app-header');
             const nav = document.querySelector('nav.sticky-nav');
-            const readerBar = document.querySelector('#reader-sticky-bar');
+            const readerBar = document.getElementById('reader-sticky-bar');
             const isReadMode = !document.getElementById('library-read-view').classList.contains('hidden');
             
             if (currentScroll > lastScrollTop && currentScroll > 60) {
                 // Scroll Down
-                header.style.top = '-60px';
+                if(header) header.style.top = '-60px';
                 if(nav && !nav.classList.contains('hidden')) nav.style.top = '0px';
                 
                 if (isReadMode && readerBar) {
-                    readerBar.style.top = '0px'; // Pins reader bar to the very top
+                    readerBar.style.top = '0px'; 
                     document.getElementById('reader-settings-panel').classList.add('hidden');
                 }
             } else {
                 // Scroll Up
-                header.style.top = '0px';
+                if(header) header.style.top = '0px';
                 if(nav && !nav.classList.contains('hidden')) nav.style.top = '60px';
                 
                 if (isReadMode && readerBar) {
-                    readerBar.style.top = '60px'; // Sits exactly under the main header
+                    // Якщо головна панель виїхала, зміщуємо панель читання під неї
+                    readerBar.style.top = currentScroll <= 60 ? '0px' : '60px'; 
                 }
             }
             lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
@@ -930,8 +940,9 @@
 
         function getSrsSvg(level, isSmall = false) {
             const size = isSmall ? "w-4 h-4" : "w-8 h-8";
-            const dash = [0, 15.7, 31.4, 47.1, 62.8][Math.min(4, Math.max(0, level || 0))];
-            const isDone = level >= 4;
+            // Поділено на 5 рівнів (62.8 / 5 = 12.56)
+            const dash = [0, 12.56, 25.12, 37.68, 50.24, 62.8][Math.min(5, Math.max(0, level || 0))];
+            const isDone = level >= 5;
             return `<svg class="${size} transform -rotate-90 cursor-pointer hover:opacity-80 transition flex-shrink-0" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" stroke="#e2e8f0" stroke-width="4" fill="none" />
                 <circle cx="12" cy="12" r="10" stroke="${isDone ? '#10b981' : '#4f46e5'}" stroke-width="4" fill="none" stroke-dasharray="${dash} 62.8" stroke-linecap="round" class="transition-all duration-500" />
@@ -954,13 +965,34 @@
 
         window.setDictMaterial = (src) => { currentDictFilter = 'material_specific'; specificMaterialName = src; setDictFilter('material_specific'); };
 
+        let dictSearchTimeout = null;
+        window.handleDictSearchInput = () => {
+            clearTimeout(dictSearchTimeout);
+            dictSearchTimeout = setTimeout(() => {
+                renderDictionary();
+            }, 400); 
+        };
+        
+        window.executeDictSearch = () => {
+            clearTimeout(dictSearchTimeout);
+            renderDictionary();
+        };
+
         function renderDictionary() {
             const grid = document.getElementById('words-grid');
+            const searchInput = document.getElementById('dict-search-input');
+            const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
             let filtered = vocabulary;
 
             if (currentDictFilter === 'materials') {
-                const materialSources = [...new Set(vocabulary.map(v => v.source).filter(s => s !== 'Словник' && s !== 'Імпорт' && s !== 'Читання'))];
-                if(materialSources.length === 0) { grid.innerHTML = '<p class="text-slate-500 font-bold col-span-full">У вас ще немає слів з матеріалів.</p>'; return; }
+                let materialSources = [...new Set(vocabulary.map(v => v.source).filter(s => s !== 'Словник' && s !== 'Імпорт' && s !== 'Читання'))];
+                
+                if (query) {
+                    materialSources = materialSources.filter(src => src.toLowerCase().includes(query));
+                }
+
+                if(materialSources.length === 0) { grid.innerHTML = '<p class="text-slate-500 font-bold col-span-full text-center py-8">Нічого не знайдено.</p>'; return; }
                 
                 grid.innerHTML = materialSources.map(src => {
                     const count = vocabulary.filter(w => w.source === src).length;
@@ -981,7 +1013,11 @@
             else if(currentDictFilter === 'import') filtered = vocabulary.filter(v => v.source === 'Імпорт');
             else if(currentDictFilter === 'material_specific') filtered = vocabulary.filter(v => v.source === specificMaterialName);
 
-            if(filtered.length === 0) { grid.innerHTML = '<p class="text-slate-500 font-bold col-span-full">Немає слів у цій категорії.</p>'; return; }
+            if (query) {
+                filtered = filtered.filter(v => v.word.toLowerCase().includes(query) || v.translation.toLowerCase().includes(query));
+            }
+
+            if(filtered.length === 0) { grid.innerHTML = '<p class="text-slate-500 font-bold col-span-full text-center py-8">Немає слів за цим запитом.</p>'; return; }
 
             grid.innerHTML = filtered.map(item => `
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group hover:shadow-md hover:border-indigo-300 transition h-40 sm:h-48">
@@ -1158,11 +1194,14 @@
                 if (!res.ok) throw new Error("API Error");
                 let text = await res.text();
                 
+                // Агресивний фільтр для очищення всього зайвого сміття (меню, реклама, зображення, копірайти)
                 text = text.replace(/!\[.*?\]\(.*?\)/g, ''); 
                 text = text.replace(/\[.*?\]\(.*?\)/g, '$1'); 
                 text = text.replace(/Image:.*?$/gm, ''); 
-                text = text.replace(/Photo:.*?$/gm, ''); 
+                text = text.replace(/Photo:.*?$/gm, '');
                 text = text.replace(/^[ \t]*>[ \t]?/gm, ''); 
+                text = text.replace(/(?:Click here|Read more|Subscribe|Follow us).*?$/gim, ''); 
+                text = text.replace(/©.*?$/gm, ''); 
                 text = text.replace(/\n{3,}/g, '\n\n'); 
                 text = text.trim();
 
@@ -1427,7 +1466,7 @@
                     <div class="flex-1 truncate pl-2 ${isRead ? 'opacity-80' : ''}">
                         <h3 class="font-bold ${isRead ? 'text-slate-600' : 'text-slate-800'} truncate text-lg flex items-center gap-2">
                             ${isRead ? '<span class="text-slate-400" title="Опрацьовано">✅</span>' : ''} 
-                            ${m.ytId ? '<span class="text-red-500">📺</span>' : '<span class="text-amber-600">📜</span>'} ${m.title}
+                            ${m.ytId ? '<span class="text-red-500 text-xl">📺</span>' : '<span class="text-amber-600 text-xl">📜</span>'} ${m.title}
                         </h3>
                         <p class="text-sm text-slate-500 mt-1 truncate font-medium">
                             ${isRead && readDate ? `<span class="text-slate-400 text-xs font-medium mr-2 bg-slate-100 px-1.5 py-0.5 rounded shadow-sm border border-slate-200">Опрацьовано: ${readDate}</span>` : ''}
@@ -1717,7 +1756,6 @@
                     const nextText = nextSub ? nextSub.text.trim() : '';
                     const startsWithCapital = /^[A-Z"'«“]/.test(nextText);
 
-                    // Зменшено кількість рядків для частішого розбиття абзаців
                     if (linesInPara >= 2 && endsWithSentence && startsWithCapital) {
                         finalHtml += `<p class="mb-4 leading-[2.2] text-justify">${paragraphTemp}</p>`;
                         paragraphTemp = '';
@@ -1911,40 +1949,65 @@
                 .catch(err => console.log('Dictionary fetch error:', err));
         }
 
+        let srsTimerInterval = null;
+
+        window.closeSrsModal = () => {
+            document.getElementById('srs-status-modal').classList.add('hidden');
+            if (srsTimerInterval) clearInterval(srsTimerInterval);
+        };
+
         window.showSrsStatus = (id) => {
             const word = vocabulary.find(v => v.id === id); if(!word) return;
             const modal = document.getElementById('srs-status-modal');
+            if(srsTimerInterval) clearInterval(srsTimerInterval);
+            
             document.getElementById('srs-status-icon').innerHTML = getSrsSvg(word.srsLevel, false);
             document.getElementById('srs-status-word').textContent = word.word;
             document.getElementById('srs-status-trans').textContent = word.translation;
             
-            const now = Date.now();
-            let text = "";
-            if (word.srsLevel >= MAX_SRS_LEVEL) {
-                text = "Слово повністю вивчено! 🎉";
-            } else if (!word.nextReviewTime || word.nextReviewTime <= now) {
-                text = "Готово до тренування ✅";
-            } else {
-                const diff = word.nextReviewTime - now;
-                const hrs = Math.floor(diff / 3600000);
-                const mins = Math.ceil((diff % 3600000) / 60000);
-                
-                if (hrs > 0) {
-                    text = `Наступне повторення через ~${hrs} год ${mins} хв ⏳`;
-                } else {
-                    text = `Наступне повторення через ~${mins} хв ⏳`;
-                }
-            }
-            document.getElementById('srs-status-text').textContent = text;
-            
+            const textContainer = document.getElementById('srs-status-text-container');
             const btnReset = document.getElementById('btn-reset-srs');
+            
             if (word.srsLevel >= MAX_SRS_LEVEL) {
+                textContainer.innerHTML = '<span class="text-emerald-600 font-bold text-base">Слово повністю вивчено! 🎉</span>';
                 btnReset.classList.remove('hidden');
                 btnReset.onclick = async () => {
                     await updateDoc(doc(db, 'users', activeUid, 'words', word.id), { srsLevel: 0, nextReviewTime: 0 });
-                    modal.classList.add('hidden');
+                    closeSrsModal();
                 };
-            } else { btnReset.classList.add('hidden'); }
+            } else if (!word.nextReviewTime || word.nextReviewTime <= Date.now()) {
+                textContainer.innerHTML = '<span class="text-emerald-600 font-bold text-base">Готово до тренування ✅</span>';
+                btnReset.classList.add('hidden');
+            } else {
+                btnReset.classList.add('hidden');
+                const updateTimer = () => {
+                    const diff = word.nextReviewTime - Date.now();
+                    if (diff <= 0) {
+                        textContainer.innerHTML = '<span class="text-emerald-600 font-bold text-base">Готово до тренування ✅</span>';
+                        clearInterval(srsTimerInterval);
+                        return;
+                    }
+                    
+                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                    const m = Math.floor((diff / 1000 / 60) % 60);
+                    const s = Math.floor((diff / 1000) % 60);
+                    
+                    let timeStr = "";
+                    if (d > 0) timeStr += `${d}д `;
+                    timeStr += `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    
+                    textContainer.innerHTML = `
+                        <div class="flex flex-col items-center justify-center">
+                            <span class="text-xs uppercase text-slate-400 font-bold tracking-wider mb-1">До повторення:</span>
+                            <span class="font-mono text-xl font-bold text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-lg border border-indigo-100 shadow-sm">${timeStr} ⏳</span>
+                        </div>
+                    `;
+                };
+                
+                updateTimer();
+                srsTimerInterval = setInterval(updateTimer, 1000);
+            }
             
             modal.classList.remove('hidden');
         };
@@ -2002,7 +2065,7 @@
             const now = Date.now();
             
             let dueWords = [];
-            if(mode === 'all') { dueWords = pool.filter(w => w.srsLevel < MAX_SRS_LEVEL && (!w.nextReviewTime || w.nextReviewTime <= now)); } 
+            if(mode === 'all') { dueWords = pool.filter(w => (w.srsLevel || 0) < MAX_SRS_LEVEL && (!w.nextReviewTime || w.nextReviewTime <= now)); } 
             else { dueWords = pool.filter(w => (w[`srs_${mode}_Level`] || 0) < MAX_SRS_LEVEL && (!(w[`srs_${mode}_NextTime`] || 0) || w[`srs_${mode}_NextTime`] <= now)); }
 
             if(dueWords.length < 15) {
@@ -2070,7 +2133,7 @@
 
         window.startReviewSession = () => {
             const srcFilter = document.getElementById('train-source-select').value;
-            let pool = vocabulary.filter(w => w.srsLevel >= MAX_SRS_LEVEL);
+            let pool = vocabulary.filter(w => (w.srsLevel || 0) >= MAX_SRS_LEVEL);
             if(srcFilter !== 'ALL') pool = pool.filter(w => w.source === srcFilter);
             if(pool.length === 0) return window.showModal("Немає повністю вивчених слів у цій категорії.");
             
@@ -2239,7 +2302,7 @@
             }
 
             document.getElementById('bs-results-list').innerHTML = bsWords.map(w => {
-                let currentLevel = w.srsLevel || 0;
+                let currentLevel = activeSessionMode === 'all' || activeSessionMode === 'sprint' ? (w.srsLevel || 0) : (w[`srs_${activeSessionMode}_Level`] || 0);
                 let newLevel = w.failed ? 0 : Math.min(currentLevel + 1, MAX_SRS_LEVEL);
                 
                 return `<div class="border-b border-slate-200 pb-3 mb-3 flex justify-between items-center">
