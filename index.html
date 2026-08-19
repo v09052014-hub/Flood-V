@@ -22,8 +22,19 @@
         
         /* Reader Styles - Baseline, dynamically overridden by JS */
         .text-reader { line-height: 1.8; color: #334155; transition: font-size 0.2s, font-family 0.2s; }
+        #reader-content-wrapper { transition: max-width 0.25s ease; }
         @media (max-width: 640px) {
             #reader-content-wrapper { padding-left: 0.75rem; padding-right: 0.75rem; }
+        }
+        #view-library.reader-wide-mode { transition: max-width 0.3s ease; }
+
+        /* Training focus mode — повне приховування шапки та вкладок */
+        body.training-focus-mode #main-app-header,
+        body.training-focus-mode #main-tabs-nav {
+            display: none !important;
+        }
+        body.training-focus-mode main {
+            padding-top: 0.75rem;
         }
         
         .word-clickable { cursor: pointer; border-radius: 4px; transition: all 0.2s; padding: 0 2px; border-bottom: 1px dotted transparent; }
@@ -61,6 +72,39 @@
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
+        .duocards-logo { width: 18px; height: 18px; object-fit: contain; border-radius: 4px; flex-shrink: 0; }
+        .duocards-logo-lg { width: 22px; height: 22px; }
+        #bulk-add-dialog { max-width: 42rem; }
+        #bulk-add-dialog.bulk-expanded { max-width: min(72rem, 96vw); height: 94vh; max-height: 94vh; }
+        #bulk-add-dialog.bulk-expanded #bulk-input-wrap { display: none; }
+        .word-card-selected { outline: 2px solid #4f46e5; outline-offset: 0; }
+        .dict-icon-btn {
+            width: 2.25rem;
+            height: 2.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.65rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            font-size: 1.05rem;
+            line-height: 1;
+            flex-shrink: 0;
+            transition: background-color 0.15s, border-color 0.15s;
+        }
+        .dict-icon-btn:hover:not(:disabled) {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+        }
+        .dict-icon-btn.is-active {
+            background: #eef2ff;
+            border-color: #a5b4fc;
+        }
+        .dict-icon-btn:disabled { opacity: 0.35; pointer-events: none; }
+        .dict-icon-btn.hidden { display: none !important; }
+        #dict-select-bar { display: none; }
+        #dict-select-bar.is-open { display: flex; }
+
         .inline-context-input {
             display: inline-block;
             width: 120px;
@@ -88,6 +132,13 @@
             40%, 80% { transform: translateX(6px); }
         }
         .animate-shake { animation: cw-shake 0.2s ease-in-out; }
+
+        #dict-context-dropdown, #bulk-folder-dropdown {
+            min-width: 220px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        .dict-context-item.active { background-color: #eef2ff; color: #4338ca; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased font-sans">
@@ -187,12 +238,27 @@
 
     <!-- Modal: Bulk Import -->
     <div id="bulk-add-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-2xl w-full relative max-h-[90vh] flex flex-col">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full relative max-h-[90vh] flex flex-col" id="bulk-add-dialog">
             <button onclick="closeBulkModal()" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700 font-bold text-2xl">&times;</button>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">📥 Розумний імпорт слів</h3>
-            <p class="text-xs text-slate-500 mb-4 leading-relaxed">Вставте текст (слово - переклад - контекст) або перетягніть сюди <b>.CSV / .TXT</b> файл.</p>
+            <div class="flex items-start justify-between gap-3 pr-8 mb-2">
+                <h3 class="text-xl font-bold text-slate-800">📥 Розумний імпорт слів</h3>
+                <button type="button" id="btn-bulk-expand" onclick="toggleBulkExpand()" class="w-8 h-8 flex items-center justify-center text-lg bg-slate-50 border border-slate-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-200 text-slate-600 transition flex-shrink-0" title="Розгорнути">⤢</button>
+            </div>
+            <p id="bulk-import-hint" class="text-xs text-slate-500 mb-3 leading-relaxed">Вставте текст (слово - переклад - контекст) або перетягніть сюди <b>.CSV / .TXT</b> файл.</p>
+            <button type="button" id="btn-duocards-import" onclick="toggleDuoCardsImport()" class="mb-4 inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition self-start" title="Імпорт з DuoCards">
+                <img src="https://files.catbox.moe/ac2k6p.webp" alt="DuoCards" class="duocards-logo" onerror="this.style.display='none'">
+            </button>
+
+            <div class="mb-4 relative" id="bulk-folder-wrapper">
+                <label class="text-xs font-bold text-slate-500 uppercase block mb-1">Папка для збереження:</label>
+                <button type="button" onclick="toggleBulkFolderDropdown()" id="bulk-folder-btn" class="w-full flex items-center justify-between gap-2 text-sm font-bold bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-xl hover:bg-slate-100 transition text-left">
+                    <span id="bulk-folder-label" class="truncate text-slate-700">📥 Імпорт</span>
+                    <span class="text-slate-400 flex-shrink-0">▼</span>
+                </button>
+                <div id="bulk-folder-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 custom-scroll"></div>
+            </div>
             
-            <div class="relative group mb-4" ondragover="handleBulkDragOver(event)" ondragleave="handleBulkDragLeave(event)" ondrop="handleBulkDrop(event)">
+            <div class="relative group mb-4" id="bulk-input-wrap" ondragover="handleBulkDragOver(event)" ondragleave="handleBulkDragLeave(event)" ondrop="handleBulkDrop(event)">
                 <textarea id="bulk-input-text" rows="5" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm font-mono custom-scroll" placeholder="apple - яблуко - An apple a day keeps the doctor away&#10;resilient&#10;obvious ; очевидний"></textarea>
                 <div id="bulk-drop-overlay" class="absolute inset-0 bg-indigo-50/95 border-2 border-dashed border-indigo-500 rounded-xl hidden flex-col items-center justify-center pointer-events-none transition-all">
                     <div class="text-4xl mb-2">📄</div>
@@ -200,9 +266,17 @@
                 </div>
             </div>
             
-            <div id="bulk-preview-area" class="hidden flex-1 overflow-y-auto mb-4 border border-slate-200 rounded-xl p-3 bg-slate-50 custom-scroll">
+            <div id="bulk-preview-area" class="hidden flex-1 min-h-0 overflow-hidden mb-4 border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col">
+                <div id="bulk-preview-toolbar" class="hidden flex items-center justify-between gap-2 mb-3 flex-shrink-0">
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="setBulkSelection(true)" class="text-xs font-bold bg-white border border-slate-200 px-2.5 py-1.5 rounded-lg hover:bg-indigo-50 hover:border-indigo-200 text-slate-600 transition">☑️ Вибрати всі</button>
+                        <button type="button" onclick="setBulkSelection(false)" class="text-xs font-bold bg-white border border-slate-200 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition">☐ Зняти всі</button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-y-auto custom-scroll min-h-0">
                 <div id="bulk-loader" class="text-center py-4 text-indigo-600 font-bold text-sm hidden flex flex-col items-center gap-2"><div class="loader"></div> Обробка та переклад...</div>
                 <ul id="bulk-preview-list" class="space-y-3"></ul>
+                </div>
             </div>
 
             <div class="flex gap-3 mt-auto">
@@ -213,7 +287,7 @@
     </div>
 
     <header id="main-app-header" class="bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center shadow-sm h-[60px]">
-        <h1 class="font-bold text-indigo-600 text-xl tracking-tight flex items-center gap-2">
+        <h1 class="font-bold text-indigo-600 text-xl tracking-tight flex items-center gap-2 cursor-default" title="">
             <span class="text-2xl">🌌</span> LinguaSpace
         </h1>
         <button onclick="openSyncModal()" class="text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg border border-indigo-100 transition shadow-sm flex items-center gap-1.5">
@@ -254,31 +328,52 @@
             </div>
 
             <div class="max-w-3xl mx-auto">
-                <div class="flex justify-between items-center mb-4 px-1">
-                    <span class="text-sm font-bold text-slate-500 uppercase tracking-wider">Словник: <span id="word-count" class="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">0</span></span>
-                    <div class="flex gap-2">
-                        <button onclick="openBulkModal()" class="text-sm font-bold bg-white shadow-sm border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition flex items-center gap-1">📥 Імпорт</button>
-                        <button onclick="exportWordsJSON()" class="text-sm font-bold bg-white shadow-sm border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition flex items-center gap-1">⚙️ Експорт</button>
+                <div class="flex items-center gap-2 mb-3 px-1">
+                    <div class="flex items-center gap-1.5 min-w-0 flex-1">
+                        <button type="button" id="btn-dict-back" onclick="goBackFromDictFolder()" class="hidden dict-icon-btn" title="Назад до папок">←</button>
+                        <div class="relative min-w-0 shrink" id="dict-context-wrapper">
+                            <button type="button" onclick="toggleDictContextDropdown(event)" id="dict-context-btn" class="flex items-center gap-1.5 text-sm font-bold text-slate-500 tracking-wide hover:text-indigo-600 transition group min-w-0 max-w-full" title="">
+                                <span id="dict-context-label" class="truncate normal-case max-w-[7rem] sm:max-w-[12rem] md:max-w-[16rem] lg:max-w-[20rem]">Усі слова</span>
+                                <span class="flex-shrink-0 text-slate-400">:</span>
+                                <span id="word-count" class="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md group-hover:bg-indigo-100 transition flex-shrink-0">0</span>
+                                <span class="text-slate-400 text-xs normal-case flex-shrink-0">▼</span>
+                            </button>
+                            <div id="dict-context-dropdown" class="hidden absolute left-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-[120] custom-scroll min-w-[240px]"></div>
+                        </div>
+                        <button id="btn-add-folder" onclick="openCreateFolderModal()" class="dict-icon-btn" title="Створити папку">
+                            <span class="relative inline-flex items-center justify-center">
+                                <span class="text-base leading-none">📁</span>
+                                <span class="absolute -bottom-1 -right-1 text-[9px] leading-none bg-indigo-600 text-white rounded-full w-3 h-3 flex items-center justify-center font-black">+</span>
+                            </span>
+                        </button>
+                        <button id="btn-reset-folder-srs" onclick="resetActiveFolderProgress()" class="hidden" title="Скинути прогрес">↺</button>
+                        <button id="btn-delete-folder" onclick="deleteActiveFolder()" class="hidden" title="Видалити">🗑️</button>
+                    </div>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button type="button" id="btn-dict-select" onclick="toggleDictSelectMode()" class="dict-icon-btn" title="Вибрати слова">☑️</button>
+                        <button type="button" onclick="openBulkModal()" class="dict-icon-btn" title="Імпорт">📥</button>
+                        <button type="button" onclick="exportWordsJSON()" class="dict-icon-btn" title="Експорт">⚙️</button>
                     </div>
                 </div>
 
-                <!-- Строка пошуку по словнику -->
-                <div class="mb-4 relative px-1">
+                <div class="mb-3 relative px-1">
                     <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400">🔍</span>
                     <input type="text" id="dict-search-input" oninput="handleDictSearchInput()" onkeydown="if(event.key==='Enter') { event.preventDefault(); executeDictSearch(); }" placeholder="Пошук слів чи перекладу..." class="w-full p-3 pl-10 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-bold text-slate-700 bg-white shadow-sm transition">
                 </div>
 
-                <div class="flex gap-2 overflow-x-auto custom-scroll pb-2 mb-4" id="dict-filters">
+                <div class="flex gap-2 overflow-x-auto custom-scroll pb-1 mb-3 px-1" id="dict-filters">
                     <button onclick="setDictFilter('all')" id="filter-btn-all" class="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-white shadow-sm transition">Усі слова</button>
-                    <button onclick="setDictFilter('manual')" id="filter-btn-manual" class="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">Словник</button>
                     <button onclick="setDictFilter('import')" id="filter-btn-import" class="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">Імпорт</button>
                     <button onclick="setDictFilter('materials')" id="filter-btn-materials" class="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition flex items-center gap-1">📁 Матеріали</button>
                 </div>
-                
-                <div id="dict-back-btn-container" class="hidden mb-4 px-1">
-                    <button onclick="setDictFilter('materials')" class="text-sm text-indigo-600 font-bold bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition flex items-center gap-1 shadow-sm">
-                        ← Назад до папок
-                    </button>
+
+                <div id="dict-select-bar" class="items-center gap-1.5 pb-1 mb-3 px-1">
+                    <button type="button" id="btn-select-all" onclick="setDictSelection(true)" class="dict-icon-btn" title="Вибрати всі">☑️</button>
+                    <button type="button" id="btn-select-none" onclick="setDictSelection(false)" class="dict-icon-btn" title="Зняти всі">☐</button>
+                    <button type="button" id="btn-move-words" onclick="openMoveWordsModal()" class="dict-icon-btn" title="Перенести в іншу папку">➡️</button>
+                    <button type="button" id="btn-reset-selected" onclick="resetSelectedWordsProgress()" class="dict-icon-btn" title="Скинути прогрес">↺</button>
+                    <button type="button" id="btn-delete-selected" onclick="deleteSelectedWords()" class="dict-icon-btn" title="Видалити вибрані">🗑️</button>
+                    <span id="dict-selected-count" class="text-xs font-bold text-slate-400 min-w-[1.25rem]"></span>
                 </div>
             </div>
 
@@ -408,12 +503,22 @@
                         <button onclick="toggleReaderSettings(event)" class="p-2 text-slate-500 hover:text-indigo-600 transition bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
                             <span class="text-xl leading-none">⚙️</span>
                         </button>
-                        <div id="reader-settings-panel" onclick="event.stopPropagation()" class="hidden absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 p-3 z-[150]">
+                        <div id="reader-settings-panel" onclick="event.stopPropagation()" class="hidden absolute right-0 top-full mt-2 w-60 bg-white rounded-xl shadow-xl border border-slate-200 p-3 z-[150]">
                             <p class="text-xs font-bold text-slate-400 uppercase mb-2">Розмір тексту</p>
                             <div class="flex justify-between items-center mb-4 bg-slate-50 rounded-lg p-1 border border-slate-100" onclick="event.stopPropagation()">
                                 <button onclick="event.stopPropagation(); changeFontSize(-1)" class="px-4 py-1.5 font-bold text-slate-600 hover:text-indigo-600 hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200">A-</button>
                                 <span id="font-size-display" class="text-sm font-bold text-slate-700">18px</span>
                                 <button onclick="event.stopPropagation(); changeFontSize(1)" class="px-4 py-1.5 font-bold text-slate-600 hover:text-indigo-600 hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200">A+</button>
+                            </div>
+                            <p class="text-xs font-bold text-slate-400 uppercase mb-2">Ширина вікна</p>
+                            <div class="flex justify-between items-center mb-4 bg-slate-50 rounded-lg p-1 border border-slate-100" onclick="event.stopPropagation()">
+                                <button onclick="event.stopPropagation(); changeReaderWidth(-1)" id="btn-reader-narrow" class="px-3 py-1.5 text-base leading-none hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed" title="Вужче">➡️⬅️</button>
+                                <div id="reader-width-indicator" class="flex items-center gap-1.5 px-1">
+                                    <span class="reader-width-dot w-2 h-2 rounded-full bg-indigo-500 transition-colors"></span>
+                                    <span class="reader-width-dot w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+                                    <span class="reader-width-dot w-2 h-2 rounded-full bg-slate-300 transition-colors"></span>
+                                </div>
+                                <button onclick="event.stopPropagation(); changeReaderWidth(1)" id="btn-reader-widen" class="px-3 py-1.5 text-base leading-none hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed" title="Ширше">⬅️➡️</button>
                             </div>
                             <p class="text-xs font-bold text-slate-400 uppercase mb-2">Шрифт</p>
                             <div class="flex flex-col gap-1">
@@ -468,7 +573,7 @@
                 <button onclick="startSession('all')" class="w-full bg-indigo-600 text-white p-6 rounded-2xl shadow-lg hover:bg-indigo-700 transition active:scale-95 text-left flex justify-between items-center mb-4 relative overflow-hidden group">
                     <div class="absolute right-0 top-0 bottom-0 w-32 bg-indigo-500 opacity-20 skew-x-12 transform translate-x-4 group-hover:translate-x-0 transition-transform"></div>
                     <div>
-                        <h3 class="text-2xl font-bold mb-1">🧠 Почати Brainstorm</h3>
+                        <h3 class="text-2xl font-bold mb-1">🧠 Brainstorm</h3>
                         <p class="text-indigo-100 text-sm font-medium">Інтенсивне комплексне опрацювання слів.</p>
                     </div>
                 </button>
@@ -519,19 +624,22 @@
             </div>
 
             <!-- Workspace -->
-            <div id="bs-workspace" class="hidden mt-2 relative">
-                <button onclick="toggleMute()" id="btn-global-mute" class="absolute -top-10 right-0 p-2 bg-slate-100 hover:bg-slate-200 rounded-full shadow-sm border border-slate-200 z-10 text-xl transition-colors" title="Вимкнути авто-звук">🔊</button>
-
-                <div class="flex justify-between items-center mb-2 px-1">
-                    <span id="bs-overall-stage" class="text-sm font-bold text-slate-500 uppercase tracking-wider"></span>
-                    <span id="bs-word-counter" class="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md"></span>
+            <div id="bs-workspace" class="hidden mt-1 relative">
+                <div id="bs-toolbar" class="flex items-center justify-between gap-2 mb-3 px-0.5">
+                    <button onclick="endSession()" id="btn-end-session" class="h-10 px-3 flex items-center justify-center gap-1.5 bg-white hover:bg-rose-50 text-rose-600 rounded-xl border border-slate-200 shadow-sm text-sm font-bold transition active:scale-95 flex-shrink-0" title="Перервати (Esc)"><span class="text-base leading-none">✕</span><span class="hidden sm:inline">Стоп</span></button>
+                    <div class="flex items-center justify-center gap-2 min-w-0 flex-1 overflow-hidden px-1">
+                        <span id="bs-overall-stage" class="text-xs font-bold text-slate-500 uppercase tracking-wider truncate"></span>
+                        <span id="bs-word-counter" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md flex-shrink-0"></span>
+                    </div>
+                    <button onclick="toggleMute()" id="btn-global-mute" class="w-10 h-10 flex items-center justify-center bg-white hover:bg-slate-50 rounded-xl border border-slate-200 shadow-sm text-lg transition-colors flex-shrink-0" title="Звук">🔊</button>
                 </div>
-                <div class="w-full bg-slate-200 rounded-full h-3 mb-4 overflow-hidden border border-slate-200">
+
+                <div class="w-full bg-slate-200 rounded-full h-2 mb-4 overflow-hidden border border-slate-200">
                     <div id="bs-progress-bar" class="bg-indigo-500 h-full rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
                 </div>
 
-                <div id="bs-workspace-layout" class="flex flex-col lg:flex-row gap-6 items-start justify-center w-full">
-                    <div id="bs-main-card" class="bg-white p-4 sm:p-5 rounded-2xl shadow-xl border border-slate-100 text-center relative overflow-hidden flex flex-col min-h-[300px] w-full">
+                <div id="bs-workspace-layout" class="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start justify-center w-full">
+                    <div id="bs-main-card" class="bg-white p-4 sm:p-5 rounded-2xl shadow-xl border border-slate-100 text-center relative overflow-hidden flex flex-col min-h-[260px] w-full">
                         <div id="bs-interactive-area" class="flex-1 flex flex-col justify-center relative z-10 w-full"></div>
                         <div id="bs-feedback" class="mt-2 min-h-[28px] flex items-center justify-center font-bold text-lg relative z-10"></div>
                         
@@ -551,15 +659,20 @@
                     </div>
                     <div id="bs-external-clues" class="w-full lg:w-5/12 hidden transition-all"></div>
                 </div>
+            </div>
 
-                <button onclick="endSession()" class="mt-6 text-sm text-slate-400 font-bold w-full text-center hover:text-slate-600 transition">× Перервати тренування</button>
+            <!-- Saving (before results) -->
+            <div id="bs-saving" class="hidden bg-white p-10 sm:p-12 rounded-2xl shadow-xl border border-slate-100 text-center mt-6">
+                <div class="loader mx-auto mb-4"></div>
+                <h2 class="text-xl font-bold text-slate-800 mb-1">Зберігаємо результати...</h2>
+                <p class="text-sm text-slate-500">Зачекайте кілька секунд</p>
             </div>
 
             <!-- Results -->
             <div id="bs-results" class="hidden bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-100 text-center mt-6">
                 <div class="text-6xl mb-4">🏆</div>
                 <h2 class="text-2xl font-bold text-slate-800 mb-2">Завершено!</h2>
-                
+                <p id="bs-save-status" class="text-sm text-slate-500 mt-1 mb-4 hidden"></p>
                 <!-- Топ-3 Спринт результати -->
                 <div id="sprint-leaderboard" class="hidden mb-6 bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-left max-w-sm mx-auto">
                     <h4 class="font-bold text-indigo-800 text-sm uppercase mb-2 flex items-center gap-1.5">⚡ Рекорди:</h4>
@@ -600,17 +713,67 @@
         </div>
     </div>
 
+    <!-- Modal: Move words to folder -->
+    <div id="move-words-modal" class="hidden fixed inset-0 z-[170] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this) closeMoveWordsModal()">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full relative max-h-[85vh] flex flex-col">
+            <button onclick="closeMoveWordsModal()" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700 font-bold text-2xl">&times;</button>
+            <h3 class="text-xl font-bold text-slate-800 mb-1">➡️ Перенести слова</h3>
+            <p class="text-xs text-slate-500 mb-4" id="move-words-count">Оберіть папку призначення</p>
+            <div id="move-words-folder-list" class="flex-1 overflow-y-auto custom-scroll border border-slate-200 rounded-xl mb-3"></div>
+            <button onclick="openCreateFolderModal(selectMoveFolderAndSave)" class="w-full text-left px-4 py-3 text-sm font-bold text-indigo-600 hover:bg-indigo-50 rounded-xl border border-indigo-100 flex items-center gap-2">
+                <span class="relative inline-flex w-5 h-5 items-center justify-center"><span class="text-sm">📁</span><span class="absolute -bottom-0.5 -right-1 text-[8px] bg-indigo-600 text-white rounded-full w-3 h-3 flex items-center justify-center font-black">+</span></span>
+                Нова папка
+            </button>
+        </div>
+    </div>
+    <div id="create-folder-modal" class="hidden fixed inset-0 z-[170] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this) closeCreateFolderModal()">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full relative">
+            <button onclick="closeCreateFolderModal()" class="absolute top-3 right-4 text-slate-400 hover:text-slate-700 font-bold text-2xl">&times;</button>
+            <h3 class="text-xl font-bold text-slate-800 mb-1">📂 Нова папка</h3>
+            <p class="text-xs text-slate-500 mb-4">Введіть назву для групування слів</p>
+            <input type="text" id="create-folder-input" maxlength="80" placeholder="Назва папки..." class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-bold text-slate-800 mb-4" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmCreateFolder();}">
+            <div class="flex gap-3">
+                <button onclick="closeCreateFolderModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition">Скасувати</button>
+                <button onclick="confirmCreateFolder()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition shadow-sm">Створити</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Info Status Modal -->
     <div id="srs-status-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center relative">
             <button onclick="closeSrsModal()" class="absolute top-3 right-4 text-slate-400 hover:text-slate-700 font-bold text-2xl">&times;</button>
-            <div class="flex justify-center mb-4" id="srs-status-icon"></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2" id="srs-status-word"></h3>
-            <p class="text-sm font-bold text-indigo-600 mb-4" id="srs-status-trans"></p>
-            <div class="h-16 flex items-center justify-center mb-6" id="srs-status-text-container">
-                <p class="text-sm text-slate-500 font-medium" id="srs-status-text"></p>
+            <h3 class="text-xl font-bold text-slate-800 mb-0.5" id="srs-status-word"></h3>
+            <p class="text-sm font-bold text-indigo-600 mb-1" id="srs-status-trans"></p>
+            <p id="srs-added-date" class="text-[11px] text-slate-400 mb-4"></p>
+            <div class="bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">
+                <div class="flex items-center justify-center gap-4">
+                    <div id="srs-status-icon"></div>
+                    <div class="text-left">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Brainstorm</div>
+                        <div class="flex items-baseline gap-0.5">
+                            <span id="srs-level-big" class="text-2xl font-bold text-indigo-600 leading-none">0</span>
+                            <span class="text-base font-bold text-slate-400">/ <span id="srs-level-max">6</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center gap-1.5 mt-3" id="srs-progress-dots"></div>
+                <button type="button" id="btn-toggle-srs-modes" onclick="toggleSrsModesPanel()" class="w-full text-xs font-bold text-indigo-600 hover:bg-indigo-50 py-2 rounded-lg transition mt-3 border border-indigo-100">
+                    ▼ Окремі тренування
+                </button>
+                <div id="srs-modes-panel" class="hidden mt-3 pt-3 border-t border-slate-100 space-y-2.5 text-left"></div>
+                <div id="srs-mode-history-panel" class="hidden mt-3 pt-3 border-t border-slate-100 text-left">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2" id="srs-mode-history-title"></p>
+                    <div id="srs-mode-history-list" class="max-h-28 overflow-y-auto custom-scroll space-y-1.5"></div>
+                    <button type="button" onclick="closeModeTrainingHistory()" class="w-full text-[11px] text-slate-400 hover:text-slate-600 mt-2 py-1">← Закрити</button>
+                </div>
             </div>
-            <button id="btn-reset-srs" class="hidden w-full bg-rose-100 text-rose-600 hover:bg-rose-200 py-3 rounded-xl font-bold transition border border-rose-200">Скинути прогрес</button>
+            <div class="flex items-center justify-center mb-4 min-h-[3.5rem]" id="srs-status-text-container"></div>
+            <div id="srs-history-section" class="mb-4 text-left border-t border-slate-100 pt-3">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Історія Brainstorm</p>
+                <div id="srs-history-list" class="max-h-32 overflow-y-auto custom-scroll space-y-1.5"></div>
+            </div>
+            <button id="btn-reset-srs" onclick="resetWordBrainstormProgress()" class="w-full bg-rose-50 text-rose-600 hover:bg-rose-100 py-2.5 rounded-xl font-bold transition border border-rose-200 text-sm">↺ Скинути прогрес</button>
         </div>
     </div>
 
@@ -620,7 +783,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, updateDoc, setDoc, getDoc, writeBatch, arrayUnion, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARJpUlEfJ53Q1a9qd9fyYC6gmHY58AKfI",
@@ -635,9 +798,140 @@
         const LOCAL_UID_KEY = 'linguaspace_active_uid';
         const DEFAULT_SHARED_UID = "linguaspace"; 
 
-        const MAX_SRS_LEVEL = 5;
-        // Інтервали: 0, 4 години, 24 години, 72 години, 7 днів, 21 день
-        const SRS_INTERVALS = [0, 4 * 3600000, 24 * 3600000, 72 * 3600000, 7 * 24 * 3600000, 21 * 24 * 3600000];
+        const MAX_SRS_LEVEL = 6;
+        const CORE_TRAIN_MODES = [
+            { id: 'word-trans', label: 'Слово → Переклад' },
+            { id: 'constructor', label: 'Конструктор' },
+            { id: 'typing', label: 'Написання' },
+            { id: 'listening', label: 'Аудіювання' }
+        ];
+        const EXTRA_TRAIN_MODES = [
+            { id: 'trans-word', label: 'Переклад → Слово' },
+            { id: 'context', label: 'Контекст' },
+            { id: 'crossword', label: 'Кросворд' },
+            { id: 'picture', label: 'По фото' }
+        ];
+        const ALL_SEPARATE_MODES = [...CORE_TRAIN_MODES, ...EXTRA_TRAIN_MODES];
+        const TRAIN_MODE_LABELS = {
+            brainstorm: 'Brainstorm',
+            all: 'Brainstorm',
+            sprint: 'Brainstorm',
+            'word-trans': 'Слово → Переклад',
+            'trans-word': 'Переклад → Слово',
+            constructor: 'Конструктор',
+            typing: 'Написання',
+            listening: 'Аудіювання',
+            context: 'Контекст',
+            crossword: 'Кросворд',
+            picture: 'По фото'
+        };
+        // Після рівня N чекати перед наступним: 0 → 4 год → 24 год → 72 год → 7 дн → 3 тиж → вивчено
+        const SRS_INTERVALS = [0, 4 * 3600000, 24 * 3600000, 72 * 3600000, 7 * 24 * 3600000, 21 * 24 * 3600000, 0];
+
+        function clampSrsLevel(level) {
+            return Math.min(Math.max(0, level || 0), MAX_SRS_LEVEL);
+        }
+
+        function isSrsMastered(level) {
+            return (level || 0) >= MAX_SRS_LEVEL;
+        }
+
+        function getWordModeLevel(w, modeId) {
+            if (!w || !modeId) return 0;
+            if (modeId === 'brainstorm' || modeId === 'all' || modeId === 'sprint') return w.srsLevel || 0;
+            return w[`srs_${modeId}_Level`] || 0;
+        }
+
+        function getHistoryForMode(word, modeId) {
+            return (word.bsHistory || [])
+                .map(h => {
+                    let at = 0;
+                    if (typeof h.at === 'number' && Number.isFinite(h.at)) at = h.at;
+                    else if (h.at && typeof h.at.toMillis === 'function') at = h.at.toMillis();
+                    else if (h.at && typeof h.at.seconds === 'number') at = h.at.seconds * 1000;
+                    return {
+                        at,
+                        level: typeof h.level === 'number' ? h.level : 0,
+                        ok: h.ok !== false,
+                        mode: h.mode || 'brainstorm'
+                    };
+                })
+                .filter(h => h.at > 0)
+                .filter(h => modeId === 'brainstorm' ? h.mode === 'brainstorm' : h.mode === modeId)
+                .sort((a, b) => b.at - a.at);
+        }
+
+        function formatBsDate(ts) {
+            let ms = 0;
+            if (typeof ts === 'number' && Number.isFinite(ts)) ms = ts;
+            else if (ts && typeof ts.toMillis === 'function') ms = ts.toMillis();
+            else if (ts && typeof ts.seconds === 'number') ms = ts.seconds * 1000;
+            if (!ms) ms = Date.now();
+            const d = new Date(ms);
+            return d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function renderHistoryEntries(history, emptyText) {
+            if (!history.length) return `<p class="text-xs text-slate-400 text-center py-2 italic">${emptyText}</p>`;
+            return history.map(h => {
+                const ok = h.ok !== false;
+                const lvl = h.level != null ? h.level : '—';
+                return `<div class="flex justify-between items-center text-xs text-slate-400 px-2 py-1 rounded-lg bg-white border border-slate-100">
+                    <span class="flex items-center gap-1.5"><span class="${ok ? 'text-emerald-500' : 'text-rose-400'}">${ok ? '✓' : '↺'}</span><span>Рів. ${lvl}</span></span>
+                    <span class="font-mono text-[11px] text-slate-400">${formatBsDate(h.at)}</span>
+                </div>`;
+            }).join('');
+        }
+        function isWordLearned(w) {
+            if (isSrsMastered(w.srsLevel)) return true;
+            return CORE_TRAIN_MODES.every(m => isSrsMastered(getWordModeLevel(w, m.id)));
+        }
+
+        function getTrainingModeLabel(mode) {
+            return TRAIN_MODE_LABELS[mode] || mode || 'Brainstorm';
+        }
+
+        function appendTrainingHistory(w, mode, newLevel, failed) {
+            const histMode = (mode === 'all' || mode === 'sprint') ? 'brainstorm' : mode;
+            return normalizeBsHistory([...(w.bsHistory || []), { at: Date.now(), level: newLevel, ok: !failed, mode: histMode }]);
+        }
+
+        function getNextReviewTime(newLevel, fromTimestamp = Date.now()) {
+            if (newLevel >= MAX_SRS_LEVEL) return 0;
+            return fromTimestamp + (SRS_INTERVALS[newLevel] || 0);
+        }
+
+        function getLastTrainingAtLevel(w, level) {
+            return (w.bsHistory || [])
+                .filter(h => h.ok !== false && h.at && h.level === level)
+                .sort((a, b) => historyTimestamp(b.at) - historyTimestamp(a.at))[0] || null;
+        }
+
+        function computeNextReviewTimeFromWord(w) {
+            const level = w.srsLevel || 0;
+            if (isSrsMastered(level)) return 0;
+            if (level === 0) return 0;
+
+            const atLevel = getLastTrainingAtLevel(w, level);
+            if (atLevel) return getNextReviewTime(level, atLevel.at);
+
+            const lastSuccess = (w.bsHistory || [])
+                .filter(h => h.ok !== false && h.at)
+                .sort((a, b) => historyTimestamp(b.at) - historyTimestamp(a.at))[0];
+            if (lastSuccess) return getNextReviewTime(level, lastSuccess.at);
+
+            return getNextReviewTime(level);
+        }
+
+        function needsSrsTimerRepair(w, level, computedReview) {
+            if (isSrsMastered(level)) return (w.nextReviewTime || 0) !== 0;
+            const hist = (w.bsHistory || []).filter(h => h.ok !== false && h.at);
+            if (hist.length === 0) return false;
+            const stored = w.nextReviewTime || 0;
+            const tolerance = 2 * 3600000;
+            if (!stored) return computedReview > Date.now();
+            return Math.abs(stored - computedReview) > tolerance;
+        }
 
         const sessionEndAudio = new Audio("https://files.catbox.moe/lkmm5l.mp3");
         const sprintCorrectAudio = new Audio("https://file.garden/alYiOQx5lAiBA0qQ/Correct%20Answer%20Light%20Sound.mp3");
@@ -651,12 +945,21 @@
 
         let app, auth, db;
         let activeUid = null;
-        let vocabulary = [], materials = [], currentMaterial = null;
-        let unsubscribeWords = null, unsubscribeMaterials = null;
+        let vocabulary = [], materials = [], folders = [], currentMaterial = null;
+        let unsubscribeWords = null, unsubscribeMaterials = null, unsubscribeFolders = null;
         let isGlobalAudioMuted = false;
 
-        let currentDictFilter = 'all'; 
+        let currentDictFilter = 'all';
         let specificMaterialName = '';
+        let activeDictSource = null;
+        let activeMaterialId = null;
+        let dictSelectMode = false;
+        let selectedWordIds = new Set();
+        let readerSaveSource = null;
+        let bulkImportTargetSource = null;
+        let pendingFolderCallback = null;
+        let srsModalWordId = null;
+        const ALL_WORDS_SOURCE = 'Усі слова';
 
         let libraryCurrentPage = 1;
         const MATERIALS_PER_PAGE = 20;
@@ -667,6 +970,15 @@
         
         let currentReaderFontSize = 18;
         let currentReaderFontFamily = "'Georgia', serif";
+        // 3 кроки: стандарт · трохи ширше · ширше (main теж розширюється)
+        const READER_LAYOUT_WIDTHS = [
+            { main: null, lib: '48rem' },
+            { main: '56rem', lib: '56rem' },
+            { main: '64rem', lib: '64rem' }
+        ];
+        let currentReaderWidthStep = parseInt(localStorage.getItem('linguaspace_reader_width') || '0', 10);
+        if (Number.isNaN(currentReaderWidthStep) || currentReaderWidthStep < 0) currentReaderWidthStep = 0;
+        if (currentReaderWidthStep >= READER_LAYOUT_WIDTHS.length) currentReaderWidthStep = READER_LAYOUT_WIDTHS.length - 1;
 
         let sprintTimer = null;
         let sprintTimeLeft = 60;
@@ -676,6 +988,209 @@
         let currentSprintQ = null;
         let sprintHighScores = [];
 
+        let trainingSessionActive = false;
+        let trainingFocusCollapsed = false;
+        let trainingLastScrollY = 0;
+        let trainingScrollLock = false;
+        let trainingChromeHeight = 108;
+
+        function getTrainingChromeHeight() {
+            const header = document.getElementById('main-app-header');
+            const nav = document.getElementById('main-tabs-nav');
+            if (!header || !nav) return trainingChromeHeight;
+            const h = header.offsetHeight + nav.offsetHeight;
+            if (h > 0) trainingChromeHeight = h;
+            return trainingChromeHeight;
+        }
+
+        function resetTrainingChromeStyles() {
+            const header = document.getElementById('main-app-header');
+            const nav = document.getElementById('main-tabs-nav');
+            if (header) header.style.top = '';
+            if (nav) nav.style.top = '';
+        }
+
+        function applyTrainingFocus(collapsed) {
+            if (trainingFocusCollapsed === collapsed) return;
+
+            const scrollBefore = window.pageYOffset || document.documentElement.scrollTop;
+            const chromeH = collapsed ? getTrainingChromeHeight() : trainingChromeHeight;
+
+            trainingFocusCollapsed = collapsed;
+            document.body.classList.toggle('training-focus-mode', collapsed);
+            resetTrainingChromeStyles();
+
+            trainingScrollLock = true;
+            requestAnimationFrame(() => {
+                if (collapsed) {
+                    window.scrollTo(0, Math.max(0, scrollBefore - chromeH));
+                } else if (scrollBefore <= 30) {
+                    window.scrollTo(0, 0);
+                } else {
+                    window.scrollTo(0, scrollBefore + chromeH);
+                }
+                trainingLastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+                setTimeout(() => { trainingScrollLock = false; }, 120);
+            });
+        }
+
+        function isTrainingUiVisible() {
+            const ws = document.getElementById('bs-workspace');
+            const results = document.getElementById('bs-results');
+            const saving = document.getElementById('bs-saving');
+            return (ws && !ws.classList.contains('hidden'))
+                || (results && !results.classList.contains('hidden'))
+                || (saving && !saving.classList.contains('hidden'));
+        }
+
+        function onTrainingWheel(e) {
+            if (!trainingSessionActive || trainingScrollLock || !isTrainingUiVisible()) return;
+            if (e.deltaY > 6 && !trainingFocusCollapsed) {
+                applyTrainingFocus(true);
+            } else if (e.deltaY < -6 && trainingFocusCollapsed) {
+                applyTrainingFocus(false);
+            }
+        }
+
+        let trainingTouchStartY = 0;
+        function onTrainingTouchStart(e) {
+            if (!trainingSessionActive) return;
+            trainingTouchStartY = e.touches[0].clientY;
+        }
+        function onTrainingTouchMove(e) {
+            if (!trainingSessionActive || trainingScrollLock || !isTrainingUiVisible()) return;
+            const dy = trainingTouchStartY - e.touches[0].clientY;
+            if (dy > 20 && !trainingFocusCollapsed) applyTrainingFocus(true);
+            else if (dy < -20 && trainingFocusCollapsed) applyTrainingFocus(false);
+        }
+
+        function preserveTrainingFocusState() {
+            if (trainingSessionActive && trainingFocusCollapsed) {
+                document.body.classList.add('training-focus-mode');
+            }
+        }
+
+        function patchLocalWord(id, patch) {
+            const w = vocabulary.find(v => v.id === id);
+            if (w) Object.assign(w, patch);
+        }
+
+        function buildWordTrainingPatch(w) {
+            if (activeSessionMode === 'all' || activeSessionMode === 'sprint') {
+                const newLevel = w.failed ? 0 : Math.min((w.srsLevel || 0) + 1, MAX_SRS_LEVEL);
+                return { srsLevel: newLevel, nextReviewTime: getNextReviewTime(newLevel), bsHistory: appendTrainingHistory(w, activeSessionMode, newLevel, w.failed) };
+            }
+            const newLevel = w.failed ? 0 : Math.min((w[`srs_${activeSessionMode}_Level`] || 0) + 1, MAX_SRS_LEVEL);
+            return {
+                [`srs_${activeSessionMode}_Level`]: newLevel,
+                [`srs_${activeSessionMode}_NextTime`]: getNextReviewTime(newLevel),
+                bsHistory: appendTrainingHistory(w, activeSessionMode, newLevel, w.failed)
+            };
+        }
+
+        function firestoreOpWithTimeout(promise, ms = 20000) {
+            return Promise.race([
+                promise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error('firestore-timeout')), ms))
+            ]);
+        }
+
+        function formatFirebaseSaveError(e) {
+            const code = e?.code || '';
+            if (code === 'resource-exhausted') {
+                return { ok: false, text: '⚠️ Ліміт Firebase на сьогодні вичерпано. Спробуйте завтра або оновіть план у консолі Firebase.', className: 'text-sm text-rose-600 mt-1 mb-4 font-bold' };
+            }
+            if (code === 'unavailable' || e?.message === 'firestore-timeout') {
+                return { ok: false, text: '⚠️ Немає з\'єднання з Firebase. Перевірте інтернет і спробуйте ще раз.', className: 'text-sm text-rose-600 mt-1 mb-4 font-bold' };
+            }
+            if (code === 'permission-denied') {
+                return { ok: false, text: '⚠️ Немає доступу до бази. Перевірте профіль (Профіль 🔑).', className: 'text-sm text-rose-600 mt-1 mb-4 font-bold' };
+            }
+            return { ok: false, text: `⚠️ Не вдалося зберегти (${code || e?.message || 'помилка'}).`, className: 'text-sm text-rose-600 mt-1 mb-4 font-bold' };
+        }
+
+        async function persistTrainingToFirebase() {
+            if (!activeUid) {
+                return { ok: false, text: 'Увійдіть у профіль, щоб зберегти прогрес', className: 'text-sm text-amber-600 mt-1 mb-4 font-bold' };
+            }
+            if (!db) {
+                return { ok: false, text: '⚠️ Firebase не підключено', className: 'text-sm text-rose-600 mt-1 mb-4 font-bold' };
+            }
+            if (activeSessionMode === 'review') {
+                return { ok: true, text: 'ℹ️ Режим повторення — рівні SRS не змінювались', className: 'text-sm text-slate-500 mt-1 mb-4' };
+            }
+
+            const wordsToSave = bsWords.filter(w => w && w.id);
+            if (wordsToSave.length === 0) {
+                return { ok: false, text: '⚠️ Немає слів для збереження', className: 'text-sm text-rose-600 mt-1 mb-4 font-bold' };
+            }
+
+            suppressAutoRepair = true;
+            try {
+                const batch = writeBatch(db);
+                wordsToSave.forEach(w => {
+                    const patch = buildWordTrainingPatch(w);
+                    batch.update(doc(db, 'users', activeUid, 'words', w.id), patch);
+                    patchLocalWord(w.id, patch);
+                    Object.assign(w, patch);
+                });
+                await firestoreOpWithTimeout(batch.commit());
+
+                if (activeSessionMode === 'sprint') {
+                    let updatedScores = [...sprintHighScores];
+                    updatedScores.push({ score: sprintScore, date: Date.now() });
+                    updatedScores.sort((a, b) => b.score - a.score);
+                    updatedScores = updatedScores.slice(0, 100);
+                    await firestoreOpWithTimeout(
+                        setDoc(doc(db, 'users', activeUid, 'stats', 'sprint'), { topScores: updatedScores }, { merge: true })
+                    );
+                    sprintHighScores = updatedScores;
+                }
+
+                return { ok: true, text: '✅ Прогрес збережено', className: 'text-sm text-emerald-600 mt-1 mb-4 font-bold' };
+            } catch (e) {
+                console.error('persistTrainingToFirebase', e);
+                return formatFirebaseSaveError(e);
+            } finally {
+                suppressAutoRepair = false;
+            }
+        }
+
+        function renderSprintLeaderboard() {
+            const listEl = document.getElementById('sprint-leaderboard-list');
+            if (!listEl) return;
+            const medals = ['🥇', '🥈', '🥉'];
+            let html = sprintHighScores.slice(0, 3).map((s, idx) => `
+                <li class="flex justify-between items-center py-1.5 border-b border-indigo-100 last:border-0">
+                    <span class="font-bold text-slate-800 text-base flex items-center gap-2"><span class="text-xl font-black">${medals[idx] || `<span class="text-slate-400 font-medium opacity-50">#</span>${idx+1}`}</span> ${s.score} балів</span>
+                    <span class="text-xs text-slate-400 font-medium">${new Date(s.date).toLocaleDateString()}</span>
+                </li>
+            `).join('');
+            const currentScoreIndex = sprintHighScores.findIndex(s => s.score === sprintScore && s.date >= Date.now() - 5000);
+            if ((currentScoreIndex === -1 || currentScoreIndex >= 3) && sprintHighScores.length >= 3) {
+                const displayIndex = currentScoreIndex !== -1 ? currentScoreIndex + 1 : '-';
+                html += `
+                    <li class="text-center text-slate-300 font-black py-0.5 leading-none mt-1">...</li>
+                    <li class="flex justify-between items-center py-1.5 px-3 bg-indigo-100/50 rounded-lg mt-1 border border-indigo-100">
+                        <span class="font-bold text-slate-400 text-sm flex items-center gap-1"><span class="text-slate-400 font-medium opacity-60">#</span>${displayIndex}</span>
+                        <span class="font-bold text-indigo-700 text-sm">${sprintScore} балів</span>
+                    </li>
+                `;
+            }
+            listEl.innerHTML = html;
+        }
+
+        function ensureAppChromeVisible() {
+            trainingFocusCollapsed = false;
+            trainingScrollLock = false;
+            document.body.classList.remove('training-focus-mode');
+            resetTrainingChromeStyles();
+            const header = document.getElementById('main-app-header');
+            const nav = document.getElementById('main-tabs-nav');
+            if (header) header.style.top = '0px';
+            if (nav) { nav.style.top = '60px'; nav.classList.remove('hidden'); }
+        }
+
         let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
         window.addEventListener('scroll', function() {
             let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
@@ -683,6 +1198,10 @@
             const nav = document.querySelector('nav.sticky-nav');
             const readerBar = document.getElementById('reader-sticky-bar');
             const isReadMode = !document.getElementById('library-read-view').classList.contains('hidden');
+
+            if (trainingSessionActive) {
+                return;
+            }
             
             if (currentScroll > lastScrollTop && currentScroll > 60) {
                 // Scroll Down
@@ -748,19 +1267,28 @@
 
         function loadData() {
             if (!activeUid) return;
+            srsInitialRepairDone = false;
+            legacyMigrationChecked = false;
             if (unsubscribeWords) unsubscribeWords();
             if (unsubscribeMaterials) unsubscribeMaterials();
+            if (unsubscribeFolders) unsubscribeFolders();
 
             const wordsPath = collection(db, 'users', activeUid, 'words');
             const materialsPath = collection(db, 'users', activeUid, 'materials');
+            const foldersPath = collection(db, 'users', activeUid, 'folders');
 
             unsubscribeWords = onSnapshot(wordsPath, (snap) => {
                 vocabulary = [];
-                snap.forEach(d => vocabulary.push({ id: d.id, ...d.data() }));
+                snap.forEach(d => vocabulary.push(normalizeWordFromFirestore(d.id, d.data())));
                 vocabulary.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
-                document.getElementById('word-count').textContent = vocabulary.length;
+                updateDictContextUI();
+                renderDictContextDropdown();
                 renderDictionary();
                 updateTrainSources();
+                if (!legacyMigrationChecked && vocabulary.length > 0) {
+                    legacyMigrationChecked = true;
+                    migrateLegacyDictionarySources();
+                }
             }, (error) => { setSystemStatus("Помилка бази", "error"); });
 
             unsubscribeMaterials = onSnapshot(materialsPath, (snap) => {
@@ -768,6 +1296,16 @@
                 snap.forEach(d => materials.push({ id: d.id, ...d.data() }));
                 materials.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
                 renderMaterials();
+                renderDictContextDropdown();
+                renderBulkFolderDropdown();
+            });
+
+            unsubscribeFolders = onSnapshot(foldersPath, (snap) => {
+                folders = [];
+                snap.forEach(d => folders.push({ id: d.id, ...d.data() }));
+                folders.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'uk'));
+                renderDictContextDropdown();
+                renderBulkFolderDropdown();
             });
 
             const statsDocRef = doc(db, 'users', activeUid, 'stats', 'sprint');
@@ -839,6 +1377,838 @@
 
         window.selectTranslation = (text) => { inputTrans.value = text; dropdown.classList.add('hidden'); inputTrans.focus(); };
         document.addEventListener('click', (e) => { if(!e.target.closest('#trans-dropdown') && e.target !== inputTrans) dropdown.classList.add('hidden'); });
+        document.addEventListener('click', (e) => {
+            const ctxWrap = document.getElementById('dict-context-wrapper');
+            const ctxMenu = document.getElementById('dict-context-dropdown');
+            if (ctxMenu && !ctxWrap?.contains(e.target)) ctxMenu.classList.add('hidden');
+            if (!e.target.closest('#bulk-folder-wrapper')) document.getElementById('bulk-folder-dropdown')?.classList.add('hidden');
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            if (trainingSessionActive) return;
+            const moveModal = document.getElementById('move-words-modal');
+            if (moveModal && !moveModal.classList.contains('hidden')) {
+                e.preventDefault();
+                closeMoveWordsModal();
+                return;
+            }
+            if (dictSelectMode) {
+                e.preventDefault();
+                exitDictSelectMode();
+            }
+        });
+
+        const BUILTIN_FOLDERS = ['Імпорт'];
+        const LEGACY_SOURCES = ['Словник', 'Читання'];
+        const DUOCARDS_SOURCE = 'DuoCards';
+        const DUOCARDS_LOGO_URL = 'https://files.catbox.moe/ac2k6p.webp';
+        let bulkImportMode = 'standard';
+
+        function duoCardsLogoImg(extraClass = '') {
+            return `<img src="${DUOCARDS_LOGO_URL}" alt="" class="duocards-logo ${extraClass} inline-block align-middle" onerror="this.style.display='none'">`;
+        }
+
+        function formatAddedDate(ts) {
+            let ms = 0;
+            if (typeof ts === 'number' && Number.isFinite(ts)) ms = ts;
+            else if (typeof ts === 'string') {
+                const parsed = Date.parse(ts);
+                ms = Number.isFinite(parsed) ? parsed : 0;
+            } else if (ts && typeof ts.toMillis === 'function') ms = ts.toMillis();
+            else if (ts && typeof ts.seconds === 'number') ms = ts.seconds * 1000;
+            if (!ms) return '';
+            const d = new Date(ms);
+            return d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getWordAddedAt(word) {
+            if (!word) return 0;
+            if (word.publishedAt) return word.publishedAt;
+            return word.createdAt || 0;
+        }
+
+        function folderMarkHtml(name) {
+            if (name === DUOCARDS_SOURCE) return `${duoCardsLogoImg()} ${name}`;
+            if (name === 'Імпорт') return '📥 Імпорт';
+            return `📂 ${name}`;
+        }
+
+        function parseCsvLine(line, delimiter) {
+            const out = [];
+            let cur = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+                    else inQuotes = !inQuotes;
+                } else if (ch === delimiter && !inQuotes) {
+                    out.push(cur.trim());
+                    cur = '';
+                } else {
+                    cur += ch;
+                }
+            }
+            out.push(cur.trim());
+            return out.map(s => s.replace(/^["']|["']$/g, '').trim());
+        }
+
+        function looksLikeDuoCardsHeader(line) {
+            const n = (line || '').toLowerCase();
+            return n.includes('front') && n.includes('back');
+        }
+
+        function looksLikeDuoCardsText(text) {
+            const first = (text || '').split(/\r?\n/).find(l => l.trim()) || '';
+            return looksLikeDuoCardsHeader(first);
+        }
+
+        function parseDuoCardsExport(text) {
+            const rawLines = (text || '').split(/\r?\n/).map(l => l.trimEnd()).filter(l => l.trim().length > 0);
+            if (rawLines.length === 0) return [];
+            const headerLine = rawLines[0];
+            const delimiter = headerLine.includes('\t') ? '\t' : ',';
+            let start = 0;
+            let headers = parseCsvLine(headerLine, delimiter).map(h => h.toLowerCase().replace(/[^a-z]/g, ''));
+            if (looksLikeDuoCardsHeader(headerLine)) start = 1;
+            else headers = ['front', 'back', 'hint', 'publishedat'];
+
+            const idx = (name) => headers.findIndex(h => h === name);
+            const iFront = idx('front') >= 0 ? idx('front') : 0;
+            const iBack = idx('back') >= 0 ? idx('back') : 1;
+            const iHint = idx('hint') >= 0 ? idx('hint') : 2;
+            const iPub = idx('publishedat') >= 0 ? idx('publishedat') : 3;
+
+            const rows = [];
+            for (let i = start; i < rawLines.length; i++) {
+                const cols = parseCsvLine(rawLines[i], delimiter);
+                const word = (cols[iFront] || '').trim();
+                if (!word) continue;
+                const trans = (cols[iBack] || '').trim();
+                const context = (cols[iHint] || '').trim();
+                const publishedAt = Date.parse(cols[iPub] || '') || 0;
+                rows.push({ word, trans, context, publishedAt, selected: true });
+            }
+            return rows;
+        }
+
+        function applyBulkImportMode(mode) {
+            bulkImportMode = mode;
+            const btn = document.getElementById('btn-duocards-import');
+            const hint = document.getElementById('bulk-import-hint');
+            const area = document.getElementById('bulk-input-text');
+            const isDuo = mode === 'duocards';
+            if (btn) {
+                btn.className = isDuo
+                    ? 'mb-4 inline-flex items-center justify-center w-9 h-9 rounded-lg border border-indigo-300 bg-indigo-50 transition self-start'
+                    : 'mb-4 inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition self-start';
+                btn.title = isDuo ? 'Стандартний імпорт' : 'Імпорт з DuoCards';
+            }
+            if (hint) {
+                hint.innerHTML = isDuo
+                    ? 'Вставте експорт <b>DuoCards</b> (front, back, hint, publishedAt). Перший рядок із заголовками буде пропущено.'
+                    : 'Вставте текст (слово - переклад - контекст) або перетягніть сюди <b>.CSV / .TXT</b> файл.';
+            }
+            if (area) {
+                area.placeholder = isDuo
+                    ? 'front\tback\thint\tpublishedAt\nunstilled\tнезаспокоєний\tHer unstilled thoughts...\t2026-06-07T11:25:16.762Z'
+                    : 'apple - яблуко - An apple a day keeps the doctor away\nresilient\nobvious ; очевидний';
+            }
+            if (isDuo && (!bulkImportTargetSource || bulkImportTargetSource === 'Імпорт')) {
+                bulkImportTargetSource = DUOCARDS_SOURCE;
+            }
+            if (!isDuo && bulkImportTargetSource === DUOCARDS_SOURCE) {
+                bulkImportTargetSource = null;
+            }
+            updateBulkFolderLabel();
+        }
+
+        window.toggleDuoCardsImport = () => {
+            applyBulkImportMode(bulkImportMode === 'duocards' ? 'standard' : 'duocards');
+        };
+
+        async function ensureFolderExists(name) {
+            if (!activeUid || !name || name === 'Імпорт' || name === ALL_WORDS_SOURCE) return;
+            if (folders.some(f => f.name === name)) return;
+            if (materials.some(m => m.title === name)) return;
+            await addDoc(collection(db, 'users', activeUid, 'folders'), { name, createdAt: serverTimestamp() });
+        }
+
+        function setBulkExpanded(on) {
+            const dialog = document.getElementById('bulk-add-dialog');
+            const btn = document.getElementById('btn-bulk-expand');
+            if (!dialog) return;
+            dialog.classList.toggle('bulk-expanded', !!on);
+            if (btn) {
+                btn.textContent = on ? '⤡' : '⤢';
+                btn.title = on ? 'Згорнути' : 'Розгорнути';
+            }
+        }
+        window.toggleBulkExpand = () => {
+            const dialog = document.getElementById('bulk-add-dialog');
+            setBulkExpanded(!(dialog && dialog.classList.contains('bulk-expanded')));
+        };
+        window.setBulkSelection = (selected) => {
+            bulkParsedWords.forEach(w => { w.selected = !!selected; });
+            renderBulkPreview();
+        };
+
+        function getVisibleDictionaryWords() {
+            if (currentDictFilter === 'materials') return [];
+            const searchInput = document.getElementById('dict-search-input');
+            const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            let filtered = vocabulary;
+            if (currentDictFilter === 'import') filtered = vocabulary.filter(v => v.source === 'Імпорт');
+            else if (currentDictFilter === 'material_specific') {
+                const m = getMaterialForSource(specificMaterialName);
+                if (m) {
+                    const aliases = getMaterialAliases(m);
+                    filtered = vocabulary.filter(v => v.materialId === m.id || aliases.includes(v.source));
+                } else {
+                    filtered = vocabulary.filter(v => v.source === specificMaterialName);
+                }
+            }
+            if (query) filtered = filtered.filter(v => v.word.toLowerCase().includes(query) || v.translation.toLowerCase().includes(query));
+            return filtered;
+        }
+
+        function updateDictSelectUI() {
+            const bar = document.getElementById('dict-select-bar');
+            const btn = document.getElementById('btn-dict-select');
+            const countEl = document.getElementById('dict-selected-count');
+            const moveBtn = document.getElementById('btn-move-words');
+            const resetBtn = document.getElementById('btn-reset-selected');
+            const deleteBtn = document.getElementById('btn-delete-selected');
+            const showingFolders = currentDictFilter === 'materials';
+            const inFolder = currentDictFilter === 'material_specific';
+            const n = selectedWordIds.size;
+
+            if (btn) {
+                btn.classList.toggle('hidden', showingFolders);
+                btn.classList.toggle('is-active', dictSelectMode);
+                btn.title = dictSelectMode ? 'Вийти з режиму вибору (Esc)' : 'Вибрати слова';
+            }
+            if (bar) bar.classList.toggle('is-open', dictSelectMode && !showingFolders);
+            if (countEl) countEl.textContent = n ? String(n) : '';
+            [moveBtn, resetBtn, deleteBtn].forEach(el => {
+                if (el) el.disabled = n === 0;
+            });
+
+            const filters = document.getElementById('dict-filters');
+            if (filters) filters.classList.toggle('hidden', inFolder || dictSelectMode);
+            const backBtn = document.getElementById('btn-dict-back');
+            if (backBtn) backBtn.classList.toggle('hidden', !inFolder);
+        }
+
+        window.goBackFromDictFolder = () => {
+            const isMat = isMaterialSource(specificMaterialName) || !!getMaterialForSource(specificMaterialName);
+            if (isMat) setDictFilter('materials');
+            else applyDictSourceFilter(null);
+        };
+
+        function exitDictSelectMode() {
+            if (!dictSelectMode) return;
+            dictSelectMode = false;
+            selectedWordIds.clear();
+            closeMoveWordsModal();
+            updateDictSelectUI();
+            renderDictionary();
+        }
+
+        window.toggleDictSelectMode = () => {
+            if (currentDictFilter === 'materials') return;
+            if (dictSelectMode) {
+                exitDictSelectMode();
+                return;
+            }
+            dictSelectMode = true;
+            updateDictSelectUI();
+            renderDictionary();
+        };
+        window.setDictSelection = (selected) => {
+            const visible = getVisibleDictionaryWords();
+            if (selected) visible.forEach(w => selectedWordIds.add(w.id));
+            else visible.forEach(w => selectedWordIds.delete(w.id));
+            updateDictSelectUI();
+            renderDictionary();
+        };
+        window.toggleDictWordSelect = (id, e) => {
+            if (e) { e.stopPropagation(); e.preventDefault(); }
+            if (!dictSelectMode) return;
+            if (selectedWordIds.has(id)) selectedWordIds.delete(id);
+            else selectedWordIds.add(id);
+            updateDictSelectUI();
+            renderDictionary();
+        };
+
+        window.closeMoveWordsModal = () => document.getElementById('move-words-modal')?.classList.add('hidden');
+        window.openMoveWordsModal = () => {
+            if (selectedWordIds.size === 0) return window.showModal('Спочатку виберіть слова.');
+            const countEl = document.getElementById('move-words-count');
+            if (countEl) countEl.textContent = `Перенести ${selectedWordIds.size} слів у папку:`;
+            renderMoveFolderList();
+            document.getElementById('move-words-modal').classList.remove('hidden');
+        };
+
+        function renderMoveFolderList() {
+            const menu = document.getElementById('move-words-folder-list');
+            if (!menu) return;
+            const esc = (s) => s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const customFolders = getCustomFolderNames();
+            const materialTitles = materials.map(m => m.title);
+            let html = `<button onclick="moveSelectedWordsTo('Імпорт')" class="w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2"><span>📥 Імпорт</span></button>`;
+            html += `<button onclick="moveSelectedWordsTo('${DUOCARDS_SOURCE}')" class="w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center justify-between gap-2"><span class="flex items-center gap-2">${duoCardsLogoImg()} DuoCards</span></button>`;
+            customFolders.filter(n => n !== DUOCARDS_SOURCE).forEach(name => {
+                html += `<button onclick="moveSelectedWordsTo('${esc(name)}')" class="w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"><span>📂 ${name}</span></button>`;
+            });
+            if (materialTitles.length) {
+                html += `<div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-t border-slate-100">Матеріали</div>`;
+                materialTitles.forEach(name => {
+                    html += `<button onclick="moveSelectedWordsTo('${esc(name)}')" class="w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"><span>📁 ${name}</span></button>`;
+                });
+            }
+            menu.innerHTML = html;
+        }
+
+        window.selectMoveFolderAndSave = (name) => { moveSelectedWordsTo(name); };
+
+        window.moveSelectedWordsTo = async (folderName) => {
+            if (!activeUid || !folderName || selectedWordIds.size === 0) return;
+            const ids = [...selectedWordIds];
+            const mat = getMaterialForSource(folderName) || getMaterialByTitle(folderName);
+            try {
+                await ensureFolderExists(folderName);
+                for (let i = 0; i < ids.length; i += 400) {
+                    const chunk = ids.slice(i, i + 400);
+                    const batch = writeBatch(db);
+                    chunk.forEach(id => {
+                        const patch = mat
+                            ? { source: mat.title, materialId: mat.id }
+                            : { source: folderName, materialId: deleteField() };
+                        batch.update(doc(db, 'users', activeUid, 'words', id), patch);
+                        patchLocalWord(id, mat ? patch : { source: folderName, materialId: null });
+                    });
+                    await batch.commit();
+                }
+                closeMoveWordsModal();
+                dictSelectMode = false;
+                selectedWordIds.clear();
+                updateDictSelectUI();
+                window.showModal(`Перенесено ${ids.length} слів у «${folderName}».`);
+            } catch (e) {
+                console.error(e);
+                window.showModal('Не вдалося перенести слова. Спробуйте ще раз.');
+            }
+        };
+
+        window.resetSelectedWordsProgress = () => {
+            const ids = [...selectedWordIds];
+            if (ids.length === 0) return window.showModal('Спочатку виберіть слова.');
+            window.showModal(`Скинути прогрес ${ids.length} вибраних слів?`, true, async () => {
+                await resetWordsBrainstormProgress(ids);
+                window.showModal('Прогрес скинуто.');
+            });
+        };
+
+        window.deleteSelectedWords = () => {
+            const ids = [...selectedWordIds];
+            if (ids.length === 0) return window.showModal('Спочатку виберіть слова.');
+            window.showModal(`Видалити ${ids.length} вибраних слів? Цю дію не можна скасувати.`, true, async () => {
+                try {
+                    for (let i = 0; i < ids.length; i += 400) {
+                        const chunk = ids.slice(i, i + 400);
+                        const batch = writeBatch(db);
+                        chunk.forEach(id => batch.delete(doc(db, 'users', activeUid, 'words', id)));
+                        await batch.commit();
+                    }
+                    if (activeDictSource && !getMaterialForSource(activeDictSource) && !isMaterialSource(activeDictSource)) {
+                        const left = getWordsForSource(activeDictSource).filter(w => !ids.includes(w.id));
+                        if (left.length === 0) {
+                            const folderBatch = writeBatch(db);
+                            folders.filter(f => f.name === activeDictSource).forEach(f => folderBatch.delete(doc(db, 'users', activeUid, 'folders', f.id)));
+                            await folderBatch.commit();
+                            applyDictSourceFilter(null);
+                        }
+                    }
+                    exitDictSelectMode();
+                    window.showModal('Слова видалено.');
+                } catch (e) {
+                    window.showModal('Не вдалося видалити слова.');
+                }
+            });
+        };
+
+        async function migrateLegacyDictionarySources() {
+            if (!activeUid || vocabulary.length === 0) return;
+            const storageKey = `linguaspace_legacy_migrated_${activeUid}`;
+            if (localStorage.getItem(storageKey)) return;
+            const legacy = vocabulary.filter(w => LEGACY_SOURCES.includes(w.source));
+            if (legacy.length === 0) {
+                localStorage.setItem(storageKey, '1');
+                return;
+            }
+            try {
+                const batch = writeBatch(db);
+                legacy.forEach(w => batch.update(doc(db, 'users', activeUid, 'words', w.id), { source: ALL_WORDS_SOURCE }));
+                await batch.commit();
+                localStorage.setItem(storageKey, '1');
+            } catch (e) { console.error('migrateLegacyDictionarySources', e); }
+        }
+
+        function getSaveSource() {
+            if (readerSaveSource) return readerSaveSource;
+            return activeDictSource || ALL_WORDS_SOURCE;
+        }
+
+        function getMaterialAliases(m) {
+            if (!m) return [];
+            const aliases = [m.title, ...(m.previousTitles || [])];
+            tryDetectRenamedMaterialLinks().forEach(l => {
+                if (l.material.id === m.id) aliases.push(l.orphanSource);
+            });
+            return [...new Set(aliases.filter(Boolean))];
+        }
+
+        function isMaterialSource(source) {
+            if (!source) return false;
+            return materials.some(m => m.title === source);
+        }
+
+        function isSourceLinkedToMaterial(source) {
+            if (!source) return false;
+            if (materials.some(m => getMaterialAliases(m).includes(source))) return true;
+            return vocabulary.some(v => v.source === source && v.materialId && materials.some(m => m.id === v.materialId));
+        }
+
+        function getMaterialByTitle(title) {
+            return materials.find(m => m.title === title);
+        }
+
+        function getMaterialForSource(source) {
+            if (!source) return null;
+            let m = materials.find(mat => mat.title === source);
+            if (m) return m;
+            m = materials.find(mat => (mat.previousTitles || []).some(t => t.toLowerCase() === source.toLowerCase()));
+            if (m) return m;
+            const link = tryDetectRenamedMaterialLinks().find(l => l.orphanSource.toLowerCase() === source.toLowerCase());
+            if (link) return link.material;
+            const linked = vocabulary.find(v => v.source === source && v.materialId);
+            if (linked) return materials.find(mat => mat.id === linked.materialId) || null;
+            return null;
+        }
+
+        function countWordsForMaterial(m) {
+            const aliases = getMaterialAliases(m);
+            return vocabulary.filter(v => v.materialId === m.id || aliases.includes(v.source)).length;
+        }
+
+        function countWordsForMaterialStrict(m) {
+            return vocabulary.filter(v => v.materialId === m.id || v.source === m.title).length;
+        }
+
+        function getOrphanVocabSources() {
+            return [...new Set(vocabulary.map(v => v.source))].filter(s =>
+                s && s !== ALL_WORDS_SOURCE && s !== 'Імпорт' && s !== 'Словник' &&
+                !materials.some(m => m.title === s) &&
+                vocabulary.some(v => v.source === s && !v.materialId)
+            );
+        }
+
+        function getWordsForSource(source) {
+            if (!source) return [];
+            const m = getMaterialForSource(source) || getMaterialByTitle(source);
+            if (m) {
+                const aliases = getMaterialAliases(m);
+                return vocabulary.filter(v => v.materialId === m.id || aliases.includes(v.source) || v.source === source);
+            }
+            return vocabulary.filter(v => v.source === source);
+        }
+
+        function tryDetectRenamedMaterialLinks() {
+            const links = [];
+            const orphanSources = getOrphanVocabSources();
+            const linkedOrphans = new Set();
+
+            orphanSources.forEach(orphan => {
+                const byPrev = materials.find(m =>
+                    (m.previousTitles || []).some(t => t.toLowerCase() === orphan.toLowerCase())
+                );
+                if (byPrev) {
+                    links.push({ orphanSource: orphan, material: byPrev });
+                    linkedOrphans.add(orphan);
+                }
+            });
+
+            const unlinked = orphanSources.filter(o => !linkedOrphans.has(o));
+            if (unlinked.length === 1) {
+                const orphan = unlinked[0];
+                const strictEmpty = materials.filter(m => countWordsForMaterialStrict(m) === 0);
+                if (strictEmpty.length === 1) {
+                    links.push({ orphanSource: orphan, material: strictEmpty[0] });
+                } else if (strictEmpty.length > 1) {
+                    const best = [...strictEmpty].sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0))[0];
+                    links.push({ orphanSource: orphan, material: best });
+                }
+            }
+
+            return links;
+        }
+
+        function isPendingOrphanMerge(source) {
+            return tryDetectRenamedMaterialLinks().some(l => l.orphanSource === source);
+        }
+
+        function isCustomFolder(source) {
+            if (!source || source === ALL_WORDS_SOURCE || source === 'Імпорт' || source === 'Словник') return false;
+            if (getMaterialForSource(source)) return false;
+            if (isPendingOrphanMerge(source)) return false;
+            if (folders.some(f => f.name === source)) return true;
+            return vocabulary.some(v => v.source === source && !v.materialId);
+        }
+
+        function getCustomFolderNames() {
+            const materialAliases = new Set(materials.flatMap(m => getMaterialAliases(m)));
+            const fromDb = folders.map(f => f.name).filter(n => n && !materialAliases.has(n));
+            const fromVocab = [...new Set(vocabulary.map(v => v.source))]
+                .filter(s => s && isCustomFolder(s));
+            return [...new Set([...fromDb, ...fromVocab])].sort((a, b) => a.localeCompare(b, 'uk'));
+        }
+
+        function countWordsForSource(source) {
+            if (!source) return vocabulary.length;
+            const m = getMaterialForSource(source);
+            if (m) return countWordsForMaterial(m);
+            return vocabulary.filter(v => v.source === source).length;
+        }
+
+        function tryDetectRenamedMaterialLink() {
+            const links = tryDetectRenamedMaterialLinks();
+            return links.length === 1 ? links[0] : (links[0] || null);
+        }
+
+        let repairMaterialLinksRunning = false;
+        let repairDebounceTimer = null;
+        let srsMigrationRunning = false;
+        let srsRepairDebounceTimer = null;
+        let srsInitialRepairDone = false;
+        let legacyMigrationChecked = false;
+        let suppressAutoRepair = false;
+
+        function historyTimestamp(at) {
+            if (typeof at === 'number' && Number.isFinite(at)) return at;
+            if (at && typeof at.toMillis === 'function') return at.toMillis();
+            if (at && typeof at.seconds === 'number') return at.seconds * 1000;
+            return 0;
+        }
+
+        function normalizeBsHistory(hist) {
+            return (hist || [])
+                .map(h => ({
+                    at: historyTimestamp(h.at) || Date.now(),
+                    level: typeof h.level === 'number' ? h.level : 0,
+                    ok: h.ok !== false,
+                    mode: h.mode || 'brainstorm'
+                }))
+                .filter(h => h.at > 0)
+                .slice(-40);
+        }
+
+        function normalizeWordFromFirestore(id, data) {
+            return {
+                id,
+                ...data,
+                bsHistory: normalizeBsHistory(data.bsHistory)
+            };
+        }
+
+        function scheduleRepairSrsState() {
+            /* Вимкнено: автоматичний repair спалював квоту Firebase (тисячі writes на день) */
+        }
+
+        function scheduleRepairMaterialWordsLinks() {
+            /* Вимкнено: автоматичний repair спалював квоту Firebase при кожному відкритті сайту */
+        }
+
+        function inferSrsLevelFromHistory(w) {
+            const hist = normalizeBsHistory(w.bsHistory).slice().sort((a, b) => b.at - a.at);
+            if (hist.length === 0) return null;
+            const latest = hist[0];
+            if (latest.ok === false && (latest.level ?? 0) === 0) return null;
+            const successes = hist.filter(h => h.ok !== false);
+            const successLevels = successes.map(h => (typeof h.level === 'number' ? h.level : 0));
+            let max = successLevels.length ? Math.max(...successLevels) : 0;
+            if (max === 0 && successes.length > 0) max = successes.length;
+            return max > 0 ? max : null;
+        }
+
+        async function repairSrsState() {
+            if (suppressAutoRepair || !activeUid || srsMigrationRunning || vocabulary.length === 0) return;
+            const updates = [];
+            vocabulary.forEach(w => {
+                const inferred = inferSrsLevelFromHistory(w);
+                const currentLevel = w.srsLevel || 0;
+                let newLevel = currentLevel;
+                if (inferred != null && inferred > currentLevel) {
+                    newLevel = Math.min(inferred, MAX_SRS_LEVEL);
+                }
+                const wordAtLevel = { ...w, srsLevel: newLevel };
+                const computedReview = computeNextReviewTimeFromWord(wordAtLevel);
+                const levelChanged = newLevel !== currentLevel;
+                const reviewWrong = needsSrsTimerRepair(wordAtLevel, newLevel, computedReview);
+                if (levelChanged || reviewWrong) {
+                    updates.push({ id: w.id, srsLevel: newLevel, nextReviewTime: computedReview });
+                }
+            });
+            if (updates.length === 0) return;
+            srsMigrationRunning = true;
+            try {
+                const batch = writeBatch(db);
+                updates.forEach(u => batch.update(doc(db, 'users', activeUid, 'words', u.id), {
+                    srsLevel: u.srsLevel,
+                    nextReviewTime: u.nextReviewTime
+                }));
+                await batch.commit();
+            } catch (e) { console.error('repairSrsState', e); } finally { srsMigrationRunning = false; }
+        }
+
+        async function repairMaterialWordsLinks() {
+            if (!activeUid || repairMaterialLinksRunning || materials.length === 0 || vocabulary.length === 0) return;
+            const updates = new Map();
+            const materialOrphanTitles = new Map();
+            const folderDeletes = new Set();
+
+            tryDetectRenamedMaterialLinks().forEach(({ orphanSource, material }) => {
+                if (!materialOrphanTitles.has(material.id)) materialOrphanTitles.set(material.id, new Set());
+                materialOrphanTitles.get(material.id).add(orphanSource);
+            });
+
+            for (const m of materials) {
+                let aliases = [...getMaterialAliases(m)];
+                if (materialOrphanTitles.has(m.id)) {
+                    materialOrphanTitles.get(m.id).forEach(a => aliases.push(a));
+                }
+                aliases = [...new Set(aliases)];
+                vocabulary.forEach(w => {
+                    if (w.materialId === m.id || aliases.includes(w.source)) {
+                        if (w.source !== m.title || w.materialId !== m.id) {
+                            updates.set(w.id, { source: m.title, materialId: m.id });
+                        }
+                    }
+                });
+                aliases.forEach(alias => {
+                    if (alias !== m.title) {
+                        folders.filter(f => f.name === alias).forEach(f => folderDeletes.add(f.id));
+                    }
+                });
+            }
+
+            folders.filter(f => materials.some(m => getMaterialAliases(m).includes(f.name) && f.name !== m.title))
+                .forEach(f => folderDeletes.add(f.id));
+
+            if (updates.size === 0 && folderDeletes.size === 0 && materialOrphanTitles.size === 0) return;
+            repairMaterialLinksRunning = true;
+            try {
+                const batch = writeBatch(db);
+                updates.forEach((data, id) => batch.update(doc(db, 'users', activeUid, 'words', id), data));
+                folderDeletes.forEach(fid => batch.delete(doc(db, 'users', activeUid, 'folders', fid)));
+                materialOrphanTitles.forEach((orphans, mid) => {
+                    batch.update(doc(db, 'users', activeUid, 'materials', mid), { previousTitles: arrayUnion(...orphans) });
+                });
+                await batch.commit();
+            } catch (e) { console.error('repairMaterialWordsLinks', e); } finally { repairMaterialLinksRunning = false; }
+        }
+
+        function updateDictContextUI() {
+            const countEl = document.getElementById('word-count');
+            const labelEl = document.getElementById('dict-context-label');
+            const contextBtn = document.getElementById('dict-context-btn');
+            const resetBtn = document.getElementById('btn-reset-folder-srs');
+            const deleteBtn = document.getElementById('btn-delete-folder');
+            const addFolderBtn = document.getElementById('btn-add-folder');
+            if (resetBtn) resetBtn.classList.add('hidden');
+            if (deleteBtn) deleteBtn.classList.add('hidden');
+            if (currentDictFilter === 'materials') {
+                const folderCount = new Set([...materials.map(m => m.title), ...getCustomFolderNames()]).size;
+                if (countEl) countEl.textContent = folderCount;
+                if (labelEl) labelEl.textContent = 'Матеріали';
+                if (contextBtn) contextBtn.title = 'Матеріали';
+                if (addFolderBtn) addFolderBtn.classList.remove('hidden');
+                return;
+            }
+            if (countEl) countEl.textContent = countWordsForSource(activeDictSource);
+            let fullLabel = 'Усі слова';
+            if (activeDictSource === 'Імпорт') fullLabel = '📥 Імпорт';
+            else if (activeDictSource === DUOCARDS_SOURCE) fullLabel = 'DuoCards';
+            else if (activeDictSource) fullLabel = activeDictSource;
+            if (labelEl) {
+                if (activeDictSource === DUOCARDS_SOURCE) labelEl.innerHTML = `${duoCardsLogoImg()} DuoCards`;
+                else labelEl.textContent = fullLabel;
+            }
+            if (contextBtn) contextBtn.title = fullLabel;
+            if (addFolderBtn) addFolderBtn.classList.toggle('hidden', activeDictSource !== null);
+        }
+
+        function syncFilterButtons(activeFilter) {
+            ['all', 'import', 'materials'].forEach(f => {
+                const btn = document.getElementById(`filter-btn-${f}`);
+                if (!btn) return;
+                const extra = f === 'materials' ? ' flex items-center gap-1' : '';
+                if (activeFilter === '_none') btn.className = 'flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition' + extra;
+                else if (f === activeFilter) btn.className = 'flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-white shadow-sm transition' + extra;
+                else btn.className = 'flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition' + extra;
+            });
+        }
+
+        function applyDictSourceFilter(source) {
+            activeDictSource = source;
+            const linkedMat = source ? getMaterialForSource(source) : null;
+            activeMaterialId = linkedMat ? linkedMat.id : (materials.find(m => m.title === source)?.id || null);
+            if (source === null) {
+                currentDictFilter = 'all';
+                specificMaterialName = '';
+            } else if (source === 'Імпорт') {
+                currentDictFilter = 'import';
+                specificMaterialName = '';
+            } else if (LEGACY_SOURCES.includes(source)) {
+                applyDictSourceFilter(null);
+                return;
+            } else {
+                currentDictFilter = 'material_specific';
+                specificMaterialName = source;
+            }
+            syncFilterButtons(currentDictFilter === 'material_specific' && (isMaterialSource(source) || getMaterialForSource(source)) ? 'materials' : (currentDictFilter === 'material_specific' ? '_none' : currentDictFilter));
+            const isMaterial = isMaterialSource(source) || !!getMaterialForSource(source);
+            updateDictContextUI();
+            updateDictSelectUI();
+            renderDictContextDropdown();
+            renderDictionary();
+        }
+
+        window.selectAllWordsContext = () => {
+            document.getElementById('dict-context-dropdown').classList.add('hidden');
+            applyDictSourceFilter(null);
+        };
+
+        window.toggleDictContextDropdown = (e) => {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('dict-context-dropdown');
+            menu.classList.toggle('hidden');
+            if (!menu.classList.contains('hidden')) renderDictContextDropdown();
+        };
+
+        function renderDictContextDropdown() {
+            const menu = document.getElementById('dict-context-dropdown');
+            if (!menu) return;
+            const customFolders = getCustomFolderNames();
+            const materialTitles = materials.map(m => m.title).filter(t => !customFolders.includes(t));
+            const esc = (s) => s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+            let html = `<button onclick="selectAllWordsContext()" class="dict-context-item w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2${activeDictSource === null ? ' active' : ''}"><span>🌐 Усі слова</span><span class="text-slate-400 font-normal">${vocabulary.length}</span></button>`;
+
+            html += `<div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-t border-slate-100 mt-1">Папки</div>`;
+            BUILTIN_FOLDERS.forEach(name => {
+                const active = activeDictSource === name ? ' active' : '';
+                const icon = name === 'Імпорт' ? '📥' : '📁';
+                html += `<button onclick="selectDictContext('${esc(name)}')" class="dict-context-item w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2${active}"><span>${icon} ${name}</span><span class="text-slate-400 font-normal">${countWordsForSource(name)}</span></button>`;
+            });
+            customFolders.forEach(name => {
+                const active = activeDictSource === name ? ' active' : '';
+                html += `<button onclick="selectDictContext('${esc(name)}')" class="dict-context-item w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2${active}"><span class="flex items-center gap-2 min-w-0">${folderMarkHtml(name)}</span><span class="text-slate-400 font-normal">${countWordsForSource(name)}</span></button>`;
+            });
+            materialTitles.forEach(name => {
+                const active = activeDictSource === name ? ' active' : '';
+                html += `<button onclick="selectDictContext('${esc(name)}')" class="dict-context-item w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2${active}"><span>📁 ${name}</span><span class="text-slate-400 font-normal">${countWordsForSource(name)}</span></button>`;
+            });
+
+            menu.innerHTML = html;
+        }
+
+        window.selectDictContext = (source) => {
+            document.getElementById('dict-context-dropdown').classList.add('hidden');
+            applyDictSourceFilter(source);
+        };
+
+        window.openCreateFolderModal = (onCreated) => {
+            pendingFolderCallback = onCreated || null;
+            document.getElementById('create-folder-input').value = '';
+            document.getElementById('create-folder-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('create-folder-input').focus(), 100);
+        };
+        window.closeCreateFolderModal = () => {
+            document.getElementById('create-folder-modal').classList.add('hidden');
+            pendingFolderCallback = null;
+        };
+
+        window.confirmCreateFolder = async () => {
+            const trimmed = document.getElementById('create-folder-input').value.trim();
+            if (!trimmed) return window.showModal('Введіть назву папки.');
+            if (trimmed === ALL_WORDS_SOURCE) return window.showModal('Така назва зарезервована.');
+            if (BUILTIN_FOLDERS.includes(trimmed)) return window.showModal('Така назва вже зайнята системною папкою.');
+            if (materials.some(m => m.title === trimmed)) return window.showModal('Папка з такою назвою вже існує серед матеріалів.');
+            const cb = pendingFolderCallback;
+            closeCreateFolderModal();
+            if (folders.some(f => f.name === trimmed) || getCustomFolderNames().includes(trimmed)) {
+                if (cb) cb(trimmed);
+                else applyDictSourceFilter(trimmed);
+                return;
+            }
+            if (!activeUid) return;
+            try {
+                await addDoc(collection(db, 'users', activeUid, 'folders'), { name: trimmed, createdAt: serverTimestamp() });
+                if (cb) cb(trimmed);
+                else applyDictSourceFilter(trimmed);
+            } catch (e) { window.showModal('Помилка створення папки.'); }
+        };
+
+        window.toggleBulkFolderDropdown = () => {
+            const menu = document.getElementById('bulk-folder-dropdown');
+            menu.classList.toggle('hidden');
+            if (!menu.classList.contains('hidden')) renderBulkFolderDropdown();
+        };
+
+        function renderBulkFolderDropdown() {
+            const menu = document.getElementById('bulk-folder-dropdown');
+            if (!menu) return;
+            const customFolders = getCustomFolderNames();
+            const materialTitles = materials.map(m => m.title);
+            const esc = (s) => s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const current = bulkImportTargetSource;
+
+            let html = `<button onclick="selectBulkFolder(null)" class="dict-context-item w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2${current === null ? ' active' : ''}"><span>📥 Імпорт</span><span class="text-slate-400 font-normal">${countWordsForSource('Імпорт')}</span></button>`;
+            html += `<button onclick="selectBulkFolder('${DUOCARDS_SOURCE}')" class="dict-context-item w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2${current === DUOCARDS_SOURCE ? ' active' : ''}"><span class="flex items-center gap-2">${duoCardsLogoImg()} DuoCards</span><span class="text-slate-400 font-normal">${countWordsForSource(DUOCARDS_SOURCE)}</span></button>`;
+            html += `<button onclick="openCreateFolderModal(selectBulkFolder)" class="w-full text-left px-4 py-3 text-sm font-bold text-indigo-600 hover:bg-indigo-50 border-t border-b border-slate-100 flex items-center gap-2"><span class="relative inline-flex w-5 h-5 items-center justify-center"><span class="text-sm">📁</span><span class="absolute -bottom-0.5 -right-1 text-[8px] bg-indigo-600 text-white rounded-full w-3 h-3 flex items-center justify-center font-black">+</span></span> Нова папка</button>`;
+            html += `<div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Інші папки</div>`;
+            customFolders.filter(name => name !== DUOCARDS_SOURCE).forEach(name => {
+                html += `<button onclick="selectBulkFolder('${esc(name)}')" class="dict-context-item w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2${current === name ? ' active' : ''}"><span>📂 ${name}</span><span class="text-slate-400 font-normal">${countWordsForSource(name)}</span></button>`;
+            });
+            if (materialTitles.length > 0) {
+                html += `<div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-t border-slate-100 mt-1">Матеріали</div>`;
+                materialTitles.forEach(name => {
+                    html += `<button onclick="selectBulkFolder('${esc(name)}')" class="dict-context-item w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2${current === name ? ' active' : ''}"><span>📁 ${name}</span><span class="text-slate-400 font-normal">${countWordsForSource(name)}</span></button>`;
+                });
+            }
+            menu.innerHTML = html;
+            updateBulkFolderLabel();
+        }
+
+        window.selectBulkFolder = (source) => {
+            bulkImportTargetSource = (source === 'Імпорт' || source === null) ? null : source;
+            document.getElementById('bulk-folder-dropdown')?.classList.add('hidden');
+            updateBulkFolderLabel();
+            renderBulkFolderDropdown();
+        };
+
+        function updateBulkFolderLabel() {
+            const label = document.getElementById('bulk-folder-label');
+            if (!label) return;
+            if (!bulkImportTargetSource || bulkImportTargetSource === 'Імпорт') {
+                label.textContent = '📥 Імпорт';
+            } else if (bulkImportTargetSource === DUOCARDS_SOURCE) {
+                label.innerHTML = `${duoCardsLogoImg()} DuoCards`;
+            } else {
+                label.textContent = `📁 ${bulkImportTargetSource}`;
+            }
+        }
 
         window.addWordManual = async () => {
             if(!activeUid) return;
@@ -847,9 +2217,9 @@
             const btn = document.getElementById('btn-add-manual'); const orig = btn.textContent; btn.disabled = true; btn.textContent = "...";
             try {
                 const imgUrl = await getImageUrl(word);
-                await addDoc(collection(db, 'users', activeUid, 'words'), {
-                    word, translation: trans, imageUrl: imgUrl, context: "", source: "Словник", createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0
-                });
+                const savePayload = { word, translation: trans, imageUrl: imgUrl, context: "", source: getSaveSource(), createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0, bsHistory: [] };
+                if (activeMaterialId) savePayload.materialId = activeMaterialId;
+                await addDoc(collection(db, 'users', activeUid, 'words'), savePayload);
                 inputWord.value = ''; inputTrans.value = ''; dropdown.classList.add('hidden'); inputWord.focus();
             } catch (err) { window.showModal("Помилка збереження."); } finally { btn.disabled = false; btn.textContent = orig; }
         };
@@ -938,32 +2308,45 @@
             document.body.appendChild(dl); dl.click(); dl.remove();
         };
 
-        function getSrsSvg(level, isSmall = false) {
-            const size = isSmall ? "w-4 h-4" : "w-8 h-8";
-            // Поділено на 5 рівнів (62.8 / 5 = 12.56)
-            const dash = [0, 12.56, 25.12, 37.68, 50.24, 62.8][Math.min(5, Math.max(0, level || 0))];
-            const isDone = level >= 5;
+        function getSrsSvg(level, isSmall = false, showLabel = false, maxLevel = MAX_SRS_LEVEL) {
+            const size = isSmall ? "w-4 h-4" : (showLabel ? "w-12 h-12" : "w-8 h-8");
+            const lvl = clampSrsLevel(level);
+            const circ = 62.8;
+            const dash = (circ / maxLevel) * lvl;
+            const isDone = isSrsMastered(level);
+            const stroke = isDone ? '#10b981' : '#4f46e5';
+            const sw = isSmall ? '4' : '3';
+            const label = showLabel ? `<text x="12" y="12.5" text-anchor="middle" dominant-baseline="middle" fill="${stroke}" font-size="6" font-weight="600" transform="rotate(90 12 12)" class="pointer-events-none select-none">${lvl}/${maxLevel}</text>` : '';
             return `<svg class="${size} transform -rotate-90 cursor-pointer hover:opacity-80 transition flex-shrink-0" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="#e2e8f0" stroke-width="4" fill="none" />
-                <circle cx="12" cy="12" r="10" stroke="${isDone ? '#10b981' : '#4f46e5'}" stroke-width="4" fill="none" stroke-dasharray="${dash} 62.8" stroke-linecap="round" class="transition-all duration-500" />
+                <circle cx="12" cy="12" r="10" stroke="#e2e8f0" stroke-width="${sw}" fill="none" />
+                <circle cx="12" cy="12" r="10" stroke="${stroke}" stroke-width="${sw}" fill="none" stroke-dasharray="${dash} 62.8" stroke-linecap="round" class="transition-all duration-500" />
+                ${label}
             </svg>`;
         }
 
         window.setDictFilter = (filter) => {
             currentDictFilter = filter;
-            ['all', 'manual', 'import', 'materials'].forEach(f => {
-                const btn = document.getElementById(`filter-btn-${f}`);
-                if(f === filter) btn.className = 'flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-white shadow-sm transition';
-                else btn.className = 'flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition';
-            });
-            document.getElementById('dict-back-btn-container').classList.toggle('hidden', filter !== 'material_specific');
-            if(filter === 'material_specific') {
-                ['all', 'manual', 'import', 'materials'].forEach(f => document.getElementById(`filter-btn-${f}`).className = 'flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 border border-slate-200 transition');
+            if (filter === 'all') { activeDictSource = null; activeMaterialId = null; }
+            else if (filter === 'import') { activeDictSource = 'Імпорт'; activeMaterialId = null; }
+            if (filter === 'materials') {
+                exitDictSelectMode();
             }
+            syncFilterButtons(filter);
+            if (filter === 'material_specific') {
+                ['all', 'import', 'materials'].forEach(f => {
+                    const btn = document.getElementById(`filter-btn-${f}`);
+                    if (!btn) return;
+                    const extra = f === 'materials' ? ' flex items-center gap-1' : '';
+                    btn.className = 'flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition' + extra;
+                });
+            }
+            updateDictContextUI();
+            renderDictContextDropdown();
+            updateDictSelectUI();
             renderDictionary();
         };
 
-        window.setDictMaterial = (src) => { currentDictFilter = 'material_specific'; specificMaterialName = src; setDictFilter('material_specific'); };
+        window.setDictMaterial = (src) => { applyDictSourceFilter(src); };
 
         let dictSearchTimeout = null;
         window.handleDictSearchInput = () => {
@@ -986,56 +2369,94 @@
             let filtered = vocabulary;
 
             if (currentDictFilter === 'materials') {
-                let materialSources = [...new Set(vocabulary.map(v => v.source).filter(s => s !== 'Словник' && s !== 'Імпорт' && s !== 'Читання'))];
+                const folderItems = [
+                    ...materials.map(m => m.title),
+                    ...getCustomFolderNames()
+                ];
+                let list = [...new Set(folderItems)];
                 
-                if (query) {
-                    materialSources = materialSources.filter(src => src.toLowerCase().includes(query));
-                }
+                if (query) list = list.filter(name => name.toLowerCase().includes(query));
 
-                if(materialSources.length === 0) { grid.innerHTML = '<p class="text-slate-500 font-bold col-span-full text-center py-8">Нічого не знайдено.</p>'; return; }
+                if(list.length === 0) { grid.innerHTML = '<p class="text-slate-500 font-bold col-span-full text-center py-8">Нічого не знайдено.</p>'; updateDictSelectUI(); return; }
                 
-                grid.innerHTML = materialSources.map(src => {
-                    const count = vocabulary.filter(w => w.source === src).length;
-                    const escapedSrc = src.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                grid.innerHTML = list.map(name => {
+                    const m = getMaterialByTitle(name);
+                    const count = m ? countWordsForMaterial(m) : vocabulary.filter(w => w.source === name).length;
+                    const escapedSrc = name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    const icon = name === DUOCARDS_SOURCE
+                        ? `<img src="${DUOCARDS_LOGO_URL}" alt="" class="w-10 h-10 object-contain rounded-lg" onerror="this.parentNode.textContent='📁'">`
+                        : '📁';
                     return `
                     <div onclick="setDictMaterial('${escapedSrc}')" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 cursor-pointer hover:border-indigo-400 hover:shadow-md transition flex items-center gap-4 group col-span-full sm:col-span-1">
-                        <div class="text-4xl">📁</div>
+                        <div class="text-4xl flex-shrink-0">${icon}</div>
                         <div class="flex-1 min-w-0">
-                            <h3 class="font-bold text-slate-800 text-lg truncate group-hover:text-indigo-600 transition">${src}</h3>
+                            <h3 class="font-bold text-slate-800 text-lg truncate group-hover:text-indigo-600 transition">${name}</h3>
                             <p class="text-sm font-bold text-slate-500">${count} слів</p>
                         </div>
                     </div>`;
                 }).join('');
+                updateDictSelectUI();
                 return;
             }
 
-            if(currentDictFilter === 'manual') filtered = vocabulary.filter(v => v.source === 'Словник');
-            else if(currentDictFilter === 'import') filtered = vocabulary.filter(v => v.source === 'Імпорт');
-            else if(currentDictFilter === 'material_specific') filtered = vocabulary.filter(v => v.source === specificMaterialName);
+            if(currentDictFilter === 'import') filtered = vocabulary.filter(v => v.source === 'Імпорт');
+            else if(currentDictFilter === 'material_specific') {
+                const m = getMaterialForSource(specificMaterialName);
+                if (m) {
+                    const aliases = getMaterialAliases(m);
+                    filtered = vocabulary.filter(v => v.materialId === m.id || aliases.includes(v.source));
+                } else {
+                    filtered = vocabulary.filter(v => v.source === specificMaterialName);
+                }
+            }
 
             if (query) {
                 filtered = filtered.filter(v => v.word.toLowerCase().includes(query) || v.translation.toLowerCase().includes(query));
             }
 
-            if(filtered.length === 0) { grid.innerHTML = '<p class="text-slate-500 font-bold col-span-full text-center py-8">Немає слів за цим запитом.</p>'; return; }
+            if(filtered.length === 0) { grid.innerHTML = '<p class="text-slate-500 font-bold col-span-full text-center py-8">Немає слів за цим запитом.</p>'; updateDictSelectUI(); return; }
 
-            grid.innerHTML = filtered.map(item => `
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group hover:shadow-md hover:border-indigo-300 transition h-40 sm:h-48">
-                    <img src="${item.imageUrl}" class="w-full h-20 sm:h-24 object-cover bg-slate-50 flex-shrink-0 border-b border-slate-100 cursor-pointer" onclick="openEditModal('${item.id}')" onerror="imgError(this)">
-                    <div class="p-2 sm:p-3 flex-1 flex flex-col justify-center min-w-0 bg-white cursor-pointer" onclick="openEditModal('${item.id}')">
+            grid.innerHTML = filtered.map(item => {
+                const selected = selectedWordIds.has(item.id);
+                const cardClick = dictSelectMode
+                    ? `toggleDictWordSelect('${item.id}', event)`
+                    : `openEditModal('${item.id}')`;
+                return `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group hover:shadow-md hover:border-indigo-300 transition h-40 sm:h-48 ${selected ? 'word-card-selected' : ''}">
+                    <img src="${item.imageUrl}" class="w-full h-20 sm:h-24 object-cover bg-slate-50 flex-shrink-0 border-b border-slate-100 cursor-pointer" onclick="${cardClick}" onerror="imgError(this)">
+                    <div class="p-2 sm:p-3 flex-1 flex flex-col justify-center min-w-0 bg-white cursor-pointer" onclick="${cardClick}">
                         <strong class="text-slate-800 text-base sm:text-lg leading-tight truncate font-bold">${item.word}</strong>
                         <span class="text-indigo-600 text-xs sm:text-sm font-bold truncate">${item.translation}</span>
                     </div>
-                    <div class="absolute top-2 left-2 bg-white rounded-full shadow-md p-1" onclick="showSrsStatus('${item.id}')">
-                        ${getSrsSvg(item.srsLevel, true)}
+                    ${dictSelectMode
+                        ? `<label class="absolute top-2 left-2 z-10 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center border cursor-pointer" onclick="event.stopPropagation();">
+                            <input type="checkbox" class="w-4 h-4 accent-indigo-600 cursor-pointer" ${selected ? 'checked' : ''} onchange="toggleDictWordSelect('${item.id}', event)">
+                           </label>`
+                        : `<div class="absolute top-2 left-2 z-10 bg-white rounded-full shadow-md p-1 cursor-pointer" data-srs-id="${item.id}" onclick="event.stopPropagation(); showSrsStatus('${item.id}')">
+                        ${getSrsSvg(item.srsLevel, true, false)}
                     </div>
-                    <button onclick="deleteWord('${item.id}', event)" class="absolute top-2 right-2 w-7 h-7 bg-white rounded-full shadow-md text-rose-500 font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center transition border hover:bg-rose-50">&times;</button>
-                </div>
-            `).join('');
+                    <button onclick="deleteWord('${item.id}', event)" class="absolute top-2 right-2 w-7 h-7 bg-white rounded-full shadow-md text-rose-500 font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center transition border hover:bg-rose-50">&times;</button>`}
+                </div>`;
+            }).join('');
+            updateDictSelectUI();
         }
 
-        window.openBulkModal = () => { document.getElementById('bulk-add-modal').classList.remove('hidden'); document.getElementById('bulk-preview-area').classList.add('hidden'); document.getElementById('btn-bulk-save').classList.add('hidden'); document.getElementById('btn-bulk-process').classList.remove('hidden'); document.getElementById('bulk-input-text').value = ''; };
-        window.closeBulkModal = () => document.getElementById('bulk-add-modal').classList.add('hidden');
+        window.openBulkModal = () => {
+            document.getElementById('bulk-add-modal').classList.remove('hidden');
+            document.getElementById('bulk-preview-area').classList.add('hidden');
+            document.getElementById('bulk-preview-toolbar')?.classList.add('hidden');
+            document.getElementById('btn-bulk-save').classList.add('hidden');
+            document.getElementById('btn-bulk-process').classList.remove('hidden');
+            document.getElementById('bulk-input-text').value = '';
+            bulkImportTargetSource = null;
+            applyBulkImportMode('standard');
+            setBulkExpanded(false);
+            renderBulkFolderDropdown();
+        };
+        window.closeBulkModal = () => {
+            document.getElementById('bulk-add-modal').classList.add('hidden');
+            setBulkExpanded(false);
+        };
 
         window.handleBulkDragOver = (e) => { e.preventDefault(); document.getElementById('bulk-drop-overlay').classList.remove('hidden'); document.getElementById('bulk-drop-overlay').classList.add('flex'); };
         window.handleBulkDragLeave = (e) => { e.preventDefault(); document.getElementById('bulk-drop-overlay').classList.add('hidden'); document.getElementById('bulk-drop-overlay').classList.remove('flex'); };
@@ -1056,11 +2477,24 @@
         let bulkParsedWords = [];
         window.processBulkText = async () => {
             const text = document.getElementById('bulk-input-text').value.trim(); if(!text) return;
-            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             document.getElementById('bulk-preview-area').classList.remove('hidden'); document.getElementById('bulk-loader').classList.remove('hidden');
             const list = document.getElementById('bulk-preview-list'); list.innerHTML = '';
             document.getElementById('btn-bulk-process').classList.add('hidden');
             bulkParsedWords = [];
+
+            const useDuoCards = bulkImportMode === 'duocards' || looksLikeDuoCardsText(text);
+            if (useDuoCards) {
+                if (bulkImportMode !== 'duocards') applyBulkImportMode('duocards');
+                bulkParsedWords = parseDuoCardsExport(text);
+                renderBulkPreview();
+                document.getElementById('bulk-preview-toolbar')?.classList.toggle('hidden', bulkParsedWords.length === 0);
+                document.getElementById('bulk-loader').classList.add('hidden');
+                if (bulkParsedWords.length > 0) document.getElementById('btn-bulk-save').classList.remove('hidden');
+                else document.getElementById('btn-bulk-process').classList.remove('hidden');
+                return;
+            }
+
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             
             for(let line of lines) {
                 try {
@@ -1107,40 +2541,49 @@
                 } catch(e) {}
             }
             document.getElementById('bulk-loader').classList.add('hidden');
+            document.getElementById('bulk-preview-toolbar')?.classList.toggle('hidden', bulkParsedWords.length === 0);
             if(bulkParsedWords.length > 0) document.getElementById('btn-bulk-save').classList.remove('hidden');
         };
 
         function renderBulkPreview() {
             const list = document.getElementById('bulk-preview-list');
+            const toolbar = document.getElementById('bulk-preview-toolbar');
+            if (toolbar) toolbar.classList.toggle('hidden', bulkParsedWords.length === 0);
             list.innerHTML = bulkParsedWords.map((item, i) => `
                 <li class="flex flex-col sm:flex-row gap-2 border-b border-slate-200 pb-3 items-start sm:items-center">
                     <div class="flex items-center gap-3 w-full sm:w-1/3">
-                        <input type="checkbox" checked onchange="toggleBulkWord(${i})" class="w-5 h-5 text-indigo-600 rounded cursor-pointer flex-shrink-0 accent-indigo-600">
+                        <input type="checkbox" ${item.selected ? 'checked' : ''} onchange="setBulkWordSelected(${i}, this.checked)" class="w-5 h-5 text-indigo-600 rounded cursor-pointer flex-shrink-0 accent-indigo-600">
                         <span class="font-bold text-slate-800 text-base truncate" title="${item.word}">${item.word}</span>
                     </div>
                     <div class="flex-1 w-full flex flex-col gap-1.5">
                         <input type="text" value="${item.trans}" onchange="updateBulkTrans(${i}, this.value)" class="w-full p-2 border border-slate-300 rounded-lg text-sm font-bold text-indigo-700 focus:border-indigo-500 outline-none" placeholder="Переклад">
                         ${item.context ? `<span class="text-xs text-slate-500 italic truncate" title="${item.context}">Контекст: ${item.context}</span>` : ''}
+                        ${item.publishedAt ? `<span class="text-[11px] text-slate-400">Додано: ${formatAddedDate(item.publishedAt)}</span>` : ''}
                     </div>
                 </li>
             `).join('');
         }
 
+        window.setBulkWordSelected = (idx, selected) => { bulkParsedWords[idx].selected = !!selected; };
         window.toggleBulkWord = (idx) => { bulkParsedWords[idx].selected = !bulkParsedWords[idx].selected; };
         window.updateBulkTrans = (idx, val) => { bulkParsedWords[idx].trans = val; };
 
         window.saveBulkWords = async () => {
             const toSave = bulkParsedWords.filter(w => w.selected);
             if(!activeUid || toSave.length === 0) return;
+            const importSource = bulkImportTargetSource || (bulkImportMode === 'duocards' ? DUOCARDS_SOURCE : 'Імпорт');
             const btn = document.getElementById('btn-bulk-save'); btn.textContent = "Зберігаємо..."; btn.disabled = true;
             try {
+                await ensureFolderExists(importSource);
                 for(let item of toSave) {
                     const imgUrl = await getImageUrl(item.word);
-                    await addDoc(collection(db, 'users', activeUid, 'words'), {
-                        word: item.word, translation: item.trans, context: item.context || "", imageUrl: imgUrl, source: "Імпорт", createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0
-                    });
+                    const payload = {
+                        word: item.word, translation: item.trans, context: item.context || "", imageUrl: imgUrl, source: importSource, createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0, bsHistory: []
+                    };
+                    if (item.publishedAt) payload.publishedAt = item.publishedAt;
+                    await addDoc(collection(db, 'users', activeUid, 'words'), payload);
                 }
-                closeBulkModal(); window.showModal("Імпорт успішно завершено!");
+                closeBulkModal(); window.showModal(`Імпорт успішно завершено! (${importSource})`);
             } catch(e) {} finally { btn.textContent = "Зберегти вибрані"; btn.disabled = false; }
         };
 
@@ -1508,8 +2951,40 @@
         };
         window.closeEditMaterialModal = () => document.getElementById('edit-material-modal').classList.add('hidden');
         window.saveEditedMaterial = async () => {
-            const id = document.getElementById('edit-mat-id').value; const title = document.getElementById('edit-mat-title').value.trim(); const content = document.getElementById('edit-mat-content').value.trim();
-            try { await updateDoc(doc(db, 'users', activeUid, 'materials', id), { title, content }); closeEditMaterialModal(); } catch(e) {}
+            const id = document.getElementById('edit-mat-id').value;
+            const title = document.getElementById('edit-mat-title').value.trim();
+            const content = document.getElementById('edit-mat-content').value.trim();
+            const m = materials.find(x => x.id === id);
+            if (!m || !title) return;
+            const oldTitle = m.title;
+            try {
+                const matRef = doc(db, 'users', activeUid, 'materials', id);
+                if (title !== oldTitle) {
+                    const aliases = getMaterialAliases(m);
+                    const wordsToUpdate = vocabulary.filter(w =>
+                        w.materialId === id ||
+                        w.source.toLowerCase() === oldTitle.toLowerCase() ||
+                        aliases.some(a => a.toLowerCase() === (w.source || '').toLowerCase())
+                    );
+                    const folderIdsToDelete = folders
+                        .filter(f => f.name.toLowerCase() === oldTitle.toLowerCase() || aliases.some(a => a.toLowerCase() === (f.name || '').toLowerCase()))
+                        .map(f => f.id);
+                    if (wordsToUpdate.length > 0 || folderIdsToDelete.length > 0) {
+                        const batch = writeBatch(db);
+                        wordsToUpdate.forEach(w => batch.update(doc(db, 'users', activeUid, 'words', w.id), { source: title, materialId: id }));
+                        folderIdsToDelete.forEach(fid => batch.delete(doc(db, 'users', activeUid, 'folders', fid)));
+                        await batch.commit();
+                    }
+                    await updateDoc(matRef, { title, content, previousTitles: arrayUnion(oldTitle) });
+                    if (activeDictSource === oldTitle) activeDictSource = title;
+                    if (specificMaterialName === oldTitle) specificMaterialName = title;
+                } else {
+                    await updateDoc(matRef, { title, content });
+                }
+                updateDictContextUI();
+                renderDictContextDropdown();
+                closeEditMaterialModal();
+            } catch(e) { window.showModal('Помилка збереження матеріалу.'); }
         };
 
         let ytPlayer = null; let syncInterval = null;
@@ -1584,6 +3059,45 @@
             document.getElementById('reader-settings-panel').classList.add('hidden');
         };
 
+        function applyReaderLayoutWidth() {
+            const readView = document.getElementById('library-read-view');
+            const lib = document.getElementById('view-library');
+            const main = document.querySelector('main');
+            if (!lib || !readView || readView.classList.contains('hidden')) return;
+
+            const layout = READER_LAYOUT_WIDTHS[currentReaderWidthStep];
+            lib.classList.add('reader-wide-mode');
+            lib.style.maxWidth = layout.lib;
+            if (main) main.style.maxWidth = layout.main || '';
+
+            document.querySelectorAll('.reader-width-dot').forEach((dot, i) => {
+                dot.classList.toggle('bg-indigo-500', i === currentReaderWidthStep);
+                dot.classList.toggle('bg-slate-300', i !== currentReaderWidthStep);
+            });
+
+            const btnNarrow = document.getElementById('btn-reader-narrow');
+            const btnWiden = document.getElementById('btn-reader-widen');
+            if (btnNarrow) btnNarrow.disabled = currentReaderWidthStep <= 0;
+            if (btnWiden) btnWiden.disabled = currentReaderWidthStep >= READER_LAYOUT_WIDTHS.length - 1;
+        }
+
+        function resetLibraryLayoutWidth() {
+            const lib = document.getElementById('view-library');
+            const main = document.querySelector('main');
+            if (lib) {
+                lib.style.maxWidth = '';
+                lib.classList.remove('reader-wide-mode');
+                lib.classList.add('max-w-3xl');
+            }
+            if (main) main.style.maxWidth = '';
+        }
+
+        window.changeReaderWidth = (delta) => {
+            currentReaderWidthStep = Math.max(0, Math.min(READER_LAYOUT_WIDTHS.length - 1, currentReaderWidthStep + delta));
+            localStorage.setItem('linguaspace_reader_width', String(currentReaderWidthStep));
+            applyReaderLayoutWidth();
+        };
+
         function applyReaderStyles() {
             document.getElementById('font-size-display').textContent = `${currentReaderFontSize}px`;
             const content = document.getElementById('reader-content');
@@ -1591,11 +3105,15 @@
                 content.style.fontSize = `${currentReaderFontSize}px`;
                 content.style.fontFamily = currentReaderFontFamily;
             }
+            applyReaderLayoutWidth();
         }
 
         window.openReader = (id) => {
             const m = materials.find(x => x.id === id); if(!m) return;
+            ensureAppChromeVisible();
             currentMaterial = m;
+            activeMaterialId = m.id;
+            readerSaveSource = m.title;
             document.getElementById('library-list-view').classList.add('hidden'); 
             document.getElementById('library-add-view').classList.add('hidden');
             document.getElementById('library-read-view').classList.remove('hidden');
@@ -1622,24 +3140,30 @@
             window.scrollTo({top: 0});
         };
 
-        window.closeReader = async () => { 
-            if (activeUid && currentMaterial) {
-                try {
-                    await updateDoc(doc(db, 'users', activeUid, 'materials', currentMaterial.id), {
-                        lastPage: readerCurrentPage
-                    });
-                    currentMaterial.lastPage = readerCurrentPage;
-                } catch (e) { console.error("Error saving reading position: ", e); }
-            }
+        window.closeReader = () => {
+            ensureAppChromeVisible();
 
-            document.getElementById('library-read-view').classList.add('hidden'); 
-            document.getElementById('library-list-view').classList.remove('hidden'); 
+            const materialToSave = currentMaterial;
+            const pageToSave = readerCurrentPage;
+            readerSaveSource = null;
+            currentMaterial = null;
+
+            document.getElementById('library-read-view').classList.add('hidden');
+            document.getElementById('library-list-view').classList.remove('hidden');
             document.getElementById('main-tabs-nav').classList.remove('hidden');
             document.getElementById('reader-settings-panel').classList.add('hidden');
-            if(ytPlayer && typeof ytPlayer.destroy === 'function') { ytPlayer.destroy(); ytPlayer = null; }
-            if(syncInterval) clearInterval(syncInterval); closeInlinePopup(); 
+            resetLibraryLayoutWidth();
+            if (ytPlayer && typeof ytPlayer.destroy === 'function') { ytPlayer.destroy(); ytPlayer = null; }
+            if (syncInterval) clearInterval(syncInterval);
+            closeInlinePopup();
             window.removeEventListener('scroll', handlePiPScroll);
             document.getElementById('reader-yt-wrapper').classList.remove('yt-pip-mode');
+
+            if (activeUid && materialToSave) {
+                updateDoc(doc(db, 'users', activeUid, 'materials', materialToSave.id), { lastPage: pageToSave })
+                    .then(() => { materialToSave.lastPage = pageToSave; })
+                    .catch(e => console.error("Error saving reading position: ", e));
+            }
         };
 
         function handlePiPScroll() {
@@ -1885,7 +3409,9 @@
                 const imgUrl = await getImageUrl(pendingInlineSaveData.word);
                 const existing = vocabulary.find(v => v.word.toLowerCase() === pendingInlineSaveData.word.toLowerCase());
                 if(existing) await deleteDoc(doc(db, 'users', activeUid, 'words', existing.id));
-                await addDoc(collection(db, 'users', activeUid, 'words'), { word: pendingInlineSaveData.word, translation: trans, context: pendingInlineSaveData.context, imageUrl: imgUrl, source: currentMaterial ? currentMaterial.title : "Читання", createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0 });
+                const saveData = { word: pendingInlineSaveData.word, translation: trans, context: pendingInlineSaveData.context, imageUrl: imgUrl, source: getSaveSource(), createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0, bsHistory: [] };
+                if (currentMaterial) saveData.materialId = currentMaterial.id;
+                await addDoc(collection(db, 'users', activeUid, 'words'), saveData);
                 const words = document.getElementById('reader-content').querySelectorAll(`[data-word="${pendingInlineSaveData.word.toLowerCase()}"]`);
                 words.forEach(w => w.classList.add('word-saved')); closeInlinePopup();
             } catch(e) {} finally { btn.disabled = false; btn.textContent = orig; }
@@ -1949,68 +3475,210 @@
                 .catch(err => console.log('Dictionary fetch error:', err));
         }
 
+        function renderSrsProgressDots(level, maxLevel = MAX_SRS_LEVEL) {
+            const display = clampSrsLevel(level);
+            return Array.from({ length: maxLevel }, (_, i) =>
+                `<span class="w-2 h-2 rounded-full ${i < display ? 'bg-indigo-500' : 'bg-slate-200'}"></span>`
+            ).join('');
+        }
+
+        let srsExtraModesVisible = false;
+
+        function renderModeProgressRow(word, m) {
+            const lvl = getWordModeLevel(word, m.id);
+            const display = clampSrsLevel(lvl);
+            const escId = m.id.replace(/'/g, "\\'");
+            return `<button type="button" onclick="showModeTrainingHistory('${escId}')" class="w-full flex items-center justify-between gap-2 rounded-lg px-1 py-1 hover:bg-slate-50 transition text-left">
+                <span class="text-xs font-bold text-slate-600 truncate flex-1">${m.label}</span>
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                    <div class="flex items-center gap-0.5">${renderSrsProgressDots(lvl)}</div>
+                    <span class="text-[10px] font-semibold text-slate-400 tabular-nums w-7 text-right">${display}/${MAX_SRS_LEVEL}</span>
+                </div>
+            </button>`;
+        }
+
+        function renderSrsModesPanel(word) {
+            let html = CORE_TRAIN_MODES.map(m => renderModeProgressRow(word, m)).join('');
+            html += `<button type="button" onclick="toggleSrsExtraModes()" class="w-full text-[11px] text-slate-400 hover:text-slate-600 py-1.5 mt-1 text-left">${srsExtraModesVisible ? '▲ Сховати' : '▼ Показати ще'}</button>`;
+            if (srsExtraModesVisible) {
+                html += `<div class="pt-1 space-y-2.5 border-t border-slate-100 mt-1">${EXTRA_TRAIN_MODES.map(m => renderModeProgressRow(word, m)).join('')}</div>`;
+            }
+            return html;
+        }
+
+        window.toggleSrsExtraModes = () => {
+            srsExtraModesVisible = !srsExtraModesVisible;
+            const word = vocabulary.find(v => v.id === srsModalWordId);
+            if (word) document.getElementById('srs-modes-panel').innerHTML = renderSrsModesPanel(word);
+        };
+
+        window.showModeTrainingHistory = (modeId) => {
+            const word = vocabulary.find(v => v.id === srsModalWordId);
+            if (!word) return;
+            const label = getTrainingModeLabel(modeId);
+            const history = getHistoryForMode(word, modeId);
+            document.getElementById('srs-mode-history-title').textContent = `Історія: ${label}`;
+            document.getElementById('srs-mode-history-list').innerHTML = renderHistoryEntries(history, 'Ще не було тренувань');
+            document.getElementById('srs-mode-history-panel').classList.remove('hidden');
+        };
+
+        function closeModeTrainingHistory() {
+            document.getElementById('srs-mode-history-panel')?.classList.add('hidden');
+        }
+        window.closeModeTrainingHistory = closeModeTrainingHistory;
+
+        function toggleSrsModesPanel() {
+            const panel = document.getElementById('srs-modes-panel');
+            const btn = document.getElementById('btn-toggle-srs-modes');
+            if (!panel || !btn) return;
+            const opening = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden');
+            btn.textContent = opening ? '▲ Окремі тренування' : '▼ Окремі тренування';
+            if (!opening) closeModeTrainingHistory();
+        }
+        window.toggleSrsModesPanel = toggleSrsModesPanel;
+
+        function closeSrsModal() {
+            document.getElementById('srs-status-modal').classList.add('hidden');
+            document.getElementById('srs-modes-panel')?.classList.add('hidden');
+            closeModeTrainingHistory();
+            srsExtraModesVisible = false;
+            const btn = document.getElementById('btn-toggle-srs-modes');
+            if (btn) btn.textContent = '▼ Окремі тренування';
+            srsModalWordId = null;
+            if (srsTimerInterval) clearInterval(srsTimerInterval);
+        }
+        window.closeSrsModal = closeSrsModal;
+
+        async function resetWordsBrainstormProgress(wordIds) {
+            if (!activeUid || wordIds.length === 0) return;
+            const batch = writeBatch(db);
+            const resetPatch = { srsLevel: 0, nextReviewTime: 0, bsHistory: [] };
+            ALL_SEPARATE_MODES.forEach(m => {
+                resetPatch[`srs_${m.id}_Level`] = 0;
+                resetPatch[`srs_${m.id}_NextTime`] = 0;
+            });
+            wordIds.forEach(id => batch.update(doc(db, 'users', activeUid, 'words', id), resetPatch));
+            await batch.commit();
+        }
+
+        window.resetWordBrainstormProgress = () => {
+            if (!srsModalWordId) return;
+            window.showModal('Скинути прогрес цього слова?', true, async () => {
+                await resetWordsBrainstormProgress([srsModalWordId]);
+                closeSrsModal();
+            });
+        };
+
+        window.resetActiveFolderProgress = () => {
+            if (!activeDictSource) return;
+            const words = getWordsForSource(activeDictSource);
+            if (words.length === 0) return window.showModal('Тут немає слів.');
+            window.showModal(`Скинути прогрес усіх ${words.length} слів у «${activeDictSource}»?`, true, async () => {
+                await resetWordsBrainstormProgress(words.map(w => w.id));
+                window.showModal('Прогрес скинуто.');
+            });
+        };
+
+        window.deleteActiveFolder = () => {
+            if (!activeDictSource) return;
+            const words = getWordsForSource(activeDictSource);
+            const folderName = activeDictSource;
+            const isMat = isMaterialSource(activeDictSource) || !!getMaterialForSource(activeDictSource);
+            window.showModal(`Видалити «${folderName}»${words.length ? ` разом з ${words.length} словами` : ''}? Цю дію не можна скасувати.`, true, async () => {
+                try {
+                    const batch = writeBatch(db);
+                    words.forEach(w => batch.delete(doc(db, 'users', activeUid, 'words', w.id)));
+                    if (!isMat) {
+                        folders.filter(f => f.name === folderName).forEach(f => batch.delete(doc(db, 'users', activeUid, 'folders', f.id)));
+                    }
+                    await batch.commit();
+                    applyDictSourceFilter(null);
+                    window.showModal(isMat ? 'Слова видалено.' : 'Папку видалено.');
+                } catch (e) { window.showModal('Помилка видалення.'); }
+            });
+        };
+
         let srsTimerInterval = null;
 
-        window.closeSrsModal = () => {
-            document.getElementById('srs-status-modal').classList.add('hidden');
-            if (srsTimerInterval) clearInterval(srsTimerInterval);
-        };
+        function showSrsStatus(id) {
+            try {
+                const word = vocabulary.find(v => v.id === id);
+                if (!word) return;
+                srsModalWordId = id;
+                const modal = document.getElementById('srs-status-modal');
+                if (!modal) return;
+                if (srsTimerInterval) clearInterval(srsTimerInterval);
 
-        window.showSrsStatus = (id) => {
-            const word = vocabulary.find(v => v.id === id); if(!word) return;
-            const modal = document.getElementById('srs-status-modal');
-            if(srsTimerInterval) clearInterval(srsTimerInterval);
-            
-            document.getElementById('srs-status-icon').innerHTML = getSrsSvg(word.srsLevel, false);
-            document.getElementById('srs-status-word').textContent = word.word;
-            document.getElementById('srs-status-trans').textContent = word.translation;
-            
-            const textContainer = document.getElementById('srs-status-text-container');
-            const btnReset = document.getElementById('btn-reset-srs');
-            
-            if (word.srsLevel >= MAX_SRS_LEVEL) {
-                textContainer.innerHTML = '<span class="text-emerald-600 font-bold text-base">Слово повністю вивчено! 🎉</span>';
-                btnReset.classList.remove('hidden');
-                btnReset.onclick = async () => {
-                    await updateDoc(doc(db, 'users', activeUid, 'words', word.id), { srsLevel: 0, nextReviewTime: 0 });
-                    closeSrsModal();
-                };
-            } else if (!word.nextReviewTime || word.nextReviewTime <= Date.now()) {
-                textContainer.innerHTML = '<span class="text-emerald-600 font-bold text-base">Готово до тренування ✅</span>';
-                btnReset.classList.add('hidden');
-            } else {
-                btnReset.classList.add('hidden');
-                const updateTimer = () => {
-                    const diff = word.nextReviewTime - Date.now();
-                    if (diff <= 0) {
-                        textContainer.innerHTML = '<span class="text-emerald-600 font-bold text-base">Готово до тренування ✅</span>';
-                        clearInterval(srsTimerInterval);
-                        return;
-                    }
-                    
-                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                    const m = Math.floor((diff / 1000 / 60) % 60);
-                    const s = Math.floor((diff / 1000) % 60);
-                    
-                    let timeStr = "";
-                    if (d > 0) timeStr += `${d}д `;
-                    timeStr += `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                    
-                    textContainer.innerHTML = `
-                        <div class="flex flex-col items-center justify-center">
-                            <span class="text-xs uppercase text-slate-400 font-bold tracking-wider mb-1">До повторення:</span>
-                            <span class="font-mono text-xl font-bold text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-lg border border-indigo-100 shadow-sm">${timeStr} ⏳</span>
-                        </div>
-                    `;
-                };
-                
-                updateTimer();
-                srsTimerInterval = setInterval(updateTimer, 1000);
+                const level = word.srsLevel || 0;
+                const displayLevel = clampSrsLevel(level);
+                const bsHistory = getHistoryForMode(word, 'brainstorm');
+
+                document.getElementById('srs-status-icon').innerHTML = getSrsSvg(level, false);
+                document.getElementById('srs-status-word').textContent = word.word;
+                document.getElementById('srs-status-trans').textContent = word.translation;
+                const addedEl = document.getElementById('srs-added-date');
+                if (addedEl) {
+                    const added = formatAddedDate(getWordAddedAt(word));
+                    addedEl.textContent = added ? `Додано: ${added}` : '';
+                }
+                document.getElementById('srs-level-big').textContent = displayLevel;
+                document.getElementById('srs-level-max').textContent = MAX_SRS_LEVEL;
+                document.getElementById('srs-progress-dots').innerHTML = renderSrsProgressDots(level);
+                srsExtraModesVisible = false;
+                document.getElementById('srs-modes-panel').innerHTML = renderSrsModesPanel(word);
+                document.getElementById('srs-modes-panel').classList.add('hidden');
+                closeModeTrainingHistory();
+                const toggleBtn = document.getElementById('btn-toggle-srs-modes');
+                if (toggleBtn) toggleBtn.textContent = '▼ Окремі тренування';
+
+                document.getElementById('srs-history-list').innerHTML = renderHistoryEntries(bsHistory, 'Ще не було тренувань Brainstorm');
+
+                const textContainer = document.getElementById('srs-status-text-container');
+
+                if (isWordLearned(word)) {
+                    textContainer.innerHTML = `<div class="flex flex-col items-center gap-1"><span class="text-emerald-600 font-bold text-lg">Вивчено 🎉</span><span class="text-xs text-slate-400">Brainstorm або всі 4 окремі тренування пройдено</span></div>`;
+                } else if (!word.nextReviewTime || word.nextReviewTime <= Date.now()) {
+                    textContainer.innerHTML = '<div class="flex flex-col items-center gap-1"><span class="text-emerald-600 font-bold text-lg">Готово до тренування</span><span class="text-xs text-slate-400">Можна проходити Brainstorm</span></div>';
+                } else {
+                    const updateTimer = () => {
+                        const diff = word.nextReviewTime - Date.now();
+                        if (diff <= 0) {
+                            textContainer.innerHTML = '<div class="flex flex-col items-center gap-1"><span class="text-emerald-600 font-bold text-lg">Готово до тренування</span><span class="text-xs text-slate-400">Можна проходити Brainstorm</span></div>';
+                            clearInterval(srsTimerInterval);
+                            return;
+                        }
+                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                        const m = Math.floor((diff / 1000 / 60) % 60);
+                        const s = Math.floor((diff / 1000) % 60);
+                        let timeStr = d > 0 ? `${d}д ` : '';
+                        timeStr += `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                        textContainer.innerHTML = `
+                            <div class="flex flex-col items-center gap-1.5 w-full">
+                                <span class="text-[10px] uppercase text-slate-400 font-bold tracking-wider">До наступного тренування</span>
+                                <span class="font-mono text-2xl sm:text-3xl font-black text-indigo-600 bg-indigo-50 px-5 py-2 rounded-xl border border-indigo-100 shadow-sm tabular-nums">${timeStr}</span>
+                                <span class="text-xs text-slate-400">залишилось ${MAX_SRS_LEVEL - level} з ${MAX_SRS_LEVEL} тренувань</span>
+                            </div>`;
+                    };
+                    updateTimer();
+                    srsTimerInterval = setInterval(updateTimer, 1000);
+                }
+
+                modal.classList.remove('hidden');
+            } catch (err) {
+                console.error('showSrsStatus', err);
             }
-            
-            modal.classList.remove('hidden');
-        };
+        }
+        window.showSrsStatus = showSrsStatus;
+
+        document.getElementById('words-grid')?.addEventListener('click', (e) => {
+            const srsEl = e.target.closest('[data-srs-id]');
+            if (!srsEl) return;
+            e.stopPropagation();
+            e.preventDefault();
+            showSrsStatus(srsEl.getAttribute('data-srs-id'));
+        });
 
         let bsWords = [], bsCurrentWordIdx = 0, bsCurrentStage = 0, bsTotalSteps = 0, bsCompletedSteps = 0;
         let activeSessionMode = 'all'; 
@@ -2019,7 +3687,7 @@
         let activeCharIndex = null;
 
         const MODE_STAGES = { 
-            'all': [0, 1, 2, 3, 5], 
+            'all': [0, 1, 2, 5], 
             'word-trans': [1], 
             'trans-word': [4], 
             'constructor': [2], 
@@ -2043,7 +3711,49 @@
             9: "По фото"
         };
 
-        window.toggleMute = () => { isGlobalAudioMuted = !isGlobalAudioMuted; const btn = document.getElementById('btn-global-mute'); btn.textContent = isGlobalAudioMuted ? '🔇' : '🔊'; btn.classList.toggle('bg-slate-300', isGlobalAudioMuted); if(isGlobalAudioMuted) window.speechSynthesis.cancel(); };
+        window.toggleMute = () => {
+            isGlobalAudioMuted = !isGlobalAudioMuted;
+            const btn = document.getElementById('btn-global-mute');
+            btn.textContent = isGlobalAudioMuted ? '🔇' : '🔊';
+            btn.classList.toggle('bg-slate-200', isGlobalAudioMuted);
+            btn.classList.toggle('opacity-70', isGlobalAudioMuted);
+            if (isGlobalAudioMuted) window.speechSynthesis.cancel();
+        };
+
+        function beginTrainingSession() {
+            trainingSessionActive = true;
+            trainingScrollLock = false;
+            trainingFocusCollapsed = false;
+            document.body.classList.remove('training-focus-mode');
+            resetTrainingChromeStyles();
+            trainingLastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+            const logo = document.querySelector('#main-app-header h1');
+            if (logo) {
+                logo.classList.add('cursor-pointer', 'hover:opacity-80');
+                logo.title = 'Перервати тренування';
+            }
+            document.addEventListener('wheel', onTrainingWheel, { passive: true });
+            document.addEventListener('touchstart', onTrainingTouchStart, { passive: true });
+            document.addEventListener('touchmove', onTrainingTouchMove, { passive: true });
+        }
+
+        function exitTrainingFocusMode() {
+            trainingSessionActive = false;
+            ensureAppChromeVisible();
+            document.removeEventListener('wheel', onTrainingWheel);
+            document.removeEventListener('touchstart', onTrainingTouchStart);
+            document.removeEventListener('touchmove', onTrainingTouchMove);
+            const logo = document.querySelector('#main-app-header h1');
+            if (logo) {
+                logo.classList.remove('cursor-pointer', 'hover:opacity-80');
+                logo.title = '';
+            }
+        }
+
+        document.getElementById('main-app-header')?.querySelector('h1')?.addEventListener('click', () => {
+            const ws = document.getElementById('bs-workspace');
+            if (trainingSessionActive && ws && !ws.classList.contains('hidden')) endSession();
+        });
 
         function updateTrainSources() {
             const select = document.getElementById('train-source-select');
@@ -2065,7 +3775,7 @@
             const now = Date.now();
             
             let dueWords = [];
-            if(mode === 'all') { dueWords = pool.filter(w => (w.srsLevel || 0) < MAX_SRS_LEVEL && (!w.nextReviewTime || w.nextReviewTime <= now)); } 
+            if(mode === 'all') { dueWords = pool.filter(w => !isSrsMastered(w.srsLevel) && (!w.nextReviewTime || w.nextReviewTime <= now)); } 
             else { dueWords = pool.filter(w => (w[`srs_${mode}_Level`] || 0) < MAX_SRS_LEVEL && (!(w[`srs_${mode}_NextTime`] || 0) || w[`srs_${mode}_NextTime`] <= now)); }
 
             if(dueWords.length < 15) {
@@ -2128,12 +3838,13 @@
             }
             
             document.getElementById('train-hub-screen').classList.add('hidden'); document.getElementById('bs-results').classList.add('hidden'); document.getElementById('bs-workspace').classList.remove('hidden');
+            beginTrainingSession();
             updateBsProgress(); renderBsStage();
         };
 
         window.startReviewSession = () => {
             const srcFilter = document.getElementById('train-source-select').value;
-            let pool = vocabulary.filter(w => (w.srsLevel || 0) >= MAX_SRS_LEVEL);
+            let pool = vocabulary.filter(w => isSrsMastered(w.srsLevel));
             if(srcFilter !== 'ALL') pool = pool.filter(w => w.source === srcFilter);
             if(pool.length === 0) return window.showModal("Немає повністю вивчених слів у цій категорії.");
             
@@ -2141,13 +3852,18 @@
             bsWords = pool.sort(() => 0.5 - Math.random()).slice(0, 10);
             bsCurrentWordIdx = 0; bsCurrentStage = 1; bsTotalSteps = bsWords.length; bsCompletedSteps = 0; 
             document.getElementById('train-hub-screen').classList.add('hidden'); document.getElementById('bs-results').classList.add('hidden'); document.getElementById('bs-workspace').classList.remove('hidden');
+            beginTrainingSession();
             updateBsProgress(); renderBsStage();
         };
 
         window.endSession = () => { 
             document.getElementById('bs-workspace').classList.add('hidden'); 
             document.getElementById('bs-results').classList.add('hidden'); 
+            document.getElementById('bs-saving')?.classList.add('hidden');
+            document.getElementById('bs-save-status')?.classList.add('hidden');
             document.getElementById('train-hub-screen').classList.remove('hidden'); 
+            exitTrainingFocusMode();
+            ensureAppChromeVisible();
             window.speechSynthesis.cancel(); 
             document.removeEventListener('keydown', handleConstructorKeyboard); 
             document.removeEventListener('keydown', handleGlobalKeyboard); 
@@ -2195,7 +3911,11 @@
         };
 
         async function finishBrainstorm() {
-            document.getElementById('bs-workspace').classList.add('hidden'); 
+            document.getElementById('bs-workspace').classList.add('hidden');
+            document.removeEventListener('keydown', handleConstructorKeyboard);
+            document.removeEventListener('keydown', handleGlobalKeyboard);
+            document.removeEventListener('keydown', handleSprintKeyboard);
+            if (sprintTimer) { clearInterval(sprintTimer); sprintTimer = null; }
             
             const mainEl = document.querySelector('main');
             const mainCard = document.getElementById('bs-main-card');
@@ -2204,37 +3924,14 @@
             mainCard.className = "bg-white p-4 sm:p-5 rounded-2xl shadow-xl border border-slate-100 text-center relative overflow-hidden flex flex-col min-h-[300px] w-full";
             extClues.classList.add('hidden');
 
-            try {
-                if(activeSessionMode === 'all') { 
-                    for(let w of bsWords) {
-                        let newLevel = w.failed ? 0 : Math.min((w.srsLevel || 0) + 1, MAX_SRS_LEVEL);
-                        await updateDoc(doc(db, 'users', activeUid, 'words', w.id), { srsLevel: newLevel, nextReviewTime: Date.now() + SRS_INTERVALS[newLevel] });
-                    }
-                } else if (activeSessionMode !== 'review' && activeSessionMode !== 'sprint') { 
-                    for(let w of bsWords) {
-                        let newLevel = w.failed ? 0 : Math.min((w[`srs_${activeSessionMode}_Level`] || 0) + 1, MAX_SRS_LEVEL);
-                        await updateDoc(doc(db, 'users', activeUid, 'words', w.id), { 
-                            [`srs_${activeSessionMode}_Level`]: newLevel, 
-                            [`srs_${activeSessionMode}_NextTime`]: Date.now() + SRS_INTERVALS[newLevel] 
-                        });
-                    }
-                } else if (activeSessionMode === 'sprint') {
-                    for(let w of bsWords) {
-                        let newLevel = w.failed ? 0 : Math.min((w.srsLevel || 0) + 1, MAX_SRS_LEVEL);
-                        await updateDoc(doc(db, 'users', activeUid, 'words', w.id), { 
-                            srsLevel: newLevel, 
-                            nextReviewTime: Date.now() + SRS_INTERVALS[newLevel] 
-                        });
-                    }
-                }
-            } catch(e) { console.error(e); }
+            document.getElementById('bs-results').classList.add('hidden');
+            document.getElementById('bs-saving').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
+            const saveResult = await persistTrainingToFirebase();
+
+            document.getElementById('bs-saving').classList.add('hidden');
             document.getElementById('bs-results').classList.remove('hidden');
-
-            if (!isGlobalAudioMuted) {
-                sessionEndAudio.currentTime = 0;
-                sessionEndAudio.play().catch(e => console.log("Audio play error:", e));
-            }
 
             let resultsIcon = "🏆";
             let resultsTitle = "Завершено!";
@@ -2245,44 +3942,8 @@
                 resultsIcon = "⚡🏃‍♂️";
                 resultsTitle = "Спринт завершено!";
                 resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100">Ваш рахунок: ${sprintScore} балів!</div>`;
-                
-                try {
-                    let updatedScores = [...sprintHighScores];
-                    updatedScores.push({ score: sprintScore, date: Date.now() });
-                    updatedScores.sort((a, b) => b.score - a.score);
-                    updatedScores = updatedScores.slice(0, 100); 
-                    
-                    const statsDocRef = doc(db, 'users', activeUid, 'stats', 'sprint');
-                    await setDoc(statsDocRef, { topScores: updatedScores }, { merge: true });
-                    sprintHighScores = updatedScores;
-                } catch (e) { console.error("Error saving sprint score:", e); }
-
                 lbdSection.classList.remove('hidden');
-                const listEl = document.getElementById('sprint-leaderboard-list');
-                const medals = ['🥇', '🥈', '🥉'];
-                
-                let html = sprintHighScores.slice(0, 3).map((s, idx) => `
-                    <li class="flex justify-between items-center py-1.5 border-b border-indigo-100 last:border-0">
-                        <span class="font-bold text-slate-800 text-base flex items-center gap-2"><span class="text-xl font-black">${medals[idx] || `<span class="text-slate-400 font-medium opacity-50">#</span>${idx+1}`}</span> ${s.score} балів</span>
-                        <span class="text-xs text-slate-400 font-medium">${new Date(s.date).toLocaleDateString()}</span>
-                    </li>
-                `).join('');
-
-                const currentScoreIndex = sprintHighScores.findIndex(s => s.score === sprintScore && s.date >= Date.now() - 5000);
-                const madeItToTop3 = currentScoreIndex !== -1 && currentScoreIndex < 3;
-                
-                if (!madeItToTop3 && sprintHighScores.length >= 3) {
-                    const displayIndex = currentScoreIndex !== -1 ? currentScoreIndex + 1 : "-";
-                    html += `
-                        <li class="text-center text-slate-300 font-black py-0.5 leading-none mt-1">...</li>
-                        <li class="flex justify-between items-center py-1.5 px-3 bg-indigo-100/50 rounded-lg mt-1 border border-indigo-100">
-                            <span class="font-bold text-slate-400 text-sm flex items-center gap-1"><span class="text-slate-400 font-medium opacity-60">#</span>${displayIndex}</span>
-                            <span class="font-bold text-indigo-700 text-sm">${sprintScore} балів</span>
-                        </li>
-                    `;
-                }
-
-                listEl.innerHTML = html;
+                renderSprintLeaderboard();
             } else {
                 lbdSection.classList.add('hidden');
             }
@@ -2301,13 +3962,17 @@
                 resultsDiv.insertBefore(subContainer, document.getElementById('bs-results-list'));
             }
 
+            const saveStatusEl = document.getElementById('bs-save-status');
+            saveStatusEl.classList.remove('hidden');
+            saveStatusEl.textContent = saveResult.text;
+            saveStatusEl.className = saveResult.className;
+
             document.getElementById('bs-results-list').innerHTML = bsWords.map(w => {
-                let currentLevel = activeSessionMode === 'all' || activeSessionMode === 'sprint' ? (w.srsLevel || 0) : (w[`srs_${activeSessionMode}_Level`] || 0);
-                let newLevel = w.failed ? 0 : Math.min(currentLevel + 1, MAX_SRS_LEVEL);
+                const displayLevel = clampSrsLevel(getWordModeLevel(w, activeSessionMode));
                 
                 return `<div class="border-b border-slate-200 pb-3 mb-3 flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8">${getSrsSvg(newLevel, false)}</div>
+                        <div class="w-12 h-12">${getSrsSvg(displayLevel, false, true)}</div>
                         <span class="font-bold text-slate-800 text-lg">${w.word}</span>
                     </div>
                     <div class="flex flex-col items-end">
@@ -2316,6 +3981,13 @@
                     </div>
                 </div>`;
             }).join('');
+
+            if (!isGlobalAudioMuted) {
+                sessionEndAudio.currentTime = 0;
+                sessionEndAudio.play().catch(e => console.log("Audio play error:", e));
+            }
+            preserveTrainingFocusState();
+            if (saveResult.ok) renderDictionary();
         }
 
         window.markWordAsFailed = () => {
@@ -2331,6 +4003,14 @@
         };
 
         function handleGlobalKeyboard(e) {
+            if (e.key === 'Escape' && trainingSessionActive) {
+                const ws = document.getElementById('bs-workspace');
+                if (ws && !ws.classList.contains('hidden')) {
+                    e.preventDefault();
+                    endSession();
+                    return;
+                }
+            }
             const btnNext = document.getElementById('bs-btn-next');
             if(e.key === 'Enter' && !btnNext.classList.contains('hidden')) { e.preventDefault(); e.stopPropagation(); btnNext.click(); return; }
             if (['1', '2', '3', '4'].includes(e.key) && (bsCurrentStage === 1 || bsCurrentStage === 4)) {
@@ -2343,14 +4023,15 @@
             document.getElementById('bs-success-img').src = word.imageUrl; 
             document.getElementById('bs-success-word').textContent = word.word;
             document.getElementById('bs-success-trans').textContent = word.translation;
-            
             const ctxEl = document.getElementById('bs-success-context');
-            if(word.context) { 
+            if (word.context) {
                 const cleanContext = word.context.replace(/[_]/g, '');
-                ctxEl.innerHTML = `<span class="italic text-slate-600">"${cleanContext.replace(new RegExp(`(${word.word})`, 'gi'), '<b class="text-indigo-600">$1</b>')}"</span>`; 
-            } else { ctxEl.textContent = ""; }
-            
-            document.getElementById('bs-success-reveal').classList.remove('hidden'); 
+                ctxEl.innerHTML = `<span class="italic text-slate-600">"${cleanContext.replace(new RegExp(`(${word.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<b class="text-indigo-600">$1</b>')}"</span>`;
+            } else {
+                ctxEl.textContent = '';
+            }
+            document.getElementById('bs-success-reveal').classList.remove('hidden');
+            preserveTrainingFocusState();
             if(!isGlobalAudioMuted) playAudioWord(word.word);
             document.getElementById('bs-btn-next').classList.remove('hidden');
             document.getElementById('bs-btn-dont-know').classList.add('hidden');
@@ -2373,7 +4054,9 @@
             if (bsCurrentStage === 7) { renderStageCrossword(area, btnNext, feedback); document.getElementById('bs-btn-dont-know').classList.add('hidden'); }
             if (bsCurrentStage === 8) { renderStageSprint(area, btnNext, feedback); }
             if (bsCurrentStage === 9) { renderStagePicture(word, area, btnNext, feedback); }
-            
+
+            preserveTrainingFocusState();
+
             if((bsCurrentStage === 0 || bsCurrentStage === 5) && !isGlobalAudioMuted) playAudioWord(word.word);
         }
 
@@ -2402,17 +4085,26 @@
             bindTestButtons(word, feedback);
         }
 
+        function markTestChoiceCorrect(btn) {
+            btn.className = 'p-4 border-2 border-emerald-600 rounded-2xl font-bold bg-emerald-500 text-white transition text-base sm:text-lg shadow-sm flex justify-between items-center';
+        }
+
+        function markTestChoiceWrong(btn) {
+            btn.className = 'p-4 border-2 border-rose-500 rounded-2xl font-bold bg-rose-500 text-white transition text-base sm:text-lg shadow-sm flex justify-between items-center';
+        }
+
         function bindTestButtons(word, feedback) {
             document.querySelectorAll('#bs-test-opts button').forEach(b => {
                 b.onclick = () => {
                     document.querySelectorAll('#bs-test-opts button').forEach(x => x.disabled = true);
+                    const correctBtn = document.querySelector(`#bs-test-opts button[data-id="${word.id}"]`);
                     if(b.dataset.id === word.id) {
-                        b.classList.replace('border-slate-200', 'border-emerald-500'); b.classList.add('bg-emerald-50', 'text-emerald-700');
+                        markTestChoiceCorrect(b);
                         feedback.innerHTML = '<span class="text-emerald-600 font-bold">Відмінно! 🎉</span>'; triggerSuccessReveal(word);
                     } else {
                         word.failed = true;
-                        b.classList.replace('border-slate-200', 'border-rose-500'); b.classList.add('bg-rose-50', 'text-rose-700');
-                        document.querySelector(`#bs-test-opts button[data-id="${word.id}"]`).classList.add('bg-emerald-50', 'border-emerald-500');
+                        markTestChoiceWrong(b);
+                        if (correctBtn) markTestChoiceCorrect(correctBtn);
                         triggerSuccessReveal(word); 
                     }
                 }
