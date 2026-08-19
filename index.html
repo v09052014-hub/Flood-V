@@ -1163,7 +1163,7 @@
             let html = sprintHighScores.slice(0, 3).map((s, idx) => `
                 <li class="flex justify-between items-center py-1.5 border-b border-indigo-100 last:border-0">
                     <span class="font-bold text-slate-800 text-base flex items-center gap-2"><span class="text-xl font-black">${medals[idx] || `<span class="text-slate-400 font-medium opacity-50">#</span>${idx+1}`}</span> ${s.score} балів</span>
-                    <span class="text-xs text-slate-400 font-medium">${new Date(s.date).toLocaleDateString()}</span>
+                    <span class="text-xs text-slate-400 font-medium">${new Date(s.date).toLocaleDateString('uk-UA')}</span>
                 </li>
             `).join('');
             const currentScoreIndex = sprintHighScores.findIndex(s => s.score === sprintScore && s.date >= Date.now() - 5000);
@@ -3814,7 +3814,7 @@
                         clearInterval(sprintTimer);
                         sprintTimer = null;
                     }
-                    bsWords = pool.sort(() => 0.5 - Math.random()).slice(0, 40);
+                    bsWords = pool.sort(() => 0.5 - Math.random());
                     if (bsWords.length < 8) {
                         let extras = vocabulary.filter(w => !bsWords.includes(w)).sort(() => 0.5 - Math.random());
                         bsWords = [...bsWords, ...extras];
@@ -3882,7 +3882,19 @@
             extClues.classList.add('hidden');
         };
 
-        function updateBsProgress() { document.getElementById('bs-progress-bar').style.width = `${(bsCompletedSteps / bsTotalSteps) * 100}%`; document.getElementById('bs-overall-stage').textContent = activeSessionMode === 'review' ? "Повторення" : STAGE_NAMES[bsCurrentStage]; document.getElementById('bs-word-counter').textContent = `${bsCurrentWordIdx + 1} / ${bsWords.length}`; }
+        function updateBsProgress() {
+            document.getElementById('bs-progress-bar').style.width = `${(bsCompletedSteps / bsTotalSteps) * 100}%`;
+            document.getElementById('bs-overall-stage').textContent = activeSessionMode === 'review' ? "Повторення" : STAGE_NAMES[bsCurrentStage];
+            const counter = document.getElementById('bs-word-counter');
+            if (!counter) return;
+            if (activeSessionMode === 'sprint') {
+                counter.textContent = '';
+                counter.classList.add('hidden');
+            } else {
+                counter.classList.remove('hidden');
+                counter.textContent = `${bsCurrentWordIdx + 1} / ${bsWords.length}`;
+            }
+        }
 
         window.nextBrainstormStep = () => {
             if (activeSessionMode === 'crossword') {
