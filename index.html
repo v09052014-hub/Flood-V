@@ -257,7 +257,49 @@
             min-height: 0;
             margin-bottom: 0.5rem;
         }
-        #bulk-photo-drop-copy { display: none; }
+        #srs-status-dialog {
+            max-width: 24rem;
+            width: 100%;
+            max-height: min(90vh, 900px);
+            overflow-y: auto;
+            transition: max-width 0.2s ease;
+        }
+        #srs-status-dialog.srs-modes-wide {
+            max-width: min(42rem, 96vw);
+        }
+        #srs-modes-panel.srs-modes-side {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem 1rem;
+            align-items: start;
+        }
+        #srs-modes-panel.srs-modes-side .srs-modes-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+        #srs-modes-panel.srs-modes-side .srs-modes-col-extra {
+            border-left: 1px solid #e2e8f0;
+            padding-left: 0.75rem;
+        }
+        #srs-modes-panel.srs-modes-side .srs-modes-more-wrap {
+            grid-column: 1 / -1;
+        }
+        @media (max-width: 640px) {
+            #srs-status-dialog.srs-modes-wide {
+                max-width: min(24rem, 96vw);
+            }
+            #srs-modes-panel.srs-modes-side {
+                grid-template-columns: 1fr;
+            }
+            #srs-modes-panel.srs-modes-side .srs-modes-col-extra {
+                border-left: none;
+                border-top: 1px solid #e2e8f0;
+                padding-left: 0;
+                padding-top: 0.5rem;
+            }
+        }
         .bulk-preview-context {
             width: 100%;
             min-height: 2.25rem;
@@ -1150,14 +1192,14 @@
     </div>
 
     <!-- Info Status Modal -->
-    <div id="srs-status-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center relative">
-            <button onclick="closeSrsModal()" class="absolute top-3 right-4 text-slate-400 hover:text-slate-700 font-bold text-2xl">&times;</button>
-            <h3 class="text-xl font-bold text-slate-800 mb-0.5" id="srs-status-word"></h3>
+    <div id="srs-status-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this) closeSrsModal()">
+        <div id="srs-status-dialog" class="bg-white p-6 rounded-2xl shadow-2xl text-center relative custom-scroll">
+            <button type="button" onclick="closeSrsModal()" class="sticky top-0 float-right z-20 w-9 h-9 -mt-1 -mr-1 mb-1 flex items-center justify-center text-slate-400 hover:text-slate-700 font-bold text-2xl bg-white/95 rounded-full shadow-sm border border-slate-100" aria-label="Close">&times;</button>
+            <h3 class="text-xl font-bold text-slate-800 mb-0.5 clear-both" id="srs-status-word"></h3>
             <p class="text-sm font-bold text-indigo-600 mb-1" id="srs-status-trans"></p>
             <p id="srs-added-date" class="text-[11px] text-slate-400 mb-4"></p>
             <div class="bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">
-                <div class="flex items-center justify-center gap-4">
+                <div id="srs-brainstorm-block" class="flex items-center justify-center gap-4 rounded-xl px-2 py-2 -mx-1 transition">
                     <div id="srs-status-icon"></div>
                     <div class="text-left">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Brainstorm</div>
@@ -1169,7 +1211,7 @@
                 </div>
                 <div class="flex items-center justify-center gap-1.5 mt-3" id="srs-progress-dots"></div>
                 <button type="button" id="btn-toggle-srs-modes" onclick="toggleSrsModesPanel()" class="w-full text-xs font-bold text-indigo-600 hover:bg-indigo-50 py-2 rounded-lg transition mt-3 border border-indigo-100">▼ Окремі тренування</button>
-                <div id="srs-modes-panel" class="hidden mt-3 pt-3 border-t border-slate-100 space-y-2.5 text-left"></div>
+                <div id="srs-modes-panel" class="hidden mt-3 pt-3 border-t border-slate-100 text-left"></div>
                 <div id="srs-mode-history-panel" class="hidden mt-3 pt-3 border-t border-slate-100 text-left">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2" id="srs-mode-history-title"></p>
                     <div id="srs-mode-history-list" class="max-h-28 overflow-y-auto custom-scroll space-y-1.5"></div>
@@ -1267,6 +1309,7 @@
                 'msg.deleteWord': 'Видалити слово?', 'msg.emptyDict': 'Словник порожній!',
                 'msg.importDone': 'Імпорт успішно завершено! ({folder})',
                 'msg.noTrainWords': 'Немає слів для тренування в цій категорії.',
+                'msg.noDueWords': 'Немає слів, готових до тренування зараз. Зачекайте до наступного інтервалу.',
                 'msg.noLearned': 'Немає повністю вивчених слів у цій категорії.',
                 'msg.moveCount': 'Перенести {n} слів у папку:',
                 'profile.sync': 'Синхронізація словника',
@@ -1458,6 +1501,7 @@
                 'msg.deleteWord': 'Delete this word?', 'msg.emptyDict': 'The dictionary is empty!',
                 'msg.importDone': 'Import finished! ({folder})',
                 'msg.noTrainWords': 'No words to train in this category.',
+                'msg.noDueWords': 'No words are due for training right now. Wait until the next interval.',
                 'msg.noLearned': 'No fully learned words in this category.',
                 'msg.moveCount': 'Move {n} words to folder:',
                 'profile.sync': 'Dictionary sync',
@@ -1644,6 +1688,7 @@
                 'msg.deleteWord': '¿Eliminar esta palabra?', 'msg.emptyDict': '¡El diccionario está vacío!',
                 'msg.importDone': '¡Importación lista! ({folder})',
                 'msg.noTrainWords': 'No hay palabras para entrenar en esta categoría.',
+                'msg.noDueWords': 'No hay palabras listas para entrenar ahora. Espera al siguiente intervalo.',
                 'msg.noLearned': 'No hay palabras totalmente aprendidas en esta categoría.',
                 'msg.moveCount': 'Mover {n} palabras a la carpeta:',
                 'profile.sync': 'Sincronización del diccionario',
@@ -2049,8 +2094,36 @@
 
         function getWordModeLevel(w, modeId) {
             if (!w || !modeId) return 0;
-            if (modeId === 'brainstorm' || modeId === 'all' || modeId === 'sprint') return w.srsLevel || 0;
+            if (modeId === 'brainstorm' || modeId === 'all' || modeId === 'sprint' || modeId === 'review') return w.srsLevel || 0;
             return w[`srs_${modeId}_Level`] || 0;
+        }
+
+        function usesBrainstormSrs(modeId) {
+            return modeId === 'all' || modeId === 'brainstorm' || modeId === 'sprint';
+        }
+
+        function normalizeSrsFocusMode(modeId) {
+            if (!modeId || modeId === 'review') return 'brainstorm';
+            if (modeId === 'all' || modeId === 'sprint') return 'brainstorm';
+            return modeId;
+        }
+
+        /** Word is ready for this training mode (interval elapsed / never scheduled). */
+        function isWordDueForMode(w, modeId, now = Date.now()) {
+            if (!w) return false;
+            if (usesBrainstormSrs(modeId)) {
+                if (isSrsMastered(w.srsLevel)) return false;
+                const next = w.nextReviewTime || 0;
+                return !next || next <= now;
+            }
+            const lvl = w[`srs_${modeId}_Level`] || 0;
+            if (isSrsMastered(lvl)) return false;
+            const next = w[`srs_${modeId}_NextTime`] || 0;
+            return !next || next <= now;
+        }
+
+        function shuffleWords(arr) {
+            return [...arr].sort(() => 0.5 - Math.random());
         }
 
         function getHistoryForMode(word, modeId) {
@@ -2613,6 +2686,12 @@
         });
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Escape') return;
+            const srsModal = document.getElementById('srs-status-modal');
+            if (srsModal && !srsModal.classList.contains('hidden')) {
+                e.preventDefault();
+                closeSrsModal();
+                return;
+            }
             if (trainingSessionActive) return;
             const moveModal = document.getElementById('move-words-modal');
             if (moveModal && !moveModal.classList.contains('hidden')) {
@@ -6076,33 +6155,66 @@
         }
 
         let srsExtraModesVisible = false;
+        let srsModalHighlightMode = null;
 
-        function renderModeProgressRow(word, m) {
+        function syncSrsModalLayout() {
+            const dialog = document.getElementById('srs-status-dialog');
+            const panel = document.getElementById('srs-modes-panel');
+            const panelOpen = panel && !panel.classList.contains('hidden');
+            const wide = !!(srsExtraModesVisible && panelOpen);
+            dialog?.classList.toggle('srs-modes-wide', wide);
+            panel?.classList.toggle('srs-modes-side', wide);
+        }
+
+        function closeSrsModal() {
+            document.getElementById('srs-status-modal').classList.add('hidden');
+            document.getElementById('srs-modes-panel')?.classList.add('hidden');
+            closeModeTrainingHistory();
+            srsExtraModesVisible = false;
+            srsModalHighlightMode = null;
+            syncSrsModalLayout();
+            const bsBlock = document.getElementById('srs-brainstorm-block');
+            if (bsBlock) bsBlock.className = 'flex items-center justify-center gap-4 rounded-xl px-2 py-2 -mx-1 transition';
+            const btn = document.getElementById('btn-toggle-srs-modes');
+            if (btn) btn.textContent = srsModesBtn(false);
+            srsModalWordId = null;
+            if (srsTimerInterval) clearInterval(srsTimerInterval);
+        }
+        window.closeSrsModal = closeSrsModal;
+
+        function renderModeProgressRow(word, m, highlightModeId = null) {
             const lvl = getWordModeLevel(word, m.id);
             const display = clampSrsLevel(lvl);
             const escId = m.id.replace(/'/g, "\\'");
-            return `<button type="button" onclick="showModeTrainingHistory('${escId}')" class="w-full flex items-center justify-between gap-2 rounded-lg px-1 py-1 hover:bg-slate-50 transition text-left">
-                <span class="text-xs font-bold text-slate-600 truncate flex-1">${t('mode.' + m.id)}</span>
+            const isHi = highlightModeId && highlightModeId === m.id;
+            const hiCls = isHi ? ' bg-indigo-50 ring-1 ring-indigo-200 font-extrabold' : ' hover:bg-slate-50';
+            return `<button type="button" onclick="showModeTrainingHistory('${escId}')" class="w-full flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 transition text-left${hiCls}">
+                <span class="text-xs font-bold ${isHi ? 'text-indigo-700' : 'text-slate-600'} truncate flex-1">${t('mode.' + m.id)}</span>
                 <div class="flex items-center gap-1.5 flex-shrink-0">
                     <div class="flex items-center gap-0.5">${renderSrsProgressDots(lvl)}</div>
-                    <span class="text-[10px] font-semibold text-slate-400 tabular-nums w-7 text-right">${display}/${MAX_SRS_LEVEL}</span>
+                    <span class="text-[10px] font-semibold ${isHi ? 'text-indigo-600' : 'text-slate-400'} tabular-nums w-7 text-right">${display}/${MAX_SRS_LEVEL}</span>
                 </div>
             </button>`;
         }
 
-        function renderSrsModesPanel(word) {
-            let html = CORE_TRAIN_MODES.map(m => renderModeProgressRow(word, m)).join('');
-            html += `<button type="button" onclick="toggleSrsExtraModes()" class="w-full text-[11px] text-slate-400 hover:text-slate-600 py-1.5 mt-1 text-left">${srsExtraModesVisible ? '▲ ' + t('srs.hide') : '▼ ' + t('srs.showMore')}</button>`;
-            if (srsExtraModesVisible) {
-                html += `<div class="pt-1 space-y-2.5 border-t border-slate-100 mt-1">${EXTRA_TRAIN_MODES.map(m => renderModeProgressRow(word, m)).join('')}</div>`;
+        function renderSrsModesPanel(word, highlightModeId = null) {
+            const coreHtml = CORE_TRAIN_MODES.map(m => renderModeProgressRow(word, m, highlightModeId)).join('');
+            const moreLabel = srsExtraModesVisible ? '▲ ' + t('srs.hide') : '▼ ' + t('srs.showMore');
+            const moreBtn = `<div class="srs-modes-more-wrap"><button type="button" onclick="toggleSrsExtraModes()" class="w-full text-[11px] text-slate-400 hover:text-slate-600 py-1.5 mt-1 text-left">${moreLabel}</button></div>`;
+
+            if (!srsExtraModesVisible) {
+                return `<div class="srs-modes-col space-y-2.5">${coreHtml}</div>${moreBtn}`;
             }
-            return html;
+
+            const extraHtml = EXTRA_TRAIN_MODES.map(m => renderModeProgressRow(word, m, highlightModeId)).join('');
+            return `<div class="srs-modes-col space-y-2.5">${coreHtml}</div><div class="srs-modes-col srs-modes-col-extra space-y-2.5">${extraHtml}</div>${moreBtn}`;
         }
 
         window.toggleSrsExtraModes = () => {
             srsExtraModesVisible = !srsExtraModesVisible;
             const word = vocabulary.find(v => v.id === srsModalWordId);
-            if (word) document.getElementById('srs-modes-panel').innerHTML = renderSrsModesPanel(word);
+            if (word) document.getElementById('srs-modes-panel').innerHTML = renderSrsModesPanel(word, srsModalHighlightMode);
+            syncSrsModalLayout();
         };
 
         window.showModeTrainingHistory = (modeId) => {
@@ -6127,21 +6239,15 @@
             const opening = panel.classList.contains('hidden');
             panel.classList.toggle('hidden');
             btn.textContent = srsModesBtn(opening);
-            if (!opening) closeModeTrainingHistory();
+            if (!opening) {
+                closeModeTrainingHistory();
+                srsExtraModesVisible = false;
+                const word = vocabulary.find(v => v.id === srsModalWordId);
+                if (word) panel.innerHTML = renderSrsModesPanel(word, srsModalHighlightMode);
+            }
+            syncSrsModalLayout();
         }
         window.toggleSrsModesPanel = toggleSrsModesPanel;
-
-        function closeSrsModal() {
-            document.getElementById('srs-status-modal').classList.add('hidden');
-            document.getElementById('srs-modes-panel')?.classList.add('hidden');
-            closeModeTrainingHistory();
-            srsExtraModesVisible = false;
-            const btn = document.getElementById('btn-toggle-srs-modes');
-            if (btn) btn.textContent = srsModesBtn(false);
-            srsModalWordId = null;
-            if (srsTimerInterval) clearInterval(srsTimerInterval);
-        }
-        window.closeSrsModal = closeSrsModal;
 
         async function resetWordsBrainstormProgress(wordIds) {
             if (!activeUid || wordIds.length === 0) return;
@@ -6195,11 +6301,13 @@
 
         let srsTimerInterval = null;
 
-        function showSrsStatus(id) {
+        function showSrsStatus(id, options = {}) {
             try {
                 const word = vocabulary.find(v => v.id === id);
                 if (!word) return;
                 srsModalWordId = id;
+                const focusMode = normalizeSrsFocusMode(options.highlightMode || null);
+                srsModalHighlightMode = options.highlightMode ? focusMode : null;
                 const modal = document.getElementById('srs-status-modal');
                 if (!modal) return;
                 if (srsTimerInterval) clearInterval(srsTimerInterval);
@@ -6219,14 +6327,28 @@
                 document.getElementById('srs-level-big').textContent = displayLevel;
                 document.getElementById('srs-level-max').textContent = MAX_SRS_LEVEL;
                 document.getElementById('srs-progress-dots').innerHTML = renderSrsProgressDots(level);
-                srsExtraModesVisible = false;
-                document.getElementById('srs-modes-panel').innerHTML = renderSrsModesPanel(word);
-                document.getElementById('srs-modes-panel').classList.add('hidden');
+
+                const bsBlock = document.getElementById('srs-brainstorm-block');
+                if (bsBlock) {
+                    bsBlock.className = srsModalHighlightMode === 'brainstorm'
+                        ? 'flex items-center justify-center gap-4 rounded-xl px-2 py-2 -mx-1 transition bg-indigo-50 ring-1 ring-indigo-200'
+                        : 'flex items-center justify-center gap-4 rounded-xl px-2 py-2 -mx-1 transition';
+                }
+
+                const isSeparateMode = srsModalHighlightMode && srsModalHighlightMode !== 'brainstorm';
+                srsExtraModesVisible = !!(isSeparateMode && EXTRA_TRAIN_MODES.some(m => m.id === srsModalHighlightMode));
+                document.getElementById('srs-modes-panel').innerHTML = renderSrsModesPanel(word, srsModalHighlightMode);
+                document.getElementById('srs-modes-panel').classList.toggle('hidden', !isSeparateMode);
                 closeModeTrainingHistory();
                 const toggleBtn = document.getElementById('btn-toggle-srs-modes');
-                if (toggleBtn) toggleBtn.textContent = srsModesBtn(false);
+                if (toggleBtn) toggleBtn.textContent = srsModesBtn(isSeparateMode);
+                syncSrsModalLayout();
 
                 document.getElementById('srs-history-list').innerHTML = renderHistoryEntries(bsHistory, t('srs.noHistoryBs'));
+
+                if (isSeparateMode) {
+                    showModeTrainingHistory(srsModalHighlightMode);
+                }
 
                 const textContainer = document.getElementById('srs-status-text-container');
 
@@ -6265,6 +6387,9 @@
             }
         }
         window.showSrsStatus = showSrsStatus;
+        window.showSrsStatusFromTraining = (id) => {
+            showSrsStatus(id, { highlightMode: activeSessionMode });
+        };
 
         document.getElementById('words-grid')?.addEventListener('click', (e) => {
             const srsEl = e.target.closest('[data-srs-id]');
@@ -6371,16 +6496,9 @@
             
             activeSessionMode = mode;
             const now = Date.now();
-            
-            let dueWords = [];
-            if(mode === 'all') { dueWords = pool.filter(w => !isSrsMastered(w.srsLevel) && (!w.nextReviewTime || w.nextReviewTime <= now)); } 
-            else { dueWords = pool.filter(w => (w[`srs_${mode}_Level`] || 0) < MAX_SRS_LEVEL && (!(w[`srs_${mode}_NextTime`] || 0) || w[`srs_${mode}_NextTime`] <= now)); }
-
-            if(dueWords.length < 15) {
-                let randomExtra = pool.filter(w => !dueWords.includes(w)).sort(() => 0.5 - Math.random());
-                dueWords = [...dueWords, ...randomExtra];
-            }
-            if(dueWords.length === 0) dueWords = pool.sort(() => 0.5 - Math.random()); 
+            // Strict SRS: only words whose interval has elapsed (never pad with not-due words)
+            let dueWords = shuffleWords(pool.filter(w => isWordDueForMode(w, mode, now)));
+            if (dueWords.length === 0) return window.showModal(t('msg.noDueWords'));
 
             const mainEl = document.querySelector('main');
             const mainCard = document.getElementById('bs-main-card');
@@ -6394,7 +6512,7 @@
                 }
                 
                 bsWords = currentCrossword.placed.map(p => {
-                    const originalWord = pool.find(w => w.id === p.id);
+                    const originalWord = dueWords.find(w => w.id === p.id) || pool.find(w => w.id === p.id);
                     return { ...originalWord, failed: false }; 
                 });
                 
@@ -6412,16 +6530,12 @@
                         clearInterval(sprintTimer);
                         sprintTimer = null;
                     }
-                    bsWords = pool.sort(() => 0.5 - Math.random());
-                    if (bsWords.length < 8) {
-                        let extras = vocabulary.filter(w => !bsWords.includes(w)).sort(() => 0.5 - Math.random());
-                        bsWords = [...bsWords, ...extras];
-                    }
+                    bsWords = dueWords;
                 } else {
                     bsWords = dueWords.slice(0, reqCount);
                 }
                 
-                if(bsWords.length === 0) return;
+                if(bsWords.length === 0) return window.showModal(t('msg.noDueWords'));
                 
                 mainEl.classList.replace('max-w-5xl', 'max-w-4xl');
                 mainCard.className = "bg-white p-4 sm:p-5 rounded-2xl shadow-xl border border-slate-100 text-center relative overflow-hidden flex flex-col min-h-[300px] w-full";
@@ -6579,13 +6693,14 @@
 
             document.getElementById('bs-results-list').innerHTML = bsWords.map(w => {
                 const displayLevel = clampSrsLevel(getWordModeLevel(w, activeSessionMode));
+                const wid = String(w.id || '').replace(/'/g, "\\'");
                 
                 return `<div class="border-b border-slate-200 pb-3 mb-3 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12">${getSrsSvg(displayLevel, false, true)}</div>
-                        <span class="font-bold text-slate-800 text-lg">${w.word}</span>
+                    <div class="flex items-center gap-3 min-w-0">
+                        <button type="button" class="w-12 h-12 flex-shrink-0 rounded-full hover:ring-2 hover:ring-indigo-300 transition cursor-pointer" title="${t('srs.ready')}" onclick="event.stopPropagation(); showSrsStatusFromTraining('${wid}')">${getSrsSvg(displayLevel, false, true)}</button>
+                        <span class="font-bold text-slate-800 text-lg truncate">${w.word}</span>
                     </div>
-                    <div class="flex flex-col items-end">
+                    <div class="flex flex-col items-end flex-shrink-0">
                         <span class="text-indigo-600 font-bold text-sm">${w.translation}</span>
                         <span class="text-base font-bold mt-0.5">${w.failed ? '❌' : '✅'}</span>
                     </div>
@@ -6614,6 +6729,12 @@
 
         function handleGlobalKeyboard(e) {
             if (e.key === 'Escape' && trainingSessionActive) {
+                const srsModal = document.getElementById('srs-status-modal');
+                if (srsModal && !srsModal.classList.contains('hidden')) {
+                    e.preventDefault();
+                    closeSrsModal();
+                    return;
+                }
                 const ws = document.getElementById('bs-workspace');
                 if (ws && !ws.classList.contains('hidden')) {
                     e.preventDefault();
