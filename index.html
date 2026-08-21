@@ -555,12 +555,42 @@
             max-width: 4.5rem;
         }
         #bulk-add-dialog.bulk-photo-results .bulk-photo-idle-copy { display: none; }
+        #bulk-photo-drop-copy { display: none; }
         #bulk-add-dialog.bulk-photo-results #bulk-photo-drop-copy {
             display: block;
             font-size: 0.7rem;
             font-weight: 700;
             color: #64748b;
         }
+        #bulk-photo-paste-target {
+            min-height: 2.75rem;
+            margin-top: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            border: 1px dashed #cbd5e1;
+            border-radius: 0.75rem;
+            background: #fff;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 600;
+            outline: none;
+            text-align: center;
+            max-width: 20rem;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+        }
+        #bulk-photo-paste-target:focus {
+            border-color: #818cf8;
+            color: #64748b;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+        }
+        #bulk-photo-paste-target:empty:before {
+            content: attr(data-placeholder);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+        #bulk-add-dialog.bulk-photo-results #bulk-photo-paste-target,
+        #bulk-add-dialog.bulk-photo-results .bulk-photo-actions { display: none !important; }
         #bulk-add-dialog.bulk-photo-results #bulk-photo-status,
         #bulk-add-dialog.bulk-photo-results #bulk-photo-retry-wrap {
             display: none !important;
@@ -804,22 +834,63 @@
 
         .inline-context-input {
             display: inline-block;
-            width: 120px;
+            width: 7ch;
+            min-width: 4ch;
+            max-width: 100%;
             border: none;
-            border-bottom: 2px solid #cbd5e1;
+            border-bottom: 2px solid #94a3b8;
             background: transparent;
             text-align: center;
-            font-weight: bold;
-            color: #4f46e5;
+            font: inherit;
+            font-weight: 500;
+            font-style: italic;
+            color: #334155;
             outline: none;
-            font-size: 1rem;
-            transition: all 0.2s;
-            margin: 0 4px;
-            padding: 0 4px;
+            font-size: 1.25rem;
+            line-height: inherit;
+            vertical-align: baseline;
+            transition: border-color 0.2s, color 0.2s;
+            margin: 0 2px;
+            padding: 0 2px;
+            box-sizing: content-box;
         }
-        .inline-context-input:focus { border-bottom-color: #4f46e5; width: 140px; }
-        .inline-context-input.correct { border-bottom-color: #10b981; color: #10b981; }
-        .inline-context-input.wrong { border-bottom-color: #f43f5e; color: #f43f5e; }
+        .inline-context-input:focus { border-bottom-color: #6366f1; color: #4338ca; }
+        .inline-context-input.correct { border-bottom-color: #10b981; color: #059669; }
+        .inline-context-input.wrong { border-bottom-color: #f43f5e; color: #e11d48; }
+
+        @keyframes ctx-penalty-float {
+            0% { opacity: 1; transform: translate(-50%, 0); filter: blur(0); }
+            100% { opacity: 0; transform: translate(-50%, -2rem); filter: blur(5px); }
+        }
+        .ctx-penalty-float {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            z-index: 5;
+            pointer-events: none;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #f43f5e;
+            animation: ctx-penalty-float 0.75s ease-out forwards;
+            white-space: nowrap;
+        }
+        #ctx-points-wrap { position: relative; }
+        .ctx-ellipsis {
+            color: #4f46e5;
+            font-style: normal;
+            font-weight: 800;
+            padding: 0 0.05em;
+            user-select: none;
+        }
+        #ctx-material-hint {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.02em;
+            text-align: center;
+            margin-top: 0.5rem;
+            min-height: 1.1rem;
+        }
 
         .grid-cols-15 { grid-template-columns: repeat(15, minmax(0, 1fr)); }
 
@@ -988,13 +1059,18 @@
             <div id="bulk-photo-top">
             <div id="bulk-photo-panel" class="hidden mb-4">
                 <input type="file" id="bulk-photo-file" accept="image/*" class="hidden" onchange="handleBulkPhotoFile(event)">
-                <div id="bulk-photo-drop" class="border-2 border-dashed border-slate-200 rounded-xl p-4 bg-slate-50 text-center cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/40 transition" onclick="document.getElementById('bulk-photo-file').click()" ondragover="handleBulkPhotoDragOver(event)" ondragleave="handleBulkPhotoDragLeave(event)" ondrop="handleBulkPhotoDrop(event)">
+                <div id="bulk-photo-drop" class="border-2 border-dashed border-slate-200 rounded-xl p-4 bg-slate-50 text-center cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/40 transition" onclick="if(!event.target.closest('.bulk-photo-actions, #bulk-photo-paste-target, #bulk-photo-drop-copy')) document.getElementById('bulk-photo-file').click()" ondragover="handleBulkPhotoDragOver(event)" ondragleave="handleBulkPhotoDragLeave(event)" ondrop="handleBulkPhotoDrop(event)">
                     <div id="bulk-photo-preview-wrap" class="hidden mb-3">
                         <img id="bulk-photo-preview" alt="" class="max-h-36 mx-auto rounded-lg shadow-sm object-contain bg-white">
                     </div>
                     <div class="bulk-photo-idle-copy min-w-0">
                         <p class="text-sm font-bold text-slate-600 mb-1" data-i18n="bulk.photoHint">Оберіть фото або вставте з буфера (Ctrl+V)</p>
-                        <p class="text-[11px] text-slate-400 leading-relaxed" data-i18n="bulk.photoSub">AI розпізнає слова з зображення словникового набору</p>
+                        <p class="text-[11px] text-slate-400 leading-relaxed mb-3" data-i18n="bulk.photoSub">AI розпізнає слова з зображення словникового набору</p>
+                        <div class="bulk-photo-actions flex flex-wrap items-center justify-center gap-2" onclick="event.stopPropagation()">
+                            <button type="button" onclick="event.stopPropagation(); document.getElementById('bulk-photo-file').click()" class="text-xs font-bold bg-white border border-slate-200 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:border-indigo-200 text-slate-700 transition shadow-sm">📁 <span data-i18n="bulk.photoChoose">Обрати фото</span></button>
+                            <button type="button" id="btn-bulk-photo-paste" onclick="event.stopPropagation(); pasteBulkPhotoFromClipboard()" class="text-xs font-bold bg-white border border-slate-200 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:border-indigo-200 text-indigo-700 transition shadow-sm">📋 <span data-i18n="bulk.photoPaste">Вставити</span></button>
+                        </div>
+                        <div id="bulk-photo-paste-target" contenteditable="true" role="textbox" aria-label="Paste image" spellcheck="false" class="bulk-photo-paste-target" data-i18n-placeholder="bulk.photoPasteField" data-placeholder="Натисніть тут і вставте зображення" onclick="event.stopPropagation()" onfocus="this.dataset.focused='1'" onblur="this.textContent=''; onpaste="handleBulkPhotoPasteTarget(event)"></div>
                     </div>
                     <span id="bulk-photo-drop-copy" data-i18n="bulk.photoChange">Інше фото</span>
                 </div>
@@ -1069,13 +1145,13 @@
                 <div class="flex flex-col gap-3">
                     <div class="flex flex-col sm:flex-row gap-3 relative">
                         <div class="flex-1 relative">
-                            <input type="text" id="manual-word" placeholder="Слово (Enter для перекладу)" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base" data-i18n-placeholder="dict.wordPlaceholder">
+                            <input type="text" id="manual-word" placeholder="Слово ↵ для перекладу" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base" data-i18n-placeholder="dict.wordPlaceholder">
                             <button onclick="autoTranslateManual()" class="absolute right-2 top-2 p-1.5 text-indigo-500 hover:bg-indigo-100 rounded-lg transition" data-i18n-title="dict.translate" title="Перекласти">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
                             </button>
                         </div>
                         <div class="flex-1 relative">
-                            <input type="text" id="manual-trans" placeholder="Переклад (Enter для збереження)" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base bg-white" autocomplete="off" data-i18n-placeholder="dict.transPlaceholder">
+                            <input type="text" id="manual-trans" placeholder="Переклад ↵ для збереження" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base bg-white" autocomplete="off" data-i18n-placeholder="dict.transPlaceholder">
                             <div id="trans-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto custom-scroll">
                                 <ul id="trans-options-list" class="flex flex-col p-1"></ul>
                             </div>
@@ -1126,8 +1202,8 @@
                 </div>
 
                 <div id="dict-select-bar" class="items-center gap-1.5 pb-1 mb-3 px-1">
-                    <button type="button" id="btn-select-all" onclick="setDictSelection(true)" class="dict-icon-btn" data-i18n-title="dict.selectAll" title="Вибрати всі">☑️</button>
                     <button type="button" id="btn-select-none" onclick="setDictSelection(false)" class="dict-icon-btn" data-i18n-title="dict.selectNone" title="Зняти всі">☐</button>
+                    <button type="button" id="btn-select-all" onclick="setDictSelection(true)" class="dict-icon-btn" data-i18n-title="dict.selectAll" title="Вибрати всі">☑️</button>
                     <button type="button" id="btn-move-words" onclick="openMoveWordsModal()" class="dict-icon-btn" data-i18n-title="dict.move" title="Перенести в іншу папку">➡️</button>
                     <button type="button" id="btn-reset-selected" onclick="resetSelectedWordsProgress()" class="dict-icon-btn" data-i18n-title="dict.resetProgress" title="Скинути прогрес">↺</button>
                     <button type="button" id="btn-delete-selected" onclick="deleteSelectedWords()" class="dict-icon-btn" data-i18n-title="dict.deleteSelected" title="Видалити вибрані">🗑️</button>
@@ -1413,7 +1489,7 @@
                         
                         <div class="mt-3 flex gap-3 relative z-10 w-full">
                             <button id="bs-btn-dont-know" onclick="markWordAsFailed()" class="flex-shrink-0 bg-slate-100 text-slate-500 hover:bg-slate-200 py-3 px-4 rounded-xl font-bold text-sm transition border border-slate-200 shadow-sm hidden" data-i18n-html="train.dontKnow">Не знаю<br>слово</button>
-                            <button id="bs-btn-next" onclick="nextBrainstormStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-lg hidden active:scale-95 shadow-md transition" data-i18n="train.next">Далі (Enter)</button>
+                            <button id="bs-btn-next" onclick="nextBrainstormStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-lg hidden active:scale-95 shadow-md transition" data-i18n="train.next">Далі <span class="font-normal">↵</span></button>
                         </div>
 
                         <div id="bs-success-reveal" class="hidden mt-4 bg-indigo-50/50 p-3 rounded-xl flex flex-col sm:flex-row items-center gap-3 text-left border border-indigo-100 fade-in z-10">
@@ -1465,14 +1541,14 @@
         </div>
         <div id="inline-popup-loader" class="hidden text-indigo-500 font-bold text-xs flex items-center gap-2 mb-2"><div class="loader w-3 h-3"></div> <span data-i18n="inline.searching">Шукаємо...</span></div>
         
-        <input type="text" id="inline-popup-trans-input" class="w-full mb-2 p-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-600 text-base font-bold text-slate-800 bg-slate-50" placeholder="Натисніть Enter" data-i18n-placeholder="inline.enter">
+        <input type="text" id="inline-popup-trans-input" class="w-full mb-2 p-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-600 text-base font-bold text-slate-800 bg-slate-50" placeholder="Натисніть ↵" data-i18n-placeholder="inline.enter">
         
         <div id="inline-trans-dropdown" class="mb-3 max-h-32 overflow-y-auto custom-scroll border border-slate-100 rounded-lg hidden bg-white">
             <ul id="inline-trans-options-list" class="flex flex-col"></ul>
         </div>
         
         <button onclick="saveWordFromInlinePopup()" id="inline-popup-save-btn" class="w-full bg-emerald-500 text-white py-2 rounded-lg font-bold text-sm shadow-sm hover:bg-emerald-600 active:scale-95 transition hidden" data-i18n="inline.save">
-            Зберегти (Enter)
+            Зберегти <span class="font-normal">↵</span>
         </button>
 
         <!-- Collapsible Dictionary Section -->
@@ -1612,8 +1688,8 @@
                 'profile.interface': 'Мова інтерфейсу', 'profile.learning': 'Мова навчання',
                 'profile.studying': 'Вивчаю', 'profile.translation': 'Переклад',
                 'profile.myPairs': 'Мої пари',
-                'dict.wordPlaceholder': 'Слово (Enter для перекладу)',
-                'dict.transPlaceholder': 'Переклад (Enter для збереження)',
+                'dict.wordPlaceholder': 'Слово ↵ для перекладу',
+                'dict.transPlaceholder': 'Переклад ↵ для збереження',
                 'dict.add': 'Додати до словника', 'dict.search': 'Пошук слів чи перекладу...',
                 'dict.select': 'Вибрати слова', 'dict.selectDone': 'Вийти з режиму вибору (Esc)',
                 'dict.allWords': 'Усі слова', 'folder.import': 'Імпорт', 'filter.all': 'Усі слова',
@@ -1680,11 +1756,11 @@
                 'reader.fontSize': 'Розмір тексту', 'reader.width': 'Ширина вікна', 'reader.font': 'Шрифт',
                 'reader.narrow': 'Вужче', 'reader.wide': 'Ширше',
                 'reader.georgia': 'Georgia (із засічками)', 'reader.inter': 'Inter (без засічок)',
-                'train.stop': 'Стоп', 'train.dontKnow': 'Не знаю слово', 'train.next': 'Далі (Enter)',
+                'train.stop': 'Стоп', 'train.dontKnow': 'Не знаю слово', 'train.next': 'Далі',
                 'train.saving': 'Зберігаємо результати...', 'train.wait': 'Зачекайте кілька секунд',
                 'train.done': 'Завершено!', 'train.records': 'Рекорди:', 'train.backHub': 'До вибору тренувань',
-                'inline.searching': 'Шукаємо...', 'inline.enter': 'Натисніть Enter',
-                'inline.save': 'Зберегти (Enter)', 'inline.update': 'Оновити (Enter)',
+                'inline.searching': 'Шукаємо...', 'inline.enter': 'Натисніть ↵',
+                'inline.save': 'Зберегти', 'inline.update': 'Оновити',
                 'inline.back': 'Назад', 'inline.listen': 'Прослухати',
                 'inline.dict': 'Тлумачення',
                 'inline.noDefs': 'Визначень не знайдено.',
@@ -1745,7 +1821,7 @@
                 'msg.deleteFolder': 'Видалити «{folder}»{extra}? Цю дію не можна скасувати.',
                 'msg.deleteFolderExtra': ' разом з {n} словами',
                 'msg.folderDeleted': 'Папку видалено.', 'msg.deleteError': 'Помилка видалення.',
-                'train.gotIt': 'Зрозуміло (Enter)',
+                'train.gotIt': 'Зрозуміло',
                 'train.crosswordDone': 'Кросворд розгадано!',
                 'train.crosswordExpand': 'На весь екран',
                 'train.crosswordShrink': 'Згорнути',
@@ -1764,8 +1840,13 @@
                 'msg.noWordsQuery': 'Немає слів за цим запитом.',
                 'msg.ytNeedSubs': 'Відео вибрано! Тепер ви можете додати субтитри (перетягніть .srt або вставте текст).',
                 'train.correct': 'Правильно: {word}', 'train.excellent': 'Відмінно! 🎉', 'train.perfect': 'Ідеально!',
-                'train.typeIn': '{lang} (Enter)', 'train.noContext': 'Контекст не знайдено для {word}',
-                'train.sprintDone': 'Спринт завершено!', 'train.yourScore': 'Ваш рахунок: {n} балів!',
+                'train.typeIn': '{lang} ↵', 'train.noContext': 'Контекст не знайдено для {word}',
+                'train.sprintDone': 'Спринт завершено!', 'train.contextDone': 'Контекст завершено!', 'train.yourScore': 'Ваш рахунок: {n} балів!',
+                'train.contextRead': 'Читайте…', 'train.contextHint': 'Підказка', 'train.score': 'Рахунок',
+                'train.contextHintLetters': 'Літери',
+                'train.contextHintTrans': 'Переклад',
+                'train.contextHintMaterial': 'Матеріал',
+                'train.contextHintCosts': 'Підказки: літери −3 · переклад −5',
                 'train.points': '{n} балів', 'train.streak': 'Серія: {n}',
                 'train.wrong': 'Неправильно', 'train.right': 'Правильно',
                 'train.interrupt': 'Перервати (Esc)', 'train.sound': 'Звук', 'train.stopSession': 'Перервати тренування',
@@ -1791,6 +1872,11 @@
                 'bulk.photoOk': 'Розпізнано {n} слів{title}.',
                 'bulk.photoTitleSuffix': ' · папка «{title}»',
                 'bulk.photoChange': 'Інше фото',
+                'bulk.photoChoose': 'Обрати фото',
+                'bulk.photoPaste': 'Вставити',
+                'bulk.photoPasteField': 'Натисніть тут і вставте зображення',
+                'bulk.photoPasteFail': 'Не вдалося вставити зображення. Натисніть поле нижче і вставте вручну.',
+                'bulk.photoPasteTip': 'Натисніть поле нижче, утримуйте палець і оберіть «Вставити».',
                 'bulk.colWord': 'Слово',
                 'bulk.colTrans': 'Переклад',
                 'bulk.colContext': 'Контекст (приклад)',
@@ -1822,8 +1908,8 @@
                 'profile.interface': 'Interface language', 'profile.learning': 'Learning languages',
                 'profile.studying': 'Learning', 'profile.translation': 'Translation',
                 'profile.myPairs': 'My pairs',
-                'dict.wordPlaceholder': 'Word (Enter to translate)',
-                'dict.transPlaceholder': 'Translation (Enter to save)',
+                'dict.wordPlaceholder': 'Word ↵ to translate',
+                'dict.transPlaceholder': 'Translation ↵ to save',
                 'dict.add': 'Add to dictionary', 'dict.search': 'Search words or translations...',
                 'dict.select': 'Select words', 'dict.selectDone': 'Exit selection (Esc)',
                 'dict.allWords': 'All words', 'folder.import': 'Import', 'filter.all': 'All words',
@@ -1890,11 +1976,11 @@
                 'reader.fontSize': 'Text size', 'reader.width': 'Window width', 'reader.font': 'Font',
                 'reader.narrow': 'Narrower', 'reader.wide': 'Wider',
                 'reader.georgia': 'Georgia (serif)', 'reader.inter': 'Inter (sans-serif)',
-                'train.stop': 'Stop', 'train.dontKnow': "I don't<br>know", 'train.next': 'Next (Enter)',
+                'train.stop': 'Stop', 'train.dontKnow': "I don't<br>know", 'train.next': 'Next',
                 'train.saving': 'Saving results...', 'train.wait': 'Please wait a few seconds',
                 'train.done': 'Done!', 'train.records': 'Records:', 'train.backHub': 'Back to training',
-                'inline.searching': 'Searching...', 'inline.enter': 'Press Enter',
-                'inline.save': 'Save (Enter)', 'inline.update': 'Update (Enter)',
+                'inline.searching': 'Searching...', 'inline.enter': 'Press ↵',
+                'inline.save': 'Save', 'inline.update': 'Update',
                 'inline.back': 'Back', 'inline.listen': 'Listen',
                 'inline.dict': 'Definition',
                 'inline.noDefs': 'No definitions found.',
@@ -1950,7 +2036,7 @@
                 'msg.deleteFolder': 'Delete “{folder}”{extra}? This cannot be undone.',
                 'msg.deleteFolderExtra': ' and {n} words',
                 'msg.folderDeleted': 'Folder deleted.', 'msg.deleteError': 'Could not delete.',
-                'train.gotIt': 'Got it (Enter)',
+                'train.gotIt': 'Got it',
                 'train.crosswordDone': 'Crossword solved!',
                 'train.crosswordExpand': 'Full screen',
                 'train.crosswordShrink': 'Exit full screen',
@@ -1969,8 +2055,13 @@
                 'msg.noWordsQuery': 'No words match this search.',
                 'msg.ytNeedSubs': 'Video selected! Now add subtitles (drop a .srt file or paste text).',
                 'train.correct': 'Correct: {word}', 'train.excellent': 'Excellent! 🎉', 'train.perfect': 'Perfect!',
-                'train.typeIn': '{lang} (Enter)', 'train.noContext': 'No context found for {word}',
-                'train.sprintDone': 'Sprint finished!', 'train.yourScore': 'Your score: {n} points!',
+                'train.typeIn': '{lang} ↵', 'train.noContext': 'No context found for {word}',
+                'train.sprintDone': 'Sprint finished!', 'train.contextDone': 'Context finished!', 'train.yourScore': 'Your score: {n} points!',
+                'train.contextRead': 'Reading…', 'train.contextHint': 'Hint', 'train.score': 'Score',
+                'train.contextHintLetters': 'Letters',
+                'train.contextHintTrans': 'Translation',
+                'train.contextHintMaterial': 'Material',
+                'train.contextHintCosts': 'Hints: letters −3 · translation −5',
                 'train.points': '{n} points', 'train.streak': 'Streak: {n}',
                 'train.wrong': 'Wrong', 'train.right': 'Correct',
                 'train.interrupt': 'Stop (Esc)', 'train.sound': 'Sound', 'train.stopSession': 'Stop training',
@@ -1996,6 +2087,11 @@
                 'bulk.photoOk': 'Recognized {n} words{title}.',
                 'bulk.photoTitleSuffix': ' · folder “{title}”',
                 'bulk.photoChange': 'Another photo',
+                'bulk.photoChoose': 'Choose photo',
+                'bulk.photoPaste': 'Paste',
+                'bulk.photoPasteField': 'Tap here and paste an image',
+                'bulk.photoPasteFail': 'Could not paste the image. Tap the field below and paste manually.',
+                'bulk.photoPasteTip': 'Tap the field below, long-press, and choose Paste.',
                 'bulk.colWord': 'Word',
                 'bulk.colTrans': 'Translation',
                 'bulk.colContext': 'Context (example)',
@@ -2027,8 +2123,8 @@
                 'profile.interface': 'Idioma de la interfaz', 'profile.learning': 'Idiomas de estudio',
                 'profile.studying': 'Estudio', 'profile.translation': 'Traducción',
                 'profile.myPairs': 'Mis pares',
-                'dict.wordPlaceholder': 'Palabra (Enter para traducir)',
-                'dict.transPlaceholder': 'Traducción (Enter para guardar)',
+                'dict.wordPlaceholder': 'Palabra ↵ para traducir',
+                'dict.transPlaceholder': 'Traducción ↵ para guardar',
                 'dict.add': 'Añadir al diccionario', 'dict.search': 'Buscar palabras o traducciones...',
                 'dict.select': 'Seleccionar palabras', 'dict.selectDone': 'Salir de la selección (Esc)',
                 'dict.allWords': 'Todas las palabras', 'folder.import': 'Importar', 'filter.all': 'Todas las palabras',
@@ -2095,11 +2191,11 @@
                 'reader.fontSize': 'Tamaño del texto', 'reader.width': 'Ancho de la ventana', 'reader.font': 'Fuente',
                 'reader.narrow': 'Más estrecho', 'reader.wide': 'Más ancho',
                 'reader.georgia': 'Georgia (con serifa)', 'reader.inter': 'Inter (sin serifa)',
-                'train.stop': 'Parar', 'train.dontKnow': 'No lo<br>sé', 'train.next': 'Siguiente (Enter)',
+                'train.stop': 'Parar', 'train.dontKnow': 'No lo<br>sé', 'train.next': 'Siguiente',
                 'train.saving': 'Guardando resultados...', 'train.wait': 'Espera unos segundos',
                 'train.done': '¡Listo!', 'train.records': 'Récords:', 'train.backHub': 'Volver a los entrenamientos',
-                'inline.searching': 'Buscando...', 'inline.enter': 'Pulsa Enter',
-                'inline.save': 'Guardar (Enter)', 'inline.update': 'Actualizar (Enter)',
+                'inline.searching': 'Buscando...', 'inline.enter': 'Pulsa ↵',
+                'inline.save': 'Guardar', 'inline.update': 'Actualizar',
                 'inline.back': 'Atrás', 'inline.listen': 'Escuchar',
                 'inline.dict': 'Definición',
                 'inline.noDefs': 'No se encontraron definiciones.',
@@ -2155,7 +2251,7 @@
                 'msg.deleteFolder': '¿Eliminar «{folder}»{extra}? No se puede deshacer.',
                 'msg.deleteFolderExtra': ' junto con {n} palabras',
                 'msg.folderDeleted': 'Carpeta eliminada.', 'msg.deleteError': 'Error al eliminar.',
-                'train.gotIt': 'Entendido (Enter)',
+                'train.gotIt': 'Entendido',
                 'train.crosswordDone': '¡Crucigrama resuelto!',
                 'train.crosswordExpand': 'Pantalla completa',
                 'train.crosswordShrink': 'Salir de pantalla completa',
@@ -2174,8 +2270,13 @@
                 'msg.noWordsQuery': 'No hay palabras para esta búsqueda.',
                 'msg.ytNeedSubs': '¡Vídeo elegido! Ahora añade subtítulos (suelta un .srt o pega texto).',
                 'train.correct': 'Correcto: {word}', 'train.excellent': '¡Excelente! 🎉', 'train.perfect': '¡Perfecto!',
-                'train.typeIn': '{lang} (Enter)', 'train.noContext': 'No hay contexto para {word}',
-                'train.sprintDone': '¡Sprint terminado!', 'train.yourScore': 'Tu puntuación: {n} puntos!',
+                'train.typeIn': '{lang} ↵', 'train.noContext': 'No hay contexto para {word}',
+                'train.sprintDone': '¡Sprint terminado!', 'train.contextDone': '¡Contexto terminado!', 'train.yourScore': 'Tu puntuación: {n} puntos!',
+                'train.contextRead': 'Lee…', 'train.contextHint': 'Pista', 'train.score': 'Puntos',
+                'train.contextHintLetters': 'Letras',
+                'train.contextHintTrans': 'Traducción',
+                'train.contextHintMaterial': 'Material',
+                'train.contextHintCosts': 'Pistas: letras −3 · traducción −5',
                 'train.points': '{n} puntos', 'train.streak': 'Racha: {n}',
                 'train.wrong': 'Incorrecto', 'train.right': 'Correcto',
                 'train.interrupt': 'Parar (Esc)', 'train.sound': 'Sonido', 'train.stopSession': 'Interrumpir el entrenamiento',
@@ -2201,6 +2302,11 @@
                 'bulk.photoOk': 'Se reconocieron {n} palabras{title}.',
                 'bulk.photoTitleSuffix': ' · carpeta «{title}»',
                 'bulk.photoChange': 'Otra foto',
+                'bulk.photoChoose': 'Elegir foto',
+                'bulk.photoPaste': 'Pegar',
+                'bulk.photoPasteField': 'Toca aquí y pega una imagen',
+                'bulk.photoPasteFail': 'No se pudo pegar la imagen. Toca el campo de abajo y pégala a mano.',
+                'bulk.photoPasteTip': 'Toca el campo de abajo, mantén pulsado y elige Pegar.',
                 'bulk.colWord': 'Palabra',
                 'bulk.colTrans': 'Traducción',
                 'bulk.colContext': 'Contexto (ejemplo)',
@@ -2239,13 +2345,19 @@
             if (vars) Object.keys(vars).forEach(k => { s = String(s).split('{' + k + '}').join(vars[k]); });
             return s;
         }
+        function withEnterHint(label) {
+            return `${String(label || '').trim()} <span class="font-normal">↵</span>`;
+        }
+        const ENTER_HINT_I18N_KEYS = new Set(['train.next', 'train.gotIt', 'inline.save', 'inline.update']);
         function uiLocale() { return LANG_META[interfaceLanguage]?.locale || 'uk-UA'; }
         function applyI18n() {
             document.documentElement.lang = interfaceLanguage;
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 // Keep live cloud status messages (set via setSystemStatus) unless still on connecting key
                 if (el.id === 'system-status' && el.dataset.statusLive === '1') return;
-                el.textContent = t(el.getAttribute('data-i18n'));
+                const key = el.getAttribute('data-i18n');
+                if (ENTER_HINT_I18N_KEYS.has(key)) el.innerHTML = withEnterHint(t(key));
+                else el.textContent = t(key);
             });
             document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.getAttribute('data-i18n-html')); });
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
@@ -2670,6 +2782,19 @@
         let sprintWordsStats = {};
         let currentSprintQ = null;
         let sprintHighScores = [];
+        let contextHighScores = [];
+        let contextScore = 0;
+        let contextRoundTimer = null;
+        let contextPointsLeft = 15;
+        let contextElapsed = 0;
+        let contextAnswered = false;
+        let contextReadingSecs = 10;
+        let contextHintPenalty = 0;
+        let contextLettersHintUsed = false;
+        let contextTransHintUsed = false;
+        let contextMaterialHintUsed = false;
+        let contextRoundWord = null;
+        let contextRoundMaterialTitle = '';
 
         let trainingSessionActive = false;
         let trainingFocusCollapsed = false;
@@ -3067,6 +3192,17 @@
                     sprintHighScores = updatedScores;
                 }
 
+                if (activeSessionMode === 'context') {
+                    let updatedScores = [...contextHighScores];
+                    updatedScores.push({ score: contextScore, date: Date.now() });
+                    updatedScores.sort((a, b) => b.score - a.score);
+                    updatedScores = updatedScores.slice(0, 100);
+                    await firestoreOpWithTimeout(
+                        setDoc(docRef('stats', 'context'), { topScores: updatedScores }, { merge: true })
+                    );
+                    contextHighScores = updatedScores;
+                }
+
                 return { ok: true, text: t('persist.saved'), className: 'text-sm text-emerald-600 mt-1 mb-4 font-bold' };
             } catch (e) {
                 console.error('persistTrainingToFirebase', e);
@@ -3076,28 +3212,36 @@
             }
         }
 
-        function renderSprintLeaderboard() {
+        function renderScoreLeaderboard(scores, currentScore) {
             const listEl = document.getElementById('sprint-leaderboard-list');
             if (!listEl) return;
             const medals = ['🥇', '🥈', '🥉'];
-            let html = sprintHighScores.slice(0, 3).map((s, idx) => `
+            let html = scores.slice(0, 3).map((s, idx) => `
                 <li class="flex justify-between items-center py-1.5 border-b border-indigo-100 last:border-0">
                     <span class="font-bold text-slate-800 text-base flex items-center gap-2"><span class="text-xl font-black">${medals[idx] || `<span class="text-slate-400 font-medium opacity-50">#</span>${idx+1}`}</span> ${t('train.points', { n: s.score })}</span>
                     <span class="text-xs text-slate-400 font-medium">${new Date(s.date).toLocaleDateString(uiLocale())}</span>
                 </li>
             `).join('');
-            const currentScoreIndex = sprintHighScores.findIndex(s => s.score === sprintScore && s.date >= Date.now() - 5000);
-            if ((currentScoreIndex === -1 || currentScoreIndex >= 3) && sprintHighScores.length >= 3) {
+            const currentScoreIndex = scores.findIndex(s => s.score === currentScore && s.date >= Date.now() - 5000);
+            if ((currentScoreIndex === -1 || currentScoreIndex >= 3) && scores.length >= 3) {
                 const displayIndex = currentScoreIndex !== -1 ? currentScoreIndex + 1 : '-';
                 html += `
                     <li class="text-center text-slate-300 font-black py-0.5 leading-none mt-1">...</li>
                     <li class="flex justify-between items-center py-1.5 px-3 bg-indigo-100/50 rounded-lg mt-1 border border-indigo-100">
                         <span class="font-bold text-slate-400 text-sm flex items-center gap-1"><span class="text-slate-400 font-medium opacity-60">#</span>${displayIndex}</span>
-                        <span class="font-bold text-indigo-700 text-sm">${t('train.points', { n: sprintScore })}</span>
+                        <span class="font-bold text-indigo-700 text-sm">${t('train.points', { n: currentScore })}</span>
                     </li>
                 `;
             }
             listEl.innerHTML = html;
+        }
+
+        function renderSprintLeaderboard() {
+            renderScoreLeaderboard(sprintHighScores, sprintScore);
+        }
+
+        function renderContextLeaderboard() {
+            renderScoreLeaderboard(contextHighScores, contextScore);
         }
 
         function resetMainLayoutStyles() {
@@ -3304,6 +3448,14 @@
                     sprintHighScores = docSnap.data().topScores || [];
                 } else {
                     sprintHighScores = [];
+                }
+            });
+
+            onSnapshot(docRef('stats', 'context'), (docSnap) => {
+                if (docSnap.exists()) {
+                    contextHighScores = docSnap.data().topScores || [];
+                } else {
+                    contextHighScores = [];
                 }
             });
         }
@@ -4263,6 +4415,55 @@
                 }
             }
         });
+
+        window.handleBulkPhotoPasteTarget = (e) => {
+            if (bulkImportMode !== 'photo') return;
+            const items = e.clipboardData?.items;
+            if (!items) return;
+            for (const item of items) {
+                if (item.type && item.type.startsWith('image/')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const file = item.getAsFile();
+                    if (file) ingestBulkPhotoFile(file);
+                    const target = document.getElementById('bulk-photo-paste-target');
+                    if (target) setTimeout(() => { target.textContent = ''; }, 0);
+                    break;
+                }
+            }
+        };
+
+        window.pasteBulkPhotoFromClipboard = async () => {
+            const target = document.getElementById('bulk-photo-paste-target');
+            try {
+                if (navigator.clipboard && typeof navigator.clipboard.read === 'function') {
+                    const items = await navigator.clipboard.read();
+                    for (const item of items) {
+                        const type = (item.types || []).find(tp => String(tp).startsWith('image/'));
+                        if (!type) continue;
+                        const blob = await item.getType(type);
+                        const file = new File([blob], 'clipboard-image.png', { type: blob.type || 'image/png' });
+                        await ingestBulkPhotoFile(file);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn('clipboard.read paste failed', err);
+            }
+            if (target) {
+                target.focus();
+                try {
+                    const sel = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(target);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                } catch (_) {}
+                window.showModal(t('bulk.photoPasteTip'));
+            } else {
+                window.showModal(t('bulk.photoPasteFail'));
+            }
+        };
 
         async function ensureFolderExists(name) {
             if (!activeUid || !name || name === 'Імпорт' || name === ALL_WORDS_SOURCE) return;
@@ -6526,7 +6727,7 @@
         window.saveWordFromInlinePopup = async () => {
             if(!activeUid || !pendingInlineSaveData) return;
             const trans = document.getElementById('inline-popup-trans-input').value.trim(); if(!trans) return;
-            const btn = document.getElementById('inline-popup-save-btn'); const orig = btn.textContent; btn.disabled = true; btn.textContent = "...";
+            const btn = document.getElementById('inline-popup-save-btn'); const orig = btn.innerHTML; btn.disabled = true; btn.textContent = "...";
             try {
                 const imgUrl = await getImageUrl(pendingInlineSaveData.word);
                 const existing = vocabulary.find(v => v.word.toLowerCase() === pendingInlineSaveData.word.toLowerCase());
@@ -6536,7 +6737,7 @@
                 await addDoc(colRef('words'), saveData);
                 const words = document.getElementById('reader-content').querySelectorAll(`[data-word="${pendingInlineSaveData.word.toLowerCase()}"]`);
                 words.forEach(w => w.classList.add('word-saved')); closeInlinePopup();
-            } catch(e) {} finally { btn.disabled = false; btn.textContent = orig; }
+            } catch(e) {} finally { btn.disabled = false; btn.innerHTML = orig; }
         };
 
         function getMerriamDictPath(word) {
@@ -6990,7 +7191,7 @@
             }
 
             const existing = vocabulary.find(v => v.word.toLowerCase() === query); let transText = '';
-            if (existing) { transText = existing.translation; document.getElementById('inline-popup-save-btn').textContent = t('inline.update'); } 
+            if (existing) { transText = existing.translation; document.getElementById('inline-popup-save-btn').innerHTML = withEnterHint(t('inline.update')); } 
             else {
                 const options = await fetchTranslationOptions(query); 
                 if(options && options.length>0) {
@@ -6998,7 +7199,7 @@
                     document.getElementById('inline-trans-options-list').innerHTML = options.map(opt => `<li onclick="selectInlineTranslation('${opt.text.replace(/'/g, "\\'")}')" class="p-2 hover:bg-indigo-50 cursor-pointer border-b border-slate-50 flex flex-col justify-center text-sm"><div class="flex justify-between items-center mb-1"><span class="font-bold text-slate-700">${opt.text}</span></div></li>`).join('');
                     document.getElementById('inline-trans-dropdown').classList.remove('hidden');
                 }
-                document.getElementById('inline-popup-save-btn').textContent = t('inline.save');
+                document.getElementById('inline-popup-save-btn').innerHTML = withEnterHint(t('inline.save'));
             }
             document.getElementById('inline-popup-loader').classList.add('hidden');
             document.getElementById('inline-popup-trans-input').value = transText;
@@ -7526,6 +7727,10 @@
                     }
                     bsWords = dueWords;
                 } else {
+                    if (mode === 'context') {
+                        contextScore = 0;
+                        clearContextRoundTimer();
+                    }
                     bsWords = dueWords.slice(0, reqCount);
                 }
                 
@@ -7583,6 +7788,7 @@
                 clearInterval(sprintTimer);
                 sprintTimer = null;
             }
+            clearContextRoundTimer();
             syncCrosswordExpandButton();
         };
 
@@ -7635,6 +7841,7 @@
             document.removeEventListener('keydown', handleGlobalKeyboard);
             document.removeEventListener('keydown', handleSprintKeyboard);
             if (sprintTimer) { clearInterval(sprintTimer); sprintTimer = null; }
+            clearContextRoundTimer();
 
             // Restore centered layout (crossword fullscreen must not leave main left-aligned)
             resetMainLayoutStyles();
@@ -7671,6 +7878,12 @@
                 resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100">${t('train.yourScore', { n: sprintScore })}</div>`;
                 lbdSection.classList.remove('hidden');
                 renderSprintLeaderboard();
+            } else if (activeSessionMode === 'context') {
+                resultsIcon = "📖";
+                resultsTitle = t('train.contextDone');
+                resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100">${t('train.yourScore', { n: contextScore })}</div>`;
+                lbdSection.classList.remove('hidden');
+                renderContextLeaderboard();
             } else {
                 lbdSection.classList.add('hidden');
             }
@@ -7721,6 +7934,10 @@
         window.markWordAsFailed = () => {
             const word = bsWords[bsCurrentWordIdx];
             word.failed = true;
+            if (activeSessionMode === 'context') {
+                contextAnswered = true;
+                clearContextRoundTimer();
+            }
             const feedback = document.getElementById('bs-feedback');
             
             document.querySelectorAll('#bs-test-opts button').forEach(x => x.disabled = true);
@@ -7767,12 +7984,17 @@
             document.getElementById('bs-success-reveal').classList.remove('hidden');
             preserveTrainingFocusState();
             if(!isGlobalAudioMuted) playAudioWord(word.word);
-            document.getElementById('bs-btn-next').classList.remove('hidden');
+            const btnNext = document.getElementById('bs-btn-next');
+            if (btnNext) {
+                btnNext.innerHTML = withEnterHint(t('train.next'));
+                btnNext.classList.remove('hidden');
+            }
             document.getElementById('bs-btn-dont-know').classList.add('hidden');
         }
 
         function renderBsStage() {
             const word = bsWords[bsCurrentWordIdx]; word.failed = false; 
+            clearContextRoundTimer();
             const area = document.getElementById('bs-interactive-area'); const btnNext = document.getElementById('bs-btn-next'), feedback = document.getElementById('bs-feedback');
             feedback.innerHTML = ''; btnNext.classList.add('hidden'); document.getElementById('bs-btn-dont-know').classList.remove('hidden'); area.innerHTML = ''; document.getElementById('bs-success-reveal').classList.add('hidden');
             document.removeEventListener('keydown', handleConstructorKeyboard); document.removeEventListener('keydown', handleGlobalKeyboard); document.addEventListener('keydown', handleGlobalKeyboard);
@@ -7798,7 +8020,7 @@
 
         function renderStageIntro(word, area, btnNext) {
             area.innerHTML = `<div class="mx-auto w-40 h-40 rounded-xl overflow-hidden shadow-sm mb-4"><img src="${word.imageUrl}" class="w-full h-full object-cover" onerror="imgError(this)"></div><h3 class="text-3xl font-bold text-slate-800 mb-1 tracking-tight">${word.word}</h3><p class="text-xl text-indigo-600 font-bold mb-2">${word.translation}</p><button id="btn-intro-audio" class="mx-auto bg-slate-100 p-4 rounded-full hover:bg-slate-200 transition shadow-sm border border-slate-200"><svg class="w-7 h-7 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75 0 11-1.06-1.06 8.25 8.25 0 000-11.668.75 0 010-1.06z"/></svg></button>`;
-            document.getElementById('btn-intro-audio').onclick = () => playAudioWord(word.word); btnNext.textContent = t('train.gotIt'); btnNext.classList.remove('hidden');
+            document.getElementById('btn-intro-audio').onclick = () => playAudioWord(word.word); btnNext.innerHTML = withEnterHint(t('train.gotIt')); btnNext.classList.remove('hidden');
         }
 
         function getOptions(correctWord) {
@@ -7907,17 +8129,310 @@
             return re.test(contextStr);
         }
 
+        function getContextReadingSeconds(contextStr) {
+            // Adaptive read time: ~25 chars ≈ 1s, centered on ~10s for medium excerpts.
+            const len = String(contextStr || '').replace(/\s+/g, ' ').trim().length;
+            return Math.min(15, Math.max(7, Math.round(len / 25) || 10));
+        }
+
+        function findContextWordMatch(contextStr, word) {
+            const cleanWord = String(word || '').toLowerCase().trim();
+            if (!cleanWord || !contextStr) return null;
+            const escapedWord = cleanWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const re = new RegExp(`(?<![\\p{L}\\p{M}0-9])${escapedWord}(?![\\p{L}\\p{M}0-9])`, 'iu');
+            const m = re.exec(contextStr);
+            if (!m) return null;
+            return { index: m.index, length: m[0].length, text: m[0] };
+        }
+
+        function snapContextCut(str, index, preferLeft) {
+            if (index <= 0) return 0;
+            if (index >= str.length) return str.length;
+            if (/\s/.test(str[index]) || /\s/.test(str[index - 1])) return index;
+            const left = str.lastIndexOf(' ', index);
+            const right = str.indexOf(' ', index);
+            if (preferLeft) {
+                if (left >= 0 && index - left <= 18) return left + 1;
+                if (right >= 0 && right - index <= 12) return right;
+            } else {
+                if (right >= 0 && right - index <= 18) return right;
+                if (left >= 0 && index - left <= 12) return left + 1;
+            }
+            return index;
+        }
+
+        function truncateContextForExercise(contextStr, word, opts = {}) {
+            // One continuous excerpt (≤ maxLen), never head+gap+tail “two cards”.
+            const maxLen = opts.maxLen ?? 225;
+            const before = opts.before ?? 60;
+            const after = opts.after ?? 60;
+            const ctx = String(contextStr || '').replace(/\s+/g, ' ').trim();
+            if (ctx.length <= maxLen) {
+                return { text: ctx, leading: false, trailing: false };
+            }
+
+            const match = findContextWordMatch(ctx, word);
+            if (!match) {
+                const cut = snapContextCut(ctx, maxLen, true);
+                return { text: ctx.slice(0, cut).trimEnd(), leading: false, trailing: cut < ctx.length };
+            }
+
+            const wordStart = match.index;
+            const wordEnd = match.index + match.length;
+
+            let start;
+            let end;
+
+            // Prefer starting from the beginning when the word still fits in the budget
+            if (wordEnd <= maxLen) {
+                start = 0;
+                end = Math.min(ctx.length, Math.max(wordEnd + after, maxLen));
+                if (end - start > maxLen) end = start + maxLen;
+            } else {
+                // Single window around the word, expanded to use the full 225 budget
+                start = Math.max(0, wordStart - before);
+                end = Math.min(ctx.length, wordEnd + after);
+                let room = maxLen - (end - start);
+                if (room > 0) {
+                    const addBefore = Math.min(start, Math.ceil(room * 0.45));
+                    start -= addBefore;
+                    room = maxLen - (end - start);
+                    const addAfter = Math.min(ctx.length - end, room);
+                    end += addAfter;
+                    room = maxLen - (end - start);
+                    if (room > 0) {
+                        if (start > 0) start = Math.max(0, start - room);
+                        else end = Math.min(ctx.length, end + room);
+                    }
+                }
+                if (end - start > maxLen) {
+                    const half = Math.floor((maxLen - match.length) / 2);
+                    start = Math.max(0, wordStart - half);
+                    end = Math.min(ctx.length, start + maxLen);
+                    if (end < wordEnd) {
+                        end = Math.min(ctx.length, wordEnd + Math.max(12, after));
+                        start = Math.max(0, end - maxLen);
+                    }
+                }
+            }
+
+            start = snapContextCut(ctx, start, false);
+            end = snapContextCut(ctx, end, true);
+            // Keep the target word inside after snapping
+            if (start > wordStart) start = Math.max(0, wordStart - 8);
+            if (end < wordEnd) end = Math.min(ctx.length, wordEnd + 8);
+            if (end - start > maxLen) {
+                if (start === 0) end = start + maxLen;
+                else start = Math.max(0, end - maxLen);
+            }
+
+            const text = ctx.slice(start, end).trim();
+            return {
+                text,
+                leading: start > 0,
+                trailing: end < ctx.length
+            };
+        }
+
+        function decorateContextEllipses(html, leading, trailing) {
+            const ell = '<span class="ctx-ellipsis" aria-hidden="true">…</span>';
+            let out = html;
+            if (leading) out = ell + out;
+            if (trailing) out = out + ell;
+            return out;
+        }
+
+        function getContextMaterialTitle(word) {
+            if (!word) return '';
+            if (word.materialId) {
+                const m = materials.find(x => x.id === word.materialId);
+                if (m?.title) return m.title;
+            }
+            if (word.source) {
+                const m = getMaterialForSource(word.source) || getMaterialByTitle(word.source);
+                if (m?.title) return m.title;
+                if (typeof isMaterialSource === 'function' && isMaterialSource(word.source)) return word.source;
+            }
+            return '';
+        }
+
+        function showContextMaterialHint(title) {
+            const el = document.getElementById('ctx-material-hint');
+            if (!el) return;
+            const name = String(title || contextRoundMaterialTitle || '').trim();
+            if (!name) return;
+            el.textContent = name;
+            el.classList.remove('opacity-0');
+            const btn = document.getElementById('btn-ctx-hint-material');
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-40', 'pointer-events-none');
+            }
+        }
+
+        function formatContextLetterHint(word) {
+            const chars = [...String(word || '').trim()];
+            let first = -1;
+            let last = -1;
+            for (let i = 0; i < chars.length; i++) {
+                if (/\p{L}/u.test(chars[i])) {
+                    if (first < 0) first = i;
+                    last = i;
+                }
+            }
+            if (first < 0) return '';
+            if (first === last) return chars[first];
+            return chars.map((c, i) => {
+                if (i === first || i === last) return c;
+                if (i > first && i < last) {
+                    if (/\p{L}/u.test(c)) return '_';
+                    if (/\s/.test(c)) return ' ';
+                    return c;
+                }
+                return c;
+            }).join('');
+        }
+
+        function refreshContextPointsFromClock() {
+            const base = contextElapsed <= contextReadingSecs
+                ? 15
+                : Math.max(0, 15 - (contextElapsed - contextReadingSecs));
+            contextPointsLeft = Math.max(0, base - contextHintPenalty);
+        }
+
+        function spawnContextPenaltyFloat(amount) {
+            const wrap = document.getElementById('ctx-points-wrap');
+            if (!wrap || !amount) return;
+            const el = document.createElement('span');
+            el.className = 'ctx-penalty-float';
+            el.textContent = `−${amount}`;
+            wrap.appendChild(el);
+            el.addEventListener('animationend', () => el.remove());
+            setTimeout(() => el.remove(), 900);
+        }
+
+        function showContextTranslationHint(translation) {
+            const hint = document.getElementById('ctx-translation-hint');
+            if (!hint || hint.dataset.shown === '1') return;
+            hint.textContent = translation || '';
+            hint.classList.remove('opacity-0');
+            hint.classList.add('opacity-100');
+            hint.dataset.shown = '1';
+            hint.setAttribute('aria-hidden', 'false');
+        }
+
+        function clearContextRoundTimer() {
+            if (contextRoundTimer) {
+                clearInterval(contextRoundTimer);
+                contextRoundTimer = null;
+            }
+        }
+
+        function updateContextHud() {
+            const ptsEl = document.getElementById('ctx-points-left');
+            const scoreEl = document.getElementById('ctx-score-val');
+            const phaseEl = document.getElementById('ctx-phase-label');
+            const scoringElapsed = Math.max(0, contextElapsed - contextReadingSecs);
+            if (ptsEl) {
+                ptsEl.textContent = String(contextPointsLeft);
+                ptsEl.classList.toggle('text-rose-500', contextPointsLeft <= 5 && (scoringElapsed > 0 || contextHintPenalty > 0));
+                ptsEl.classList.toggle('animate-pulse', contextPointsLeft <= 5 && scoringElapsed > 0);
+            }
+            if (scoreEl) scoreEl.textContent = String(contextScore);
+            if (phaseEl) {
+                if (contextElapsed < contextReadingSecs) phaseEl.textContent = t('train.contextRead');
+                else if (scoringElapsed >= 10 || contextTransHintUsed) phaseEl.textContent = t('train.contextHint');
+                else phaseEl.textContent = '';
+            }
+        }
+
+        window.useContextLetterHint = () => {
+            if (activeSessionMode !== 'context' || contextAnswered || contextLettersHintUsed || !contextRoundWord) return;
+            const mask = formatContextLetterHint(contextRoundWord.word);
+            if (!mask) return;
+            contextLettersHintUsed = true;
+            contextHintPenalty += 3;
+            refreshContextPointsFromClock();
+            updateContextHud();
+            spawnContextPenaltyFloat(3);
+            const el = document.getElementById('ctx-letter-hint');
+            if (el) {
+                el.textContent = mask;
+                el.classList.remove('hidden');
+            }
+            const btn = document.getElementById('btn-ctx-hint-letters');
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-40', 'pointer-events-none');
+            }
+            document.getElementById('ctx-type-input')?.focus();
+        };
+
+        window.useContextTransHint = () => {
+            if (activeSessionMode !== 'context' || contextAnswered || contextTransHintUsed || !contextRoundWord) return;
+            contextTransHintUsed = true;
+            contextHintPenalty += 5;
+            refreshContextPointsFromClock();
+            updateContextHud();
+            spawnContextPenaltyFloat(5);
+            showContextTranslationHint(contextRoundWord.translation);
+            const btn = document.getElementById('btn-ctx-hint-trans');
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-40', 'pointer-events-none');
+            }
+            document.getElementById('ctx-type-input')?.focus();
+        };
+
+        window.useContextMaterialHint = () => {
+            if (activeSessionMode !== 'context' || contextAnswered || contextMaterialHintUsed || !contextRoundWord) return;
+            if (!contextRoundMaterialTitle) return;
+            contextMaterialHintUsed = true;
+            contextHintPenalty += 1;
+            refreshContextPointsFromClock();
+            updateContextHud();
+            spawnContextPenaltyFloat(1);
+            showContextMaterialHint(contextRoundMaterialTitle);
+            document.getElementById('ctx-type-input')?.focus();
+        };
+
         function blankWholeWordInContext(contextStr, word) {
             const cleanWord = String(word || '').toLowerCase().trim();
             const escapedWord = cleanWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const re = new RegExp(`(?<![\\p{L}\\p{M}0-9])${escapedWord}(?![\\p{L}\\p{M}0-9])`, 'iu');
             if (!re.test(contextStr)) return null;
-            return contextStr.replace(re, `<input type="text" id="ctx-type-input" class="inline-context-input" autocomplete="off">`);
+            const widthCh = Math.max(cleanWord.length + 1, 4);
+            return contextStr.replace(re, `<input type="text" id="ctx-type-input" class="inline-context-input" autocomplete="off" style="width:${widthCh}ch" spellcheck="false">`);
+        }
+
+        function resolveContextAnswer(word, cleanWord, correct) {
+            if (contextAnswered) return;
+            contextAnswered = true;
+            clearContextRoundTimer();
+            const inp = document.getElementById('ctx-type-input');
+            if (inp) inp.disabled = true;
+            if (correct) {
+                if (activeSessionMode === 'context') {
+                    contextScore += Math.max(0, contextPointsLeft);
+                    updateContextHud();
+                }
+                if (inp) inp.classList.add('correct');
+                triggerSuccessReveal(word);
+            } else {
+                word.failed = true;
+                if (inp) inp.classList.add('wrong');
+                const feedback = document.getElementById('bs-feedback');
+                if (feedback) {
+                    feedback.innerHTML = `<span class="text-rose-500 font-bold text-base bg-rose-50 px-3 py-1 rounded border border-rose-100">${t('train.correct', { word: word.word })}</span>`;
+                }
+                triggerSuccessReveal(word);
+            }
         }
 
         function renderStageContext(word, area, btnNext, feedback) {
             let contextStr = word.context || "";
             const cleanWord = word.word.toLowerCase().trim();
+            const timed = activeSessionMode === 'context';
 
             if (!contextHasWholeWord(contextStr, cleanWord)) {
                 area.innerHTML = `<p class="text-lg text-slate-500">${t('train.noContext', { word: word.word })}</p>`;
@@ -7925,33 +8440,116 @@
                 return;
             }
 
+            // One continuous excerpt up to ~225 chars (ellipsis only at edges if cut)
+            const truncated = truncateContextForExercise(contextStr, word.word);
+            contextStr = truncated.text;
+
             const replacedContext = blankWholeWordInContext(contextStr, cleanWord);
             if (!replacedContext) {
                 area.innerHTML = `<p class="text-lg text-slate-500">${t('train.noContext', { word: word.word })}</p>`;
                 setTimeout(() => nextBrainstormStep(), 1500);
                 return;
             }
+            const contextHtml = decorateContextEllipses(replacedContext, truncated.leading, truncated.trailing);
+
+            contextAnswered = false;
+            contextElapsed = 0;
+            contextPointsLeft = 15;
+            contextHintPenalty = 0;
+            contextLettersHintUsed = false;
+            contextTransHintUsed = false;
+            contextMaterialHintUsed = false;
+            contextRoundWord = word;
+            contextRoundMaterialTitle = getContextMaterialTitle(word);
+            contextReadingSecs = timed ? getContextReadingSeconds(contextStr) : 10;
+
+            const materialBtn = contextRoundMaterialTitle
+                ? `<button type="button" id="btn-ctx-hint-material" onclick="useContextMaterialHint()" class="text-sm font-bold bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 px-3.5 py-2 rounded-xl transition shadow-sm">${t('train.contextHintMaterial')}</button>`
+                : '';
+
+            const hud = timed ? `
+                <div class="flex justify-between items-center w-full max-w-xl mx-auto mb-4 px-3 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/70 shadow-inner">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="text-lg flex-shrink-0">⏳</span>
+                        <span id="ctx-points-wrap" class="relative inline-flex items-center justify-center min-w-[1.5rem]">
+                            <span id="ctx-points-left" class="font-extrabold text-xl text-slate-700 tabular-nums">15</span>
+                        </span>
+                        <span id="ctx-phase-label" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1 truncate">${t('train.contextRead')}</span>
+                    </div>
+                    <div class="flex flex-col items-end flex-shrink-0">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${t('train.score')}</span>
+                        <span id="ctx-score-val" class="font-black text-2xl text-indigo-600 tabular-nums">${contextScore}</span>
+                    </div>
+                </div>` : '';
+
+            const transBlock = timed
+                ? `<p id="ctx-translation-hint" class="text-lg text-indigo-700 font-bold mb-4 uppercase tracking-wider min-h-[1.75rem] opacity-0 transition-opacity duration-300" aria-hidden="true"></p>`
+                : `<p class="text-lg text-indigo-700 font-bold mb-4 uppercase tracking-wider">${word.translation}</p>`;
+
+            const hintsBlock = timed ? `
+                <div class="mt-4 max-w-xl mx-auto">
+                    <div class="flex flex-wrap items-center justify-center gap-2">
+                        <button type="button" id="btn-ctx-hint-letters" onclick="useContextLetterHint()" class="text-sm font-bold bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 px-3.5 py-2 rounded-xl transition shadow-sm">${t('train.contextHintLetters')}</button>
+                        <button type="button" id="btn-ctx-hint-trans" onclick="useContextTransHint()" class="text-sm font-bold bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 px-3.5 py-2 rounded-xl transition shadow-sm">${t('train.contextHintTrans')}</button>
+                        ${materialBtn}
+                    </div>
+                    <p id="ctx-letter-hint" class="hidden mt-3 text-xl sm:text-2xl font-semibold font-mono tracking-wider text-slate-600 text-center"></p>
+                    <p id="ctx-material-hint" class="opacity-0 transition-opacity duration-300"></p>
+                </div>` : '';
 
             area.innerHTML = `
-                <p class="text-lg text-indigo-700 font-bold mb-4 uppercase tracking-wider">${word.translation}</p>
+                ${hud}
+                ${transBlock}
                 <div class="text-xl text-slate-700 font-medium leading-relaxed italic border-l-4 border-indigo-200 pl-5 py-2 text-left inline-block max-w-xl mx-auto relative bg-slate-50/50 rounded-r-xl">
-                    ${replacedContext}
+                    ${contextHtml}
                 </div>
+                ${hintsBlock}
             `;
             
-            const inp = document.getElementById('ctx-type-input'); setTimeout(()=>inp.focus(), 50);
-            inp.addEventListener('keydown', (e) => {
-                if(e.key === 'Enter') {
-                    e.preventDefault(); e.stopPropagation(); if(inp.disabled) return; 
+            const inp = document.getElementById('ctx-type-input');
+            setTimeout(() => inp?.focus(), 50);
+            inp?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!inp || inp.disabled || contextAnswered) return;
                     const userVal = inp.value.trim().toLowerCase();
-                    if(userVal === cleanWord) {
-                        inp.classList.add('correct'); inp.disabled = true; triggerSuccessReveal(word);
-                    } else {
-                        word.failed = true;
-                        inp.classList.add('wrong'); inp.disabled = true; triggerSuccessReveal(word);
-                    }
+                    resolveContextAnswer(word, cleanWord, userVal === cleanWord);
                 }
             });
+
+            if (timed) {
+                clearContextRoundTimer();
+                contextRoundTimer = setInterval(() => {
+                    if (contextAnswered) {
+                        clearContextRoundTimer();
+                        return;
+                    }
+                    contextElapsed += 1;
+                    refreshContextPointsFromClock();
+                    updateContextHud();
+
+                    // Free translation + material title during the last 5 scoring seconds
+                    if (contextElapsed >= contextReadingSecs + 10) {
+                        if (!contextTransHintUsed) {
+                            showContextTranslationHint(word.translation);
+                            const btn = document.getElementById('btn-ctx-hint-trans');
+                            if (btn) {
+                                btn.disabled = true;
+                                btn.classList.add('opacity-40', 'pointer-events-none');
+                            }
+                        }
+                        if (contextRoundMaterialTitle) {
+                            showContextMaterialHint(contextRoundMaterialTitle);
+                        }
+                    }
+
+                    if (contextElapsed >= contextReadingSecs + 15 || contextPointsLeft <= 0) {
+                        word.failed = true;
+                        resolveContextAnswer(word, cleanWord, false);
+                    }
+                }, 1000);
+            }
         }
 
         function renderStagePicture(word, area, btnNext, feedback) {
@@ -8293,7 +8891,7 @@
                             <p class="text-emerald-700/80 text-xs font-semibold mt-0.5">${t('train.excellent')}</p>
                         </div>
                         <button type="button" onclick="nextBrainstormStep()" class="w-full sm:w-auto flex-shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition active:scale-95">
-                            ${t('train.next')}
+                            ${withEnterHint(t('train.next'))}
                         </button>
                     </div>`;
                 document.getElementById('bs-btn-next').classList.add('hidden');
