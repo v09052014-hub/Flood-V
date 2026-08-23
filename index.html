@@ -54,8 +54,11 @@
         }
         #bs-reveal-badge.bs-reveal-badge-missed { color: #64748b; }
         #bs-reveal-badge.bs-reveal-badge-success { color: #059669; }
-        #bs-success-word.bs-word-highlight { color: #047857; }
-        #bs-success-reveal.bs-reveal-missed #bs-success-word { color: #0f172a; }
+        #bs-success-word { color: #4338ca; }
+        #bs-success-word.bs-word-highlight { color: #4338ca; }
+        #bs-success-reveal.bs-reveal-missed #bs-success-word { color: #4338ca; }
+        #bs-success-trans { color: #0f172a; font-weight: 600; }
+        #bs-success-context { color: #64748b; font-style: italic; }
         
         /* Reader Styles - Baseline, dynamically overridden by JS */
         .text-reader {
@@ -477,6 +480,36 @@
         .yt-sub-line { transition: all 0.2s ease; border-radius: 6px; padding: 2px 4px; display: inline; cursor: pointer; line-height: 2; border-bottom: none; }
         .yt-sub-line:hover { background-color: #f1f5f9; }
         .yt-sub-line.active-sub { background-color: #e0f2fe; color: #0369a1; font-weight: 500; }
+        .yt-sub-line.yt-lyric-line {
+            display: block;
+            line-height: 1.75;
+            padding: 0.12em 0.35em;
+            text-align: center;
+        }
+        .yt-lyric-stanza {
+            margin: 0 0 1.35rem;
+            padding: 0.15rem 0;
+        }
+        .ctx-excerpt-shell { position: relative; }
+        .ctx-expand-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 36rem;
+            margin: 0 auto;
+            padding: 0.15rem 0;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.15s ease, opacity 0.15s ease;
+        }
+        .ctx-expand-btn:hover { color: #64748b; }
+        #btn-ctx-expand-up { margin-bottom: 0.15rem; }
+        #btn-ctx-expand-down { margin-top: 0.15rem; }
         
         .yt-pip-mode {
             position: fixed !important;
@@ -875,8 +908,10 @@
             white-space: nowrap;
         }
         #ctx-hud-anchor { position: relative; }
-        #ctx-score-block { position: relative; min-width: 3.5rem; }
-        #ctx-round-wrap { position: relative; display: inline-flex; justify-content: flex-end; min-height: 2rem; min-width: 2.5rem; }
+        #ctx-score-block { position: relative; min-width: 2.5rem; }
+        #ctx-round-block { position: relative; }
+        #ctx-round-block.ctx-zeroing #ctx-round-pts { color: #f43f5e; }
+        #ctx-round-wrap { position: relative; display: inline-flex; justify-content: center; min-height: 1.25rem; min-width: 1.5rem; }
         #ctx-round-pts {
             font-size: 1.5rem;
             font-weight: 800;
@@ -917,7 +952,8 @@
             100% { transform: scale(1); }
         }
         .ctx-points-pop { animation: ctx-points-pop 0.35s ease; }
-        #ctx-score-block.ctx-zeroing #ctx-round-pts { color: #f43f5e; }
+        #ctx-score-block.ctx-zeroing #ctx-round-pts,
+        #ctx-round-block.ctx-zeroing #ctx-round-pts { color: #f43f5e; }
         .ctx-ellipsis {
             color: #4f46e5;
             font-style: normal;
@@ -1031,6 +1067,23 @@
             overflow-x: hidden;
         }
         .dict-context-item.active { background-color: #eef2ff; color: #4338ca; }
+        .mat-secondary-btn {
+            background: #fff;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        .mat-secondary-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .mat-secondary-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        #yt-preview-container { max-width: 100%; }
+        @media (min-width: 640px) {
+            #yt-preview-container { max-width: 28rem; margin-left: auto; margin-right: auto; }
+        }
         #system-status {
             max-height: 3rem;
             overflow: hidden;
@@ -1281,13 +1334,13 @@
                 <div class="flex flex-col gap-3">
                     <div class="flex flex-col sm:flex-row gap-3 relative">
                         <div class="flex-1 relative">
-                            <input type="text" id="manual-word" placeholder="Слово ↵ для перекладу" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base" data-i18n-placeholder="dict.wordPlaceholder">
+                            <input type="text" id="manual-word" placeholder="Слово" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base" data-i18n-placeholder="dict.wordPlaceholder">
                             <button onclick="autoTranslateManual()" class="absolute right-2 top-2 p-1.5 text-indigo-500 hover:bg-indigo-100 rounded-lg transition" data-i18n-title="dict.translate" title="Перекласти">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
                             </button>
                         </div>
                         <div class="flex-1 relative">
-                            <input type="text" id="manual-trans" placeholder="Переклад ↵ для збереження" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base bg-white" autocomplete="off" data-i18n-placeholder="dict.transPlaceholder">
+                            <input type="text" id="manual-trans" placeholder="Переклад" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base bg-white" autocomplete="off" data-i18n-placeholder="dict.transPlaceholder">
                             <div id="trans-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto custom-scroll">
                                 <ul id="trans-options-list" class="flex flex-col p-1"></ul>
                             </div>
@@ -1391,33 +1444,29 @@
                     <div id="material-content" class="material-editor custom-scroll" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Оригінальний текст (або скрипт відео)..." data-i18n-placeholder="lib.textPh"></div>
                 </div>
 
-                <!-- Tab: URL (Wikipedia / News) -->
-                <div id="mode-url-area" class="hidden">
-                    <div class="mb-2 bg-indigo-50/50 p-3 sm:p-4 rounded-xl border border-indigo-100">
-                        <label class="text-xs font-bold text-indigo-800 uppercase mb-2 flex items-center gap-1.5">
-                            <img class="wiki-w-img" alt="" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Wikipedia%27s_W.svg" onerror="this.onerror=null;this.src='https://en.wikipedia.org/static/favicon/wikipedia.ico'">
-                            <span data-i18n="lib.searchArticles">Пошук статей</span>
+                <!-- Tab: URL (link / Wikipedia / News) -->
+                <div id="mode-url-area" class="hidden mb-4">
+                    <div class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                        <label class="text-xs font-bold text-slate-600 uppercase mb-1 flex items-center gap-1.5">
+                            <span id="article-source-icon" class="inline-flex items-center" aria-hidden="true">🌐</span>
+                            <span id="article-source-label" data-i18n="lib.importUrl">Посилання на статтю</span>
                         </label>
-                        <div class="flex flex-col sm:flex-row gap-2 mb-2 w-full">
-                            <select id="article-search-source" class="p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm bg-white text-slate-700 font-bold w-full sm:w-auto flex-shrink-0">
+                        <div class="flex flex-col sm:flex-row gap-2 w-full">
+                            <select id="article-search-source" class="p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm bg-white text-slate-700 font-bold w-full sm:w-auto flex-shrink-0" onchange="setArticleSourceMode(this.value)">
+                                <option value="url" data-i18n="lib.sourceUrl">🌐 URL</option>
                                 <option value="wiki-en">Wikipedia (EN)</option>
                                 <option value="news">News API</option>
                             </select>
-                            <div class="flex flex-col sm:flex-row gap-2 w-full flex-1 min-w-0">
-                                <input type="text" id="article-search-query" placeholder="Введіть тему (напр. 'SpaceX')..." class="flex-1 min-w-0 p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium" data-i18n-placeholder="lib.topicPh" onkeydown="if(event.key==='Enter') searchArticles()">
-                                <button onclick="searchArticles()" class="bg-indigo-600 text-white px-4 sm:px-5 py-3 sm:py-0 rounded-xl font-bold hover:bg-indigo-700 text-sm whitespace-nowrap shadow-sm transition w-full sm:w-auto shrink-0" data-i18n="lib.find">Знайти</button>
+                            <div class="relative flex-1 min-w-0">
+                                <span id="article-input-icon" class="absolute left-3 top-1/2 -translate-y-1/2 text-base leading-none text-slate-400 pointer-events-none select-none" aria-hidden="true">🌐</span>
+                                <input type="text" id="article-main-input" placeholder="https://example.com/article" class="w-full min-w-0 pl-3 pr-3 py-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm bg-white" data-i18n-placeholder="lib.urlPh" onkeydown="if(event.key==='Enter') handleArticleAction()">
                             </div>
+                            <button type="button" id="article-action-btn" onclick="handleArticleAction()" class="mat-secondary-btn px-4 sm:px-5 py-3 sm:py-0 w-full sm:w-auto shrink-0" data-i18n="lib.extract">Витягнути текст</button>
                         </div>
-                        <div id="article-search-results" class="max-h-96 overflow-y-auto custom-scroll space-y-2 hidden bg-white rounded-xl border border-slate-200 p-2 shadow-inner"></div>
+                        <p id="article-extract-hint" class="text-xs text-slate-500 px-1 leading-relaxed" data-i18n="lib.extractHint">Розумний екстрактор очистить статтю від меню, реклами та зайвих посилань.</p>
+                        <div id="article-search-results" class="max-h-72 overflow-y-auto custom-scroll space-y-2 hidden bg-white rounded-lg p-2 border border-slate-200 shadow-inner"></div>
                     </div>
-
-                    <div class="flex items-center gap-4 my-5 opacity-70"><div class="flex-1 h-px bg-slate-300"></div><span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center" data-i18n="lib.orExtract">Або витягнути текст із посилання</span><div class="flex-1 h-px bg-slate-300"></div></div>
-
-                    <div class="flex flex-col sm:flex-row gap-2 mb-2 w-full">
-                        <input type="url" id="material-url" placeholder="https://example.com/article" class="flex-1 min-w-0 p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm w-full">
-                        <button onclick="fetchArticleText(event)" class="bg-slate-100 text-slate-700 border border-slate-200 px-4 py-3 rounded-xl font-bold hover:bg-slate-200 text-sm whitespace-nowrap shadow-sm w-full sm:w-auto shrink-0" data-i18n="lib.extract">Витягнути текст</button>
-                    </div>
-                    <p class="text-xs text-slate-500 mb-4 px-1" data-i18n="lib.extractHint">Розумний екстрактор очистить статтю від меню, реклами та зайвих посилань.</p>
+                    <input type="hidden" id="material-url" value="">
                 </div>
 
                 <!-- Tab: YouTube -->
@@ -1429,20 +1478,15 @@
                                 <span data-i18n="lib.searchVideo">Пошук відео</span>
                             </label>
                             <div class="flex flex-col sm:flex-row gap-2 w-full">
-                                <input type="text" id="yt-search-query" placeholder="Назва відео або тема..." class="flex-1 min-w-0 p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium bg-white" data-i18n-placeholder="lib.ytQuery" onkeydown="if(event.key==='Enter') searchYouTube()">
-                                <button onclick="searchYouTube()" class="bg-indigo-600 text-white px-4 sm:px-5 py-3 sm:py-0 rounded-xl font-bold hover:bg-indigo-700 text-sm whitespace-nowrap shadow-sm transition w-full sm:w-auto shrink-0" data-i18n="lib.find">Знайти</button>
+                                <div class="relative flex-1 min-w-0">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-base leading-none text-slate-400 pointer-events-none select-none" aria-hidden="true">🔗</span>
+                                    <input type="text" id="yt-search-query" placeholder="Назва, тема або посилання YouTube..." class="w-full min-w-0 pl-9 pr-3 py-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium bg-white" data-i18n-placeholder="lib.ytQuery" onkeydown="if(event.key==='Enter') searchYouTube()" onpaste="handleYouTubePaste(event)">
+                                </div>
+                                <button type="button" onclick="searchYouTube()" class="mat-secondary-btn px-4 sm:px-5 py-3 sm:py-0 w-full sm:w-auto shrink-0" data-i18n="lib.find">Знайти</button>
                             </div>
                             <div id="yt-search-results" class="max-h-72 overflow-y-auto custom-scroll space-y-2 hidden bg-white rounded-lg p-2 border border-slate-200 shadow-inner mt-2"></div>
                         </div>
-
-                        <div class="flex items-center gap-3 opacity-70"><div class="flex-1 h-px bg-slate-200"></div><span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center shrink-0" data-i18n="lib.orPaste">Або вставити посилання вручну</span><div class="flex-1 h-px bg-slate-200"></div></div>
-
-                        <div>
-                            <div class="flex flex-col sm:flex-row gap-2 w-full">
-                                <input type="url" id="material-yt-url" placeholder="Пряме посилання на YouTube" class="flex-1 min-w-0 p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm w-full bg-white" data-i18n-placeholder="lib.ytUrl">
-                                <button onclick="loadYTIframeForPreview()" class="bg-white text-slate-700 border border-slate-200 px-4 py-3 rounded-xl font-bold hover:bg-slate-100 text-sm whitespace-nowrap shadow-sm w-full sm:w-auto shrink-0" data-i18n="lib.addVideo">Додати відео</button>
-                            </div>
-                        </div>
+                        <input type="hidden" id="material-yt-url" value="">
                     </div>
                     
                     <div id="yt-preview-container" class="w-full aspect-video bg-black rounded-xl hidden overflow-hidden shadow-inner flex items-center justify-center text-slate-500 text-sm"></div>
@@ -1512,6 +1556,12 @@
                 
                 <div id="reader-yt-wrapper" class="w-full aspect-video bg-black rounded-xl mb-4 hidden shadow-md overflow-hidden z-[100] transition-all duration-300">
                     <div id="reader-yt-player" class="w-full h-full"></div>
+                </div>
+
+                <div id="reader-pagination-top" class="hidden flex justify-between items-center bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
+                    <button type="button" onclick="changeReaderPage(-1)" id="btn-reader-prev-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs sm:text-sm transition">← <span data-i18n="common.back">Назад</span></button>
+                    <span id="reader-page-info-top" class="text-xs sm:text-sm font-bold text-slate-500">Сторінка 1 з 1</span>
+                    <button type="button" onclick="changeReaderPage(1)" id="btn-reader-next-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs sm:text-sm transition"><span data-i18n="common.next">Вперед</span> →</button>
                 </div>
                 
                 <div id="reader-content-wrapper" class="bg-white px-3 py-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 relative mb-4 overflow-hidden">
@@ -1636,9 +1686,9 @@
                             <img id="bs-success-img" class="w-16 h-16 rounded-xl object-cover shadow-sm bg-slate-200 flex-shrink-0 mx-auto sm:mx-0 ring-2 ring-white">
                             <div class="text-center sm:text-left w-full min-w-0">
                                 <p id="bs-reveal-badge" class="hidden text-xs font-bold uppercase tracking-wider mb-1"></p>
-                                <h4 class="font-bold text-lg mb-0 leading-tight" id="bs-success-word"></h4>
-                                <p class="text-sm font-bold text-indigo-600 mb-1" id="bs-success-trans"></p>
-                                <p class="text-sm text-slate-600 font-medium leading-snug" id="bs-success-context"></p>
+                                <h4 class="font-bold text-lg mb-0 leading-tight text-indigo-700" id="bs-success-word"></h4>
+                                <p class="text-sm font-semibold text-slate-900 mb-1" id="bs-success-trans"></p>
+                                <p class="text-sm text-slate-500 font-medium leading-snug italic" id="bs-success-context"></p>
                             </div>
                         </div>
                     </div>
@@ -1840,8 +1890,8 @@
                 'profile.interface': 'Мова інтерфейсу', 'profile.learning': 'Мова навчання',
                 'profile.studying': 'Вивчаю', 'profile.translation': 'Переклад',
                 'profile.myPairs': 'Мої пари',
-                'dict.wordPlaceholder': 'Слово ↵ для перекладу',
-                'dict.transPlaceholder': 'Переклад ↵ для збереження',
+                'dict.wordPlaceholder': 'Слово',
+                'dict.transPlaceholder': 'Переклад',
                 'dict.add': 'Додати до словника', 'dict.search': 'Пошук слів чи перекладу...',
                 'dict.select': 'Вибрати слова', 'dict.selectDone': 'Вийти з режиму вибору (Esc)',
                 'dict.allWords': 'Усі слова', 'folder.import': 'Імпорт', 'filter.all': 'Усі слова',
@@ -1898,9 +1948,10 @@
                 'lib.tabText': 'Текст', 'lib.tabUrl': 'Стаття (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Назва матеріалу', 'lib.textPh': 'Оригінальний текст (або скрипт відео)...',
                 'lib.searchArticles': 'Пошук статей', 'lib.find': 'Знайти',
+                'lib.importUrl': 'Посилання на статтю', 'lib.sourceUrl': '🌐 URL', 'lib.urlPh': 'https://example.com/article',
                 'lib.orExtract': 'Або витягнути текст із посилання', 'lib.extract': 'Витягнути текст',
                 'lib.extractHint': 'Розумний екстрактор очистить статтю від меню, реклами та зайвих посилань.',
-                'lib.searchVideo': 'Пошук відео', 'lib.ytQuery': 'Назва відео або тема...',
+                'lib.searchVideo': 'Пошук відео', 'lib.ytQuery': 'Назва, тема або посилання YouTube...',
                 'lib.orPaste': 'Або вставити посилання вручну', 'lib.ytUrl': 'Пряме посилання на YouTube',
                 'lib.addVideo': 'Додати відео', 'lib.srtTitle': 'Перетягніть файл субтитрів (.srt)',
                 'lib.srtOrClick': 'або натисніть, щоб вибрати файл', 'lib.pasteSub': 'Вставити текст вручну',
@@ -2001,6 +2052,8 @@
                 'train.typeIn': '{lang} ↵', 'train.noContext': 'Контекст не знайдено для {word}',
                 'train.sprintDone': 'Спринт завершено!', 'train.contextDone': 'Контекст завершено!', 'train.yourScore': 'Ваш рахунок: {n} балів!',
                 'train.contextRead': 'Читайте…', 'train.contextHint': 'Підказка', 'train.score': 'Рахунок',
+                'train.roundPts': 'Бали за це слово',
+                'train.zeroPass': '0 балів — повторити',
                 'train.contextHintLetters': 'Літери',
                 'train.contextHintTrans': 'Переклад',
                 'train.contextHintMaterial': 'Матеріал',
@@ -2066,8 +2119,8 @@
                 'profile.interface': 'Interface language', 'profile.learning': 'Learning languages',
                 'profile.studying': 'Learning', 'profile.translation': 'Translation',
                 'profile.myPairs': 'My pairs',
-                'dict.wordPlaceholder': 'Word ↵ to translate',
-                'dict.transPlaceholder': 'Translation ↵ to save',
+                'dict.wordPlaceholder': 'Word',
+                'dict.transPlaceholder': 'Translation',
                 'dict.add': 'Add to dictionary', 'dict.search': 'Search words or translations...',
                 'dict.select': 'Select words', 'dict.selectDone': 'Exit selection (Esc)',
                 'dict.allWords': 'All words', 'folder.import': 'Import', 'filter.all': 'All words',
@@ -2124,9 +2177,10 @@
                 'lib.tabText': 'Text', 'lib.tabUrl': 'Article (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Material title', 'lib.textPh': 'Original text (or video script)...',
                 'lib.searchArticles': 'Search articles', 'lib.find': 'Find',
+                'lib.importUrl': 'Article link', 'lib.sourceUrl': '🌐 URL', 'lib.urlPh': 'https://example.com/article',
                 'lib.orExtract': 'Or extract text from a link', 'lib.extract': 'Extract text',
                 'lib.extractHint': 'The extractor will clean menus, ads and extra links from the article.',
-                'lib.searchVideo': 'Search videos', 'lib.ytQuery': 'Video title or topic...',
+                'lib.searchVideo': 'Search videos', 'lib.ytQuery': 'Title, topic, or YouTube link...',
                 'lib.orPaste': 'Or paste a link manually', 'lib.ytUrl': 'Direct YouTube link',
                 'lib.addVideo': 'Add video', 'lib.srtTitle': 'Drop a subtitle file (.srt)',
                 'lib.srtOrClick': 'or click to choose a file', 'lib.pasteSub': 'Paste text manually',
@@ -2222,6 +2276,8 @@
                 'train.typeIn': '{lang} ↵', 'train.noContext': 'No context found for {word}',
                 'train.sprintDone': 'Sprint finished!', 'train.contextDone': 'Context finished!', 'train.yourScore': 'Your score: {n} points!',
                 'train.contextRead': 'Reading…', 'train.contextHint': 'Hint', 'train.score': 'Score',
+                'train.roundPts': 'Score for this word',
+                'train.zeroPass': '0 pts — will repeat',
                 'train.contextHintLetters': 'Letters',
                 'train.contextHintTrans': 'Translation',
                 'train.contextHintMaterial': 'Material',
@@ -2287,8 +2343,8 @@
                 'profile.interface': 'Idioma de la interfaz', 'profile.learning': 'Idiomas de estudio',
                 'profile.studying': 'Estudio', 'profile.translation': 'Traducción',
                 'profile.myPairs': 'Mis pares',
-                'dict.wordPlaceholder': 'Palabra ↵ para traducir',
-                'dict.transPlaceholder': 'Traducción ↵ para guardar',
+                'dict.wordPlaceholder': 'Palabra',
+                'dict.transPlaceholder': 'Traducción',
                 'dict.add': 'Añadir al diccionario', 'dict.search': 'Buscar palabras o traducciones...',
                 'dict.select': 'Seleccionar palabras', 'dict.selectDone': 'Salir de la selección (Esc)',
                 'dict.allWords': 'Todas las palabras', 'folder.import': 'Importar', 'filter.all': 'Todas las palabras',
@@ -2345,9 +2401,10 @@
                 'lib.tabText': 'Texto', 'lib.tabUrl': 'Artículo (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Título del material', 'lib.textPh': 'Texto original (o guion del vídeo)...',
                 'lib.searchArticles': 'Buscar artículos', 'lib.find': 'Buscar',
+                'lib.importUrl': 'Enlace del artículo', 'lib.sourceUrl': '🌐 URL', 'lib.urlPh': 'https://example.com/articulo',
                 'lib.orExtract': 'O extraer el texto de un enlace', 'lib.extract': 'Extraer texto',
                 'lib.extractHint': 'El extractor limpiará menús, anuncios y enlaces extra del artículo.',
-                'lib.searchVideo': 'Buscar vídeos', 'lib.ytQuery': 'Título o tema del vídeo...',
+                'lib.searchVideo': 'Buscar vídeos', 'lib.ytQuery': 'Título, tema o enlace de YouTube...',
                 'lib.orPaste': 'O pegar un enlace a mano', 'lib.ytUrl': 'Enlace directo de YouTube',
                 'lib.addVideo': 'Añadir vídeo', 'lib.srtTitle': 'Suelta un archivo de subtítulos (.srt)',
                 'lib.srtOrClick': 'o pulsa para elegir un archivo', 'lib.pasteSub': 'Pegar texto a mano',
@@ -2443,6 +2500,8 @@
                 'train.typeIn': '{lang} ↵', 'train.noContext': 'No hay contexto para {word}',
                 'train.sprintDone': '¡Sprint terminado!', 'train.contextDone': '¡Contexto terminado!', 'train.yourScore': 'Tu puntuación: {n} puntos!',
                 'train.contextRead': 'Lee…', 'train.contextHint': 'Pista', 'train.score': 'Puntos',
+                'train.roundPts': 'Puntos por esta palabra',
+                'train.zeroPass': '0 pts — se repetirá',
                 'train.contextHintLetters': 'Letras',
                 'train.contextHintTrans': 'Traducción',
                 'train.contextHintMaterial': 'Material',
@@ -2540,6 +2599,12 @@
             if (countSel) [...countSel.options].forEach(opt => { opt.textContent = t('train.wordsN', { n: opt.value }); });
             const wikiOpt = document.querySelector('#article-search-source option[value="wiki-en"]');
             if (wikiOpt) wikiOpt.textContent = `Wikipedia (${LANG_META[learningLanguage]?.code || 'EN'})`;
+            const urlOpt = document.querySelector('#article-search-source option[value="url"]');
+            if (urlOpt) urlOpt.textContent = t('lib.sourceUrl');
+            if (typeof setArticleSourceMode === 'function') {
+                const src = document.getElementById('article-search-source')?.value || 'url';
+                setArticleSourceMode(src);
+            }
             const modalOk = document.getElementById('modal-btn-ok');
             if (modalOk) modalOk.textContent = t('common.ok');
             const dontKnow = document.getElementById('bs-btn-dont-know');
@@ -2969,6 +3034,8 @@
         let contextHudMergeDone = false;
         let contextHudMergeAnimating = false;
         let contextLastRoundPtsShown = -1;
+        let contextExpandMeta = null;
+        let contextExpandUsed = false;
 
         let trainingSessionActive = false;
         let trainingFocusCollapsed = false;
@@ -5526,8 +5593,8 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group hover:shadow-md hover:border-indigo-300 transition h-40 sm:h-48 ${selected ? 'word-card-selected' : ''}">
                     <img src="${item.imageUrl}" class="w-full h-20 sm:h-24 object-cover bg-slate-50 flex-shrink-0 border-b border-slate-100 cursor-pointer" onclick="${cardClick}" onerror="imgError(this)">
                     <div class="p-2 sm:p-3 flex-1 flex flex-col justify-center min-w-0 bg-white cursor-pointer" onclick="${cardClick}">
-                        <strong class="text-slate-800 text-base sm:text-lg leading-tight truncate font-bold">${item.word}</strong>
-                        <span class="text-indigo-600 text-xs sm:text-sm font-bold truncate">${item.translation}</span>
+                        <strong class="text-indigo-700 text-base sm:text-lg leading-tight truncate font-bold">${item.word}</strong>
+                        <span class="text-slate-800 text-xs sm:text-sm font-semibold truncate">${item.translation}</span>
                     </div>
                     ${dictSelectMode
                         ? `<label class="absolute top-2 left-2 z-10 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center border cursor-pointer" onclick="event.stopPropagation();">
@@ -5987,8 +6054,15 @@
             document.getElementById('yt-sub-raw').classList.add('hidden'); 
             document.getElementById('article-search-results').classList.add('hidden');
             document.getElementById('yt-search-results').classList.add('hidden');
-            document.getElementById('article-search-query').value = '';
+            document.getElementById('article-main-input').value = '';
+            document.getElementById('material-url').value = '';
+            const articleSource = document.getElementById('article-search-source');
+            if (articleSource) {
+                articleSource.value = 'url';
+                setArticleSourceMode('url');
+            }
             document.getElementById('yt-search-query').value = '';
+            document.getElementById('material-yt-url').value = '';
         };
 
         window.setAddMode = (mode) => {
@@ -6007,14 +6081,68 @@
                 btn.classList.toggle('text-slate-500', !isActive);
                 btn.classList.toggle('hover:bg-slate-50', !isActive);
             });
+            if (mode === 'url') {
+                const src = document.getElementById('article-search-source')?.value || 'url';
+                setArticleSourceMode(src);
+            }
+        };
+
+        const WIKI_ICON_HTML = '<img class="wiki-w-img" alt="" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Wikipedia%27s_W.svg" onerror="this.onerror=null;this.src=\'https://en.wikipedia.org/static/favicon/wikipedia.ico\'">';
+
+        window.setArticleSourceMode = (source) => {
+            const label = document.getElementById('article-source-label');
+            const icon = document.getElementById('article-source-icon');
+            const inputIcon = document.getElementById('article-input-icon');
+            const input = document.getElementById('article-main-input');
+            const btn = document.getElementById('article-action-btn');
+            const hint = document.getElementById('article-extract-hint');
+            const results = document.getElementById('article-search-results');
+            const isUrl = source === 'url';
+
+            if (hint) hint.classList.toggle('hidden', !isUrl);
+            if (results && isUrl) results.classList.add('hidden');
+
+            if (inputIcon) inputIcon.classList.toggle('hidden', !isUrl);
+            if (input) {
+                input.classList.toggle('pl-9', isUrl);
+                input.classList.toggle('pl-3', !isUrl);
+            }
+
+            if (isUrl) {
+                if (icon) icon.textContent = '🌐';
+                if (label) label.textContent = t('lib.importUrl');
+                if (input) input.setAttribute('data-i18n-placeholder', 'lib.urlPh');
+                input?.setAttribute('placeholder', t('lib.urlPh'));
+                if (btn) btn.textContent = t('lib.extract');
+            } else if (source === 'wiki-en') {
+                if (icon) icon.innerHTML = WIKI_ICON_HTML;
+                if (label) label.textContent = t('lib.searchArticles');
+                if (input) input.setAttribute('data-i18n-placeholder', 'lib.topicPh');
+                input?.setAttribute('placeholder', t('lib.topicPh'));
+                if (btn) btn.textContent = t('lib.find');
+            } else {
+                if (icon) icon.textContent = '📰';
+                if (label) label.textContent = t('lib.searchArticles');
+                if (input) input.setAttribute('data-i18n-placeholder', 'lib.topicPh');
+                input?.setAttribute('placeholder', t('lib.topicPh'));
+                if (btn) btn.textContent = t('lib.find');
+            }
+        };
+
+        window.handleArticleAction = () => {
+            const source = document.getElementById('article-search-source')?.value || 'url';
+            if (source === 'url') fetchArticleText();
+            else searchArticles();
         };
 
         window.fetchArticleText = async (event) => {
             if (event) event.preventDefault();
-            const urlInput = document.getElementById('material-url').value.trim();
+            const urlInput = (document.getElementById('article-main-input')?.value || document.getElementById('material-url')?.value || '').trim();
             if (!urlInput) return window.showModal(t('msg.needUrl'));
+            const hiddenUrl = document.getElementById('material-url');
+            if (hiddenUrl) hiddenUrl.value = urlInput;
             
-            const btn = document.querySelector('button[onclick="fetchArticleText(event)"]');
+            const btn = document.getElementById('article-action-btn');
             const origText = btn ? btn.textContent : t('lib.extract');
             if (btn) { btn.textContent = t('msg.extracting'); btn.disabled = true; }
             
@@ -6047,7 +6175,7 @@
         };
 
         window.searchArticles = async () => {
-            const query = document.getElementById('article-search-query').value.trim();
+            const query = document.getElementById('article-main-input')?.value.trim() || '';
             const source = document.getElementById('article-search-source').value;
             if (!query) return;
             
@@ -6111,7 +6239,10 @@
         };
 
         window.selectNewsArticle = (url) => {
-            document.getElementById('material-url').value = url;
+            const mainInput = document.getElementById('article-main-input');
+            const hiddenUrl = document.getElementById('material-url');
+            if (mainInput) mainInput.value = url;
+            if (hiddenUrl) hiddenUrl.value = url;
             document.getElementById('article-search-results').classList.add('hidden');
             window.showModal(t('msg.newsExtract'));
             window.fetchArticleText();
@@ -6137,9 +6268,50 @@
             }
         };
 
+        function parseYouTubeVideoId(input) {
+            const raw = String(input || '').trim();
+            if (!raw) return null;
+            let candidate = raw;
+            if (!/^https?:\/\//i.test(candidate) && /(?:youtube\.com|youtu\.be)/i.test(candidate)) {
+                candidate = `https://${candidate.replace(/^\/\//, '')}`;
+            }
+            const match = candidate.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i);
+            return match?.[1] || null;
+        }
+
+        function looksLikeYouTubeLink(input) {
+            const raw = String(input || '').trim();
+            if (!raw) return false;
+            if (parseYouTubeVideoId(raw)) return true;
+            return /(?:youtube\.com|youtu\.be)/i.test(raw);
+        }
+
+        window.handleYouTubePaste = () => {
+            setTimeout(() => {
+                const query = document.getElementById('yt-search-query')?.value.trim() || '';
+                if (looksLikeYouTubeLink(query)) searchYouTube();
+            }, 0);
+        };
+
         window.searchYouTube = async () => {
             const query = document.getElementById('yt-search-query').value.trim();
             if (!query) return;
+
+            const videoId = parseYouTubeVideoId(query);
+            if (looksLikeYouTubeLink(query)) {
+                if (!videoId) {
+                    window.showModal(t('msg.badYt'));
+                    return;
+                }
+                const urlInput = document.getElementById('material-yt-url');
+                const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                if (urlInput) urlInput.value = watchUrl;
+                document.getElementById('yt-search-query').value = watchUrl;
+                document.getElementById('yt-search-results').classList.add('hidden');
+                loadYTIframeForPreview();
+                return;
+            }
+
             const resContainer = document.getElementById('yt-search-results');
             resContainer.innerHTML = `<div class="text-center text-sm text-slate-500 p-3"><div class="loader inline-block align-middle mr-2 w-4 h-4"></div>${t('lib.searchYt')}</div>`;
             resContainer.classList.remove('hidden');
@@ -6184,8 +6356,11 @@
 
         window.selectYTVideo = (videoId, title) => {
             if(!videoId) return;
+            const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
             const urlInput = document.getElementById('material-yt-url');
-            urlInput.value = `https://www.youtube.com/watch?v=${videoId}`;
+            const searchInput = document.getElementById('yt-search-query');
+            if (urlInput) urlInput.value = watchUrl;
+            if (searchInput) searchInput.value = watchUrl;
             
             if (!document.getElementById('material-title').value.trim()) {
                 document.getElementById('material-title').value = title;
@@ -6198,10 +6373,13 @@
 
         let currentYtId = "";
         window.loadYTIframeForPreview = () => {
-            const url = document.getElementById('material-yt-url').value;
-            const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})/);
-            if(match && match[1]) {
-                currentYtId = match[1];
+            const urlInput = document.getElementById('material-yt-url');
+            const searchInput = document.getElementById('yt-search-query');
+            const url = (urlInput?.value || searchInput?.value || '').trim();
+            const videoId = parseYouTubeVideoId(url);
+            if (videoId) {
+                currentYtId = videoId;
+                if (urlInput) urlInput.value = `https://www.youtube.com/watch?v=${videoId}`;
                 const container = document.getElementById('yt-preview-container');
                 container.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${currentYtId}" frameborder="0" allowfullscreen></iframe>`;
                 container.classList.remove('hidden');
@@ -6708,6 +6886,83 @@
             return `<button onclick="markCurrentAsRead()" class="mt-10 w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold font-sans shadow-md text-base sm:text-lg transition flex justify-center items-center gap-2 active:scale-95"><span>✅ ${t('lib.markRead')}</span></button>`;
         }
 
+        function isLyricsLikeSubtitles(subs) {
+            const texts = (subs || [])
+                .map(s => String(s?.text || '').replace(/\s+/g, ' ').trim())
+                .filter(Boolean);
+            if (texts.length < 5) return false;
+
+            const withSentencePunct = texts.filter(t => /[.!?…]/.test(t)).length;
+            const punctRatio = withSentencePunct / texts.length;
+            // Almost no sentence punctuation → almost always lyrics / verse, not spoken prose
+            if (punctRatio > 0.22) return false;
+
+            const avgLen = texts.reduce((sum, t) => sum + t.length, 0) / texts.length;
+            const shortLines = texts.filter(t => t.length <= 55).length / texts.length;
+            // Lyrics cues are usually short; allow a bit longer if punctuation is essentially absent
+            return punctRatio <= 0.12 || (avgLen <= 48 && shortLines >= 0.65);
+        }
+
+        function renderSubtitleLineHtml(sub, savedWordsMap, wordOccMap, lyricMode) {
+            const cls = lyricMode ? 'yt-sub-line yt-lyric-line' : 'yt-sub-line';
+            return `<span class="${cls}" data-start="${sub.start}" data-end="${sub.end}" onclick="seekVideo(${sub.start})">${wrapWords(sub.text, savedWordsMap, wordOccMap)}</span>`;
+        }
+
+        function renderLyricsSubtitlesHtml(subs, savedWordsMap, wordOccMap) {
+            let finalHtml = '';
+            let stanzaHtml = '';
+            let linesInStanza = 0;
+
+            subs.forEach((sub, i) => {
+                stanzaHtml += renderSubtitleLineHtml(sub, savedWordsMap, wordOccMap, true);
+                linesInStanza++;
+
+                const next = subs[i + 1];
+                const gap = next ? Math.max(0, Number(next.start) - Number(sub.end)) : 99;
+                // New stanza: ~4 lines, longer pause between cues, or end of page
+                const breakStanza = !next || linesInStanza >= 4 || gap >= 2.2;
+                if (breakStanza) {
+                    finalHtml += `<div class="yt-lyric-stanza">${stanzaHtml}</div>`;
+                    stanzaHtml = '';
+                    linesInStanza = 0;
+                }
+            });
+            return finalHtml;
+        }
+
+        function renderProseSubtitlesHtml(subs, savedWordsMap, wordOccMap) {
+            let finalHtml = '';
+            let paragraphTemp = '';
+            let linesInPara = 0;
+
+            subs.forEach((sub, i) => {
+                paragraphTemp += `${renderSubtitleLineHtml(sub, savedWordsMap, wordOccMap, false)} `;
+                linesInPara++;
+
+                const isLast = i === subs.length - 1;
+                if (isLast) {
+                    finalHtml += `<p class="mb-4 leading-[2.2] text-justify">${paragraphTemp}</p>`;
+                    return;
+                }
+
+                const currentText = String(sub.text || '').trim();
+                const endsWithSentence = /[.!?…]['"»”]*$/.test(currentText);
+                const nextText = String(subs[i + 1]?.text || '').trim();
+                const startsWithCapital = /^[A-ZА-ЯІЇЄҐЁÑ¿¡"'«“]/.test(nextText);
+
+                if (linesInPara >= 2 && endsWithSentence && startsWithCapital) {
+                    finalHtml += `<p class="mb-4 leading-[2.2] text-justify">${paragraphTemp}</p>`;
+                    paragraphTemp = '';
+                    linesInPara = 0;
+                } else if (linesInPara >= 4 && endsWithSentence) {
+                    finalHtml += `<p class="mb-4 leading-[2.2] text-justify">${paragraphTemp}</p>`;
+                    paragraphTemp = '';
+                    linesInPara = 0;
+                }
+            });
+            return finalHtml;
+        }
+
         function renderReaderContent() {
             if(!currentMaterial) return; 
             const container = document.getElementById('reader-content'); 
@@ -6717,41 +6972,10 @@
             const currentPageData = readerPages[readerCurrentPage - 1];
 
             if (currentMaterial.subtitles) {
-                const subs = currentPageData || []; 
-                let finalHtml = '';
-                let paragraphTemp = '';
-                let linesInPara = 0;
-                
-                subs.forEach((sub, i) => {
-                    paragraphTemp += `<span class="yt-sub-line" data-start="${sub.start}" data-end="${sub.end}" onclick="seekVideo(${sub.start})">${wrapWords(sub.text, savedWordsMap, wordOccMap)}</span> `;
-                    linesInPara++;
-                    
-                    const isLast = i === subs.length - 1;
-                    if (isLast) {
-                        finalHtml += `<p class="mb-4 leading-[2.2] text-justify">${paragraphTemp}</p>`;
-                        return;
-                    }
-
-                    const currentText = sub.text.trim();
-                    const endsWithSentence = /[.!?]['"»”]*$/.test(currentText);
-
-                    const nextSub = subs[i + 1];
-                    const nextText = nextSub ? nextSub.text.trim() : '';
-                    const startsWithCapital = /^[A-Z"'«“]/.test(nextText);
-
-                    if (linesInPara >= 2 && endsWithSentence && startsWithCapital) {
-                        finalHtml += `<p class="mb-4 leading-[2.2] text-justify">${paragraphTemp}</p>`;
-                        paragraphTemp = '';
-                        linesInPara = 0;
-                    } else if (linesInPara >= 4) {
-                        if (endsWithSentence) {
-                            finalHtml += `<p class="mb-4 leading-[2.2] text-justify">${paragraphTemp}</p>`;
-                            paragraphTemp = '';
-                            linesInPara = 0;
-                        }
-                    }
-                });
-                container.innerHTML = finalHtml;
+                const subs = currentPageData || [];
+                container.innerHTML = isLyricsLikeSubtitles(subs)
+                    ? renderLyricsSubtitlesHtml(subs, savedWordsMap, wordOccMap)
+                    : renderProseSubtitlesHtml(subs, savedWordsMap, wordOccMap);
             } else {
                 const pageHtml = currentPageData || '';
                 container.innerHTML = wrapHtmlWords(pageHtml, savedWordsMap, wordOccMap);
@@ -6761,14 +6985,32 @@
                 container.innerHTML += renderMarkAsReadBtn();
             }
 
-            document.getElementById('reader-page-info').textContent = pageLabel(readerCurrentPage, readerTotalPages);
-            document.getElementById('btn-reader-prev').disabled = (readerCurrentPage === 1);
-            document.getElementById('btn-reader-next').disabled = (readerCurrentPage === readerTotalPages);
-            document.getElementById('reader-pagination').classList.toggle('hidden', readerTotalPages <= 1);
+            const pageText = pageLabel(readerCurrentPage, readerTotalPages);
+            const atFirst = readerCurrentPage === 1;
+            const atLast = readerCurrentPage === readerTotalPages;
+            const multiPage = readerTotalPages > 1;
+
+            document.getElementById('reader-page-info').textContent = pageText;
+            document.getElementById('btn-reader-prev').disabled = atFirst;
+            document.getElementById('btn-reader-next').disabled = atLast;
+            document.getElementById('reader-pagination').classList.toggle('hidden', !multiPage);
+
+            // Top prev/next: only from page 2 (handy after scrolling a long page)
+            const topBar = document.getElementById('reader-pagination-top');
+            const topInfo = document.getElementById('reader-page-info-top');
+            const topPrev = document.getElementById('btn-reader-prev-top');
+            const topNext = document.getElementById('btn-reader-next-top');
+            if (topBar) topBar.classList.toggle('hidden', !multiPage || atFirst);
+            if (topInfo) topInfo.textContent = pageText;
+            if (topPrev) topPrev.disabled = atFirst;
+            if (topNext) topNext.disabled = atLast;
         }
 
         const inlinePopup = document.getElementById('inline-popup');
         let lastInlineAnchorRect = null;
+        let selectionFetchTimeout = null;
+        let selectionRepositionRaf = null;
+        let selectionAdjusting = false;
 
         function positionInlinePopup(anchorRect) {
             if (!inlinePopup || !anchorRect) return;
@@ -6785,24 +7027,50 @@
             inlinePopup.style.visibility = 'hidden';
 
             const pad = 12;
+            const gap = 10;
             const vw = window.innerWidth;
             const vh = window.innerHeight;
             const maxW = Math.min(320, vw - pad * 2);
             inlinePopup.style.width = maxW + 'px';
             inlinePopup.style.maxWidth = `calc(100vw - ${pad * 2}px)`;
 
-            // Measure after width is applied
             const pw = inlinePopup.offsetWidth || maxW;
             const ph = inlinePopup.offsetHeight || 180;
 
             let left = lastInlineAnchorRect.left + lastInlineAnchorRect.width / 2 - pw / 2;
             left = Math.max(pad, Math.min(left, vw - pw - pad));
 
-            let top = lastInlineAnchorRect.bottom + 10;
-            if (top + ph > vh - pad) {
-                const above = lastInlineAnchorRect.top - ph - 10;
-                if (above >= pad) top = above;
-                else top = Math.max(pad, Math.min(top, vh - Math.min(ph, vh - pad * 2) - pad));
+            const spaceBelow = vh - pad - (lastInlineAnchorRect.bottom + gap);
+            const spaceAbove = lastInlineAnchorRect.top - gap - pad;
+            const fitsBelow = spaceBelow >= ph;
+            const fitsAbove = spaceAbove >= ph;
+
+            let top;
+            if (fitsBelow && fitsAbove) {
+                top = spaceBelow >= spaceAbove
+                    ? lastInlineAnchorRect.bottom + gap
+                    : lastInlineAnchorRect.top - ph - gap;
+            } else if (fitsBelow) {
+                top = lastInlineAnchorRect.bottom + gap;
+            } else if (fitsAbove) {
+                top = lastInlineAnchorRect.top - ph - gap;
+            } else {
+                top = spaceBelow >= spaceAbove
+                    ? lastInlineAnchorRect.bottom + gap
+                    : lastInlineAnchorRect.top - ph - gap;
+                top = Math.max(pad, Math.min(top, vh - ph - pad));
+            }
+
+            // Keep popup from covering the highlighted text / selection handles
+            const popupBottom = top + ph;
+            const overlapsAnchor = top < lastInlineAnchorRect.bottom + gap && popupBottom > lastInlineAnchorRect.top - gap;
+            if (overlapsAnchor) {
+                if (top >= lastInlineAnchorRect.bottom) {
+                    top = lastInlineAnchorRect.top - ph - gap;
+                } else {
+                    top = lastInlineAnchorRect.bottom + gap;
+                }
+                top = Math.max(pad, Math.min(top, vh - ph - pad));
             }
 
             inlinePopup.style.left = `${Math.round(left)}px`;
@@ -6810,9 +7078,35 @@
             inlinePopup.style.visibility = '';
         }
 
+        function setInlinePopupSelectionAdjusting(active) {
+            selectionAdjusting = !!active;
+            if (!inlinePopup) return;
+            inlinePopup.style.pointerEvents = active ? 'none' : '';
+            inlinePopup.style.opacity = active ? '0.92' : '';
+        }
+
+        function scheduleInlinePopupReposition(anchorRect) {
+            if (selectionRepositionRaf) cancelAnimationFrame(selectionRepositionRaf);
+            selectionRepositionRaf = requestAnimationFrame(() => {
+                positionInlinePopup(anchorRect);
+                selectionRepositionRaf = null;
+            });
+        }
+
         function repositionInlinePopupSoon() {
             if (!lastInlineAnchorRect || inlinePopup.classList.contains('hidden')) return;
             requestAnimationFrame(() => positionInlinePopup(lastInlineAnchorRect));
+        }
+
+        function getReaderSelectionRangeRect() {
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return null;
+            const range = selection.getRangeAt(0);
+            const readerContent = document.getElementById('reader-content');
+            if (!readerContent || !readerContent.contains(range.commonAncestorContainer)) return null;
+            const rect = range.getBoundingClientRect();
+            if (rect.width === 0 && rect.height === 0) return null;
+            return { range, rect, text: selection.toString().trim() };
         }
 
         document.getElementById('reader-content').addEventListener('click', (e) => {
@@ -6826,42 +7120,50 @@
             }
         });
 
-        let selectionTimeout;
         let lastSelectedText = "";
 
         document.addEventListener('selectionchange', () => {
             if (document.getElementById('library-read-view').classList.contains('hidden')) return;
-            
-            clearTimeout(selectionTimeout);
-            
-            selectionTimeout = setTimeout(() => {
-                const selection = window.getSelection();
-                const text = selection.toString().trim();
-                
-                const readerContent = document.getElementById('reader-content');
-                if (!readerContent) return;
-                
-                if (text.length > 0 && text.length <= 150 && !text.includes('\n\n')) {
-                    if (text === lastSelectedText) return; 
 
-                    if (selection.rangeCount === 0) return;
-                    const range = selection.getRangeAt(0);
-                    
-                    if (!readerContent.contains(range.commonAncestorContainer)) return;
+            const selInfo = getReaderSelectionRangeRect();
+            if (!selInfo) {
+                if (selectionAdjusting) setInlinePopupSelectionAdjusting(false);
+                return;
+            }
 
-                    const rect = range.getBoundingClientRect();
-                    if(rect.width === 0 && rect.height === 0) return;
-                    
-                    lastSelectedText = text;
-                    positionInlinePopup(rect);
-                    const textOffset = getPlainTextOffsetInReader(range);
-                    processInlineTranslationRequest(text, currentMaterial ? currentMaterial.content : '', { textOffset });
-                } else {
-                    if (text.length === 0) {
-                        lastSelectedText = "";
-                    }
+            const { range, rect, text } = selInfo;
+
+            if (text.length === 0) {
+                lastSelectedText = "";
+                setInlinePopupSelectionAdjusting(false);
+                return;
+            }
+            if (text.length > 150 || text.includes('\n\n')) {
+                setInlinePopupSelectionAdjusting(false);
+                return;
+            }
+
+            // Move popup immediately while the user extends or adjusts the selection
+            setInlinePopupSelectionAdjusting(true);
+            scheduleInlinePopupReposition(rect);
+
+            clearTimeout(selectionFetchTimeout);
+            selectionFetchTimeout = setTimeout(() => {
+                setInlinePopupSelectionAdjusting(false);
+                const latest = getReaderSelectionRangeRect();
+                if (!latest) return;
+                const stableText = latest.text;
+                if (stableText.length === 0 || stableText.length > 150 || stableText.includes('\n\n')) return;
+                if (stableText === lastSelectedText) {
+                    scheduleInlinePopupReposition(latest.rect);
+                    return;
                 }
-            }, 800); 
+
+                lastSelectedText = stableText;
+                scheduleInlinePopupReposition(latest.rect);
+                const textOffset = getPlainTextOffsetInReader(latest.range);
+                processInlineTranslationRequest(stableText, currentMaterial ? currentMaterial.content : '', { textOffset });
+            }, 450);
         });
 
         document.addEventListener('click', (e) => { 
@@ -6878,6 +7180,8 @@
 
         window.selectInlineTranslation = (text) => { document.getElementById('inline-popup-trans-input').value = text; }
         window.closeInlinePopup = () => {
+            clearTimeout(selectionFetchTimeout);
+            setInlinePopupSelectionAdjusting(false);
             inlinePopup.classList.add('hidden');
             pendingInlineSaveData = null;
             lastSelectedText = "";
@@ -7518,9 +7822,12 @@
             return { index: m.index, length: m[0].length, matchedText: m[0] };
         }
 
+        // Particles allowed for automatic verb+particle expansion (phrasal verbs).
+        // "of" is excluded on purpose — usually possessive ("the end of the day"), not a phrasal particle.
+        // Real "… of" phrases stay in CONTEXT_FIXED_PHRASES only (because of, instead of, …).
         const CONTEXT_PHRASAL_PARTICLES = new Set([
             'about', 'around', 'at', 'away', 'back', 'down', 'for', 'in', 'into', 'off', 'on', 'onto',
-            'out', 'over', 'through', 'to', 'up', 'upon', 'with', 'along', 'apart', 'aside', 'by', 'from', 'of', 'as'
+            'out', 'over', 'through', 'to', 'up', 'upon', 'with', 'along', 'apart', 'aside', 'by', 'from', 'as'
         ]);
         const CONTEXT_FIXED_PHRASES = [
             ['in', 'order', 'to'],
@@ -7800,16 +8107,34 @@
         function highlightPhraseInSentence(sentence, phrase) {
             if (!sentence) return '';
             if (!phrase) return escapeHtmlText(sentence);
-            const lower = sentence.toLowerCase();
-            const needle = phrase.toLowerCase();
-            const idx = lower.indexOf(needle);
-            if (idx >= 0) {
-                const before = sentence.slice(0, idx);
-                const mid = sentence.slice(idx, idx + phrase.length);
-                const after = sentence.slice(idx + phrase.length);
-                return `${escapeHtmlText(before)}<b class="text-emerald-700 not-italic font-bold">${escapeHtmlText(mid)}</b>${escapeHtmlText(after)}`;
+            const escaped = String(phrase).replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+            const re = new RegExp(`(?<![\\p{L}\\p{M}0-9])(${escaped})(?![\\p{L}\\p{M}0-9])`, 'iu');
+            const m = re.exec(sentence);
+            if (m) {
+                const before = sentence.slice(0, m.index);
+                const mid = m[0];
+                const after = sentence.slice(m.index + mid.length);
+                return `${escapeHtmlText(before)}<b class="text-indigo-700 not-italic font-bold">${escapeHtmlText(mid)}</b>${escapeHtmlText(after)}`;
             }
             return escapeHtmlText(sentence);
+        }
+
+        function highlightWholeWordInText(text, word, highlightHtml) {
+            const source = String(text || '');
+            const needle = String(word || '').trim();
+            if (!source || !needle) return escapeHtmlText(source);
+            const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const re = new RegExp(`(?<![\\p{L}\\p{M}0-9])(${escaped})(?![\\p{L}\\p{M}0-9])`, 'giu');
+            let out = '';
+            let last = 0;
+            let m;
+            while ((m = re.exec(source)) !== null) {
+                out += escapeHtmlText(source.slice(last, m.index));
+                out += highlightHtml.replace('$1', escapeHtmlText(m[1]));
+                last = m.index + m[0].length;
+            }
+            out += escapeHtmlText(source.slice(last));
+            return out;
         }
 
         function showInlineContextPanel(word, sentence, sentenceTrans, contextWordTrans) {
@@ -8746,14 +9071,26 @@
             document.getElementById('bs-results-list').innerHTML = bsWords.map(w => {
                 const displayLevel = clampSrsLevel(getWordModeLevel(w, activeSessionMode));
                 const wid = String(w.id || '').replace(/'/g, "\\'");
+                const zeroPass = !!w.contextZeroPass;
                 const ok = !w.failed;
+                let markClass = 'bg-rose-50 text-rose-500';
+                let mark = '✕';
+                let titleAttr = '';
+                if (ok) {
+                    markClass = 'bg-emerald-50 text-emerald-600';
+                    mark = '✓';
+                } else if (zeroPass) {
+                    markClass = 'bg-amber-50 text-amber-600';
+                    mark = '✓';
+                    titleAttr = ` title="${t('train.zeroPass').replace(/"/g, '&quot;')}"`;
+                }
                 return `<div class="bg-white rounded-xl border border-slate-100 px-2.5 py-2 flex items-center gap-2 min-w-0 shadow-sm">
                     <button type="button" class="w-10 h-10 flex-shrink-0 rounded-full hover:ring-2 hover:ring-indigo-300 transition cursor-pointer flex items-center justify-center" title="${t('srs.ready')}" onclick="event.stopPropagation(); showSrsStatusFromTraining('${wid}')">${getSrsSvg(displayLevel, false, true, MAX_SRS_LEVEL, { compact: true })}</button>
                     <div class="min-w-0 flex-1 leading-tight">
-                        <p class="font-bold text-slate-800 text-sm truncate">${w.word}</p>
-                        <p class="font-medium text-indigo-600 text-xs truncate">${w.translation}</p>
+                        <p class="font-bold text-indigo-700 text-sm truncate">${w.word}</p>
+                        <p class="font-medium text-slate-800 text-xs truncate">${w.translation}</p>
                     </div>
-                    <span class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm ${ok ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'}" aria-hidden="true">${ok ? '✓' : '✕'}</span>
+                    <span class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm ${markClass}"${titleAttr} aria-hidden="true">${mark}</span>
                 </div>`;
             }).join('');
 
@@ -8811,7 +9148,8 @@
         function triggerSuccessReveal(word) {
             const reveal = document.getElementById('bs-success-reveal');
             const feedback = document.getElementById('bs-feedback');
-            const failed = !!word.failed;
+            const zeroPass = !!word.contextZeroPass;
+            const failed = !!word.failed && !zeroPass;
 
             if (feedback) feedback.innerHTML = '';
 
@@ -8820,7 +9158,11 @@
 
             const badge = document.getElementById('bs-reveal-badge');
             if (badge) {
-                if (failed) {
+                if (zeroPass) {
+                    badge.textContent = t('train.zeroPass');
+                    badge.className = 'bs-reveal-badge text-xs font-bold uppercase tracking-wider mb-1 text-amber-600';
+                    badge.classList.remove('hidden');
+                } else if (failed) {
                     badge.textContent = t('train.answerReveal');
                     badge.className = 'bs-reveal-badge bs-reveal-badge-missed text-xs font-bold uppercase tracking-wider mb-1';
                     badge.classList.remove('hidden');
@@ -8837,11 +9179,11 @@
             const ctxEl = document.getElementById('bs-success-context');
             if (word.context) {
                 const cleanContext = word.context.replace(/[_]/g, '');
-                const escaped = word.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                // Whole-word only — never highlight "pica" inside "typically"
                 const hl = failed
-                    ? '<b class="text-emerald-600 font-extrabold underline decoration-emerald-300 decoration-2 underline-offset-2">$1</b>'
-                    : '<b class="text-emerald-700 font-extrabold">$1</b>';
-                ctxEl.innerHTML = `<span class="italic text-slate-600">"${cleanContext.replace(new RegExp(`(${escaped})`, 'gi'), hl)}"</span>`;
+                    ? '<b class="text-indigo-700 not-italic font-extrabold underline decoration-indigo-300 decoration-2 underline-offset-2">$1</b>'
+                    : '<b class="text-indigo-700 not-italic font-extrabold">$1</b>';
+                ctxEl.innerHTML = `"${highlightWholeWordInText(cleanContext, word.word, hl)}"`;
             } else {
                 ctxEl.textContent = '';
             }
@@ -8856,7 +9198,9 @@
         }
 
         function renderBsStage() {
-            const word = bsWords[bsCurrentWordIdx]; word.failed = false; 
+            const word = bsWords[bsCurrentWordIdx];
+            word.failed = false;
+            word.contextZeroPass = false;
             clearContextRoundTimer();
             const area = document.getElementById('bs-interactive-area'); const btnNext = document.getElementById('bs-btn-next'), feedback = document.getElementById('bs-feedback');
             feedback.innerHTML = ''; btnNext.classList.add('hidden'); document.getElementById('bs-btn-dont-know').classList.remove('hidden'); area.innerHTML = '';
@@ -8885,7 +9229,7 @@
         function playAudioWord(text) { const u = new SpeechSynthesisUtterance(text); u.lang = LANG_META[learningLanguage]?.bcp47 || 'en-US'; u.rate = 0.9; window.speechSynthesis.speak(u); }
 
         function renderStageIntro(word, area, btnNext) {
-            area.innerHTML = `<div class="mx-auto w-40 h-40 rounded-xl overflow-hidden shadow-sm mb-4"><img src="${word.imageUrl}" class="w-full h-full object-cover" onerror="imgError(this)"></div><h3 class="text-3xl font-bold text-slate-800 mb-1 tracking-tight">${word.word}</h3><p class="text-xl text-indigo-600 font-bold mb-2">${word.translation}</p><button id="btn-intro-audio" class="mx-auto bg-slate-100 p-4 rounded-full hover:bg-slate-200 transition shadow-sm border border-slate-200"><svg class="w-7 h-7 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75 0 11-1.06-1.06 8.25 8.25 0 000-11.668.75 0 010-1.06z"/></svg></button>`;
+            area.innerHTML = `<div class="mx-auto w-40 h-40 rounded-xl overflow-hidden shadow-sm mb-4"><img src="${word.imageUrl}" class="w-full h-full object-cover" onerror="imgError(this)"></div><h3 class="text-3xl font-bold text-indigo-700 mb-1 tracking-tight">${word.word}</h3><p class="text-xl text-slate-900 font-semibold mb-2">${word.translation}</p><button id="btn-intro-audio" class="mx-auto bg-slate-100 p-4 rounded-full hover:bg-slate-200 transition shadow-sm border border-slate-200"><svg class="w-7 h-7 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75 0 11-1.06-1.06 8.25 8.25 0 000-11.668.75 0 010-1.06z"/></svg></button>`;
             document.getElementById('btn-intro-audio').onclick = () => playAudioWord(word.word); btnNext.innerHTML = withEnterHint(t('train.gotIt')); btnNext.classList.remove('hidden');
         }
 
@@ -9034,13 +9378,13 @@
             const after = opts.after ?? 60;
             const ctx = String(contextStr || '').replace(/\s+/g, ' ').trim();
             if (ctx.length <= maxLen) {
-                return { text: ctx, leading: false, trailing: false };
+                return { text: ctx, leading: false, trailing: false, start: 0, end: ctx.length, full: ctx };
             }
 
             const match = findContextWordMatch(ctx, word);
             if (!match) {
                 const cut = snapContextCut(ctx, maxLen, true);
-                return { text: ctx.slice(0, cut).trimEnd(), leading: false, trailing: cut < ctx.length };
+                return { text: ctx.slice(0, cut).trimEnd(), leading: false, trailing: cut < ctx.length, start: 0, end: cut, full: ctx };
             }
 
             const wordStart = match.index;
@@ -9096,9 +9440,95 @@
             return {
                 text,
                 leading: start > 0,
-                trailing: end < ctx.length
+                trailing: end < ctx.length,
+                start,
+                end,
+                full: ctx
             };
         }
+
+        function expandContextWindowBySentence(full, start, end, direction) {
+            if (!full || start == null || end == null) return null;
+            if (direction === 'before') {
+                if (start <= 0) return null;
+                let newStart = 0;
+                for (let i = start - 2; i >= 0; i--) {
+                    if (/[.!?…]/.test(full[i])) {
+                        newStart = i + 1;
+                        while (newStart < start && /\s/.test(full[newStart])) newStart++;
+                        break;
+                    }
+                }
+                if (newStart >= start) newStart = Math.max(0, start - 90);
+                newStart = snapContextCut(full, newStart, false);
+                if (newStart >= start) return null;
+                return { start: newStart, end, leading: newStart > 0, trailing: end < full.length };
+            }
+            if (end >= full.length) return null;
+            let newEnd = full.length;
+            for (let i = end; i < full.length; i++) {
+                if (/[.!?…]/.test(full[i])) {
+                    newEnd = i + 1;
+                    break;
+                }
+            }
+            if (newEnd <= end) newEnd = Math.min(full.length, end + 90);
+            newEnd = snapContextCut(full, newEnd, true);
+            if (newEnd <= end) return null;
+            return { start, end: newEnd, leading: start > 0, trailing: newEnd < full.length };
+        }
+
+        function refreshContextExcerptDom(text, leading, trailing, cleanWord, keepInputValue) {
+            const body = document.getElementById('ctx-excerpt-body');
+            if (!body) return;
+            const prevVal = keepInputValue ? (document.getElementById('ctx-type-input')?.value || '') : '';
+            const blanked = blankWholeWordInContext(text, cleanWord);
+            if (!blanked) return;
+            body.innerHTML = decorateContextEllipses(blanked, leading, trailing);
+            const inp = document.getElementById('ctx-type-input');
+            if (inp) {
+                if (keepInputValue) inp.value = prevVal;
+                inp.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Enter') return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!inp || inp.disabled || contextAnswered || !contextRoundWord) return;
+                    const userVal = inp.value.trim().toLowerCase();
+                    resolveContextAnswer(contextRoundWord, cleanWord, userVal === cleanWord);
+                });
+                setTimeout(() => inp.focus(), 30);
+            }
+        }
+
+        window.expandContextExcerpt = (direction) => {
+            if (contextExpandUsed || contextAnswered || !contextExpandMeta) return;
+            if (direction !== 'before' && direction !== 'after') return;
+            if (direction === 'before' && !contextExpandMeta.leading) return;
+            if (direction === 'after' && !contextExpandMeta.trailing) return;
+
+            const expanded = expandContextWindowBySentence(
+                contextExpandMeta.full,
+                contextExpandMeta.start,
+                contextExpandMeta.end,
+                direction
+            );
+            if (!expanded) return;
+
+            contextExpandUsed = true;
+            const text = contextExpandMeta.full.slice(expanded.start, expanded.end).trim();
+            contextExpandMeta = {
+                ...contextExpandMeta,
+                start: expanded.start,
+                end: expanded.end,
+                leading: expanded.leading,
+                trailing: expanded.trailing
+            };
+
+            refreshContextExcerptDom(text, expanded.leading, expanded.trailing, contextExpandMeta.cleanWord, true);
+
+            document.getElementById('btn-ctx-expand-up')?.classList.add('hidden');
+            document.getElementById('btn-ctx-expand-down')?.classList.add('hidden');
+        };
 
         function decorateContextEllipses(html, leading, trailing) {
             const ell = '<span class="ctx-ellipsis" aria-hidden="true">…</span>';
@@ -9202,7 +9632,7 @@
         function flyContextTimerToScore(remaining) {
             if (contextHudMergeAnimating || contextHudMergeDone) return;
             const timerWrap = document.getElementById('ctx-timer-wrap');
-            const roundWrap = document.getElementById('ctx-round-wrap');
+            const roundWrap = document.getElementById('ctx-round-wrap') || document.getElementById('ctx-round-block');
             if (!timerWrap || !roundWrap) return;
 
             contextHudMergeAnimating = true;
@@ -9213,30 +9643,33 @@
 
             const ghost = document.createElement('div');
             ghost.id = 'ctx-timer-fly';
-            ghost.innerHTML = `<span class="text-lg leading-none">⏳</span><span class="ctx-fly-timer-val">${remaining}s</span>`;
-            ghost.style.cssText = `position:fixed;left:${from.left}px;top:${from.top}px;z-index:120;pointer-events:none;transition:transform 0.85s cubic-bezier(0.22,1,0.36,1),opacity 0.85s ease;will-change:transform,opacity;`;
+            ghost.innerHTML = `<span class="text-base leading-none">⏳</span><span class="ctx-fly-timer-val">${remaining}s</span>`;
+            // Short local dissolve into the adjacent round points (not a long flight).
+            ghost.style.cssText = `position:fixed;left:${from.left}px;top:${from.top}px;width:${from.width}px;height:${from.height}px;z-index:120;pointer-events:none;transition:transform 0.32s ease-out,opacity 0.32s ease-out;will-change:transform,opacity;`;
             document.body.appendChild(ghost);
             timerWrap.classList.add('ctx-timer-hidden');
 
             requestAnimationFrame(() => {
                 const dx = (to.left + to.width / 2) - (from.left + from.width / 2);
                 const dy = (to.top + to.height / 2) - (from.top + from.height / 2);
-                ghost.style.transform = `translate(${dx}px, ${dy}px) scale(0.75)`;
+                ghost.style.transform = `translate(${dx * 0.55}px, ${dy * 0.55}px) scale(0.92)`;
                 ghost.style.opacity = '0';
             });
 
             const finish = () => {
+                if (!ghost.isConnected) return;
                 ghost.remove();
                 timerWrap.classList.add('hidden');
                 contextHudMergeAnimating = false;
+                document.getElementById('ctx-round-pts')?.classList.add('ctx-round-decay');
             };
             ghost.addEventListener('transitionend', finish, { once: true });
-            setTimeout(finish, 950);
+            setTimeout(finish, 380);
         }
 
         function animateContextPointsToZero(onDone) {
             const roundPts = document.getElementById('ctx-round-pts');
-            const scoreBlock = document.getElementById('ctx-score-block');
+            const scoreBlock = document.getElementById('ctx-round-block');
             if (!roundPts) {
                 onDone?.();
                 return;
@@ -9272,6 +9705,7 @@
             const inp = document.getElementById('ctx-type-input');
             if (inp) inp.disabled = true;
             word.failed = true;
+            word.contextZeroPass = false;
             animateContextPointsToZero(() => {
                 if (inp) inp.classList.add('wrong');
                 triggerSuccessReveal(word);
@@ -9307,7 +9741,7 @@
         }
 
         function spawnContextPenaltyFloat(amount) {
-            const wrap = document.getElementById('ctx-round-wrap') || document.getElementById('ctx-score-block');
+            const wrap = document.getElementById('ctx-round-wrap') || document.getElementById('ctx-round-block');
             if (!wrap || !amount) return;
             const el = document.createElement('span');
             el.className = 'ctx-penalty-float';
@@ -9318,7 +9752,7 @@
         }
 
         function spawnContextBonusFloat(amount) {
-            const wrap = document.getElementById('ctx-round-wrap') || document.getElementById('ctx-score-block');
+            const wrap = document.getElementById('ctx-round-wrap') || document.getElementById('ctx-round-block');
             if (!wrap || !amount) return;
             const el = document.createElement('span');
             el.className = 'ctx-bonus-float';
@@ -9361,7 +9795,8 @@
             const roundPts = document.getElementById('ctx-round-pts');
             const timerWrap = document.getElementById('ctx-timer-wrap');
             const timerEl = document.getElementById('ctx-timer-val');
-            const scoreBlock = document.getElementById('ctx-score-block');
+            const roundBlock = document.getElementById('ctx-round-block');
+            const totalEl = document.getElementById('ctx-total-score');
             const remaining = CONTEXT_ROUND_SECS - contextElapsed;
             const decayStart = getContextDecayStartRemaining();
             const inDecay = remaining <= decayStart;
@@ -9375,7 +9810,7 @@
                 flyContextTimerToScore(remaining);
             }
 
-            if (roundPts && !scoreBlock?.classList.contains('ctx-zeroing')) {
+            if (roundPts && !roundBlock?.classList.contains('ctx-zeroing')) {
                 const shown = inDecay ? contextPointsLeft : getContextMaxFromHints();
                 roundPts.textContent = String(shown);
                 roundPts.classList.toggle('ctx-round-decay', inDecay);
@@ -9387,6 +9822,8 @@
                 }
                 contextLastRoundPtsShown = shown;
             }
+
+            if (totalEl) totalEl.textContent = String(contextScore);
 
             updateContextStreakHud();
         }
@@ -9476,8 +9913,9 @@
             clearContextRoundTimer();
             const inp = document.getElementById('ctx-type-input');
             if (inp) inp.disabled = true;
+            let earned = 0;
             if (activeSessionMode === 'context') {
-                let earned = Math.max(0, contextPointsLeft);
+                earned = Math.max(0, contextPointsLeft);
                 const noHints = !contextMaterialHintUsed && !contextLettersHintUsed && !contextTransHintUsed;
                 const perfect = noHints && earned === CONTEXT_MAX_POINTS;
                 if (perfect) {
@@ -9494,6 +9932,14 @@
                 }
                 contextScore += earned;
                 updateContextHud();
+            }
+            // 0 pts: typed correctly, but does not count as SRS success — will repeat
+            if (activeSessionMode === 'context' && earned === 0) {
+                word.failed = true;
+                word.contextZeroPass = true;
+            } else {
+                word.failed = false;
+                word.contextZeroPass = false;
             }
             if (inp) inp.classList.add('correct');
             triggerSuccessReveal(word);
@@ -9513,6 +9959,15 @@
             // One continuous excerpt up to ~225 chars (ellipsis only at edges if cut)
             const truncated = truncateContextForExercise(contextStr, word.word);
             contextStr = truncated.text;
+            contextExpandMeta = {
+                full: truncated.full || String(word.context || '').replace(/\s+/g, ' ').trim(),
+                start: truncated.start ?? 0,
+                end: truncated.end ?? truncated.text.length,
+                leading: truncated.leading,
+                trailing: truncated.trailing,
+                cleanWord
+            };
+            contextExpandUsed = false;
 
             const replacedContext = blankWholeWordInContext(contextStr, cleanWord);
             if (!replacedContext) {
@@ -9540,24 +9995,36 @@
                 ? `<button type="button" id="btn-ctx-hint-material" onclick="useContextMaterialHint()" class="text-sm font-bold bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 px-3.5 py-2 rounded-xl transition shadow-sm">${t('train.contextHintMaterial')}</button>`
                 : '';
 
+            const showExpandUp = truncated.leading;
+            const showExpandDown = truncated.trailing;
+            const expandUpBtn = (showExpandUp || showExpandDown)
+                ? `<button type="button" id="btn-ctx-expand-up" onclick="expandContextExcerpt('before')" class="ctx-expand-btn ${showExpandUp ? '' : 'invisible pointer-events-none'}" aria-label="More context above" ${showExpandUp ? '' : 'tabindex="-1"'}>▲</button>`
+                : '';
+            const expandDownBtn = (showExpandUp || showExpandDown)
+                ? `<button type="button" id="btn-ctx-expand-down" onclick="expandContextExcerpt('after')" class="ctx-expand-btn ${showExpandDown ? '' : 'invisible pointer-events-none'}" aria-label="More context below" ${showExpandDown ? '' : 'tabindex="-1"'}>▼</button>`
+                : '';
+
             const hud = timed ? `
-                <div class="flex justify-between items-center w-full max-w-xl mx-auto mb-4 px-3 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/70 shadow-inner">
-                    <div id="ctx-hud-anchor" class="flex items-center min-w-0 relative">
-                        <div id="ctx-timer-wrap" class="flex items-center gap-2 bg-white py-1.5 px-4 rounded-full border border-slate-100 shadow-sm">
-                            <span class="text-lg leading-none">⏳</span>
+                <div class="flex justify-between items-center w-full max-w-xl mx-auto mb-4 px-3 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/70 shadow-inner gap-2">
+                    <div id="ctx-hud-anchor" class="flex items-center gap-2 min-w-0 relative">
+                        <div id="ctx-timer-wrap" class="flex items-center gap-1.5 bg-white py-1.5 px-3 rounded-full border border-slate-100 shadow-sm">
+                            <span class="text-base leading-none">⏳</span>
                             <span id="ctx-timer-val" class="text-sm font-semibold text-slate-400 tabular-nums">${CONTEXT_ROUND_SECS}s</span>
                         </div>
+                        <div id="ctx-round-block" class="flex items-center bg-white py-1 px-2.5 rounded-full border border-slate-100 shadow-sm relative" title="${t('train.roundPts')}" data-i18n-title="train.roundPts">
+                            <span id="ctx-round-wrap" class="relative inline-flex items-center min-w-[1.5rem] justify-center">
+                                <span id="ctx-round-pts" class="font-black text-lg text-indigo-600 tabular-nums leading-none">${CONTEXT_MAX_POINTS}</span>
+                            </span>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2.5 flex-shrink-0">
-                        <div id="ctx-streak-container" class="${contextPerfectStreak >= 2 ? '' : 'invisible'} flex items-center gap-1.5 bg-amber-50 border border-amber-200/60 px-3 py-1 rounded-full shadow-sm transition-all duration-300">
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <div id="ctx-streak-container" class="${contextPerfectStreak >= 2 ? '' : 'invisible'} flex items-center gap-1.5 bg-amber-50 border border-amber-200/60 px-2.5 py-1 rounded-full shadow-sm transition-all duration-300">
                             <span class="text-xs">🔥</span>
                             <span id="ctx-streak-val" class="text-[10px] font-bold text-amber-700">${t('train.streak', { n: contextPerfectStreak })}</span>
                         </div>
-                        <div id="ctx-score-block" class="flex flex-col items-end relative">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${t('train.score')}</span>
-                            <span id="ctx-round-wrap" class="relative inline-flex justify-end mt-0.5">
-                                <span id="ctx-round-pts" class="font-black text-2xl text-indigo-600 tabular-nums">${CONTEXT_MAX_POINTS}</span>
-                            </span>
+                        <div id="ctx-score-block" class="flex flex-col items-end leading-none">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">${t('train.score')}</span>
+                            <span id="ctx-total-score" class="font-black text-xl text-slate-800 tabular-nums mt-0.5">${contextScore}</span>
                         </div>
                     </div>
                 </div>` : '';
@@ -9584,8 +10051,12 @@
                 ${hud}
                 ${materialBanner}
                 ${transBlock}
-                <div class="text-xl text-slate-700 font-medium leading-relaxed italic border-l-4 border-indigo-200 pl-5 py-2 text-left inline-block max-w-xl mx-auto relative bg-slate-50/50 rounded-r-xl">
-                    ${contextHtml}
+                <div class="ctx-excerpt-shell max-w-xl mx-auto">
+                    ${expandUpBtn}
+                    <div id="ctx-excerpt-body" class="text-xl text-slate-700 font-medium leading-relaxed italic border-l-4 border-indigo-200 pl-5 py-2 text-left bg-slate-50/50 rounded-r-xl">
+                        ${contextHtml}
+                    </div>
+                    ${expandDownBtn}
                 </div>
                 ${hintsBlock}
             `;
