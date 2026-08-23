@@ -562,34 +562,6 @@
             font-weight: 700;
             color: #64748b;
         }
-        #bulk-photo-paste-target {
-            min-height: 2.75rem;
-            margin-top: 0.75rem;
-            padding: 0.6rem 0.75rem;
-            border: 1px dashed #cbd5e1;
-            border-radius: 0.75rem;
-            background: #fff;
-            color: #94a3b8;
-            font-size: 0.75rem;
-            font-weight: 600;
-            outline: none;
-            text-align: center;
-            max-width: 20rem;
-            margin-left: auto;
-            margin-right: auto;
-            width: 100%;
-        }
-        #bulk-photo-paste-target:focus {
-            border-color: #818cf8;
-            color: #64748b;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
-        }
-        #bulk-photo-paste-target:empty:before {
-            content: attr(data-placeholder);
-            color: #94a3b8;
-            pointer-events: none;
-        }
-        #bulk-add-dialog.bulk-photo-results #bulk-photo-paste-target,
         #bulk-add-dialog.bulk-photo-results .bulk-photo-actions { display: none !important; }
         #bulk-add-dialog.bulk-photo-results #bulk-photo-status,
         #bulk-add-dialog.bulk-photo-results #bulk-photo-retry-wrap {
@@ -1059,18 +1031,17 @@
             <div id="bulk-photo-top">
             <div id="bulk-photo-panel" class="hidden mb-4">
                 <input type="file" id="bulk-photo-file" accept="image/*" class="hidden" onchange="handleBulkPhotoFile(event)">
-                <div id="bulk-photo-drop" class="border-2 border-dashed border-slate-200 rounded-xl p-4 bg-slate-50 text-center cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/40 transition" onclick="if(!event.target.closest('.bulk-photo-actions, #bulk-photo-paste-target, #bulk-photo-drop-copy')) document.getElementById('bulk-photo-file').click()" ondragover="handleBulkPhotoDragOver(event)" ondragleave="handleBulkPhotoDragLeave(event)" ondrop="handleBulkPhotoDrop(event)">
+                <div id="bulk-photo-drop" class="border-2 border-dashed border-slate-200 rounded-xl p-4 bg-slate-50 text-center cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/40 transition" onclick="if(!event.target.closest('.bulk-photo-actions, #bulk-photo-drop-copy')) document.getElementById('bulk-photo-file').click()" ondragover="handleBulkPhotoDragOver(event)" ondragleave="handleBulkPhotoDragLeave(event)" ondrop="handleBulkPhotoDrop(event)">
                     <div id="bulk-photo-preview-wrap" class="hidden mb-3">
                         <img id="bulk-photo-preview" alt="" class="max-h-36 mx-auto rounded-lg shadow-sm object-contain bg-white">
                     </div>
                     <div class="bulk-photo-idle-copy min-w-0">
                         <p class="text-sm font-bold text-slate-600 mb-1" data-i18n="bulk.photoHint">Оберіть фото або вставте з буфера (Ctrl+V)</p>
-                        <p class="text-[11px] text-slate-400 leading-relaxed mb-3" data-i18n="bulk.photoSub">AI розпізнає слова з зображення словникового набору</p>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-3" data-i18n="bulk.photoSub">AI розпізнає слова з зображення словникового набору</p>
                         <div class="bulk-photo-actions flex flex-wrap items-center justify-center gap-2" onclick="event.stopPropagation()">
                             <button type="button" onclick="event.stopPropagation(); document.getElementById('bulk-photo-file').click()" class="text-xs font-bold bg-white border border-slate-200 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:border-indigo-200 text-slate-700 transition shadow-sm">📁 <span data-i18n="bulk.photoChoose">Обрати фото</span></button>
                             <button type="button" id="btn-bulk-photo-paste" onclick="event.stopPropagation(); pasteBulkPhotoFromClipboard()" class="text-xs font-bold bg-white border border-slate-200 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:border-indigo-200 text-indigo-700 transition shadow-sm">📋 <span data-i18n="bulk.photoPaste">Вставити</span></button>
                         </div>
-                        <div id="bulk-photo-paste-target" contenteditable="true" role="textbox" aria-label="Paste image" spellcheck="false" class="bulk-photo-paste-target" data-i18n-placeholder="bulk.photoPasteField" data-placeholder="Натисніть тут і вставте зображення" onclick="event.stopPropagation()" onfocus="this.dataset.focused='1'" onblur="this.textContent=''; onpaste="handleBulkPhotoPasteTarget(event)"></div>
                     </div>
                     <span id="bulk-photo-drop-copy" data-i18n="bulk.photoChange">Інше фото</span>
                 </div>
@@ -1523,7 +1494,7 @@
                     <ol id="sprint-leaderboard-list" class="space-y-1.5 text-slate-700 font-bold text-sm"></ol>
                 </div>
 
-                <div id="bs-results-list" class="text-left bg-slate-50 p-4 sm:p-5 rounded-xl mb-8 max-h-60 overflow-y-auto space-y-3 border border-slate-200 custom-scroll"></div>
+                <div id="bs-results-list" class="text-left bg-slate-50 p-3 sm:p-4 rounded-xl mb-8 max-h-[min(55vh,28rem)] overflow-y-auto border border-slate-200 custom-scroll grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                 <button onclick="endSession()" class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg w-full shadow-lg active:scale-95 transition" data-i18n="train.backHub">До вибору тренувань</button>
             </div>
         </section>
@@ -2785,7 +2756,7 @@
         let contextHighScores = [];
         let contextScore = 0;
         let contextRoundTimer = null;
-        let contextPointsLeft = 15;
+        let contextPointsLeft = 10;
         let contextElapsed = 0;
         let contextAnswered = false;
         let contextReadingSecs = 10;
@@ -4416,25 +4387,7 @@
             }
         });
 
-        window.handleBulkPhotoPasteTarget = (e) => {
-            if (bulkImportMode !== 'photo') return;
-            const items = e.clipboardData?.items;
-            if (!items) return;
-            for (const item of items) {
-                if (item.type && item.type.startsWith('image/')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const file = item.getAsFile();
-                    if (file) ingestBulkPhotoFile(file);
-                    const target = document.getElementById('bulk-photo-paste-target');
-                    if (target) setTimeout(() => { target.textContent = ''; }, 0);
-                    break;
-                }
-            }
-        };
-
         window.pasteBulkPhotoFromClipboard = async () => {
-            const target = document.getElementById('bulk-photo-paste-target');
             try {
                 if (navigator.clipboard && typeof navigator.clipboard.read === 'function') {
                     const items = await navigator.clipboard.read();
@@ -4450,19 +4403,7 @@
             } catch (err) {
                 console.warn('clipboard.read paste failed', err);
             }
-            if (target) {
-                target.focus();
-                try {
-                    const sel = window.getSelection();
-                    const range = document.createRange();
-                    range.selectNodeContents(target);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                } catch (_) {}
-                window.showModal(t('bulk.photoPasteTip'));
-            } else {
-                window.showModal(t('bulk.photoPasteFail'));
-            }
+            window.showModal(t('bulk.photoPasteFail'));
         };
 
         async function ensureFolderExists(name) {
@@ -5239,15 +5180,20 @@
             document.body.appendChild(dl); dl.click(); dl.remove();
         };
 
-        function getSrsSvg(level, isSmall = false, showLabel = false, maxLevel = MAX_SRS_LEVEL) {
-            const size = isSmall ? "w-4 h-4" : (showLabel ? "w-12 h-12" : "w-8 h-8");
+        function getSrsSvg(level, isSmall = false, showLabel = false, maxLevel = MAX_SRS_LEVEL, opts = {}) {
+            const compact = !!(opts && opts.compact);
+            const size = opts.sizeClass
+                || (isSmall ? "w-4 h-4" : (showLabel ? (compact ? "w-10 h-10" : "w-12 h-12") : "w-8 h-8"));
             const lvl = clampSrsLevel(level);
             const circ = 62.8;
             const dash = (circ / maxLevel) * lvl;
             const isDone = isSrsMastered(level);
             const stroke = isDone ? '#10b981' : '#4f46e5';
-            const sw = isSmall ? '4' : '3';
-            const label = showLabel ? `<text x="12" y="12.5" text-anchor="middle" dominant-baseline="middle" fill="${stroke}" font-size="6" font-weight="600" transform="rotate(90 12 12)" class="pointer-events-none select-none">${lvl}/${maxLevel}</text>` : '';
+            const sw = isSmall ? '4' : (compact ? '2.75' : '3');
+            // Compact tiles need a slightly larger label so “3/6” stays readable at small size
+            const labelFs = compact ? '7.25' : (showLabel ? '6.5' : '6');
+            const labelFw = compact ? '700' : '600';
+            const label = showLabel ? `<text x="12" y="12.5" text-anchor="middle" dominant-baseline="middle" fill="${stroke}" font-size="${labelFs}" font-weight="${labelFw}" transform="rotate(90 12 12)" class="pointer-events-none select-none">${lvl}/${maxLevel}</text>` : '';
             return `<svg class="${size} transform -rotate-90 cursor-pointer hover:opacity-80 transition flex-shrink-0" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" stroke="#e2e8f0" stroke-width="${sw}" fill="none" />
                 <circle cx="12" cy="12" r="10" stroke="${stroke}" stroke-width="${sw}" fill="none" stroke-dasharray="${dash} 62.8" stroke-linecap="round" class="transition-all duration-500" />
@@ -7910,16 +7856,14 @@
             document.getElementById('bs-results-list').innerHTML = bsWords.map(w => {
                 const displayLevel = clampSrsLevel(getWordModeLevel(w, activeSessionMode));
                 const wid = String(w.id || '').replace(/'/g, "\\'");
-                
-                return `<div class="border-b border-slate-200 pb-3 mb-3 flex justify-between items-center">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <button type="button" class="w-12 h-12 flex-shrink-0 rounded-full hover:ring-2 hover:ring-indigo-300 transition cursor-pointer" title="${t('srs.ready')}" onclick="event.stopPropagation(); showSrsStatusFromTraining('${wid}')">${getSrsSvg(displayLevel, false, true)}</button>
-                        <span class="font-bold text-slate-800 text-lg truncate">${w.word}</span>
+                const ok = !w.failed;
+                return `<div class="bg-white rounded-xl border border-slate-100 px-2.5 py-2 flex items-center gap-2 min-w-0 shadow-sm">
+                    <button type="button" class="w-10 h-10 flex-shrink-0 rounded-full hover:ring-2 hover:ring-indigo-300 transition cursor-pointer flex items-center justify-center" title="${t('srs.ready')}" onclick="event.stopPropagation(); showSrsStatusFromTraining('${wid}')">${getSrsSvg(displayLevel, false, true, MAX_SRS_LEVEL, { compact: true })}</button>
+                    <div class="min-w-0 flex-1 leading-tight">
+                        <p class="font-bold text-slate-800 text-sm truncate">${w.word}</p>
+                        <p class="font-medium text-indigo-600 text-xs truncate">${w.translation}</p>
                     </div>
-                    <div class="flex flex-col items-end flex-shrink-0">
-                        <span class="text-indigo-600 font-bold text-sm">${w.translation}</span>
-                        <span class="text-base font-bold mt-0.5">${w.failed ? '❌' : '✅'}</span>
-                    </div>
+                    <span class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm ${ok ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'}" aria-hidden="true">${ok ? '✓' : '✕'}</span>
                 </div>`;
             }).join('');
 
@@ -8293,10 +8237,16 @@
             }).join('');
         }
 
+        const CONTEXT_ROUND_SECS = 30;
+        const CONTEXT_MAX_POINTS = 10;
+        const CONTEXT_DECAY_SECS = 10; // last 10s: points = seconds left
+
         function refreshContextPointsFromClock() {
-            const base = contextElapsed <= contextReadingSecs
-                ? 15
-                : Math.max(0, 15 - (contextElapsed - contextReadingSecs));
+            const remaining = CONTEXT_ROUND_SECS - contextElapsed;
+            // First 20s stay at 10; last 10s count down 10→0
+            const base = remaining >= CONTEXT_DECAY_SECS
+                ? CONTEXT_MAX_POINTS
+                : Math.max(0, remaining);
             contextPointsLeft = Math.max(0, base - contextHintPenalty);
         }
 
@@ -8332,16 +8282,17 @@
             const ptsEl = document.getElementById('ctx-points-left');
             const scoreEl = document.getElementById('ctx-score-val');
             const phaseEl = document.getElementById('ctx-phase-label');
-            const scoringElapsed = Math.max(0, contextElapsed - contextReadingSecs);
+            const remaining = CONTEXT_ROUND_SECS - contextElapsed;
+            const inDecay = remaining < CONTEXT_DECAY_SECS;
             if (ptsEl) {
                 ptsEl.textContent = String(contextPointsLeft);
-                ptsEl.classList.toggle('text-rose-500', contextPointsLeft <= 5 && (scoringElapsed > 0 || contextHintPenalty > 0));
-                ptsEl.classList.toggle('animate-pulse', contextPointsLeft <= 5 && scoringElapsed > 0);
+                ptsEl.classList.toggle('text-rose-500', contextPointsLeft <= 5 && (inDecay || contextHintPenalty > 0));
+                ptsEl.classList.toggle('animate-pulse', contextPointsLeft <= 5 && inDecay);
             }
             if (scoreEl) scoreEl.textContent = String(contextScore);
             if (phaseEl) {
-                if (contextElapsed < contextReadingSecs) phaseEl.textContent = t('train.contextRead');
-                else if (scoringElapsed >= 10 || contextTransHintUsed) phaseEl.textContent = t('train.contextHint');
+                if (remaining > CONTEXT_DECAY_SECS) phaseEl.textContent = t('train.contextRead');
+                else if (remaining <= 5 || contextTransHintUsed) phaseEl.textContent = t('train.contextHint');
                 else phaseEl.textContent = '';
             }
         }
@@ -8454,14 +8405,14 @@
 
             contextAnswered = false;
             contextElapsed = 0;
-            contextPointsLeft = 15;
+            contextPointsLeft = CONTEXT_MAX_POINTS;
             contextHintPenalty = 0;
             contextLettersHintUsed = false;
             contextTransHintUsed = false;
             contextMaterialHintUsed = false;
             contextRoundWord = word;
             contextRoundMaterialTitle = getContextMaterialTitle(word);
-            contextReadingSecs = timed ? getContextReadingSeconds(contextStr) : 10;
+            contextReadingSecs = 20; // first 20s at full points (display phase)
 
             const materialBtn = contextRoundMaterialTitle
                 ? `<button type="button" id="btn-ctx-hint-material" onclick="useContextMaterialHint()" class="text-sm font-bold bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 px-3.5 py-2 rounded-xl transition shadow-sm">${t('train.contextHintMaterial')}</button>`
@@ -8472,7 +8423,7 @@
                     <div class="flex items-center gap-2 min-w-0">
                         <span class="text-lg flex-shrink-0">⏳</span>
                         <span id="ctx-points-wrap" class="relative inline-flex items-center justify-center min-w-[1.5rem]">
-                            <span id="ctx-points-left" class="font-extrabold text-xl text-slate-700 tabular-nums">15</span>
+                            <span id="ctx-points-left" class="font-extrabold text-xl text-slate-700 tabular-nums">${CONTEXT_MAX_POINTS}</span>
                         </span>
                         <span id="ctx-phase-label" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1 truncate">${t('train.contextRead')}</span>
                     </div>
@@ -8529,8 +8480,8 @@
                     refreshContextPointsFromClock();
                     updateContextHud();
 
-                    // Free translation + material title during the last 5 scoring seconds
-                    if (contextElapsed >= contextReadingSecs + 10) {
+                    // Free translation + material title in the last 5 seconds
+                    if (contextElapsed >= CONTEXT_ROUND_SECS - 5) {
                         if (!contextTransHintUsed) {
                             showContextTranslationHint(word.translation);
                             const btn = document.getElementById('btn-ctx-hint-trans');
@@ -8544,7 +8495,7 @@
                         }
                     }
 
-                    if (contextElapsed >= contextReadingSecs + 15 || contextPointsLeft <= 0) {
+                    if (contextElapsed >= CONTEXT_ROUND_SECS) {
                         word.failed = true;
                         resolveContextAnswer(word, cleanWord, false);
                     }
