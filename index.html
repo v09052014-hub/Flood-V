@@ -28,6 +28,34 @@
 
         .fade-in { animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        #bs-success-reveal {
+            transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+        }
+        #bs-success-reveal.bs-reveal-success {
+            background: linear-gradient(145deg, #ecfdf5 0%, #f8fafc 55%, #eef2ff 100%);
+            border-color: #6ee7b7;
+        }
+        #bs-success-reveal.bs-reveal-missed {
+            background: #fff;
+            border-color: #cbd5e1;
+        }
+        #bs-success-reveal.bs-reveal-success,
+        #bs-success-reveal.bs-reveal-missed {
+            animation: bs-reveal-ring 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        @keyframes bs-reveal-ring {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.42); }
+            65% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        #bs-reveal-badge {
+            letter-spacing: 0.06em;
+        }
+        #bs-reveal-badge.bs-reveal-badge-missed { color: #64748b; }
+        #bs-reveal-badge.bs-reveal-badge-success { color: #059669; }
+        #bs-success-word.bs-word-highlight { color: #047857; }
+        #bs-success-reveal.bs-reveal-missed #bs-success-word { color: #0f172a; }
         
         /* Reader Styles - Baseline, dynamically overridden by JS */
         .text-reader {
@@ -846,7 +874,50 @@
             animation: ctx-penalty-float 0.75s ease-out forwards;
             white-space: nowrap;
         }
-        #ctx-points-wrap { position: relative; }
+        #ctx-hud-anchor { position: relative; }
+        #ctx-score-block { position: relative; min-width: 3.5rem; }
+        #ctx-round-wrap { position: relative; display: inline-flex; justify-content: flex-end; min-height: 2rem; min-width: 2.5rem; }
+        #ctx-round-pts {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #4f46e5;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            transition: color 0.25s ease;
+        }
+        #ctx-round-pts.ctx-round-decay { color: #4338ca; }
+        #ctx-round-pts.text-rose-500 { color: #f43f5e !important; }
+        #ctx-timer-wrap { transition: opacity 0.35s ease; }
+        #ctx-timer-wrap.ctx-timer-hidden { opacity: 0; pointer-events: none; }
+        #ctx-timer-fly {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #fff;
+            padding: 0.375rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+        }
+        #ctx-timer-fly .ctx-fly-timer-val {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #94a3b8;
+            font-variant-numeric: tabular-nums;
+        }
+        @keyframes ctx-round-tick {
+            0% { transform: scale(1); }
+            35% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+        .ctx-round-tick { animation: ctx-round-tick 0.28s ease; }
+        @keyframes ctx-points-pop {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.14); }
+            100% { transform: scale(1); }
+        }
+        .ctx-points-pop { animation: ctx-points-pop 0.35s ease; }
+        #ctx-score-block.ctx-zeroing #ctx-round-pts { color: #f43f5e; }
         .ctx-ellipsis {
             color: #4f46e5;
             font-style: normal;
@@ -854,14 +925,94 @@
             padding: 0 0.05em;
             user-select: none;
         }
-        #ctx-material-hint {
-            font-size: 0.75rem;
+        .ctx-material-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 36rem;
+            margin: 0 auto 1rem;
+            padding: 0.55rem 1rem;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+            border: 1px solid #c7d2fe;
+            box-shadow: 0 1px 2px rgba(79, 70, 229, 0.08);
+        }
+        .ctx-material-banner.hidden { display: none; }
+        .ctx-material-icon { font-size: 0.95rem; line-height: 1; }
+        .ctx-material-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #4338ca;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+        .ctx-letter-hint-panel {
+            margin-top: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 1rem;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+        }
+        .ctx-letter-hint-inner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+        .ctx-letter-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.65rem;
+            height: 2rem;
+            padding: 0 0.35rem;
+            border-radius: 0.5rem;
+            font-size: 1.05rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .ctx-letter-revealed {
+            background: #eef2ff;
+            color: #4338ca;
+            border: 1px solid #c7d2fe;
+            box-shadow: inset 0 -1px 0 rgba(79, 70, 229, 0.12);
+        }
+        .ctx-letter-mask {
+            background: #f8fafc;
+            color: #94a3b8;
+            border: 1px dashed #cbd5e1;
+            font-size: 1.25rem;
+        }
+        .ctx-letter-punct {
+            font-size: 1rem;
             font-weight: 700;
             color: #64748b;
-            letter-spacing: 0.02em;
-            text-align: center;
-            margin-top: 0.5rem;
-            min-height: 1.1rem;
+            padding: 0 0.1rem;
+        }
+        .ctx-letter-gap { width: 0.35rem; }
+        @keyframes ctx-bonus-float {
+            0% { opacity: 1; transform: translate(-50%, 0); filter: blur(0); }
+            100% { opacity: 0; transform: translate(-50%, -2rem); filter: blur(5px); }
+        }
+        .ctx-bonus-float {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            z-index: 5;
+            pointer-events: none;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #059669;
+            animation: ctx-bonus-float 0.75s ease-out forwards;
+            white-space: nowrap;
         }
 
         .grid-cols-15 { grid-template-columns: repeat(15, minmax(0, 1fr)); }
@@ -880,6 +1031,20 @@
             overflow-x: hidden;
         }
         .dict-context-item.active { background-color: #eef2ff; color: #4338ca; }
+        #system-status {
+            max-height: 3rem;
+            overflow: hidden;
+            transition: max-height 0.45s ease, padding 0.45s ease, opacity 0.45s ease, transform 0.45s ease;
+        }
+        #system-status.is-dismissed {
+            max-height: 0;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            opacity: 0;
+            transform: translateY(-100%);
+            pointer-events: none;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased font-sans">
@@ -1202,13 +1367,13 @@
             </div>
 
             <div id="library-add-view" class="hidden bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200">
-                <div class="flex flex-col sm:flex-row gap-2 mb-4 border-b border-slate-100 pb-2">
-                    <button onclick="setAddMode('text')" id="tab-add-text" class="px-3 sm:px-4 py-2 bg-indigo-50 text-indigo-700 font-bold rounded-lg text-sm transition flex items-center gap-1"><span data-i18n="lib.tabText">Текст</span></button>
-                    <button onclick="setAddMode('url')" id="tab-add-url" class="px-3 sm:px-4 py-2 text-slate-500 font-bold rounded-lg hover:bg-slate-50 text-sm transition flex items-center gap-1">
+                <div class="add-mode-tabs grid grid-cols-2 gap-2 mb-4 border-b border-slate-100 pb-2 sm:flex sm:flex-row sm:gap-2">
+                    <button onclick="setAddMode('text')" id="tab-add-text" class="add-mode-tab col-span-1 sm:flex-1 px-3 sm:px-4 py-2 bg-indigo-50 text-indigo-700 font-bold rounded-lg text-sm transition flex items-center justify-center gap-1.5"><span aria-hidden="true">📝</span> <span data-i18n="lib.tabText">Текст</span></button>
+                    <button onclick="setAddMode('url')" id="tab-add-url" class="add-mode-tab col-span-1 sm:flex-1 px-3 sm:px-4 py-2 text-slate-500 font-bold rounded-lg hover:bg-slate-50 text-sm transition flex items-center justify-center gap-1.5">
                         <img class="wiki-w-img" alt="" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Wikipedia%27s_W.svg" onerror="this.onerror=null;this.src='https://en.wikipedia.org/static/favicon/wikipedia.ico'"> <span data-i18n="lib.tabUrl">Стаття (URL)</span>
                     </button>
-                    <button onclick="setAddMode('yt')" id="tab-add-yt" class="px-3 sm:px-4 py-2 text-slate-500 font-bold rounded-lg hover:bg-slate-50 text-sm transition flex items-center gap-1">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="w-5 h-4 opacity-90"> YouTube
+                    <button onclick="setAddMode('yt')" id="tab-add-yt" class="add-mode-tab col-span-2 sm:col-span-1 sm:flex-1 px-3 sm:px-4 py-2 text-slate-500 font-bold rounded-lg hover:bg-slate-50 text-sm transition flex items-center justify-center gap-1.5">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="w-5 h-4 opacity-90" alt=""> <span data-i18n="lib.tabYt">YouTube</span>
                     </button>
                 </div>
 
@@ -1256,43 +1421,47 @@
                 </div>
 
                 <!-- Tab: YouTube -->
-                <div id="mode-yt-area" class="hidden mb-4">
-                    <div class="mb-4 bg-red-50 p-3 sm:p-4 rounded-xl border border-red-100 shadow-sm w-full">
-                        <label class="text-xs font-bold text-red-800 uppercase mb-2 flex items-center gap-1.5">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="w-6 h-5">
-                            <span data-i18n="lib.searchVideo">Пошук відео</span>
-                        </label>
-                        <div class="flex flex-col sm:flex-row gap-2 w-full mb-2">
-                            <input type="text" id="yt-search-query" placeholder="Назва відео або тема..." class="flex-1 min-w-0 p-3 border border-slate-300 rounded-xl outline-none focus:border-red-500 text-sm font-medium" data-i18n-placeholder="lib.ytQuery" onkeydown="if(event.key==='Enter') searchYouTube()">
-                            <button onclick="searchYouTube()" class="bg-red-600 text-white px-4 sm:px-5 py-3 sm:py-0 rounded-xl font-bold hover:bg-red-700 text-sm whitespace-nowrap shadow-sm transition w-full sm:w-auto shrink-0" data-i18n="lib.find">Знайти</button>
+                <div id="mode-yt-area" class="hidden mb-4 space-y-4">
+                    <div class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm w-full space-y-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-600 uppercase mb-2 flex items-center gap-1.5">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="w-5 h-4" alt="">
+                                <span data-i18n="lib.searchVideo">Пошук відео</span>
+                            </label>
+                            <div class="flex flex-col sm:flex-row gap-2 w-full">
+                                <input type="text" id="yt-search-query" placeholder="Назва відео або тема..." class="flex-1 min-w-0 p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium bg-white" data-i18n-placeholder="lib.ytQuery" onkeydown="if(event.key==='Enter') searchYouTube()">
+                                <button onclick="searchYouTube()" class="bg-indigo-600 text-white px-4 sm:px-5 py-3 sm:py-0 rounded-xl font-bold hover:bg-indigo-700 text-sm whitespace-nowrap shadow-sm transition w-full sm:w-auto shrink-0" data-i18n="lib.find">Знайти</button>
+                            </div>
+                            <div id="yt-search-results" class="max-h-72 overflow-y-auto custom-scroll space-y-2 hidden bg-white rounded-lg p-2 border border-slate-200 shadow-inner mt-2"></div>
                         </div>
-                        <div id="yt-search-results" class="max-h-96 overflow-y-auto custom-scroll space-y-2 hidden bg-white rounded-lg p-2 border border-slate-200 shadow-inner"></div>
-                    </div>
 
-                    <div class="flex items-center gap-4 my-5 opacity-70"><div class="flex-1 h-px bg-slate-300"></div><span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center" data-i18n="lib.orPaste">Або вставити посилання вручну</span><div class="flex-1 h-px bg-slate-300"></div></div>
+                        <div class="flex items-center gap-3 opacity-70"><div class="flex-1 h-px bg-slate-200"></div><span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center shrink-0" data-i18n="lib.orPaste">Або вставити посилання вручну</span><div class="flex-1 h-px bg-slate-200"></div></div>
 
-                    <div class="flex flex-col sm:flex-row gap-2 mb-3 w-full">
-                        <input type="url" id="material-yt-url" placeholder="Пряме посилання на YouTube" class="flex-1 min-w-0 p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm w-full" data-i18n-placeholder="lib.ytUrl">
-                        <button onclick="loadYTIframeForPreview()" class="bg-slate-100 text-slate-700 border border-slate-200 px-4 py-3 rounded-xl font-bold hover:bg-slate-200 text-sm whitespace-nowrap shadow-sm w-full sm:w-auto shrink-0" data-i18n="lib.addVideo">Додати відео</button>
+                        <div>
+                            <div class="flex flex-col sm:flex-row gap-2 w-full">
+                                <input type="url" id="material-yt-url" placeholder="Пряме посилання на YouTube" class="flex-1 min-w-0 p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm w-full bg-white" data-i18n-placeholder="lib.ytUrl">
+                                <button onclick="loadYTIframeForPreview()" class="bg-white text-slate-700 border border-slate-200 px-4 py-3 rounded-xl font-bold hover:bg-slate-100 text-sm whitespace-nowrap shadow-sm w-full sm:w-auto shrink-0" data-i18n="lib.addVideo">Додати відео</button>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="yt-preview-container" class="w-full aspect-video bg-black rounded-xl mb-3 hidden overflow-hidden shadow-inner flex items-center justify-center text-slate-500 text-sm"></div>
+                    <div id="yt-preview-container" class="w-full aspect-video bg-black rounded-xl hidden overflow-hidden shadow-inner flex items-center justify-center text-slate-500 text-sm"></div>
                     
-                    <div id="srt-drop-zone" class="border-2 border-dashed border-slate-300 rounded-xl p-6 sm:p-8 text-center transition-colors hover:border-indigo-500 bg-slate-50 mt-4 cursor-pointer relative" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="document.getElementById('yt-sub-file').click()">
+                    <div id="srt-drop-zone" class="border-2 border-dashed border-slate-300 rounded-xl p-5 sm:p-6 text-center transition-colors hover:border-indigo-400 bg-slate-50 cursor-pointer relative" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="document.getElementById('yt-sub-file').click()">
                         <div class="text-4xl mb-2">📄</div>
                         <h4 class="font-bold text-slate-700 text-base" data-i18n="lib.srtTitle">Перетягніть файл субтитрів (.srt)</h4>
                         <p class="text-xs text-slate-500 mt-1" data-i18n="lib.srtOrClick">або натисніть, щоб вибрати файл</p>
                         <input type="file" id="yt-sub-file" accept=".srt,.txt" class="hidden" onchange="handleSubFileUpload(event)">
                         
-                        <div class="mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-3 justify-center items-center">
+                        <div class="mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center">
                             <button type="button" onclick="event.stopPropagation(); toggleManualSubInput()" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition">📝 <span data-i18n="lib.pasteSub">Вставити текст вручну</span></button>
                             <span class="hidden sm:inline text-slate-300">|</span>
-                            <button type="button" onclick="event.stopPropagation(); openDownsub()" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition flex items-center gap-1 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-100 shadow-sm">
+                            <button type="button" onclick="event.stopPropagation(); openDownsub()" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 shadow-sm">
                                 <span>⬇️</span> <span data-i18n="lib.downsub">Завантажити з DownSub</span>
                             </button>
                         </div>
                     </div>
-                    <textarea id="yt-sub-raw" rows="6" placeholder="1\n00:00:05,000 --> 00:00:08,000\nHello, world!" class="w-full p-3 mt-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-xs font-mono custom-scroll hidden"></textarea>
+                    <textarea id="yt-sub-raw" rows="6" placeholder="1\n00:00:05,000 --> 00:00:08,000\nHello, world!" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-xs font-mono custom-scroll hidden"></textarea>
                 </div>
 
                 <div class="flex gap-3 mt-4 pt-4 border-t border-slate-100">
@@ -1456,19 +1625,20 @@
                 <div id="bs-workspace-layout" class="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start justify-center w-full">
                     <div id="bs-main-card" class="bg-white p-4 sm:p-5 rounded-2xl shadow-xl border border-slate-100 text-center relative overflow-hidden flex flex-col min-h-[260px] w-full">
                         <div id="bs-interactive-area" class="flex-1 flex flex-col justify-center relative z-10 w-full"></div>
-                        <div id="bs-feedback" class="mt-2 min-h-[28px] flex items-center justify-center font-bold text-lg relative z-10"></div>
+                        <div id="bs-feedback" class="min-h-0 flex items-center justify-center font-bold text-lg relative z-10"></div>
                         
                         <div class="mt-3 flex gap-3 relative z-10 w-full">
                             <button id="bs-btn-dont-know" onclick="markWordAsFailed()" class="flex-shrink-0 bg-slate-100 text-slate-500 hover:bg-slate-200 py-3 px-4 rounded-xl font-bold text-sm transition border border-slate-200 shadow-sm hidden" data-i18n-html="train.dontKnow">Не знаю<br>слово</button>
                             <button id="bs-btn-next" onclick="nextBrainstormStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-lg hidden active:scale-95 shadow-md transition" data-i18n="train.next">Далі <span class="font-normal">↵</span></button>
                         </div>
 
-                        <div id="bs-success-reveal" class="hidden mt-4 bg-indigo-50/50 p-3 rounded-xl flex flex-col sm:flex-row items-center gap-3 text-left border border-indigo-100 fade-in z-10">
-                            <img id="bs-success-img" class="w-16 h-16 rounded-lg object-cover shadow-sm bg-slate-200 flex-shrink-0 mx-auto sm:mx-0">
-                            <div class="text-center sm:text-left w-full">
-                                <h4 class="font-bold text-indigo-800 text-lg mb-0 leading-tight" id="bs-success-word"></h4>
+                        <div id="bs-success-reveal" class="hidden mt-4 p-3 rounded-2xl flex flex-col sm:flex-row items-center gap-3 text-left border fade-in z-10 shadow-sm">
+                            <img id="bs-success-img" class="w-16 h-16 rounded-xl object-cover shadow-sm bg-slate-200 flex-shrink-0 mx-auto sm:mx-0 ring-2 ring-white">
+                            <div class="text-center sm:text-left w-full min-w-0">
+                                <p id="bs-reveal-badge" class="hidden text-xs font-bold uppercase tracking-wider mb-1"></p>
+                                <h4 class="font-bold text-lg mb-0 leading-tight" id="bs-success-word"></h4>
                                 <p class="text-sm font-bold text-indigo-600 mb-1" id="bs-success-trans"></p>
-                                <p class="text-sm text-slate-600 font-medium" id="bs-success-context"></p>
+                                <p class="text-sm text-slate-600 font-medium leading-snug" id="bs-success-context"></p>
                             </div>
                         </div>
                     </div>
@@ -1502,17 +1672,28 @@
 
     <!-- Inline Popup -->
     <div id="inline-popup" class="hidden fixed z-[200] bg-white rounded-xl shadow-2xl border border-slate-200 p-4 w-80 max-w-[calc(100vw-1.5rem)] transition-opacity">
-        <div class="flex justify-between items-start gap-2 mb-2">
+        <div class="flex justify-between items-center gap-2 mb-2">
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
                 <button type="button" id="inline-popup-back" onclick="inlinePopupGoBack()" class="hidden flex-shrink-0 w-8 h-8 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 font-bold text-sm transition" title="Back" data-i18n-title="inline.back">←</button>
                 <strong id="inline-popup-word" class="text-lg text-indigo-700 font-bold break-words min-w-0"></strong>
                 <button type="button" id="inline-popup-tts" onclick="playInlineWordAudio()" class="flex-shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 transition" title="Listen" data-i18n-title="inline.listen" aria-label="Listen">🔊</button>
             </div>
-            <button onclick="closeInlinePopup()" class="text-slate-400 hover:text-slate-600 font-bold text-xl flex-shrink-0 leading-none">&times;</button>
+            <div class="flex items-center gap-1 flex-shrink-0">
+                <button type="button" id="inline-context-trans-btn" onclick="fetchInlineContextTranslation()" class="hidden w-8 h-8 inline-flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 transition text-base leading-none disabled:opacity-40 disabled:pointer-events-none" title="Exact translation in sentence" data-i18n-title="inline.contextTrans" aria-label="Context translation">🎯</button>
+                <button onclick="closeInlinePopup()" class="w-8 h-8 inline-flex items-center justify-center text-slate-400 hover:text-slate-600 font-bold text-xl leading-none rounded-lg hover:bg-slate-50 transition">&times;</button>
+            </div>
         </div>
         <div id="inline-popup-loader" class="hidden text-indigo-500 font-bold text-xs flex items-center gap-2 mb-2"><div class="loader w-3 h-3"></div> <span data-i18n="inline.searching">Шукаємо...</span></div>
         
         <input type="text" id="inline-popup-trans-input" class="w-full mb-2 p-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-600 text-base font-bold text-slate-800 bg-slate-50" placeholder="Натисніть ↵" data-i18n-placeholder="inline.enter">
+
+        <div id="inline-context-panel" class="hidden mb-2 p-2.5 rounded-xl bg-gradient-to-br from-indigo-50/90 to-slate-50 border border-indigo-100 text-left">
+            <p id="inline-context-phrase-hint" class="hidden text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-100 rounded-md px-2 py-1 mb-2 leading-snug" data-i18n="inline.phraseHint">Збережіть всю фразу, а не одне слово</p>
+            <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-1" data-i18n="inline.contextSource">Речення</p>
+            <p id="inline-context-source" class="text-xs text-slate-600 italic leading-snug mb-2"></p>
+            <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-1" data-i18n="inline.contextFullTrans">Повний переклад</p>
+            <p id="inline-context-full" class="text-xs text-slate-700 leading-snug font-medium"></p>
+        </div>
         
         <div id="inline-trans-dropdown" class="mb-3 max-h-32 overflow-y-auto custom-scroll border border-slate-100 rounded-lg hidden bg-white">
             <ul id="inline-trans-options-list" class="flex flex-col"></ul>
@@ -1714,7 +1895,7 @@
                 'bulk.saving': 'Зберігаємо...',
                 'lib.add': 'Додати новий матеріал', 'common.back': 'Назад', 'common.next': 'Вперед',
                 'page': 'Сторінка {n} з {total}',
-                'lib.tabText': 'Текст', 'lib.tabUrl': 'Стаття (URL)',
+                'lib.tabText': 'Текст', 'lib.tabUrl': 'Стаття (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Назва матеріалу', 'lib.textPh': 'Оригінальний текст (або скрипт відео)...',
                 'lib.searchArticles': 'Пошук статей', 'lib.find': 'Знайти',
                 'lib.orExtract': 'Або витягнути текст із посилання', 'lib.extract': 'Витягнути текст',
@@ -1752,6 +1933,12 @@
                 'inline.dictRunOns': 'Вирази',
                 'inline.dictStems': 'Форми пошуку',
                 'inline.dictShort': 'Коротко',
+                'inline.contextTrans': 'Точний переклад у реченні',
+                'inline.contextSource': 'Речення',
+                'inline.contextFullTrans': 'Повний переклад',
+                'inline.contextLoading': 'Контекст…',
+                'inline.contextFail': 'Не вдалося отримати контекстний переклад',
+                'inline.phraseHint': 'Збережіть всю фразу, а не одне слово',
                 'move.title': 'Перенести слова', 'move.pick': 'Оберіть папку призначення', 'move.newFolder': 'Нова папка',
                 'folder.title': 'Нова папка', 'folder.hint': 'Введіть назву для групування слів',
                 'folder.ph': 'Назва папки...', 'folder.create': 'Створити',
@@ -1810,14 +1997,14 @@
                 'lib.ytNone': 'Нічого не знайдено за цим запитом.',
                 'msg.noWordsQuery': 'Немає слів за цим запитом.',
                 'msg.ytNeedSubs': 'Відео вибрано! Тепер ви можете додати субтитри (перетягніть .srt або вставте текст).',
-                'train.correct': 'Правильно: {word}', 'train.excellent': 'Відмінно! 🎉', 'train.perfect': 'Ідеально!',
+                'train.correct': 'Правильно: {word}', 'train.answerReveal': 'Відповідь', 'train.excellent': 'Відмінно! 🎉', 'train.perfect': 'Ідеально!',
                 'train.typeIn': '{lang} ↵', 'train.noContext': 'Контекст не знайдено для {word}',
                 'train.sprintDone': 'Спринт завершено!', 'train.contextDone': 'Контекст завершено!', 'train.yourScore': 'Ваш рахунок: {n} балів!',
                 'train.contextRead': 'Читайте…', 'train.contextHint': 'Підказка', 'train.score': 'Рахунок',
                 'train.contextHintLetters': 'Літери',
                 'train.contextHintTrans': 'Переклад',
                 'train.contextHintMaterial': 'Матеріал',
-                'train.contextHintCosts': 'Підказки: літери −3 · переклад −5',
+                'train.contextHintCosts': 'Підказки: матеріал −2 · літери −5 · переклад −10',
                 'train.points': '{n} балів', 'train.streak': 'Серія: {n}',
                 'train.wrong': 'Неправильно', 'train.right': 'Правильно',
                 'train.interrupt': 'Перервати (Esc)', 'train.sound': 'Звук', 'train.stopSession': 'Перервати тренування',
@@ -1934,7 +2121,7 @@
                 'bulk.saving': 'Saving...',
                 'lib.add': 'Add new material', 'common.back': 'Back', 'common.next': 'Next',
                 'page': 'Page {n} of {total}',
-                'lib.tabText': 'Text', 'lib.tabUrl': 'Article (URL)',
+                'lib.tabText': 'Text', 'lib.tabUrl': 'Article (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Material title', 'lib.textPh': 'Original text (or video script)...',
                 'lib.searchArticles': 'Search articles', 'lib.find': 'Find',
                 'lib.orExtract': 'Or extract text from a link', 'lib.extract': 'Extract text',
@@ -1972,6 +2159,12 @@
                 'inline.dictRunOns': 'Expressions',
                 'inline.dictStems': 'Search forms',
                 'inline.dictShort': 'Short definition',
+                'inline.contextTrans': 'Exact translation in sentence',
+                'inline.contextSource': 'Sentence',
+                'inline.contextFullTrans': 'Full translation',
+                'inline.contextLoading': 'Context…',
+                'inline.contextFail': 'Could not get contextual translation',
+                'inline.phraseHint': 'Save the whole phrase, not just one word',
                 'move.title': 'Move words', 'move.pick': 'Choose a destination folder', 'move.newFolder': 'New folder',
                 'folder.title': 'New folder', 'folder.hint': 'Enter a name to group words',
                 'folder.ph': 'Folder name...', 'folder.create': 'Create',
@@ -2025,14 +2218,14 @@
                 'lib.ytNone': 'Nothing found for this query.',
                 'msg.noWordsQuery': 'No words match this search.',
                 'msg.ytNeedSubs': 'Video selected! Now add subtitles (drop a .srt file or paste text).',
-                'train.correct': 'Correct: {word}', 'train.excellent': 'Excellent! 🎉', 'train.perfect': 'Perfect!',
+                'train.correct': 'Correct: {word}', 'train.answerReveal': 'Answer', 'train.excellent': 'Excellent! 🎉', 'train.perfect': 'Perfect!',
                 'train.typeIn': '{lang} ↵', 'train.noContext': 'No context found for {word}',
                 'train.sprintDone': 'Sprint finished!', 'train.contextDone': 'Context finished!', 'train.yourScore': 'Your score: {n} points!',
                 'train.contextRead': 'Reading…', 'train.contextHint': 'Hint', 'train.score': 'Score',
                 'train.contextHintLetters': 'Letters',
                 'train.contextHintTrans': 'Translation',
                 'train.contextHintMaterial': 'Material',
-                'train.contextHintCosts': 'Hints: letters −3 · translation −5',
+                'train.contextHintCosts': 'Hints: material −2 · letters −5 · translation −10',
                 'train.points': '{n} points', 'train.streak': 'Streak: {n}',
                 'train.wrong': 'Wrong', 'train.right': 'Correct',
                 'train.interrupt': 'Stop (Esc)', 'train.sound': 'Sound', 'train.stopSession': 'Stop training',
@@ -2149,7 +2342,7 @@
                 'bulk.saving': 'Guardando...',
                 'lib.add': 'Añadir material nuevo', 'common.back': 'Atrás', 'common.next': 'Siguiente',
                 'page': 'Página {n} de {total}',
-                'lib.tabText': 'Texto', 'lib.tabUrl': 'Artículo (URL)',
+                'lib.tabText': 'Texto', 'lib.tabUrl': 'Artículo (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Título del material', 'lib.textPh': 'Texto original (o guion del vídeo)...',
                 'lib.searchArticles': 'Buscar artículos', 'lib.find': 'Buscar',
                 'lib.orExtract': 'O extraer el texto de un enlace', 'lib.extract': 'Extraer texto',
@@ -2187,6 +2380,12 @@
                 'inline.dictRunOns': 'Expresiones',
                 'inline.dictStems': 'Formas de búsqueda',
                 'inline.dictShort': 'Definición breve',
+                'inline.contextTrans': 'Traducción exacta en la frase',
+                'inline.contextSource': 'Frase',
+                'inline.contextFullTrans': 'Traducción completa',
+                'inline.contextLoading': 'Contexto…',
+                'inline.contextFail': 'No se pudo obtener la traducción contextual',
+                'inline.phraseHint': 'Guarde la frase completa, no solo una palabra',
                 'move.title': 'Mover palabras', 'move.pick': 'Elige la carpeta de destino', 'move.newFolder': 'Carpeta nueva',
                 'folder.title': 'Carpeta nueva', 'folder.hint': 'Escribe un nombre para agrupar palabras',
                 'folder.ph': 'Nombre de la carpeta...', 'folder.create': 'Crear',
@@ -2240,14 +2439,14 @@
                 'lib.ytNone': 'No se ha encontrado nada para esta búsqueda.',
                 'msg.noWordsQuery': 'No hay palabras para esta búsqueda.',
                 'msg.ytNeedSubs': '¡Vídeo elegido! Ahora añade subtítulos (suelta un .srt o pega texto).',
-                'train.correct': 'Correcto: {word}', 'train.excellent': '¡Excelente! 🎉', 'train.perfect': '¡Perfecto!',
+                'train.correct': 'Correcto: {word}', 'train.answerReveal': 'Respuesta', 'train.excellent': '¡Excelente! 🎉', 'train.perfect': '¡Perfecto!',
                 'train.typeIn': '{lang} ↵', 'train.noContext': 'No hay contexto para {word}',
                 'train.sprintDone': '¡Sprint terminado!', 'train.contextDone': '¡Contexto terminado!', 'train.yourScore': 'Tu puntuación: {n} puntos!',
                 'train.contextRead': 'Lee…', 'train.contextHint': 'Pista', 'train.score': 'Puntos',
                 'train.contextHintLetters': 'Letras',
                 'train.contextHintTrans': 'Traducción',
                 'train.contextHintMaterial': 'Material',
-                'train.contextHintCosts': 'Pistas: letras −3 · traducción −5',
+                'train.contextHintCosts': 'Pistas: material −2 · letras −5 · traducción −10',
                 'train.points': '{n} puntos', 'train.streak': 'Racha: {n}',
                 'train.wrong': 'Incorrecto', 'train.right': 'Correcto',
                 'train.interrupt': 'Parar (Esc)', 'train.sound': 'Sonido', 'train.stopSession': 'Interrumpir el entrenamiento',
@@ -2755,17 +2954,21 @@
         let sprintHighScores = [];
         let contextHighScores = [];
         let contextScore = 0;
+        let contextPerfectStreak = 0;
+        let contextPerfectCount = 0;
         let contextRoundTimer = null;
-        let contextPointsLeft = 10;
+        let contextPointsLeft = 12;
         let contextElapsed = 0;
         let contextAnswered = false;
-        let contextReadingSecs = 10;
         let contextHintPenalty = 0;
         let contextLettersHintUsed = false;
         let contextTransHintUsed = false;
         let contextMaterialHintUsed = false;
         let contextRoundWord = null;
         let contextRoundMaterialTitle = '';
+        let contextHudMergeDone = false;
+        let contextHudMergeAnimating = false;
+        let contextLastRoundPtsShown = -1;
 
         let trainingSessionActive = false;
         let trainingFocusCollapsed = false;
@@ -3345,8 +3548,11 @@
             status.className = `text-white text-center py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-500 shadow-md z-[100] relative ${
                 type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
             }`;
-            if(type === 'success') { setTimeout(() => { status.style.transform = "translateY(-100%)"; }, 2500); } 
-            else { status.style.transform = "translateY(0)"; }
+            status.classList.remove('is-dismissed');
+            status.style.transform = '';
+            if (type === 'success') {
+                setTimeout(() => { status.classList.add('is-dismissed'); }, 2500);
+            }
         }
 
         try {
@@ -3466,21 +3672,30 @@
             return UNSPLASH_FALLBACK;
         }
 
+        async function fetchTranslationText(text, opts = {}) {
+            if (!text) return null;
+            if (learningLanguage === translationLanguage) return opts.lowercase ? text.toLowerCase() : text;
+            try {
+                const res = await fetch("https://translator-proxy.v09052014.workers.dev/", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text, from: learningLanguage, to: translationLanguage })
+                });
+                if (!res.ok) return null;
+                const data = await res.json();
+                const raw = data.data?.translations?.[0]?.translatedText;
+                if (!raw) return null;
+                return opts.lowercase ? raw.toLowerCase() : raw;
+            } catch (e) { return null; }
+        }
+
         async function fetchTranslationOptions(query) {
             if (!query) return null;
             if (learningLanguage === translationLanguage) {
                 return [{ text: query.toLowerCase(), score: 1 }];
             }
-            try {
-                const res = await fetch("https://translator-proxy.v09052014.workers.dev/", {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: query, from: learningLanguage, to: translationLanguage })
-                });
-                if (!res.ok) return null;
-                const data = await res.json();
-                if (!data.data?.translations?.length) return null;
-                return [{ text: data.data.translations[0].translatedText.toLowerCase(), score: 1 }];
-            } catch (e) { return null; }
+            const text = await fetchTranslationText(query, { lowercase: true });
+            if (!text) return null;
+            return [{ text, score: 1 }];
         }
 
         const inputWord = document.getElementById('manual-word'), inputTrans = document.getElementById('manual-trans'), dropdown = document.getElementById('trans-dropdown'), optionsList = document.getElementById('trans-options-list');
@@ -3854,7 +4069,12 @@
             if (inputWrap) inputWrap.classList.toggle('hidden', isPhoto);
             if (processBtn) processBtn.classList.toggle('hidden', isPhoto);
             document.getElementById('bulk-add-dialog')?.classList.toggle('bulk-photo-mode', isPhoto);
-            if (isPhoto) setBulkExpanded(true);
+            if (isPhoto) {
+                setBulkExpanded(true);
+            } else if (prevMode === 'photo') {
+                setBulkExpanded(false);
+                document.getElementById('bulk-add-dialog')?.classList.remove('bulk-photo-results');
+            }
 
             if (area && !isPhoto) {
                 if (isDuo) {
@@ -5772,16 +5992,20 @@
         };
 
         window.setAddMode = (mode) => {
+            if (addMaterialMode === mode) {
+                if (mode === 'text') return;
+                mode = 'text';
+            }
             addMaterialMode = mode;
             ['text', 'url', 'yt'].forEach(m => {
                 document.getElementById(`mode-${m}-area`).classList.toggle('hidden', m !== mode);
                 const isActive = m === mode;
                 const btn = document.getElementById(`tab-add-${m}`);
-                if (isActive) {
-                    btn.className = 'px-3 sm:px-4 py-2 bg-indigo-50 text-indigo-700 font-bold rounded-lg text-sm transition flex items-center gap-1';
-                } else {
-                    btn.className = 'px-3 sm:px-4 py-2 text-slate-500 font-bold rounded-lg hover:bg-slate-50 text-sm transition flex items-center gap-1';
-                }
+                if (!btn) return;
+                btn.classList.toggle('bg-indigo-50', isActive);
+                btn.classList.toggle('text-indigo-700', isActive);
+                btn.classList.toggle('text-slate-500', !isActive);
+                btn.classList.toggle('hover:bg-slate-50', !isActive);
             });
         };
 
@@ -6397,7 +6621,7 @@
         }
         window.seekVideo = (seconds) => { if(ytPlayer && ytPlayer.seekTo) { ytPlayer.seekTo(seconds, true); if(ytPlayer.getPlayerState() !== YT.PlayerState.PLAYING) ytPlayer.playVideo(); } };
 
-        function wrapWords(text, savedWordsMap) {
+        function wrapWords(text, savedWordsMap, wordOccMap = null) {
             // Include Unicode letters + combining marks so Spanish/Ukrainian diacritics stay in the word
             const regex = /([\p{L}\p{M}'’\-]+)|([^\p{L}\p{M}'’\-]+)/gu;
             let match, html = '';
@@ -6407,7 +6631,13 @@
                     const cleanWord = raw.toLowerCase();
                     const css = savedWordsMap.has(cleanWord) ? 'word-clickable word-saved' : 'word-clickable';
                     const esc = raw.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-                    html += `<span class="${css}" data-word="${esc}">${esc}</span>`;
+                    let occAttr = '';
+                    if (wordOccMap) {
+                        const occ = wordOccMap.get(cleanWord) || 0;
+                        wordOccMap.set(cleanWord, occ + 1);
+                        occAttr = ` data-occ="${occ}"`;
+                    }
+                    html += `<span class="${css}" data-word="${esc}"${occAttr}>${esc}</span>`;
                 } else if (match[2]) {
                     html += match[2].replace(/&/g, '&amp;').replace(/</g, '&lt;');
                 }
@@ -6415,7 +6645,7 @@
             return html;
         }
 
-        function wrapHtmlWords(html, savedWordsMap) {
+        function wrapHtmlWords(html, savedWordsMap, wordOccMap = null) {
             const root = document.createElement('div');
             root.innerHTML = sanitizeMaterialHtml(html || '');
             const textNodes = [];
@@ -6430,7 +6660,7 @@
             })(root);
             textNodes.forEach(textNode => {
                 const holder = document.createElement('span');
-                holder.innerHTML = wrapWords(textNode.textContent, savedWordsMap);
+                holder.innerHTML = wrapWords(textNode.textContent, savedWordsMap, wordOccMap);
                 const parent = textNode.parentNode;
                 while (holder.firstChild) parent.insertBefore(holder.firstChild, textNode);
                 parent.removeChild(textNode);
@@ -6482,6 +6712,7 @@
             if(!currentMaterial) return; 
             const container = document.getElementById('reader-content'); 
             const savedWordsMap = new Set(vocabulary.map(v => v.word.toLowerCase()));
+            const wordOccMap = new Map();
             
             const currentPageData = readerPages[readerCurrentPage - 1];
 
@@ -6492,7 +6723,7 @@
                 let linesInPara = 0;
                 
                 subs.forEach((sub, i) => {
-                    paragraphTemp += `<span class="yt-sub-line" data-start="${sub.start}" data-end="${sub.end}" onclick="seekVideo(${sub.start})">${wrapWords(sub.text, savedWordsMap)}</span> `;
+                    paragraphTemp += `<span class="yt-sub-line" data-start="${sub.start}" data-end="${sub.end}" onclick="seekVideo(${sub.start})">${wrapWords(sub.text, savedWordsMap, wordOccMap)}</span> `;
                     linesInPara++;
                     
                     const isLast = i === subs.length - 1;
@@ -6523,7 +6754,7 @@
                 container.innerHTML = finalHtml;
             } else {
                 const pageHtml = currentPageData || '';
-                container.innerHTML = wrapHtmlWords(pageHtml, savedWordsMap);
+                container.innerHTML = wrapHtmlWords(pageHtml, savedWordsMap, wordOccMap);
             }
 
             if (readerCurrentPage === readerTotalPages) {
@@ -6588,9 +6819,10 @@
             if (e.target.classList.contains('word-clickable') && window.getSelection().toString().trim().length === 0) {
                 e.stopPropagation();
                 const word = e.target.getAttribute('data-word');
+                const occurrenceIndex = parseInt(e.target.getAttribute('data-occ') || '0', 10) || 0;
                 const rect = e.target.getBoundingClientRect();
                 positionInlinePopup(rect);
-                processInlineTranslationRequest(word, currentMaterial.content);
+                processInlineTranslationRequest(word, currentMaterial.content, { occurrenceIndex });
             }
         });
 
@@ -6622,7 +6854,8 @@
                     
                     lastSelectedText = text;
                     positionInlinePopup(rect);
-                    processInlineTranslationRequest(text, currentMaterial ? currentMaterial.content : '');
+                    const textOffset = getPlainTextOffsetInReader(range);
+                    processInlineTranslationRequest(text, currentMaterial ? currentMaterial.content : '', { textOffset });
                 } else {
                     if (text.length === 0) {
                         lastSelectedText = "";
@@ -6651,6 +6884,9 @@
             lastInlineAnchorRect = null;
             inlineLookupStack = [];
             updateInlineBackBtn();
+            resetInlineContextPanel();
+            updateContextTransBtnState(false);
+            document.getElementById('inline-context-trans-btn')?.classList.add('hidden');
             if (inlineTtsAudio) {
                 try { inlineTtsAudio.pause(); } catch (_) {}
                 inlineTtsAudio = null;
@@ -7099,6 +7335,616 @@
         };
 
         let pendingInlineSaveData = null;
+
+        function getReaderContextText() {
+            if (!currentMaterial) return '';
+            const pageIdx = Math.max(0, (readerCurrentPage || 1) - 1);
+            if (currentMaterial.subtitles) {
+                const pageSubs = readerPages[pageIdx];
+                if (Array.isArray(pageSubs)) return pageSubs.map(s => s.text).join(' ');
+                try {
+                    return JSON.parse(currentMaterial.subtitles).map(s => s.text).join(' ');
+                } catch (_) { return ''; }
+            }
+            const pageHtml = readerPages[pageIdx] || currentMaterial.content || '';
+            const tmp = document.createElement('div');
+            tmp.innerHTML = pageHtml;
+            return (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function findWordOccurrenceInText(pureText, query, occurrenceIndex = 0) {
+            if (!pureText || !query) return null;
+            const escapedQ = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const wholeRe = new RegExp(`(?<![\\p{L}\\p{M}0-9])${escapedQ}(?![\\p{L}\\p{M}0-9])`, 'giu');
+            let match = null;
+            let count = 0;
+            while ((match = wholeRe.exec(pureText)) !== null) {
+                if (count === occurrenceIndex) break;
+                count++;
+            }
+            if (!match) return null;
+            return { index: match.index, length: match[0].length, matchedText: match[0] };
+        }
+
+        function findWordOccurrenceNearOffset(pureText, query, targetOffset = 0) {
+            if (!pureText || !query) return null;
+            const escapedQ = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const wholeRe = new RegExp(`(?<![\\p{L}\\p{M}0-9])${escapedQ}(?![\\p{L}\\p{M}0-9])`, 'giu');
+            let match = null;
+            let best = null;
+            let bestDist = Infinity;
+            while ((match = wholeRe.exec(pureText)) !== null) {
+                const dist = Math.abs(match.index - targetOffset);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = { index: match.index, length: match[0].length, matchedText: match[0] };
+                }
+            }
+            return best;
+        }
+
+        function resolveWordOccurrenceInClip(clipSource, queryStr, opts = {}) {
+            if (!clipSource || !queryStr) return null;
+            if (Number.isFinite(opts.textOffset)) {
+                return findWordOccurrenceNearOffset(clipSource, queryStr, opts.textOffset);
+            }
+            return findWordOccurrenceInText(clipSource, queryStr, opts.occurrenceIndex ?? 0);
+        }
+
+        function getPlainTextOffsetInReader(range) {
+            const container = document.getElementById('reader-content');
+            if (!container || !range) return 0;
+            try {
+                const preRange = document.createRange();
+                preRange.selectNodeContents(container);
+                preRange.setEnd(range.startContainer, range.startOffset);
+                const before = (preRange.toString() || '').replace(/\s+/g, ' ');
+                const full = (container.textContent || '').replace(/\s+/g, ' ').trim();
+                const beforeTrimmed = before.replace(/\s+/g, ' ').trimStart();
+                return Math.min(Math.max(0, beforeTrimmed.length), full.length);
+            } catch (_) {
+                return 0;
+            }
+        }
+
+        function extractSentenceFromOccurrence(pureText, occ) {
+            if (!pureText || !occ) return '';
+            const idx = occ.index;
+            const boundaries = /[.!?…]/;
+            let start = 0;
+            for (let i = idx - 1; i >= 0; i--) {
+                if (boundaries.test(pureText[i])) { start = i + 1; break; }
+            }
+            let end = pureText.length;
+            for (let i = idx; i < pureText.length; i++) {
+                if (boundaries.test(pureText[i])) { end = i + 1; break; }
+            }
+            return pureText.substring(start, end).trim();
+        }
+
+        function extractSentenceFromText(pureText, query, occurrenceIndex = 0) {
+            const occ = findWordOccurrenceInText(pureText, query, occurrenceIndex);
+            if (!occ) return '';
+            return extractSentenceFromOccurrence(pureText, occ);
+        }
+
+        function buildWordCenteredContextClip(pureText, idx, wordEnd, sStart, sEnd, maxLen) {
+            const half = Math.floor(maxLen / 2);
+            let clipStart = Math.max(sStart, idx - half);
+            let clipEnd = Math.min(sEnd, wordEnd + (maxLen - (idx - clipStart)));
+            if (clipEnd - clipStart < maxLen) {
+                clipStart = Math.max(sStart, clipEnd - maxLen);
+            }
+            while (clipStart > sStart && /\p{L}/u.test(pureText[clipStart - 1])) clipStart--;
+            while (clipEnd < sEnd && /\p{L}/u.test(pureText[clipEnd])) clipEnd++;
+            return { clipStart, clipEnd };
+        }
+
+        function sliceContextClipWithWordMatch(pureText, clipStart, clipEnd, wordMatch) {
+            const rawClip = pureText.slice(clipStart, clipEnd);
+            const leadingTrim = rawClip.match(/^\s*/)?.[0]?.length || 0;
+            const clip = rawClip.trim();
+            const adjustedIdx = wordMatch.index - clipStart - leadingTrim;
+            if (adjustedIdx >= 0 && adjustedIdx + wordMatch.length <= clip.length) {
+                return {
+                    clip,
+                    wordMatch: {
+                        index: adjustedIdx,
+                        length: wordMatch.length,
+                        matchedText: clip.slice(adjustedIdx, adjustedIdx + wordMatch.length)
+                    }
+                };
+            }
+            const fallback = findWordInSentence(clip, wordMatch.matchedText);
+            return { clip, wordMatch: fallback };
+        }
+
+        function extractMinimalContextClip(pureText, wordMatch) {
+            if (!pureText || !wordMatch) return { clip: '', wordMatch: null };
+            const idx = wordMatch.index;
+            const wordEnd = idx + wordMatch.length;
+            const sentenceBoundaries = /[.!?…]/;
+            const commaBreak = /,/;
+            const otherClauseBreak = /[;:—–]/;
+
+            let sStart = 0;
+            for (let i = idx - 1; i >= 0; i--) {
+                if (sentenceBoundaries.test(pureText[i])) { sStart = i + 1; break; }
+            }
+            let sEnd = pureText.length;
+            for (let i = idx; i < pureText.length; i++) {
+                if (sentenceBoundaries.test(pureText[i])) { sEnd = i + 1; break; }
+            }
+
+            const findBreakBefore = (pattern) => {
+                for (let i = idx - 1; i >= sStart; i--) {
+                    if (pattern.test(pureText[i])) return i + 1;
+                }
+                return sStart;
+            };
+            const findBreakAfter = (pattern) => {
+                for (let i = wordEnd; i < sEnd; i++) {
+                    if (pattern.test(pureText[i])) return i + 1;
+                }
+                return sEnd;
+            };
+
+            let clipStart = findBreakBefore(commaBreak);
+            let clipEnd = findBreakAfter(commaBreak);
+            if (clipStart === sStart && clipEnd === sEnd) {
+                clipStart = findBreakBefore(otherClauseBreak);
+                clipEnd = findBreakAfter(otherClauseBreak);
+            }
+
+            let sliced = sliceContextClipWithWordMatch(pureText, clipStart, clipEnd, wordMatch);
+            const fullInSentence = pureText.slice(sStart, sEnd).trim();
+            const maxClipLen = 180;
+            const preferShortClip = 120;
+
+            if ((sliced.clip === fullInSentence || sliced.clip.length > maxClipLen) && fullInSentence.length > preferShortClip) {
+                const centered = buildWordCenteredContextClip(pureText, idx, wordEnd, sStart, sEnd, maxClipLen);
+                sliced = sliceContextClipWithWordMatch(pureText, centered.clipStart, centered.clipEnd, wordMatch);
+            }
+
+            return sliced;
+        }
+
+        function findWordInSentence(sentence, query) {
+            if (!sentence || !query) return null;
+            const escapedQ = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const wholeRe = new RegExp(`(?<![\\p{L}\\p{M}0-9])${escapedQ}(?![\\p{L}\\p{M}0-9])`, 'iu');
+            const m = wholeRe.exec(sentence);
+            if (!m) return null;
+            return { index: m.index, length: m[0].length, matchedText: m[0] };
+        }
+
+        const CONTEXT_PHRASAL_PARTICLES = new Set([
+            'about', 'around', 'at', 'away', 'back', 'down', 'for', 'in', 'into', 'off', 'on', 'onto',
+            'out', 'over', 'through', 'to', 'up', 'upon', 'with', 'along', 'apart', 'aside', 'by', 'from', 'of', 'as'
+        ]);
+        const CONTEXT_FIXED_PHRASES = [
+            ['in', 'order', 'to'],
+            ['as', 'well', 'as'],
+            ['due', 'to'],
+            ['owing', 'to'],
+            ['according', 'to'],
+            ['thanks', 'to'],
+            ['prior', 'to'],
+            ['next', 'to'],
+            ['close', 'to'],
+            ['because', 'of'],
+            ['instead', 'of'],
+            ['out', 'of'],
+            ['such', 'as'],
+            ['rather', 'than'],
+            ['up', 'to'],
+            ['in', 'spite', 'of'],
+        ];
+
+        function tokenizeWithSpans(text) {
+            const re = /[\p{L}\p{M}][\p{L}\p{M}'-]*|[\p{N}]+/gu;
+            const tokens = [];
+            let m;
+            while ((m = re.exec(String(text || ''))) !== null) {
+                tokens.push({
+                    text: m[0],
+                    start: m.index,
+                    end: m.index + m[0].length,
+                    lower: m[0].toLowerCase()
+                });
+            }
+            return tokens;
+        }
+
+        function expandContextPhraseInClip(clip, wordMatch) {
+            if (!clip || !wordMatch) {
+                return { phrase: wordMatch?.matchedText || '', wordMatch, expanded: false };
+            }
+
+            const tokens = tokenizeWithSpans(clip);
+            if (!tokens.length) {
+                return { phrase: wordMatch.matchedText, wordMatch, expanded: false };
+            }
+
+            let tokenIdx = -1;
+            for (let i = 0; i < tokens.length; i++) {
+                const tok = tokens[i];
+                if (wordMatch.index >= tok.start && wordMatch.index < tok.end) {
+                    tokenIdx = i;
+                    break;
+                }
+            }
+            if (tokenIdx < 0) {
+                return { phrase: wordMatch.matchedText, wordMatch, expanded: false };
+            }
+
+            const buildSpan = (startIdx, endIdx) => {
+                const spanStart = tokens[startIdx].start;
+                const spanEnd = tokens[endIdx].end;
+                const phrase = clip.slice(spanStart, spanEnd);
+                return {
+                    phrase,
+                    wordMatch: { index: spanStart, length: spanEnd - spanStart, matchedText: phrase },
+                    expanded: phrase.toLowerCase() !== wordMatch.matchedText.toLowerCase()
+                };
+            };
+
+            for (const parts of CONTEXT_FIXED_PHRASES) {
+                for (let start = Math.max(0, tokenIdx - parts.length + 1); start <= tokenIdx; start++) {
+                    const end = start + parts.length - 1;
+                    if (end >= tokens.length || tokenIdx > end) continue;
+                    const matches = parts.every((part, j) => tokens[start + j].lower === part);
+                    if (matches) return buildSpan(start, end);
+                }
+            }
+
+            if (tokenIdx + 1 < tokens.length && CONTEXT_PHRASAL_PARTICLES.has(tokens[tokenIdx + 1].lower)) {
+                return buildSpan(tokenIdx, tokenIdx + 1);
+            }
+
+            if (tokenIdx > 0 && CONTEXT_PHRASAL_PARTICLES.has(tokens[tokenIdx].lower)) {
+                return buildSpan(tokenIdx - 1, tokenIdx);
+            }
+
+            return { phrase: wordMatch.matchedText, wordMatch, expanded: false };
+        }
+
+        function resolveContextPhraseExpansion(data) {
+            if (!data?.contextClip) return null;
+            const anchor = data.clickedWord || data.word;
+            const baseMatch = data.wordMatch
+                || findWordInSentence(data.contextClip, anchor);
+            if (!baseMatch) return null;
+
+            let expanded = expandContextPhraseInClip(data.contextClip, baseMatch);
+            if (expanded.expanded) return expanded;
+
+            const fullCtx = data.context;
+            if (!fullCtx || fullCtx === data.contextClip) return expanded;
+
+            const sentMatch = findWordInSentence(fullCtx, anchor);
+            if (!sentMatch) return expanded;
+
+            const sentExpanded = expandContextPhraseInClip(fullCtx, sentMatch);
+            if (!sentExpanded.expanded) return expanded;
+
+            const inClip = findWordInSentence(data.contextClip, sentExpanded.phrase);
+            if (inClip) {
+                return {
+                    phrase: inClip.matchedText,
+                    wordMatch: inClip,
+                    expanded: true
+                };
+            }
+
+            const widened = extractMinimalContextClip(fullCtx, sentExpanded.wordMatch);
+            if (widened.clip && widened.wordMatch) {
+                if (data.contextClip !== widened.clip) {
+                    data.contextClip = widened.clip;
+                    data.contextReady = false;
+                }
+                return {
+                    phrase: widened.wordMatch.matchedText,
+                    wordMatch: widened.wordMatch,
+                    expanded: true
+                };
+            }
+
+            return sentExpanded;
+        }
+
+        function applyContextPhraseExpansion(data, expanded) {
+            const hint = document.getElementById('inline-context-phrase-hint');
+            const wordEl = document.getElementById('inline-popup-word');
+            if (!expanded?.expanded) {
+                data.phraseExpanded = false;
+                hint?.classList.add('hidden');
+                return;
+            }
+
+            data.word = expanded.phrase;
+            data.wordMatch = expanded.wordMatch;
+            data.phraseExpanded = true;
+            if (wordEl) {
+                wordEl.textContent = expanded.phrase;
+                wordEl.classList.add('ring-2', 'ring-amber-300', 'rounded-md', 'px-1', '-mx-1');
+                setTimeout(() => wordEl.classList.remove('ring-2', 'ring-amber-300', 'rounded-md', 'px-1', '-mx-1'), 1200);
+            }
+            if (hint) {
+                hint.textContent = t('inline.phraseHint');
+                hint.classList.remove('hidden');
+            }
+        }
+
+        function revertContextPhraseExpansion(data) {
+            const hint = document.getElementById('inline-context-phrase-hint');
+            hint?.classList.add('hidden');
+            if (!data?.clickedWord) return;
+            data.word = data.clickedWord;
+            data.phraseExpanded = false;
+            data.wordMatch = data.anchorWordMatch || data.wordMatch;
+            const wordEl = document.getElementById('inline-popup-word');
+            if (wordEl) wordEl.textContent = data.clickedWord;
+        }
+
+        function setInlineTranslationOptionsVisible(visible) {
+            const dropdown = document.getElementById('inline-trans-dropdown');
+            if (!dropdown) return;
+            dropdown.classList.toggle('hidden', !visible);
+        }
+
+        function stripContextMarkers(text) {
+            return String(text || '')
+                .replace(/⟦([^⟧]+)⟧/g, '$1')
+                .replace(/«([^»]+)»/g, '$1')
+                .replace(/\{\{([^}]+)\}\}/g, '$1')
+                .replace(/<<([^>]+)>>/g, '$1')
+                .replace(/「([^」]+)」/g, '$1');
+        }
+
+        function extractMarkedWordFromTranslation(translated) {
+            if (!translated) return null;
+            const patterns = [
+                /⟦([^⟧]+)⟧/,
+                /«([^»]+)»/,
+                /\{\{([^}]+)\}\}/,
+                /<<([^>]+)>>/,
+                /「([^」]+)」/,
+            ];
+            for (const p of patterns) {
+                const m = translated.match(p);
+                if (m?.[1]?.trim()) return m[1].trim();
+            }
+            return null;
+        }
+
+        function alignWordByOffset(sourceSentence, targetSentence, matchIndex, matchLength) {
+            if (!sourceSentence || !targetSentence) return null;
+            const srcLen = Math.max(sourceSentence.length, 1);
+            const tgtLen = targetSentence.length;
+            const relStart = matchIndex / srcLen;
+            const relEnd = (matchIndex + matchLength) / srcLen;
+            let tgtStart = Math.floor(relStart * tgtLen);
+            let tgtEnd = Math.max(tgtStart + 1, Math.ceil(relEnd * tgtLen));
+
+            while (tgtStart > 0 && /\p{L}/u.test(targetSentence[tgtStart - 1])) tgtStart--;
+            while (tgtEnd < tgtLen && /\p{L}/u.test(targetSentence[tgtEnd])) tgtEnd++;
+
+            let chunk = targetSentence.slice(tgtStart, tgtEnd).trim();
+            chunk = chunk.replace(/^[^\p{L}\p{M}''-]+|[^\p{L}\p{M}''-]+$/gu, '').trim();
+            return chunk || null;
+        }
+
+        function alignWordByTokenIndex(sourceSentence, targetSentence, wordMatch) {
+            if (!wordMatch) return null;
+            const srcTokens = tokenizeForContextAlign(sourceSentence);
+            const tgtTokens = tokenizeForContextAlign(targetSentence);
+            if (!srcTokens.length || !tgtTokens.length) return null;
+
+            let charPos = 0;
+            let tokenIdx = 0;
+            for (let i = 0; i < srcTokens.length; i++) {
+                const idx = sourceSentence.indexOf(srcTokens[i], charPos);
+                if (idx < 0) continue;
+                const end = idx + srcTokens[i].length;
+                if (wordMatch.index >= idx && wordMatch.index < end) {
+                    tokenIdx = i;
+                    break;
+                }
+                charPos = end;
+                tokenIdx = i;
+            }
+
+            const ratio = tokenIdx / Math.max(srcTokens.length - 1, 1);
+            const tgtIdx = Math.min(Math.round(ratio * (tgtTokens.length - 1)), tgtTokens.length - 1);
+            return tgtTokens[tgtIdx] || null;
+        }
+
+        async function prefetchContextTranslation(sentence, wordMatch) {
+            if (!sentence || !wordMatch) return { sentenceTrans: null, contextWordTrans: null };
+            if (learningLanguage === translationLanguage) {
+                return {
+                    sentenceTrans: sentence,
+                    contextWordTrans: wordMatch.matchedText.toLowerCase()
+                };
+            }
+
+            const before = sentence.slice(0, wordMatch.index);
+            const target = sentence.slice(wordMatch.index, wordMatch.index + wordMatch.length);
+            const after = sentence.slice(wordMatch.index + wordMatch.length);
+            const marked = `${before}⟦${target}⟧${after}`;
+
+            const markedTrans = await fetchTranslationText(marked);
+            if (!markedTrans) return { sentenceTrans: null, contextWordTrans: null };
+
+            const sentenceTrans = stripContextMarkers(markedTrans);
+            let contextWordTrans = extractMarkedWordFromTranslation(markedTrans);
+
+            if (!contextWordTrans) {
+                contextWordTrans = alignWordByTokenIndex(sentence, sentenceTrans, wordMatch);
+            }
+            if (!contextWordTrans) {
+                contextWordTrans = alignWordByOffset(sentence, sentenceTrans, wordMatch.index, wordMatch.length);
+            }
+
+            return {
+                sentenceTrans,
+                contextWordTrans: contextWordTrans ? contextWordTrans.toLowerCase() : null
+            };
+        }
+
+        function tokenizeForContextAlign(text) {
+            return (String(text || '').match(/[\p{L}\p{M}][\p{L}\p{M}'-]*|[\p{N}]+/gu) || []);
+        }
+
+        function highlightPhraseInSentence(sentence, phrase) {
+            if (!sentence) return '';
+            if (!phrase) return escapeHtmlText(sentence);
+            const lower = sentence.toLowerCase();
+            const needle = phrase.toLowerCase();
+            const idx = lower.indexOf(needle);
+            if (idx >= 0) {
+                const before = sentence.slice(0, idx);
+                const mid = sentence.slice(idx, idx + phrase.length);
+                const after = sentence.slice(idx + phrase.length);
+                return `${escapeHtmlText(before)}<b class="text-emerald-700 not-italic font-bold">${escapeHtmlText(mid)}</b>${escapeHtmlText(after)}`;
+            }
+            return escapeHtmlText(sentence);
+        }
+
+        function showInlineContextPanel(word, sentence, sentenceTrans, contextWordTrans) {
+            const panel = document.getElementById('inline-context-panel');
+            const srcEl = document.getElementById('inline-context-source');
+            const fullEl = document.getElementById('inline-context-full');
+            const dictSection = document.getElementById('inline-dict-section');
+            const dictContent = document.getElementById('inline-dict-content');
+            const dictArrow = document.getElementById('inline-dict-arrow');
+
+            const wordMatch = sentence ? findWordInSentence(sentence, word) : null;
+
+            if (srcEl && sentence) {
+                if (wordMatch) {
+                    const before = sentence.slice(0, wordMatch.index);
+                    const mid = sentence.slice(wordMatch.index, wordMatch.index + wordMatch.length);
+                    const after = sentence.slice(wordMatch.index + wordMatch.length);
+                    srcEl.innerHTML = `"${escapeHtmlText(before)}<b class="text-indigo-700 not-italic font-bold">${escapeHtmlText(mid)}</b>${escapeHtmlText(after)}"`;
+                } else {
+                    srcEl.textContent = `"${sentence}"`;
+                }
+            }
+            if (fullEl) {
+                if (sentenceTrans && contextWordTrans) {
+                    fullEl.innerHTML = `"${highlightPhraseInSentence(sentenceTrans, contextWordTrans)}"`;
+                } else {
+                    fullEl.textContent = sentenceTrans ? `"${sentenceTrans}"` : '—';
+                }
+            }
+            panel?.classList.remove('hidden');
+
+            if (dictSection && dictContent) {
+                dictContent.classList.add('hidden');
+                if (dictArrow) dictArrow.textContent = '▼';
+            }
+            repositionInlinePopupSoon();
+        }
+
+        function resetInlineContextPanel() {
+            document.getElementById('inline-context-panel')?.classList.add('hidden');
+            document.getElementById('inline-context-phrase-hint')?.classList.add('hidden');
+            const src = document.getElementById('inline-context-source');
+            const full = document.getElementById('inline-context-full');
+            if (src) src.textContent = '';
+            if (full) full.textContent = '';
+        }
+
+        function updateContextTransBtnState(active) {
+            const btn = document.getElementById('inline-context-trans-btn');
+            if (!btn) return;
+            btn.classList.toggle('bg-indigo-600', active);
+            btn.classList.toggle('text-white', active);
+            btn.classList.toggle('border-indigo-600', active);
+            btn.classList.toggle('shadow-sm', active);
+            btn.classList.toggle('bg-indigo-50', !active);
+            btn.classList.toggle('text-indigo-600', !active);
+            btn.classList.toggle('border-indigo-100', !active);
+        }
+
+        function revertInlineContextTranslation(data) {
+            const input = document.getElementById('inline-popup-trans-input');
+            if (input && data.literalTrans != null) {
+                input.value = data.literalTrans;
+            }
+            revertContextPhraseExpansion(data);
+            resetInlineContextPanel();
+            data.contextActive = false;
+            updateContextTransBtnState(false);
+            if (data.hadTranslationOptions) {
+                setInlineTranslationOptionsVisible(true);
+            }
+            repositionInlinePopupSoon();
+        }
+
+        function applyInlineContextTranslation(data) {
+            const input = document.getElementById('inline-popup-trans-input');
+            if (input && !data.contextActive) {
+                data.literalTrans = input.value;
+                const dropdown = document.getElementById('inline-trans-dropdown');
+                data.hadTranslationOptions = !!(dropdown && !dropdown.classList.contains('hidden'));
+            }
+
+            const expanded = resolveContextPhraseExpansion(data);
+            if (expanded) applyContextPhraseExpansion(data, expanded);
+
+            if (data.contextWordTrans && input) {
+                input.value = data.contextWordTrans;
+                input.classList.add('ring-2', 'ring-indigo-300');
+                setTimeout(() => input.classList.remove('ring-2', 'ring-indigo-300'), 1000);
+            }
+            data.contextActive = true;
+            updateContextTransBtnState(true);
+            setInlineTranslationOptionsVisible(false);
+            showInlineContextPanel(data.word, data.contextClip || data.context, data.sentenceTrans, data.contextWordTrans);
+        }
+
+        window.fetchInlineContextTranslation = async () => {
+            const data = pendingInlineSaveData;
+            if (!data?.contextClip || !data.wordMatch) return;
+
+            if (data.contextActive) {
+                revertInlineContextTranslation(data);
+                return;
+            }
+
+            if (data.contextReady) {
+                applyInlineContextTranslation(data);
+                return;
+            }
+
+            const btn = document.getElementById('inline-context-trans-btn');
+            if (btn) btn.disabled = true;
+
+            try {
+                const expanded = resolveContextPhraseExpansion(data);
+                if (expanded) applyContextPhraseExpansion(data, expanded);
+
+                const result = await prefetchContextTranslation(data.contextClip, data.wordMatch);
+                if (!pendingInlineSaveData || pendingInlineSaveData.clickedWord !== data.clickedWord) return;
+                pendingInlineSaveData.sentenceTrans = result.sentenceTrans;
+                pendingInlineSaveData.contextWordTrans = result.contextWordTrans;
+                pendingInlineSaveData.contextReady = !!(result.contextWordTrans || result.sentenceTrans);
+                if (!pendingInlineSaveData.contextReady) {
+                    window.showModal?.(t('inline.contextFail'));
+                    return;
+                }
+                applyInlineContextTranslation(pendingInlineSaveData);
+            } catch (e) {
+                console.error('fetchInlineContextTranslation', e);
+                window.showModal?.(t('inline.contextFail'));
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        };
+
         async function processInlineTranslationRequest(queryStr, fullText, opts = {}) {
             const query = queryStr.toLowerCase().trim();
             inlinePopup.classList.remove('hidden');
@@ -7107,6 +7953,9 @@
             document.getElementById('inline-trans-dropdown').classList.add('hidden');
             document.getElementById('inline-popup-loader').classList.remove('hidden');
             document.getElementById('inline-popup-save-btn').classList.add('hidden');
+            resetInlineContextPanel();
+            updateContextTransBtnState(false);
+            document.getElementById('inline-context-trans-btn')?.classList.add('hidden');
 
             if (!opts.keepDictOpen) {
                 inlineLookupStack = [];
@@ -7123,34 +7972,69 @@
                 if (dictArrow) dictArrow.textContent = '▼';
             }
 
-            let sentence = "";
-            const pureText = currentMaterial && currentMaterial.subtitles ? JSON.parse(currentMaterial.subtitles).map(s=>s.text).join(' ') : fullText;
-            const escapedQ = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const wholeRe = new RegExp(`(?<![\\p{L}\\p{M}0-9])${escapedQ}(?![\\p{L}\\p{M}0-9])`, 'iu');
-            const m = wholeRe.exec(pureText);
-            if (m && m.index >= 0) {
-                const idx = m.index;
-                const start = Math.max(0, pureText.lastIndexOf('.', idx) + 1);
-                let end = pureText.indexOf('.', idx);
-                if (end === -1) end = pureText.length;
-                sentence = pureText.substring(start, end + 1).trim();
+            let fullSentence = "";
+            let clipSource = getReaderContextText() || fullText || '';
+            let wordOccurrence = resolveWordOccurrenceInClip(clipSource, queryStr, opts);
+
+            if (wordOccurrence) {
+                fullSentence = extractSentenceFromOccurrence(clipSource, wordOccurrence);
+            } else if (fullText && fullText !== clipSource) {
+                wordOccurrence = resolveWordOccurrenceInClip(fullText, queryStr, opts);
+                if (wordOccurrence) {
+                    clipSource = fullText;
+                    fullSentence = extractSentenceFromOccurrence(clipSource, wordOccurrence);
+                }
             }
 
-            const existing = vocabulary.find(v => v.word.toLowerCase() === query); let transText = '';
-            if (existing) { transText = existing.translation; document.getElementById('inline-popup-save-btn').innerHTML = withEnterHint(t('inline.update')); } 
-            else {
-                const options = await fetchTranslationOptions(query); 
-                if(options && options.length>0) {
+            const clipResult = wordOccurrence
+                ? extractMinimalContextClip(clipSource, wordOccurrence)
+                : { clip: fullSentence, wordMatch: wordOccurrence };
+            const contextClip = clipResult.clip || fullSentence;
+            const wordMatch = contextClip ? (clipResult.wordMatch || wordOccurrence) : null;
+
+            const ctxBtn = document.getElementById('inline-context-trans-btn');
+            if (ctxBtn) {
+                ctxBtn.classList.toggle('hidden', !contextClip);
+                ctxBtn.disabled = false;
+                updateContextTransBtnState(false);
+            }
+
+            pendingInlineSaveData = {
+                word: queryStr,
+                clickedWord: queryStr,
+                context: fullSentence,
+                contextClip: contextClip || fullSentence,
+                wordMatch,
+                anchorWordMatch: wordMatch,
+                occurrenceIndex: opts.occurrenceIndex ?? 0,
+                textOffset: Number.isFinite(opts.textOffset) ? opts.textOffset : null,
+                contextReady: false,
+                contextActive: false,
+                phraseExpanded: false,
+                hadTranslationOptions: false,
+                contextWordTrans: null,
+                sentenceTrans: null,
+                literalTrans: null
+            };
+
+            const existing = vocabulary.find(v => v.word.toLowerCase() === query);
+            let transText = '';
+            if (existing) {
+                transText = existing.translation;
+                document.getElementById('inline-popup-save-btn').innerHTML = withEnterHint(t('inline.update'));
+            } else {
+                const options = await fetchTranslationOptions(query);
+                if (options && options.length > 0) {
                     transText = options[0].text;
                     document.getElementById('inline-trans-options-list').innerHTML = options.map(opt => `<li onclick="selectInlineTranslation('${opt.text.replace(/'/g, "\\'")}')" class="p-2 hover:bg-indigo-50 cursor-pointer border-b border-slate-50 flex flex-col justify-center text-sm"><div class="flex justify-between items-center mb-1"><span class="font-bold text-slate-700">${opt.text}</span></div></li>`).join('');
                     document.getElementById('inline-trans-dropdown').classList.remove('hidden');
                 }
                 document.getElementById('inline-popup-save-btn').innerHTML = withEnterHint(t('inline.save'));
             }
+
             document.getElementById('inline-popup-loader').classList.add('hidden');
             document.getElementById('inline-popup-trans-input').value = transText;
             document.getElementById('inline-popup-save-btn').classList.remove('hidden');
-            pendingInlineSaveData = { word: queryStr, context: sentence };
 
             loadInlineMerriamDict(queryStr, dictSection, dictContent, { expand: !!opts.keepDictOpen });
             repositionInlinePopupSoon();
@@ -7675,6 +8559,8 @@
                 } else {
                     if (mode === 'context') {
                         contextScore = 0;
+                        contextPerfectStreak = 0;
+                        contextPerfectCount = 0;
                         clearContextRoundTimer();
                     }
                     bsWords = dueWords.slice(0, reqCount);
@@ -7789,6 +8675,10 @@
             if (sprintTimer) { clearInterval(sprintTimer); sprintTimer = null; }
             clearContextRoundTimer();
 
+            if (activeSessionMode === 'context') {
+                applyContextSessionBonuses();
+            }
+
             // Restore centered layout (crossword fullscreen must not leave main left-aligned)
             resetMainLayoutStyles();
             resetTrainingChromeStyles();
@@ -7877,17 +8767,21 @@
 
         window.markWordAsFailed = () => {
             const word = bsWords[bsCurrentWordIdx];
+            if (activeSessionMode === 'context' && !contextAnswered) {
+                document.querySelectorAll('#bs-test-opts button').forEach(x => x.disabled = true);
+                failContextRound(word);
+                return;
+            }
             word.failed = true;
             if (activeSessionMode === 'context') {
                 contextAnswered = true;
+                contextPerfectStreak = 0;
                 clearContextRoundTimer();
             }
-            const feedback = document.getElementById('bs-feedback');
-            
+
             document.querySelectorAll('#bs-test-opts button').forEach(x => x.disabled = true);
             const inp = document.getElementById('bs-type-input') || document.getElementById('ctx-type-input') || document.getElementById('bs-pic-input'); if(inp) inp.disabled = true;
 
-            feedback.innerHTML = `<span class="text-rose-500 font-bold text-base bg-rose-50 px-3 py-1 rounded border border-rose-100">${t('train.correct', { word: word.word })}</span>`; 
             triggerSuccessReveal(word);
         };
 
@@ -7915,17 +8809,42 @@
         }
 
         function triggerSuccessReveal(word) {
-            document.getElementById('bs-success-img').src = word.imageUrl; 
-            document.getElementById('bs-success-word').textContent = word.word;
+            const reveal = document.getElementById('bs-success-reveal');
+            const feedback = document.getElementById('bs-feedback');
+            const failed = !!word.failed;
+
+            if (feedback) feedback.innerHTML = '';
+
+            reveal.classList.remove('bs-reveal-success', 'bs-reveal-missed', 'hidden');
+            reveal.classList.add(failed ? 'bs-reveal-missed' : 'bs-reveal-success');
+
+            const badge = document.getElementById('bs-reveal-badge');
+            if (badge) {
+                if (failed) {
+                    badge.textContent = t('train.answerReveal');
+                    badge.className = 'bs-reveal-badge bs-reveal-badge-missed text-xs font-bold uppercase tracking-wider mb-1';
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+
+            document.getElementById('bs-success-img').src = word.imageUrl;
+            const wordEl = document.getElementById('bs-success-word');
+            wordEl.textContent = word.word;
+            wordEl.classList.toggle('bs-word-highlight', !failed);
             document.getElementById('bs-success-trans').textContent = word.translation;
             const ctxEl = document.getElementById('bs-success-context');
             if (word.context) {
                 const cleanContext = word.context.replace(/[_]/g, '');
-                ctxEl.innerHTML = `<span class="italic text-slate-600">"${cleanContext.replace(new RegExp(`(${word.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<b class="text-indigo-600">$1</b>')}"</span>`;
+                const escaped = word.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const hl = failed
+                    ? '<b class="text-emerald-600 font-extrabold underline decoration-emerald-300 decoration-2 underline-offset-2">$1</b>'
+                    : '<b class="text-emerald-700 font-extrabold">$1</b>';
+                ctxEl.innerHTML = `<span class="italic text-slate-600">"${cleanContext.replace(new RegExp(`(${escaped})`, 'gi'), hl)}"</span>`;
             } else {
                 ctxEl.textContent = '';
             }
-            document.getElementById('bs-success-reveal').classList.remove('hidden');
             preserveTrainingFocusState();
             if(!isGlobalAudioMuted) playAudioWord(word.word);
             const btnNext = document.getElementById('bs-btn-next');
@@ -7940,7 +8859,10 @@
             const word = bsWords[bsCurrentWordIdx]; word.failed = false; 
             clearContextRoundTimer();
             const area = document.getElementById('bs-interactive-area'); const btnNext = document.getElementById('bs-btn-next'), feedback = document.getElementById('bs-feedback');
-            feedback.innerHTML = ''; btnNext.classList.add('hidden'); document.getElementById('bs-btn-dont-know').classList.remove('hidden'); area.innerHTML = ''; document.getElementById('bs-success-reveal').classList.add('hidden');
+            feedback.innerHTML = ''; btnNext.classList.add('hidden'); document.getElementById('bs-btn-dont-know').classList.remove('hidden'); area.innerHTML = '';
+            const reveal = document.getElementById('bs-success-reveal');
+            reveal.classList.add('hidden');
+            reveal.classList.remove('bs-reveal-success', 'bs-reveal-missed');
             document.removeEventListener('keydown', handleConstructorKeyboard); document.removeEventListener('keydown', handleGlobalKeyboard); document.addEventListener('keydown', handleGlobalKeyboard);
             document.removeEventListener('keydown', handleSprintKeyboard);
 
@@ -8000,7 +8922,7 @@
                     const correctBtn = document.querySelector(`#bs-test-opts button[data-id="${word.id}"]`);
                     if(b.dataset.id === word.id) {
                         markTestChoiceCorrect(b);
-                        feedback.innerHTML = `<span class="text-emerald-600 font-bold">${t('train.excellent')}</span>`; triggerSuccessReveal(word);
+                        triggerSuccessReveal(word);
                     } else {
                         word.failed = true;
                         markTestChoiceWrong(b);
@@ -8035,7 +8957,7 @@
                 });
                 if(bsLetterPool.length === 0) {
                     if(bsSelectedLetters.map(x=>x.char).join('') === expectedWordStr) {
-                        feedback.innerHTML = `<span class="text-emerald-600 font-bold">${t('train.perfect')}</span>`; document.querySelectorAll('#bs-c-slots .bg-indigo-600').forEach(e => e.classList.replace('bg-indigo-600', 'bg-emerald-500'));
+                        document.querySelectorAll('#bs-c-slots .bg-indigo-600').forEach(e => e.classList.replace('bg-indigo-600', 'bg-emerald-500'));
                         document.removeEventListener('keydown', handleConstructorKeyboard); triggerSuccessReveal(word);
                     } else { slots.classList.add('animate-pulse'); setTimeout(() => slots.classList.remove('animate-pulse'), 500); }
                 } else { feedback.innerHTML = ''; btnNext.classList.add('hidden'); }
@@ -8201,17 +9123,45 @@
         }
 
         function showContextMaterialHint(title) {
+            const banner = document.getElementById('ctx-material-banner');
             const el = document.getElementById('ctx-material-hint');
-            if (!el) return;
+            if (!banner || !el) return;
             const name = String(title || contextRoundMaterialTitle || '').trim();
             if (!name) return;
             el.textContent = name;
-            el.classList.remove('opacity-0');
+            banner.classList.remove('hidden');
             const btn = document.getElementById('btn-ctx-hint-material');
             if (btn) {
                 btn.disabled = true;
                 btn.classList.add('opacity-40', 'pointer-events-none');
             }
+        }
+
+        function buildContextLetterHintHtml(word) {
+            const chars = [...String(word || '').trim()];
+            let first = -1;
+            let last = -1;
+            for (let i = 0; i < chars.length; i++) {
+                if (/\p{L}/u.test(chars[i])) {
+                    if (first < 0) first = i;
+                    last = i;
+                }
+            }
+            if (first < 0) return '';
+            const chips = chars.map((c, i) => {
+                if (i < first || i > last) {
+                    return `<span class="ctx-letter-punct">${escapeHtmlText(c)}</span>`;
+                }
+                if (i === first || i === last) {
+                    return `<span class="ctx-letter-chip ctx-letter-revealed">${escapeHtmlText(c)}</span>`;
+                }
+                if (/\p{L}/u.test(c)) {
+                    return `<span class="ctx-letter-chip ctx-letter-mask">·</span>`;
+                }
+                if (/\s/.test(c)) return `<span class="ctx-letter-gap"></span>`;
+                return `<span class="ctx-letter-punct">${escapeHtmlText(c)}</span>`;
+            }).join('');
+            return `<div class="ctx-letter-hint-inner">${chips}</div>`;
         }
 
         function formatContextLetterHint(word) {
@@ -8237,21 +9187,127 @@
             }).join('');
         }
 
-        const CONTEXT_ROUND_SECS = 30;
-        const CONTEXT_MAX_POINTS = 10;
-        const CONTEXT_DECAY_SECS = 10; // last 10s: points = seconds left
+        const CONTEXT_ROUND_SECS = 42;
+        const CONTEXT_MAX_POINTS = 12;
+        const CONTEXT_DECAY_SECS = 12;
+        const CONTEXT_STREAK_BONUS = 12;
+        const CONTEXT_HINT_MATERIAL = 2;
+        const CONTEXT_HINT_LETTERS = 5;
+        const CONTEXT_HINT_TRANS = 10;
+
+        function getContextMaxFromHints() {
+            return Math.max(0, CONTEXT_MAX_POINTS - contextHintPenalty);
+        }
+
+        function flyContextTimerToScore(remaining) {
+            if (contextHudMergeAnimating || contextHudMergeDone) return;
+            const timerWrap = document.getElementById('ctx-timer-wrap');
+            const roundWrap = document.getElementById('ctx-round-wrap');
+            if (!timerWrap || !roundWrap) return;
+
+            contextHudMergeAnimating = true;
+            contextHudMergeDone = true;
+
+            const from = timerWrap.getBoundingClientRect();
+            const to = roundWrap.getBoundingClientRect();
+
+            const ghost = document.createElement('div');
+            ghost.id = 'ctx-timer-fly';
+            ghost.innerHTML = `<span class="text-lg leading-none">⏳</span><span class="ctx-fly-timer-val">${remaining}s</span>`;
+            ghost.style.cssText = `position:fixed;left:${from.left}px;top:${from.top}px;z-index:120;pointer-events:none;transition:transform 0.85s cubic-bezier(0.22,1,0.36,1),opacity 0.85s ease;will-change:transform,opacity;`;
+            document.body.appendChild(ghost);
+            timerWrap.classList.add('ctx-timer-hidden');
+
+            requestAnimationFrame(() => {
+                const dx = (to.left + to.width / 2) - (from.left + from.width / 2);
+                const dy = (to.top + to.height / 2) - (from.top + from.height / 2);
+                ghost.style.transform = `translate(${dx}px, ${dy}px) scale(0.75)`;
+                ghost.style.opacity = '0';
+            });
+
+            const finish = () => {
+                ghost.remove();
+                timerWrap.classList.add('hidden');
+                contextHudMergeAnimating = false;
+            };
+            ghost.addEventListener('transitionend', finish, { once: true });
+            setTimeout(finish, 950);
+        }
+
+        function animateContextPointsToZero(onDone) {
+            const roundPts = document.getElementById('ctx-round-pts');
+            const scoreBlock = document.getElementById('ctx-score-block');
+            if (!roundPts) {
+                onDone?.();
+                return;
+            }
+            const start = parseInt(roundPts.textContent, 10);
+            const from = Number.isFinite(start) && start > 0 ? start : (getContextMaxFromHints() || CONTEXT_MAX_POINTS);
+            scoreBlock?.classList.add('ctx-zeroing');
+            roundPts.classList.add('text-rose-500');
+            let frame = 0;
+            const totalFrames = 12;
+            const step = () => {
+                frame++;
+                const t = frame / totalFrames;
+                const eased = 1 - Math.pow(1 - t, 2);
+                roundPts.textContent = String(Math.max(0, Math.round(from * (1 - eased))));
+                if (frame < totalFrames) {
+                    requestAnimationFrame(step);
+                } else {
+                    roundPts.textContent = '0';
+                    onDone?.();
+                }
+            };
+            requestAnimationFrame(step);
+        }
+
+        function failContextRound(word) {
+            if (contextAnswered) return;
+            contextAnswered = true;
+            clearContextRoundTimer();
+            contextPerfectStreak = 0;
+            contextPointsLeft = 0;
+            updateContextStreakHud();
+            const inp = document.getElementById('ctx-type-input');
+            if (inp) inp.disabled = true;
+            word.failed = true;
+            animateContextPointsToZero(() => {
+                if (inp) inp.classList.add('wrong');
+                triggerSuccessReveal(word);
+            });
+        }
+
+        function applyContextSessionBonuses() {
+            const totalWords = bsWords.length;
+            if (contextPerfectCount === totalWords && totalWords > 0) {
+                contextScore += CONTEXT_STREAK_BONUS;
+            }
+        }
+
+        function getContextDecayStartRemaining() {
+            if (contextTransHintUsed) return 2;
+            if (contextLettersHintUsed) return 7;
+            if (contextMaterialHintUsed) return 10;
+            return CONTEXT_DECAY_SECS;
+        }
 
         function refreshContextPointsFromClock() {
             const remaining = CONTEXT_ROUND_SECS - contextElapsed;
-            // First 20s stay at 10; last 10s count down 10→0
-            const base = remaining >= CONTEXT_DECAY_SECS
-                ? CONTEXT_MAX_POINTS
-                : Math.max(0, remaining);
-            contextPointsLeft = Math.max(0, base - contextHintPenalty);
+            const maxFromHints = Math.max(0, CONTEXT_MAX_POINTS - contextHintPenalty);
+            const decayStart = getContextDecayStartRemaining();
+
+            if (remaining > decayStart) {
+                contextPointsLeft = maxFromHints;
+                return;
+            }
+
+            const timePoints = Math.max(0, Math.min(CONTEXT_MAX_POINTS, remaining));
+            contextPointsLeft = Math.min(maxFromHints, timePoints);
         }
 
         function spawnContextPenaltyFloat(amount) {
-            const wrap = document.getElementById('ctx-points-wrap');
+            const wrap = document.getElementById('ctx-round-wrap') || document.getElementById('ctx-score-block');
             if (!wrap || !amount) return;
             const el = document.createElement('span');
             el.className = 'ctx-penalty-float';
@@ -8259,6 +9315,29 @@
             wrap.appendChild(el);
             el.addEventListener('animationend', () => el.remove());
             setTimeout(() => el.remove(), 900);
+        }
+
+        function spawnContextBonusFloat(amount) {
+            const wrap = document.getElementById('ctx-round-wrap') || document.getElementById('ctx-score-block');
+            if (!wrap || !amount) return;
+            const el = document.createElement('span');
+            el.className = 'ctx-bonus-float';
+            el.textContent = `+${amount}`;
+            wrap.appendChild(el);
+            el.addEventListener('animationend', () => el.remove());
+            setTimeout(() => el.remove(), 900);
+        }
+
+        function updateContextStreakHud() {
+            const container = document.getElementById('ctx-streak-container');
+            const valEl = document.getElementById('ctx-streak-val');
+            if (!container || !valEl) return;
+            if (contextPerfectStreak >= 2) {
+                container.classList.remove('invisible');
+                valEl.textContent = t('train.streak', { n: contextPerfectStreak });
+            } else {
+                container.classList.add('invisible');
+            }
         }
 
         function showContextTranslationHint(translation) {
@@ -8279,36 +9358,78 @@
         }
 
         function updateContextHud() {
-            const ptsEl = document.getElementById('ctx-points-left');
-            const scoreEl = document.getElementById('ctx-score-val');
-            const phaseEl = document.getElementById('ctx-phase-label');
+            const roundPts = document.getElementById('ctx-round-pts');
+            const timerWrap = document.getElementById('ctx-timer-wrap');
+            const timerEl = document.getElementById('ctx-timer-val');
+            const scoreBlock = document.getElementById('ctx-score-block');
             const remaining = CONTEXT_ROUND_SECS - contextElapsed;
-            const inDecay = remaining < CONTEXT_DECAY_SECS;
-            if (ptsEl) {
-                ptsEl.textContent = String(contextPointsLeft);
-                ptsEl.classList.toggle('text-rose-500', contextPointsLeft <= 5 && (inDecay || contextHintPenalty > 0));
-                ptsEl.classList.toggle('animate-pulse', contextPointsLeft <= 5 && inDecay);
+            const decayStart = getContextDecayStartRemaining();
+            const inDecay = remaining <= decayStart;
+            const mergeAt = decayStart + 1;
+
+            if (timerEl && timerWrap && !timerWrap.classList.contains('hidden')) {
+                timerEl.textContent = `${remaining}s`;
             }
-            if (scoreEl) scoreEl.textContent = String(contextScore);
-            if (phaseEl) {
-                if (remaining > CONTEXT_DECAY_SECS) phaseEl.textContent = t('train.contextRead');
-                else if (remaining <= 5 || contextTransHintUsed) phaseEl.textContent = t('train.contextHint');
-                else phaseEl.textContent = '';
+
+            if (remaining === mergeAt) {
+                flyContextTimerToScore(remaining);
             }
+
+            if (roundPts && !scoreBlock?.classList.contains('ctx-zeroing')) {
+                const shown = inDecay ? contextPointsLeft : getContextMaxFromHints();
+                roundPts.textContent = String(shown);
+                roundPts.classList.toggle('ctx-round-decay', inDecay);
+                roundPts.classList.toggle('text-rose-500', inDecay && shown <= 3 && shown > 0);
+                if (inDecay && shown !== contextLastRoundPtsShown && contextLastRoundPtsShown >= 0) {
+                    roundPts.classList.remove('ctx-round-tick');
+                    void roundPts.offsetWidth;
+                    roundPts.classList.add('ctx-round-tick');
+                }
+                contextLastRoundPtsShown = shown;
+            }
+
+            updateContextStreakHud();
         }
+
+        function bumpContextDisplayPoints() {
+            const roundPts = document.getElementById('ctx-round-pts');
+            if (!roundPts) return;
+            roundPts.classList.remove('ctx-points-pop');
+            void roundPts.offsetWidth;
+            roundPts.classList.add('ctx-points-pop');
+        }
+
+        window.useContextMaterialHint = () => {
+            if (activeSessionMode !== 'context' || contextAnswered || contextMaterialHintUsed || !contextRoundWord) return;
+            if (!contextRoundMaterialTitle) return;
+            contextMaterialHintUsed = true;
+            contextHintPenalty += CONTEXT_HINT_MATERIAL;
+            refreshContextPointsFromClock();
+            updateContextHud();
+            bumpContextDisplayPoints();
+            spawnContextPenaltyFloat(CONTEXT_HINT_MATERIAL);
+            showContextMaterialHint(contextRoundMaterialTitle);
+            const btn = document.getElementById('btn-ctx-hint-material');
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-40', 'pointer-events-none');
+            }
+            document.getElementById('ctx-type-input')?.focus();
+        };
 
         window.useContextLetterHint = () => {
             if (activeSessionMode !== 'context' || contextAnswered || contextLettersHintUsed || !contextRoundWord) return;
-            const mask = formatContextLetterHint(contextRoundWord.word);
-            if (!mask) return;
+            const html = buildContextLetterHintHtml(contextRoundWord.word);
+            if (!html) return;
             contextLettersHintUsed = true;
-            contextHintPenalty += 3;
+            contextHintPenalty += CONTEXT_HINT_LETTERS;
             refreshContextPointsFromClock();
             updateContextHud();
-            spawnContextPenaltyFloat(3);
+            bumpContextDisplayPoints();
+            spawnContextPenaltyFloat(CONTEXT_HINT_LETTERS);
             const el = document.getElementById('ctx-letter-hint');
             if (el) {
-                el.textContent = mask;
+                el.innerHTML = html;
                 el.classList.remove('hidden');
             }
             const btn = document.getElementById('btn-ctx-hint-letters');
@@ -8322,28 +9443,17 @@
         window.useContextTransHint = () => {
             if (activeSessionMode !== 'context' || contextAnswered || contextTransHintUsed || !contextRoundWord) return;
             contextTransHintUsed = true;
-            contextHintPenalty += 5;
+            contextHintPenalty += CONTEXT_HINT_TRANS;
             refreshContextPointsFromClock();
             updateContextHud();
-            spawnContextPenaltyFloat(5);
+            bumpContextDisplayPoints();
+            spawnContextPenaltyFloat(CONTEXT_HINT_TRANS);
             showContextTranslationHint(contextRoundWord.translation);
             const btn = document.getElementById('btn-ctx-hint-trans');
             if (btn) {
                 btn.disabled = true;
                 btn.classList.add('opacity-40', 'pointer-events-none');
             }
-            document.getElementById('ctx-type-input')?.focus();
-        };
-
-        window.useContextMaterialHint = () => {
-            if (activeSessionMode !== 'context' || contextAnswered || contextMaterialHintUsed || !contextRoundWord) return;
-            if (!contextRoundMaterialTitle) return;
-            contextMaterialHintUsed = true;
-            contextHintPenalty += 1;
-            refreshContextPointsFromClock();
-            updateContextHud();
-            spawnContextPenaltyFloat(1);
-            showContextMaterialHint(contextRoundMaterialTitle);
             document.getElementById('ctx-type-input')?.focus();
         };
 
@@ -8358,26 +9468,35 @@
 
         function resolveContextAnswer(word, cleanWord, correct) {
             if (contextAnswered) return;
+            if (!correct) {
+                failContextRound(word);
+                return;
+            }
             contextAnswered = true;
             clearContextRoundTimer();
             const inp = document.getElementById('ctx-type-input');
             if (inp) inp.disabled = true;
-            if (correct) {
-                if (activeSessionMode === 'context') {
-                    contextScore += Math.max(0, contextPointsLeft);
-                    updateContextHud();
+            if (activeSessionMode === 'context') {
+                let earned = Math.max(0, contextPointsLeft);
+                const noHints = !contextMaterialHintUsed && !contextLettersHintUsed && !contextTransHintUsed;
+                const perfect = noHints && earned === CONTEXT_MAX_POINTS;
+                if (perfect) {
+                    contextPerfectCount++;
+                    contextPerfectStreak++;
+                    if (contextPerfectStreak >= 2) {
+                        earned += CONTEXT_STREAK_BONUS;
+                        spawnContextBonusFloat(CONTEXT_STREAK_BONUS);
+                    }
+                    updateContextStreakHud();
+                } else {
+                    contextPerfectStreak = 0;
+                    updateContextStreakHud();
                 }
-                if (inp) inp.classList.add('correct');
-                triggerSuccessReveal(word);
-            } else {
-                word.failed = true;
-                if (inp) inp.classList.add('wrong');
-                const feedback = document.getElementById('bs-feedback');
-                if (feedback) {
-                    feedback.innerHTML = `<span class="text-rose-500 font-bold text-base bg-rose-50 px-3 py-1 rounded border border-rose-100">${t('train.correct', { word: word.word })}</span>`;
-                }
-                triggerSuccessReveal(word);
+                contextScore += earned;
+                updateContextHud();
             }
+            if (inp) inp.classList.add('correct');
+            triggerSuccessReveal(word);
         }
 
         function renderStageContext(word, area, btnNext, feedback) {
@@ -8412,7 +9531,10 @@
             contextMaterialHintUsed = false;
             contextRoundWord = word;
             contextRoundMaterialTitle = getContextMaterialTitle(word);
-            contextReadingSecs = 20; // first 20s at full points (display phase)
+            contextHudMergeDone = false;
+            contextHudMergeAnimating = false;
+            contextLastRoundPtsShown = -1;
+            document.getElementById('ctx-timer-fly')?.remove();
 
             const materialBtn = contextRoundMaterialTitle
                 ? `<button type="button" id="btn-ctx-hint-material" onclick="useContextMaterialHint()" class="text-sm font-bold bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 px-3.5 py-2 rounded-xl transition shadow-sm">${t('train.contextHintMaterial')}</button>`
@@ -8420,18 +9542,29 @@
 
             const hud = timed ? `
                 <div class="flex justify-between items-center w-full max-w-xl mx-auto mb-4 px-3 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/70 shadow-inner">
-                    <div class="flex items-center gap-2 min-w-0">
-                        <span class="text-lg flex-shrink-0">⏳</span>
-                        <span id="ctx-points-wrap" class="relative inline-flex items-center justify-center min-w-[1.5rem]">
-                            <span id="ctx-points-left" class="font-extrabold text-xl text-slate-700 tabular-nums">${CONTEXT_MAX_POINTS}</span>
-                        </span>
-                        <span id="ctx-phase-label" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1 truncate">${t('train.contextRead')}</span>
+                    <div id="ctx-hud-anchor" class="flex items-center min-w-0 relative">
+                        <div id="ctx-timer-wrap" class="flex items-center gap-2 bg-white py-1.5 px-4 rounded-full border border-slate-100 shadow-sm">
+                            <span class="text-lg leading-none">⏳</span>
+                            <span id="ctx-timer-val" class="text-sm font-semibold text-slate-400 tabular-nums">${CONTEXT_ROUND_SECS}s</span>
+                        </div>
                     </div>
-                    <div class="flex flex-col items-end flex-shrink-0">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${t('train.score')}</span>
-                        <span id="ctx-score-val" class="font-black text-2xl text-indigo-600 tabular-nums">${contextScore}</span>
+                    <div class="flex items-center gap-2.5 flex-shrink-0">
+                        <div id="ctx-streak-container" class="${contextPerfectStreak >= 2 ? '' : 'invisible'} flex items-center gap-1.5 bg-amber-50 border border-amber-200/60 px-3 py-1 rounded-full shadow-sm transition-all duration-300">
+                            <span class="text-xs">🔥</span>
+                            <span id="ctx-streak-val" class="text-[10px] font-bold text-amber-700">${t('train.streak', { n: contextPerfectStreak })}</span>
+                        </div>
+                        <div id="ctx-score-block" class="flex flex-col items-end relative">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${t('train.score')}</span>
+                            <span id="ctx-round-wrap" class="relative inline-flex justify-end mt-0.5">
+                                <span id="ctx-round-pts" class="font-black text-2xl text-indigo-600 tabular-nums">${CONTEXT_MAX_POINTS}</span>
+                            </span>
+                        </div>
                     </div>
                 </div>` : '';
+
+            const materialBanner = timed
+                ? `<div id="ctx-material-banner" class="ctx-material-banner hidden" aria-live="polite"><span class="ctx-material-icon">📖</span><span id="ctx-material-hint" class="ctx-material-title"></span></div>`
+                : '';
 
             const transBlock = timed
                 ? `<p id="ctx-translation-hint" class="text-lg text-indigo-700 font-bold mb-4 uppercase tracking-wider min-h-[1.75rem] opacity-0 transition-opacity duration-300" aria-hidden="true"></p>`
@@ -8440,16 +9573,16 @@
             const hintsBlock = timed ? `
                 <div class="mt-4 max-w-xl mx-auto">
                     <div class="flex flex-wrap items-center justify-center gap-2">
+                        ${materialBtn}
                         <button type="button" id="btn-ctx-hint-letters" onclick="useContextLetterHint()" class="text-sm font-bold bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 px-3.5 py-2 rounded-xl transition shadow-sm">${t('train.contextHintLetters')}</button>
                         <button type="button" id="btn-ctx-hint-trans" onclick="useContextTransHint()" class="text-sm font-bold bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 px-3.5 py-2 rounded-xl transition shadow-sm">${t('train.contextHintTrans')}</button>
-                        ${materialBtn}
                     </div>
-                    <p id="ctx-letter-hint" class="hidden mt-3 text-xl sm:text-2xl font-semibold font-mono tracking-wider text-slate-600 text-center"></p>
-                    <p id="ctx-material-hint" class="opacity-0 transition-opacity duration-300"></p>
+                    <div id="ctx-letter-hint" class="hidden ctx-letter-hint-panel max-w-md mx-auto"></div>
                 </div>` : '';
 
             area.innerHTML = `
                 ${hud}
+                ${materialBanner}
                 ${transBlock}
                 <div class="text-xl text-slate-700 font-medium leading-relaxed italic border-l-4 border-indigo-200 pl-5 py-2 text-left inline-block max-w-xl mx-auto relative bg-slate-50/50 rounded-r-xl">
                     ${contextHtml}
@@ -8470,6 +9603,7 @@
             });
 
             if (timed) {
+                updateContextHud();
                 clearContextRoundTimer();
                 contextRoundTimer = setInterval(() => {
                     if (contextAnswered) {
@@ -8480,24 +9614,8 @@
                     refreshContextPointsFromClock();
                     updateContextHud();
 
-                    // Free translation + material title in the last 5 seconds
-                    if (contextElapsed >= CONTEXT_ROUND_SECS - 5) {
-                        if (!contextTransHintUsed) {
-                            showContextTranslationHint(word.translation);
-                            const btn = document.getElementById('btn-ctx-hint-trans');
-                            if (btn) {
-                                btn.disabled = true;
-                                btn.classList.add('opacity-40', 'pointer-events-none');
-                            }
-                        }
-                        if (contextRoundMaterialTitle) {
-                            showContextMaterialHint(contextRoundMaterialTitle);
-                        }
-                    }
-
                     if (contextElapsed >= CONTEXT_ROUND_SECS) {
-                        word.failed = true;
-                        resolveContextAnswer(word, cleanWord, false);
+                        failContextRound(word);
                     }
                 }, 1000);
             }
