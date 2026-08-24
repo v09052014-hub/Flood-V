@@ -2,8 +2,35 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <!-- viewport-fit=cover: Chrome Android edge-to-edge opt-in (removes the bottom "chin") -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <!--
+      Chrome Android edge-to-edge opt-in (removes bottom "chin" on load):
+      https://developer.chrome.com/docs/css-ui/edge-to-edge
+      Exact required signal: viewport-fit=cover on the viewport meta.
+      Keep a SINGLE viewport meta — duplicates can leave the last one winning without cover.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <script>
+    (function () {
+        // Enforce one viewport meta with cover before any later scripts run.
+        // Chrome reads viewport-fit from Blink's meta parser → DisplayCutout → E2E opt-in.
+        var DESIRED = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover';
+        var head = document.head || document.getElementsByTagName('head')[0];
+        if (!head) return;
+        var metas = head.querySelectorAll('meta[name="viewport"]');
+        var primary = metas[0];
+        if (!primary) {
+            primary = document.createElement('meta');
+            primary.setAttribute('name', 'viewport');
+            head.insertBefore(primary, head.firstChild);
+        }
+        primary.setAttribute('content', DESIRED);
+        for (var i = 1; i < metas.length; i++) {
+            metas[i].parentNode && metas[i].parentNode.removeChild(metas[i]);
+        }
+        document.documentElement.setAttribute('data-viewport-fit', 'cover');
+        document.documentElement.setAttribute('data-viewport-content', DESIRED);
+    })();
+    </script>
     <meta name="theme-color" content="#f8fafc">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,7 +41,9 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Chrome Android edge-to-edge: prefer max insets for scroll padding (no layout thrash).
+        /* Chrome Android edge-to-edge:
+           - viewport-fit=cover opts out of the chin (see head meta)
+           - use safe-area-max-inset-bottom for scroll padding (stable; no thrash)
            Docs: https://developer.chrome.com/docs/css-ui/edge-to-edge */
         :root {
             --app-bg: #f8fafc;
@@ -23,7 +52,8 @@
             --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
             --safe-area-inset-left: env(safe-area-inset-left, 0px);
             --safe-area-max-inset-bottom: env(safe-area-max-inset-bottom, 36px);
-            --app-scroll-pad-bottom: 2.5rem;
+            /* Modest breathing room above gesture nav — avoid a tall empty strip that looks like a chin */
+            --app-scroll-pad-bottom: 1rem;
         }
         html {
             overflow-x: hidden;
@@ -33,7 +63,7 @@
             min-height: 100dvh;
         }
         body {
-            /* Clear gesture nav with the *max* inset (stable). Content paints under the chin area. */
+            /* Clear Android gesture nav only (max inset). Do not invent a second "chin". */
             padding-bottom: calc(var(--app-scroll-pad-bottom) + var(--safe-area-max-inset-bottom));
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
@@ -43,11 +73,11 @@
             min-height: 100dvh;
         }
         main {
-            padding-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
         }
         #library-read-view,
         #view-training {
-            padding-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
         }
 
         /* Review learned — soft urgency wash (0 = caught up, 1 = long overdue) */
@@ -3365,6 +3395,36 @@
         }
 
         try { applyI18n(); renderLanguagePickers(); } catch (e) { console.error(e); }
+
+        // Edge-to-edge / chin diagnostics (Chrome Android). Run: window.debugViewportFit()
+        window.debugViewportFit = function debugViewportFit() {
+            const metas = [...document.querySelectorAll('meta[name="viewport"]')];
+            const probe = document.createElement('div');
+            probe.setAttribute('aria-hidden', 'true');
+            probe.style.cssText = 'position:fixed;left:-9999px;top:0;visibility:hidden;pointer-events:none;'
+                + 'padding-top:env(safe-area-inset-top,0px);'
+                + 'padding-right:env(safe-area-inset-right,0px);'
+                + 'padding-bottom:env(safe-area-inset-bottom,0px);'
+                + 'padding-left:env(safe-area-inset-left,0px);'
+                + 'margin-bottom:env(safe-area-max-inset-bottom,0px);';
+            document.documentElement.appendChild(probe);
+            const cs = getComputedStyle(probe);
+            const report = {
+                viewportMetaCount: metas.length,
+                viewportContents: metas.map((m) => m.getAttribute('content')),
+                htmlDataViewportFit: document.documentElement.getAttribute('data-viewport-fit'),
+                htmlDataViewportContent: document.documentElement.getAttribute('data-viewport-content'),
+                hasViewportFitCover: metas.some((m) => /viewport-fit\s*=\s*cover/i.test(m.getAttribute('content') || '')),
+                safeAreaInsetBottom: cs.paddingBottom,
+                safeAreaInsetTop: cs.paddingTop,
+                safeAreaMaxInsetBottom: cs.marginBottom,
+                note: 'Opt-in requires exactly one meta viewport with viewport-fit=cover. Chin gone on load = Chrome accepted cover. Non-zero safe-area-inset-bottom after opt-in is expected (gesture nav).'
+            };
+            probe.remove();
+            console.info('[LinguaSpace viewport / edge-to-edge]', report);
+            return report;
+        };
+        try { window.debugViewportFit(); } catch (_) {}
 
         function initTrainModeCardPeek() {
             const cards = document.querySelectorAll('.train-mode-card');
