@@ -2,7 +2,8 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- viewport-fit=cover: Chrome Android edge-to-edge opt-in (removes the bottom "chin") -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#f8fafc">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -13,21 +14,75 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Chrome Android edge-to-edge: prefer max insets for scroll padding (no layout thrash).
+           Docs: https://developer.chrome.com/docs/css-ui/edge-to-edge */
+        :root {
+            --app-bg: #f8fafc;
+            --safe-area-inset-top: env(safe-area-inset-top, 0px);
+            --safe-area-inset-right: env(safe-area-inset-right, 0px);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-inset-left: env(safe-area-inset-left, 0px);
+            --safe-area-max-inset-bottom: env(safe-area-max-inset-bottom, 36px);
+            --app-scroll-pad-bottom: 2.5rem;
+        }
         html {
             overflow-x: hidden;
             max-width: 100%;
-            background-color: #f8fafc;
+            background-color: var(--app-bg);
             min-height: 100%;
+            min-height: 100dvh;
         }
         body {
-            /* Only the real home-indicator inset — no extra empty strip */
-            padding-bottom: env(safe-area-inset-bottom, 0px);
+            /* Clear gesture nav with the *max* inset (stable). Content paints under the chin area. */
+            padding-bottom: calc(var(--app-scroll-pad-bottom) + var(--safe-area-max-inset-bottom));
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
             max-width: 100vw;
-            background-color: #f8fafc;
+            background-color: var(--app-bg);
             min-height: 100%;
             min-height: 100dvh;
+        }
+        main {
+            padding-bottom: 1.25rem;
+        }
+        #library-read-view,
+        #view-training {
+            padding-bottom: 1.5rem;
+        }
+
+        /* Review learned — soft urgency wash (0 = caught up, 1 = long overdue) */
+        #btn-start-review {
+            --review-u: 0;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            border-color: color-mix(in srgb, #a7f3d0 calc((1 - var(--review-u)) * 100%), #fcd34d calc(var(--review-u) * 55%), #fecdd3 calc(var(--review-u) * 45%));
+            background: color-mix(in srgb, #ecfdf5 calc((1 - var(--review-u)) * 100%), #fffbeb calc(var(--review-u) * 50%), #fff1f2 calc(var(--review-u) * 50%));
+            color: color-mix(in srgb, #065f46 calc((1 - var(--review-u)) * 100%), #92400e calc(var(--review-u) * 50%), #9f1239 calc(var(--review-u) * 50%));
+        }
+        #btn-start-review::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                105deg,
+                rgba(16, 185, 129, 0.14) 0%,
+                rgba(16, 185, 129, calc(0.1 * (1 - var(--review-u)))) 35%,
+                rgba(245, 158, 11, calc(0.16 * var(--review-u))) 68%,
+                rgba(251, 113, 133, calc(0.12 * var(--review-u))) 100%
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+        #btn-start-review:hover {
+            filter: brightness(0.98);
+        }
+        #btn-start-review .review-btn-inner {
+            position: relative;
+            z-index: 1;
+        }
+        #btn-start-review.review-btn-empty {
+            opacity: 0.55;
         }
         
         /* Smooth scrolling transitions for headers */
@@ -177,9 +232,9 @@
             max-width: 100%;
             overflow-x: hidden;
         }
+        #view-library,
         #view-library.reader-wide-mode {
-            transition: max-width 0.3s ease;
-            max-width: 100%;
+            background-color: var(--app-bg);
         }
         @media (max-width: 640px) {
             #reader-content-wrapper { padding-left: 0.75rem; padding-right: 0.75rem; }
@@ -389,12 +444,12 @@
             padding-top: 0.35rem;
         }
         body.training-focus-mode {
-            padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+            padding-bottom: calc(0.75rem + var(--safe-area-max-inset-bottom)) !important;
         }
 
         /* Expand: compact chrome, taller board, side action rail */
         body.crossword-expand-mode {
-            padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+            padding-bottom: calc(0.75rem + var(--safe-area-max-inset-bottom)) !important;
             overflow-x: hidden;
         }
         body.crossword-expand-mode main {
@@ -627,27 +682,37 @@
             z-index: 1000;
             box-shadow: 0 10px 25px rgba(0,0,0,0.25);
             border-radius: 12px;
-            top: auto !important;
             display: flex !important;
             flex-direction: column;
             overflow: hidden;
         }
+        .yt-pip-mode:not(.yt-pip-dragged) {
+            top: auto;
+            left: auto;
+        }
         .yt-pip-mode #reader-yt-player {
             flex: 1 1 auto;
             min-height: 0;
+            /* Avoid the iframe eating the first drag gestures near the handle */
+            pointer-events: auto;
+        }
+        .yt-pip-mode.yt-pip-dragging #reader-yt-player {
+            pointer-events: none;
         }
         #reader-yt-pip-handle {
             display: none;
             align-items: center;
             justify-content: center;
-            flex: 0 0 18px;
-            background: rgba(15, 23, 42, 0.72);
-            color: #94a3b8;
-            font-size: 0.65rem;
-            letter-spacing: 0.12em;
+            flex: 0 0 28px;
+            background: rgba(15, 23, 42, 0.82);
+            color: #cbd5e1;
+            font-size: 0.7rem;
+            letter-spacing: 0.14em;
             cursor: grab;
             user-select: none;
             touch-action: none;
+            z-index: 2;
+            position: relative;
         }
         .yt-pip-mode #reader-yt-pip-handle { display: flex; }
         #reader-yt-pip-handle:active { cursor: grabbing; }
@@ -663,7 +728,8 @@
             position: fixed;
             left: 50%;
             transform: translateX(-50%) translateY(8px);
-            bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+            /* Stay above Android gesture nav (dynamic inset; no padding thrash) */
+            bottom: calc(1rem + var(--safe-area-inset-bottom));
             z-index: 1005;
             width: 2.65rem;
             height: 2.65rem;
@@ -698,13 +764,15 @@
                 width: min(56vw, 210px) !important;
                 height: auto !important;
                 aspect-ratio: 16 / 9;
+            }
+            .yt-pip-mode:not(.yt-pip-dragged) {
                 top: max(6px, env(safe-area-inset-top, 0px)) !important;
                 right: 8px;
                 bottom: auto !important;
                 left: auto;
             }
             #reader-yt-jump {
-                bottom: max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem));
+                bottom: calc(1.25rem + var(--safe-area-inset-bottom));
                 width: 2.85rem;
                 height: 2.85rem;
                 font-size: 1.45rem;
@@ -886,7 +954,7 @@
             font-size: 1.05rem;
             line-height: 1;
             flex-shrink: 0;
-            transition: background-color 0.15s, border-color 0.15s;
+            transition: background-color 0.15s, border-color 0.15s, opacity 0.18s ease;
         }
         .dict-icon-btn:hover:not(:disabled) {
             background: #eef2ff;
@@ -895,6 +963,16 @@
         .dict-icon-btn.is-active {
             background: #eef2ff;
             border-color: #a5b4fc;
+        }
+        /* Occasional tools — quieter until hover / focus / active select mode */
+        .dict-icon-btn.dict-chrome-dim {
+            opacity: 0.62;
+        }
+        .dict-icon-btn.dict-chrome-dim:hover:not(:disabled),
+        .dict-icon-btn.dict-chrome-dim:focus-visible,
+        .dict-icon-btn.dict-chrome-dim:active:not(:disabled),
+        .dict-icon-btn.dict-chrome-dim.is-active {
+            opacity: 1;
         }
         .dict-icon-btn:disabled { opacity: 0.35; pointer-events: none; }
         .dict-icon-btn.hidden { display: none !important; }
@@ -1400,6 +1478,24 @@
         </div>
     </div>
 
+    <!-- Modal: Review setup (modes) -->
+    <div id="review-setup-modal" class="hidden fixed inset-0 z-[200] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeReviewSetup()">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-2xl max-w-md w-full relative text-left" role="dialog" aria-modal="true" aria-labelledby="review-setup-title">
+            <button type="button" onclick="closeReviewSetup()" class="absolute top-3 right-4 text-slate-400 hover:text-slate-700 font-bold text-3xl leading-none" aria-label="Close">&times;</button>
+            <h3 id="review-setup-title" class="text-lg font-bold text-slate-800 mb-1 pr-8" data-i18n="train.reviewSetupTitle">Повторення вивчених</h3>
+            <p id="review-setup-due" class="text-xs font-semibold text-emerald-700/80 mb-4"></p>
+            <div class="flex items-center justify-between gap-2 mb-2">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400" data-i18n="train.reviewModes">Вправи в повторенні</p>
+                <button type="button" onclick="resetReviewModesDefault()" class="text-[10px] font-bold text-emerald-600 hover:text-emerald-800 transition" data-i18n="train.reviewModesMixed">Усі змішані</button>
+            </div>
+            <div id="review-modes-chips" class="flex flex-wrap gap-1.5 mb-5"></div>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeReviewSetup()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold border border-slate-200" data-i18n="common.cancel">Скасувати</button>
+                <button type="button" id="btn-confirm-review" onclick="confirmReviewSession()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold shadow-sm" data-i18n="train.reviewStart">Почати</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: Edit Word -->
     <div id="edit-word-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto" onclick="if(event.target === this) closeEditModal()">
         <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-2xl max-w-md w-full relative edit-word-dialog custom-scroll my-auto">
@@ -1635,7 +1731,12 @@
                             </div>
                         </div>
                         <div class="flex-1 relative">
-                            <input type="text" id="manual-trans" placeholder="Переклад" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base bg-white" autocomplete="off" data-i18n-placeholder="dict.transPlaceholder">
+                            <input type="text" id="manual-trans" placeholder="Переклад" class="w-full p-3 pr-12 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base bg-white" autocomplete="off" data-i18n-placeholder="dict.transPlaceholder">
+                            <div id="home-reverse-trans-wrap" class="absolute right-1.5 top-1.5 hidden items-center">
+                                <button type="button" id="btn-home-reverse-trans" onclick="autoReverseTranslateManual()" class="p-1.5 text-indigo-500 hover:bg-indigo-100 rounded-lg transition" data-i18n-title="dict.reverseTranslate" title="Зворотний переклад">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
+                                </button>
+                            </div>
                             <div id="trans-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto custom-scroll">
                                 <ul id="trans-options-list" class="flex flex-col p-1"></ul>
                             </div>
@@ -1673,7 +1774,7 @@
                             </button>
                             <div id="dict-context-dropdown" class="hidden absolute left-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-[120] custom-scroll min-w-[240px]"></div>
                         </div>
-                        <button id="btn-add-folder" onclick="openCreateFolderModal()" class="dict-icon-btn" data-i18n-title="dict.newFolder" title="Створити папку">
+                        <button id="btn-add-folder" onclick="openCreateFolderModal()" class="dict-icon-btn dict-chrome-dim" data-i18n-title="dict.newFolder" title="Створити папку">
                             <span class="relative inline-flex items-center justify-center">
                                 <span class="text-base leading-none">📁</span>
                                 <span class="absolute -bottom-1 -right-1 text-[9px] leading-none bg-indigo-600 text-white rounded-full w-3 h-3 flex items-center justify-center font-black">+</span>
@@ -1683,9 +1784,9 @@
                         <button id="btn-delete-folder" onclick="deleteActiveFolder()" class="hidden" data-i18n-title="dict.delete" title="Видалити">🗑️</button>
                     </div>
                     <div class="flex items-center gap-1 flex-shrink-0">
-                        <button type="button" id="btn-dict-select" onclick="toggleDictSelectMode()" class="dict-icon-btn" title="Вибрати слова" data-i18n-title="dict.select">☑️</button>
-                        <button type="button" onclick="openBulkModal()" class="dict-icon-btn" title="Імпорт" data-i18n-title="filter.import">📥</button>
-                        <button type="button" onclick="exportWordsJSON()" class="dict-icon-btn" data-i18n-title="dict.export" title="Експорт">⚙️</button>
+                        <button type="button" id="btn-dict-select" onclick="toggleDictSelectMode()" class="dict-icon-btn dict-chrome-dim" title="Вибрати слова" data-i18n-title="dict.select">☑️</button>
+                        <button type="button" onclick="openBulkModal()" class="dict-icon-btn dict-chrome-dim" title="Імпорт" data-i18n-title="filter.import">📥</button>
+                        <button type="button" onclick="exportWordsJSON()" class="dict-icon-btn dict-chrome-dim" data-i18n-title="dict.export" title="Експорт">⚙️</button>
                     </div>
                 </div>
 
@@ -1921,9 +2022,14 @@
                     </div>
                 </button>
 
-                <button onclick="startReviewSession()" class="w-full bg-emerald-50 border border-emerald-300 text-emerald-700 py-3 rounded-xl shadow-sm hover:bg-emerald-100 transition active:scale-95 text-center flex items-center justify-center gap-2 mb-6 font-bold text-sm">
-                    <span>🔁</span> <span data-i18n="train.review">Повторити вивчені слова</span>
-                </button>
+                <div class="mb-6">
+                    <button type="button" id="btn-start-review" onclick="openReviewSetup()" class="w-full py-2.5 px-3 rounded-xl shadow-sm hover:border-emerald-300 transition active:scale-[0.99] text-left text-sm font-bold">
+                        <span class="review-btn-inner flex items-center gap-2 min-w-0">
+                            <span class="text-emerald-500 review-btn-icon" aria-hidden="true">🔁</span>
+                            <span class="truncate" data-i18n="train.review">Повторити вивчені слова</span>
+                        </span>
+                    </button>
+                </div>
 
                 <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 px-1" data-i18n="train.separate">Окремі вправи</h3>
                 <div id="train-mode-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -2257,6 +2363,14 @@
                 'train.title': 'Тренування', 'train.bsCount': 'Слів у Brainstorm:', 'train.source': 'Джерело слів:',
                 'train.bsDesc': 'Інтенсивне комплексне опрацювання слів',
                 'train.review': 'Повторити вивчені слова', 'train.separate': 'Окремі вправи',
+                'train.reviewModes': 'Вправи в повторенні',
+                'train.reviewModesMixed': 'Усі змішані',
+                'train.reviewSetupTitle': 'Повторення вивчених',
+                'train.reviewStart': 'Почати',
+                'train.reviewStatusOk': 'Усе актуально — наступне повторення пізніше',
+                'train.reviewStatusSoon': 'Є слова для повторення — без поспіху',
+                'train.reviewStatusRefresh': 'Час освіжити частину вивчених слів',
+                'train.reviewStatusOverdue': 'Довго не повторювали — варто зайти',
                 'train.wordsN': '{n} слів',
                 'mode.word-trans': 'Слово → Переклад', 'mode.trans-word': 'Переклад → Слово',
                 'mode.constructor': 'Конструктор', 'mode.typing': 'Написання', 'mode.listening': 'Аудіювання',
@@ -2294,6 +2408,8 @@
                 'msg.noTrainWords': 'Немає слів для тренування в цій категорії.',
                 'msg.noDueWords': 'Немає слів, готових до тренування зараз. Зачекайте до наступного інтервалу.',
                 'msg.noLearned': 'Немає повністю вивчених слів у цій категорії.',
+                'msg.noMaintDue': 'Немає вивчених слів, які вже час повторити. Наступне повторення пізніше.',
+                'msg.reviewModesNeed': 'Оберіть хоча б одну вправу для повторення.',
                 'msg.moveCount': 'Перенести {n} слів у папку:',
                 'profile.sync': 'Синхронізація словника',
                 'edit.title': 'Редагувати слово', 'edit.word': 'Слово', 'edit.trans': 'Переклад',
@@ -2340,6 +2456,7 @@
                 'inline.dictError': 'Не вдалося завантажити словник.',
                 'inline.dictNetwork': 'Помилка мережі. Перевірте зʼєднання.',
                 'inline.dictSuggestions': 'Можливо, ви шукали:',
+                'inline.dictLemmaOf': 'Показано словникову форму: {lemma}',
                 'inline.dictPron': 'Вимова',
                 'inline.dictInflections': 'Форми',
                 'inline.dictEtymology': 'Етимологія',
@@ -2377,6 +2494,7 @@
                 'dict.back': 'Назад до папок', 'dict.newFolder': 'Створити папку', 'dict.export': 'Експорт',
                 'dict.selectAll': 'Вибрати всі', 'dict.selectNone': 'Зняти всі', 'dict.move': 'Перенести в іншу папку',
                 'dict.translate': 'Перекласти',
+                'dict.reverseTranslate': 'Зворотний переклад у поле слова',
                 'dict.listen': 'Прослухати (Alt/⌥+↵)',
                 'dict.mwOpen': 'Тлумачення · Shift+↵',
                 'dict.contextPlaceholder': 'Контекст (необовʼязково)',
@@ -2474,7 +2592,7 @@
                 'persist.fail': '⚠️ Не вдалося зберегти ({err}).',
                 'persist.login': 'Увійдіть у профіль, щоб зберегти прогрес',
                 'persist.noFirebase': '⚠️ Firebase не підключено',
-                'persist.review': 'ℹ️ Режим повторення — рівні SRS не змінювались',
+                'persist.review': '✅ Прогрес повторення збережено (підтримка вивчених слів)',
                 'persist.noWords': '⚠️ Немає слів для збереження', 'persist.saved': '✅ Прогрес збережено',
                 'lib.read': 'Опрацьовано', 'lib.readAt': 'Опрацьовано: {date}',
                 'lib.video': 'Відео матеріал', 'lib.empty': 'Тут ще немає доданих матеріалів. Створіть перший!',
@@ -2504,6 +2622,14 @@
                 'train.title': 'Training', 'train.bsCount': 'Words in Brainstorm:', 'train.source': 'Word source:',
                 'train.bsDesc': 'Intensive mixed practice for your words',
                 'train.review': 'Review learned words', 'train.separate': 'Separate exercises',
+                'train.reviewModes': 'Review exercises',
+                'train.reviewModesMixed': 'All mixed',
+                'train.reviewSetupTitle': 'Review learned words',
+                'train.reviewStart': 'Start',
+                'train.reviewStatusOk': 'All caught up — next review later',
+                'train.reviewStatusSoon': 'Some words are due — no rush',
+                'train.reviewStatusRefresh': 'Good time to refresh learned words',
+                'train.reviewStatusOverdue': 'Long since last review — worth a visit',
                 'train.wordsN': '{n} words',
                 'mode.word-trans': 'Word → Translation', 'mode.trans-word': 'Translation → Word',
                 'mode.constructor': 'Constructor', 'mode.typing': 'Typing', 'mode.listening': 'Listening',
@@ -2541,6 +2667,8 @@
                 'msg.noTrainWords': 'No words to train in this category.',
                 'msg.noDueWords': 'No words are due for training right now. Wait until the next interval.',
                 'msg.noLearned': 'No fully learned words in this category.',
+                'msg.noMaintDue': 'No learned words are due for review yet. Come back later.',
+                'msg.reviewModesNeed': 'Pick at least one exercise for review.',
                 'msg.moveCount': 'Move {n} words to folder:',
                 'profile.sync': 'Dictionary sync',
                 'edit.title': 'Edit word', 'edit.word': 'Word', 'edit.trans': 'Translation',
@@ -2587,6 +2715,7 @@
                 'inline.dictError': 'Could not load the dictionary.',
                 'inline.dictNetwork': 'Network error. Check your connection.',
                 'inline.dictSuggestions': 'Did you mean:',
+                'inline.dictLemmaOf': 'Showing dictionary form: {lemma}',
                 'inline.dictPron': 'Pronunciation',
                 'inline.dictInflections': 'Inflections',
                 'inline.dictEtymology': 'Etymology',
@@ -2624,6 +2753,7 @@
                 'dict.back': 'Back to folders', 'dict.newFolder': 'Create folder', 'dict.export': 'Export',
                 'dict.selectAll': 'Select all', 'dict.selectNone': 'Clear all', 'dict.move': 'Move to another folder',
                 'dict.translate': 'Translate',
+                'dict.reverseTranslate': 'Reverse-translate into the word field',
                 'dict.listen': 'Listen (Alt/⌥+↵)',
                 'dict.mwOpen': 'Dictionary · Shift+↵',
                 'dict.contextPlaceholder': 'Context (optional)',
@@ -2716,7 +2846,7 @@
                 'persist.fail': '⚠️ Could not save ({err}).',
                 'persist.login': 'Sign in to the profile to save progress',
                 'persist.noFirebase': '⚠️ Firebase is not connected',
-                'persist.review': 'ℹ️ Review mode — SRS levels were not changed',
+                'persist.review': '✅ Review progress saved (learned-word maintenance)',
                 'persist.noWords': '⚠️ No words to save', 'persist.saved': '✅ Progress saved',
                 'lib.read': 'Read', 'lib.readAt': 'Read: {date}',
                 'lib.video': 'Video material', 'lib.empty': 'No materials yet. Add the first one!',
@@ -2746,6 +2876,14 @@
                 'train.title': 'Entrenamiento', 'train.bsCount': 'Palabras en Brainstorm:', 'train.source': 'Fuente:',
                 'train.bsDesc': 'Práctica intensiva combinada de tus palabras',
                 'train.review': 'Repasar palabras aprendidas', 'train.separate': 'Ejercicios sueltos',
+                'train.reviewModes': 'Ejercicios de repaso',
+                'train.reviewModesMixed': 'Todos mezclados',
+                'train.reviewSetupTitle': 'Repaso de aprendidas',
+                'train.reviewStart': 'Empezar',
+                'train.reviewStatusOk': 'Todo al día — próximo repaso más tarde',
+                'train.reviewStatusSoon': 'Hay palabras pendientes — sin prisa',
+                'train.reviewStatusRefresh': 'Buen momento para repasar aprendidas',
+                'train.reviewStatusOverdue': 'Hace tiempo — conviene repasar',
                 'train.wordsN': '{n} palabras',
                 'mode.word-trans': 'Palabra → Traducción', 'mode.trans-word': 'Traducción → Palabra',
                 'mode.constructor': 'Constructor', 'mode.typing': 'Escritura', 'mode.listening': 'Escucha',
@@ -2783,6 +2921,8 @@
                 'msg.noTrainWords': 'No hay palabras para entrenar en esta categoría.',
                 'msg.noDueWords': 'No hay palabras listas para entrenar ahora. Espera al siguiente intervalo.',
                 'msg.noLearned': 'No hay palabras totalmente aprendidas en esta categoría.',
+                'msg.noMaintDue': 'No hay palabras aprendidas pendientes de repaso todavía. Vuelve más tarde.',
+                'msg.reviewModesNeed': 'Elige al menos un ejercicio para el repaso.',
                 'msg.moveCount': 'Mover {n} palabras a la carpeta:',
                 'profile.sync': 'Sincronización del diccionario',
                 'edit.title': 'Editar palabra', 'edit.word': 'Palabra', 'edit.trans': 'Traducción',
@@ -2829,6 +2969,7 @@
                 'inline.dictError': 'No se pudo cargar el diccionario.',
                 'inline.dictNetwork': 'Error de red. Comprueba la conexión.',
                 'inline.dictSuggestions': 'Quizá quisiste decir:',
+                'inline.dictLemmaOf': 'Mostrando la forma del diccionario: {lemma}',
                 'inline.dictPron': 'Pronunciación',
                 'inline.dictInflections': 'Formas',
                 'inline.dictEtymology': 'Etimología',
@@ -2866,6 +3007,7 @@
                 'dict.back': 'Volver a las carpetas', 'dict.newFolder': 'Crear carpeta', 'dict.export': 'Exportar',
                 'dict.selectAll': 'Seleccionar todas', 'dict.selectNone': 'Quitar todas', 'dict.move': 'Mover a otra carpeta',
                 'dict.translate': 'Traducir',
+                'dict.reverseTranslate': 'Traducción inversa al campo de la palabra',
                 'dict.listen': 'Escuchar (Alt/⌥+↵)',
                 'dict.mwOpen': 'Definición · Shift+↵',
                 'dict.contextPlaceholder': 'Contexto (opcional)',
@@ -2958,7 +3100,7 @@
                 'persist.fail': '⚠️ No se pudo guardar ({err}).',
                 'persist.login': 'Entra en el perfil para guardar el progreso',
                 'persist.noFirebase': '⚠️ Firebase no está conectado',
-                'persist.review': 'ℹ️ Modo de repaso — los niveles SRS no cambiaron',
+                'persist.review': '✅ Progreso de repaso guardado (mantenimiento de aprendidas)',
                 'persist.noWords': '⚠️ No hay palabras para guardar', 'persist.saved': '✅ Progreso guardado',
                 'lib.read': 'Leído', 'lib.readAt': 'Leído: {date}',
                 'lib.video': 'Material de vídeo', 'lib.empty': 'Aún no hay materiales. ¡Crea el primero!',
@@ -3033,6 +3175,11 @@
             updateHeaderTrackFlags();
             updateLearningFlags();
             if (typeof updateHomeMwAvailability === 'function') updateHomeMwAvailability();
+            if (typeof renderReviewModesChips === 'function') {
+                const modal = document.getElementById('review-setup-modal');
+                if (modal && !modal.classList.contains('hidden')) renderReviewModesChips();
+            }
+            if (typeof updateReviewDueBadge === 'function') updateReviewDueBadge();
         }
         function langPairLabel() {
             const a = LANG_META[learningLanguage] || {};
@@ -3298,6 +3445,230 @@
         const ALL_SEPARATE_MODES = [...CORE_TRAIN_MODES, ...EXTRA_TRAIN_MODES];
         // Після рівня N чекати перед наступним: 0 → 4 год → 24 год → 72 год → 7 дн → 3 тиж → вивчено
         const SRS_INTERVALS = [0, 4 * 3600000, 24 * 3600000, 72 * 3600000, 7 * 24 * 3600000, 21 * 24 * 3600000, 0];
+
+        // Maintenance SRS for fully learned words (6 steps): 30 → 60 → 90 → 180 → 270 → 365 days
+        const MAX_MAINT_LEVEL = 6;
+        const DAY_MS = 24 * 3600000;
+        const MAINT_INTERVALS = [
+            30 * DAY_MS,
+            60 * DAY_MS,
+            90 * DAY_MS,
+            180 * DAY_MS,
+            270 * DAY_MS,
+            365 * DAY_MS,
+            0
+        ];
+        // Review session exercises (no crossword / sprint / context)
+        const REVIEW_MODE_IDS = ['word-trans', 'trans-word', 'constructor', 'typing', 'listening', 'picture'];
+        const REVIEW_MODES_STORAGE_KEY = 'linguaspace-review-modes';
+        let selectedReviewModes = loadReviewModesSelection();
+
+        function loadReviewModesSelection() {
+            try {
+                const raw = localStorage.getItem(REVIEW_MODES_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) {
+                        const cleaned = parsed.filter((id) => REVIEW_MODE_IDS.includes(id));
+                        if (cleaned.length) return cleaned;
+                    }
+                }
+            } catch (_) {}
+            return [...REVIEW_MODE_IDS];
+        }
+
+        function saveReviewModesSelection() {
+            try { localStorage.setItem(REVIEW_MODES_STORAGE_KEY, JSON.stringify(selectedReviewModes)); } catch (_) {}
+        }
+
+        function clampMaintLevel(level) {
+            return Math.min(Math.max(0, level || 0), MAX_MAINT_LEVEL);
+        }
+
+        function isMaintMastered(level) {
+            return clampMaintLevel(level) >= MAX_MAINT_LEVEL;
+        }
+
+        function getMaintNextTime(newLevel, fromTimestamp = Date.now()) {
+            const lvl = clampMaintLevel(newLevel);
+            if (lvl >= MAX_MAINT_LEVEL) return 0;
+            return fromTimestamp + (MAINT_INTERVALS[lvl] || 0);
+        }
+
+        function graduationMaintFields(w, fromTimestamp = Date.now()) {
+            // First due in 30 days after becoming learned (unless already on a maintenance track)
+            if (w && (w.maintNextTime != null || (w.maintLevel != null && w.maintLevel > 0))) {
+                return {
+                    maintLevel: clampMaintLevel(w.maintLevel || 0),
+                    maintNextTime: w.maintNextTime || 0
+                };
+            }
+            return { maintLevel: 0, maintNextTime: getMaintNextTime(0, fromTimestamp) };
+        }
+
+        function isWordDueForMaintenance(w, now = Date.now()) {
+            if (!w || !isSrsMastered(w.srsLevel)) return false;
+            if (isMaintMastered(w.maintLevel)) return false;
+            // Legacy learned words (no maint fields yet) are due immediately
+            if (w.maintNextTime == null && (w.maintLevel == null || w.maintLevel === 0)) return true;
+            const next = w.maintNextTime || 0;
+            return !next || next <= now;
+        }
+
+        function buildMaintTrainingPatch(w) {
+            const cur = clampMaintLevel(w.maintLevel || 0);
+            if (w.failed) {
+                // Keep the same step; ask again in a week (no drop back into main SRS)
+                return {
+                    maintLevel: cur,
+                    maintNextTime: Date.now() + 7 * DAY_MS,
+                    bsHistory: appendTrainingHistory(w, 'review', cur, true)
+                };
+            }
+            const newLevel = Math.min(cur + 1, MAX_MAINT_LEVEL);
+            return {
+                maintLevel: newLevel,
+                maintNextTime: getMaintNextTime(newLevel),
+                bsHistory: appendTrainingHistory(w, 'review', newLevel, false)
+            };
+        }
+
+        function getReviewPool(srcFilter = 'ALL', now = Date.now()) {
+            let pool = vocabulary.filter((w) => isWordDueForMaintenance(w, now));
+            if (srcFilter && srcFilter !== 'ALL') pool = pool.filter((w) => w.source === srcFilter);
+            return pool;
+        }
+
+        function countLearnedWords(srcFilter = 'ALL') {
+            let pool = vocabulary.filter((w) => isSrsMastered(w.srsLevel));
+            if (srcFilter && srcFilter !== 'ALL') pool = pool.filter((w) => w.source === srcFilter);
+            return pool.length;
+        }
+
+        function pickReviewStageForWord(modes) {
+            const list = (modes && modes.length) ? modes : REVIEW_MODE_IDS;
+            const id = list[Math.floor(Math.random() * list.length)];
+            const stages = MODE_STAGES[id] || [1];
+            return stages[0];
+        }
+
+        function renderReviewModesChips() {
+            const wrap = document.getElementById('review-modes-chips');
+            if (!wrap) return;
+            wrap.innerHTML = REVIEW_MODE_IDS.map((id) => {
+                const on = selectedReviewModes.includes(id);
+                const label = t(`mode.${id}`);
+                return `<button type="button" data-review-mode="${id}" onclick="toggleReviewMode('${id}')" class="text-[11px] font-bold px-2.5 py-1.5 rounded-lg border transition ${on ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300 hover:text-slate-600'}">${label}</button>`;
+            }).join('');
+        }
+
+        window.toggleReviewMode = (id) => {
+            if (!REVIEW_MODE_IDS.includes(id)) return;
+            if (selectedReviewModes.includes(id)) {
+                if (selectedReviewModes.length <= 1) return; // keep at least one
+                selectedReviewModes = selectedReviewModes.filter((m) => m !== id);
+            } else {
+                selectedReviewModes = [...selectedReviewModes, id];
+            }
+            saveReviewModesSelection();
+            renderReviewModesChips();
+        };
+
+        window.resetReviewModesDefault = () => {
+            selectedReviewModes = [...REVIEW_MODE_IDS];
+            saveReviewModesSelection();
+            renderReviewModesChips();
+        };
+
+        // Maintenance urgency ramps over 30 days *after* a word becomes due (not instantly red)
+        const REVIEW_URGENCY_RAMP_MS = 30 * DAY_MS;
+
+        function getLearnedMaintPool(srcFilter = 'ALL') {
+            let pool = vocabulary.filter((w) => isSrsMastered(w.srsLevel) && !isMaintMastered(w.maintLevel));
+            if (srcFilter && srcFilter !== 'ALL') pool = pool.filter((w) => w.source === srcFilter);
+            return pool;
+        }
+
+        function getWordMaintUrgency(w, now = Date.now()) {
+            if (!w || !isSrsMastered(w.srsLevel) || isMaintMastered(w.maintLevel)) return 0;
+            if (!isWordDueForMaintenance(w, now)) return 0;
+            const dueAt = w.maintNextTime || 0;
+            if (!dueAt) {
+                const masteredAt = getLastTrainingAtLevel(w, MAX_SRS_LEVEL)?.at || 0;
+                if (!masteredAt) return 0;
+                const firstDue = masteredAt + MAINT_INTERVALS[0];
+                if (now < firstDue) return 0;
+                return Math.min(1, (now - firstDue) / REVIEW_URGENCY_RAMP_MS);
+            }
+            const overdueMs = Math.max(0, now - dueAt);
+            return Math.min(1, overdueMs / REVIEW_URGENCY_RAMP_MS);
+        }
+
+        function getReviewUrgencyStats(srcFilter = 'ALL', now = Date.now()) {
+            const learned = getLearnedMaintPool(srcFilter);
+            if (!learned.length) {
+                return { urgency: 0, learned: 0, due: 0, caughtUp: true };
+            }
+            const urgencies = learned.map((w) => getWordMaintUrgency(w, now));
+            const urgency = urgencies.reduce((a, b) => a + b, 0) / learned.length;
+            const due = learned.filter((w) => isWordDueForMaintenance(w, now)).length;
+            return { urgency, learned: learned.length, due, caughtUp: due === 0 };
+        }
+
+        function reviewStatusMessage(stats) {
+            if (!stats.learned) return t('msg.noLearned');
+            if (stats.caughtUp) return t('train.reviewStatusOk');
+            if (stats.urgency < 0.22) return t('train.reviewStatusSoon');
+            if (stats.urgency < 0.55) return t('train.reviewStatusRefresh');
+            return t('train.reviewStatusOverdue');
+        }
+
+        function applyReviewButtonUrgency(stats) {
+            const btn = document.getElementById('btn-start-review');
+            if (!btn) return;
+            if (!stats.learned) {
+                btn.style.setProperty('--review-u', '0');
+                btn.classList.add('review-btn-empty');
+                btn.disabled = false;
+                return;
+            }
+            btn.classList.remove('review-btn-empty');
+            btn.style.setProperty('--review-u', String(Math.max(0, Math.min(1, stats.urgency))));
+        }
+
+        function updateReviewDueBadge() {
+            const src = document.getElementById('train-source-select')?.value || 'ALL';
+            applyReviewButtonUrgency(getReviewUrgencyStats(src));
+        }
+
+        function syncReviewSetupDueLine() {
+            const el = document.getElementById('review-setup-due');
+            if (!el) return;
+            const src = document.getElementById('train-source-select')?.value || 'ALL';
+            el.textContent = reviewStatusMessage(getReviewUrgencyStats(src));
+        }
+
+        window.openReviewSetup = () => {
+            const srcFilter = document.getElementById('train-source-select')?.value || 'ALL';
+            if (countLearnedWords(srcFilter) === 0) return window.showModal(t('msg.noLearned'));
+            if (getReviewPool(srcFilter).length === 0) return window.showModal(t('msg.noMaintDue'));
+            renderReviewModesChips();
+            syncReviewSetupDueLine();
+            document.getElementById('review-setup-modal')?.classList.remove('hidden');
+        };
+
+        window.closeReviewSetup = () => {
+            document.getElementById('review-setup-modal')?.classList.add('hidden');
+        };
+
+        window.confirmReviewSession = () => {
+            if (!selectedReviewModes.length) return window.showModal(t('msg.reviewModesNeed'));
+            closeReviewSetup();
+            startReviewSession();
+        };
+
+        // Initial paint (applyI18n may run before these helpers exist)
+        try { updateReviewDueBadge(); } catch (_) {}
 
         function clampSrsLevel(level) {
             return Math.min(Math.max(0, level || 0), MAX_SRS_LEVEL);
@@ -3837,16 +4208,28 @@
         }
 
         function buildWordTrainingPatch(w) {
+            if (activeSessionMode === 'review') {
+                return buildMaintTrainingPatch(w);
+            }
             if (activeSessionMode === 'all' || activeSessionMode === 'sprint') {
                 const newLevel = w.failed ? 0 : Math.min((w.srsLevel || 0) + 1, MAX_SRS_LEVEL);
-                return { srsLevel: newLevel, nextReviewTime: getNextReviewTime(newLevel), bsHistory: appendTrainingHistory(w, activeSessionMode, newLevel, w.failed) };
+                const patch = {
+                    srsLevel: newLevel,
+                    nextReviewTime: getNextReviewTime(newLevel),
+                    bsHistory: appendTrainingHistory(w, activeSessionMode, newLevel, w.failed)
+                };
+                if (!w.failed && newLevel >= MAX_SRS_LEVEL) {
+                    Object.assign(patch, graduationMaintFields(w));
+                }
+                return patch;
             }
             const newLevel = w.failed ? 0 : Math.min((w[`srs_${activeSessionMode}_Level`] || 0) + 1, MAX_SRS_LEVEL);
-            return {
+            const patch = {
                 [`srs_${activeSessionMode}_Level`]: newLevel,
                 [`srs_${activeSessionMode}_NextTime`]: getNextReviewTime(newLevel),
                 bsHistory: appendTrainingHistory(w, activeSessionMode, newLevel, w.failed)
             };
+            return patch;
         }
 
         function firestoreOpWithTimeout(promise, ms = 20000) {
@@ -3877,10 +4260,6 @@
             if (!db) {
                 return { ok: false, text: t('persist.noFirebase'), className: 'text-sm text-rose-600 mt-1 mb-4 font-bold' };
             }
-            if (activeSessionMode === 'review') {
-                return { ok: true, text: t('persist.review'), className: 'text-sm text-slate-500 mt-1 mb-4' };
-            }
-
             const wordsToSave = bsWords.filter(w => w && w.id);
             if (wordsToSave.length === 0) {
                 return { ok: false, text: t('persist.noWords'), className: 'text-sm text-rose-600 mt-1 mb-4 font-bold' };
@@ -3919,6 +4298,9 @@
                     contextHighScores = updatedScores;
                 }
 
+                if (activeSessionMode === 'review') {
+                    return { ok: true, text: t('persist.review'), className: 'text-sm text-emerald-600 mt-1 mb-4 font-bold' };
+                }
                 return { ok: true, text: t('persist.saved'), className: 'text-sm text-emerald-600 mt-1 mb-4 font-bold' };
             } catch (e) {
                 console.error('persistTrainingToFirebase', e);
@@ -4373,11 +4755,13 @@
 
         async function fetchTranslationText(text, opts = {}) {
             if (!text) return null;
-            if (learningLanguage === translationLanguage) return opts.lowercase ? text.toLowerCase() : text;
+            const from = opts.from || learningLanguage;
+            const to = opts.to || translationLanguage;
+            if (from === to) return opts.lowercase ? text.toLowerCase() : text;
             try {
                 const res = await fetch("https://translator-proxy.v09052014.workers.dev/", {
                     method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text, from: learningLanguage, to: translationLanguage })
+                    body: JSON.stringify({ text, from, to })
                 });
                 if (!res.ok) return null;
                 const data = await res.json();
@@ -4393,6 +4777,21 @@
                 return [{ text: query.toLowerCase(), score: 1 }];
             }
             const text = await fetchTranslationText(query, { lowercase: true });
+            if (!text) return null;
+            return [{ text, score: 1 }];
+        }
+
+        async function fetchReverseTranslationOptions(query) {
+            if (!query) return null;
+            if (learningLanguage === translationLanguage) {
+                return [{ text: query.toLowerCase(), score: 1 }];
+            }
+            // Translation field → learning-language word field
+            const text = await fetchTranslationText(query, {
+                lowercase: true,
+                from: translationLanguage,
+                to: learningLanguage
+            });
             if (!text) return null;
             return [{ text, score: 1 }];
         }
@@ -4424,6 +4823,9 @@
             if (e.target === inputWord) {
                 autoTranslateManual();
                 inputTrans.focus();
+            } else if (e.target === inputTrans) {
+                autoReverseTranslateManual();
+                inputWord.focus();
             } else {
                 e.stopPropagation();
                 addWordManual();
@@ -4432,6 +4834,7 @@
         inputWord.addEventListener('keydown', handleManualAddKeydown);
         inputTrans.addEventListener('keydown', handleManualAddKeydown);
         inputContext?.addEventListener('keydown', handleManualAddKeydown);
+
         function syncHomeAuxButtonsOpacity() {
             const tts = document.getElementById('btn-home-tts');
             const mw = document.getElementById('btn-home-mw');
@@ -4439,26 +4842,57 @@
             tts?.classList.toggle('home-aux-dim', !engaged);
             mw?.classList.toggle('home-aux-dim', !engaged);
         }
+
+        function syncHomeReverseTranslateVisibility() {
+            const wrap = document.getElementById('home-reverse-trans-wrap');
+            if (!wrap || !inputTrans) return;
+            const show = document.activeElement === inputTrans || !!inputTrans.value.trim();
+            wrap.classList.toggle('hidden', !show);
+            wrap.classList.toggle('flex', show);
+        }
+
         inputWord.addEventListener('input', () => {
             syncManualContextVisibility();
             syncHomeAuxButtonsOpacity();
         });
         inputWord.addEventListener('focus', syncHomeAuxButtonsOpacity);
         inputWord.addEventListener('blur', () => setTimeout(syncHomeAuxButtonsOpacity, 0));
+        inputTrans.addEventListener('focus', syncHomeReverseTranslateVisibility);
+        inputTrans.addEventListener('input', syncHomeReverseTranslateVisibility);
+        inputTrans.addEventListener('blur', () => setTimeout(syncHomeReverseTranslateVisibility, 120));
         syncHomeAuxButtonsOpacity();
+        syncHomeReverseTranslateVisibility();
 
         window.autoTranslateManual = async () => {
             const word = inputWord.value.trim(); if(!word) return;
             inputTrans.value = t('searching'); dropdown.classList.add('hidden');
+            syncHomeReverseTranslateVisibility();
             const options = await fetchTranslationOptions(word);
             if(options && options.length > 0) {
                 inputTrans.value = options[0].text;
                 optionsList.innerHTML = options.map(opt => `<li onclick="selectTranslation('${opt.text.replace(/'/g, "\\'")}')" class="p-3 hover:bg-indigo-50 cursor-pointer border-b border-slate-100"><span class="font-bold">${opt.text}</span></li>`).join('');
                 dropdown.classList.remove('hidden');
             } else { inputTrans.value = t('notFound'); }
+            syncHomeReverseTranslateVisibility();
         };
 
-        window.selectTranslation = (text) => { inputTrans.value = text; dropdown.classList.add('hidden'); inputTrans.focus(); };
+        window.autoReverseTranslateManual = async () => {
+            const phrase = inputTrans.value.trim();
+            if (!phrase || phrase === t('searching') || phrase === t('notFound')) return;
+            const prev = inputWord.value;
+            inputWord.value = t('searching');
+            syncManualContextVisibility();
+            const options = await fetchReverseTranslationOptions(phrase);
+            if (options && options.length > 0) {
+                inputWord.value = options[0].text;
+            } else {
+                inputWord.value = prev || t('notFound');
+            }
+            syncManualContextVisibility();
+            syncHomeAuxButtonsOpacity();
+        };
+
+        window.selectTranslation = (text) => { inputTrans.value = text; dropdown.classList.add('hidden'); inputTrans.focus(); syncHomeReverseTranslateVisibility(); };
         document.addEventListener('click', (e) => { if(!e.target.closest('#trans-dropdown') && e.target !== inputTrans) dropdown.classList.add('hidden'); });
         document.addEventListener('click', (e) => {
             const ctxWrap = document.getElementById('dict-context-wrapper');
@@ -4468,6 +4902,12 @@
         });
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Escape') return;
+            const reviewSetup = document.getElementById('review-setup-modal');
+            if (reviewSetup && !reviewSetup.classList.contains('hidden')) {
+                e.preventDefault();
+                closeReviewSetup();
+                return;
+            }
             const srsModal = document.getElementById('srs-status-modal');
             if (srsModal && !srsModal.classList.contains('hidden')) {
                 e.preventDefault();
@@ -7289,6 +7729,8 @@
         let ytLastScrollY = 0;
         let ytPipDragBound = false;
         let ytPipDragOffset = { x: 0, y: 0 };
+        // Lyrics vs conversational subtitles — set when the reader page renders
+        let currentSubtitlesLyricMode = false;
 
         function paginateTextMaterial(content, limit = 8000) {
             const html = materialHtmlFromStored(content || '');
@@ -7537,19 +7979,26 @@
                     ytWrapper.parentNode.insertBefore(spacer, ytWrapper);
                 }
                 ytWrapper.classList.add('yt-pip-mode');
-                // Keep phone default corner unless user already dragged
-                if (!ytPipDragOffset.x && !ytPipDragOffset.y) {
-                    ytWrapper.style.left = '';
-                    ytWrapper.style.top = '';
-                    ytWrapper.style.right = '';
-                    ytWrapper.style.bottom = '';
+                // Keep default corner unless user already dragged this session
+                if (ytPipDragOffset.x || ytPipDragOffset.y) {
+                    ytWrapper.classList.add('yt-pip-dragged');
+                    ytWrapper.style.setProperty('left', `${ytPipDragOffset.x}px`, 'important');
+                    ytWrapper.style.setProperty('top', `${ytPipDragOffset.y}px`, 'important');
+                    ytWrapper.style.setProperty('right', 'auto', 'important');
+                    ytWrapper.style.setProperty('bottom', 'auto', 'important');
+                } else {
+                    ytWrapper.classList.remove('yt-pip-dragged');
+                    ytWrapper.style.removeProperty('left');
+                    ytWrapper.style.removeProperty('top');
+                    ytWrapper.style.removeProperty('right');
+                    ytWrapper.style.removeProperty('bottom');
                 }
             } else {
-                ytWrapper.classList.remove('yt-pip-mode');
-                ytWrapper.style.left = '';
-                ytWrapper.style.top = '';
-                ytWrapper.style.right = '';
-                ytWrapper.style.bottom = '';
+                ytWrapper.classList.remove('yt-pip-mode', 'yt-pip-dragged', 'yt-pip-dragging');
+                ytWrapper.style.removeProperty('left');
+                ytWrapper.style.removeProperty('top');
+                ytWrapper.style.removeProperty('right');
+                ytWrapper.style.removeProperty('bottom');
                 ytPipDragOffset = { x: 0, y: 0 };
                 getYtPipSpacer()?.remove();
             }
@@ -7579,12 +8028,13 @@
                 ytProgrammaticScroll = false;
                 ytProgrammaticScrollTimer = null;
                 ytLastScrollY = window.scrollY || 0;
+                updateYtJumpButton();
             }, ms);
         }
 
         function scrollToSubtitleLine(line, behavior = 'smooth') {
             if (!line) return;
-            markYtProgrammaticScroll(behavior === 'smooth' ? 520 : 180);
+            markYtProgrammaticScroll(behavior === 'smooth' ? 650 : 180);
             const yOffset = -220;
             const y = line.getBoundingClientRect().top + window.scrollY + yOffset;
             window.scrollTo({ top: Math.max(0, y), behavior });
@@ -7594,10 +8044,22 @@
             document.getElementById('reader-yt-jump')?.classList.remove('is-visible');
         }
 
+        function isActiveSubtitleInView(line) {
+            const el = line || document.querySelector('.yt-sub-line.active-sub');
+            if (!el) return false;
+            const r = el.getBoundingClientRect();
+            // Comfort band under sticky header / PiP — same idea as follow-pause thresholds
+            const topPad = 80;
+            const bottomPad = window.innerHeight * 0.82;
+            return r.bottom > topPad && r.top < bottomPad;
+        }
+
         function updateYtJumpButton() {
             const btn = document.getElementById('reader-yt-jump');
             if (!btn) return;
-            const show = !!(currentMaterial?.ytId && !ytFollowActiveLine && document.querySelector('.yt-sub-line.active-sub'));
+            const active = document.querySelector('.yt-sub-line.active-sub');
+            // Show only when the playing cue is off-screen; hide once it's back in view
+            const show = !!(currentMaterial?.ytId && active && !isActiveSubtitleInView(active));
             btn.classList.toggle('is-visible', show);
             btn.setAttribute('title', t('lib.jumpToLine'));
         }
@@ -7607,6 +8069,8 @@
             ytFollowActiveLine = true;
             hideYtJumpButton();
             if (active) scrollToSubtitleLine(active);
+            // Smooth scroll finishes after the flag window — re-check visibility then
+            setTimeout(updateYtJumpButton, 700);
         };
 
         function pauseYtFollowFromUser() {
@@ -7673,10 +8137,42 @@
             if (!wrap || !handle || ytPipDragBound) return;
             ytPipDragBound = true;
             let dragging = false;
+            let pointerId = null;
             let startX = 0;
             let startY = 0;
             let origLeft = 0;
             let origTop = 0;
+
+            const placePip = (left, top) => {
+                wrap.classList.add('yt-pip-dragged');
+                wrap.style.setProperty('left', `${left}px`, 'important');
+                wrap.style.setProperty('top', `${top}px`, 'important');
+                wrap.style.setProperty('right', 'auto', 'important');
+                wrap.style.setProperty('bottom', 'auto', 'important');
+                ytPipDragOffset = { x: left, y: top };
+            };
+
+            const onMove = (e) => {
+                if (!dragging || (pointerId != null && e.pointerId !== pointerId)) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                const w = wrap.offsetWidth;
+                const h = wrap.offsetHeight;
+                const left = Math.min(window.innerWidth - w - 6, Math.max(6, origLeft + dx));
+                const top = Math.min(window.innerHeight - h - 6, Math.max(6, origTop + dy));
+                placePip(left, top);
+            };
+
+            const onUp = (e) => {
+                if (!dragging || (pointerId != null && e.pointerId !== pointerId)) return;
+                dragging = false;
+                pointerId = null;
+                wrap.classList.remove('yt-pip-dragging');
+                try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+                window.removeEventListener('pointermove', onMove);
+                window.removeEventListener('pointerup', onUp);
+                window.removeEventListener('pointercancel', onUp);
+            };
 
             handle.addEventListener('pointerdown', (e) => {
                 if (!wrap.classList.contains('yt-pip-mode')) return;
@@ -7684,32 +8180,19 @@
                 e.preventDefault();
                 e.stopPropagation();
                 dragging = true;
+                pointerId = e.pointerId;
                 startX = e.clientX;
                 startY = e.clientY;
                 const rect = wrap.getBoundingClientRect();
                 origLeft = rect.left;
                 origTop = rect.top;
-                wrap.style.right = 'auto';
-                wrap.style.bottom = 'auto';
-                wrap.style.left = `${origLeft}px`;
-                wrap.style.top = `${origTop}px`;
+                wrap.classList.add('yt-pip-dragging');
+                placePip(origLeft, origTop);
                 try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+                window.addEventListener('pointermove', onMove);
+                window.addEventListener('pointerup', onUp);
+                window.addEventListener('pointercancel', onUp);
             });
-            handle.addEventListener('pointermove', (e) => {
-                if (!dragging) return;
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                const w = wrap.offsetWidth;
-                const h = wrap.offsetHeight;
-                const left = Math.min(window.innerWidth - w - 6, Math.max(6, origLeft + dx));
-                const top = Math.min(window.innerHeight - h - 6, Math.max(6, origTop + dy));
-                wrap.style.left = `${left}px`;
-                wrap.style.top = `${top}px`;
-                ytPipDragOffset = { x: left, y: top };
-            });
-            const endDrag = () => { dragging = false; };
-            handle.addEventListener('pointerup', endDrag);
-            handle.addEventListener('pointercancel', endDrag);
         }
 
         function initYouTubePlayer(videoId) {
@@ -7734,22 +8217,29 @@
             const time = ytPlayer.getCurrentTime();
             const lines = document.querySelectorAll('.yt-sub-line');
             let activeLine = null;
+            let bestScore = -Infinity;
             lines.forEach(line => {
                 const start = parseFloat(line.dataset.start);
                 const end = parseFloat(line.dataset.end);
-                const on = time >= start && time <= end;
-                if (on) {
+                if (!(time >= start && time <= end)) return;
+                // Prefer the cue whose midpoint is closest (one highlight at sentence seams)
+                const score = -Math.abs(time - (start + end) / 2);
+                if (score > bestScore) {
+                    bestScore = score;
                     activeLine = line;
+                }
+            });
+            lines.forEach(line => {
+                if (line === activeLine) {
                     if (!line.classList.contains('active-sub')) {
                         line.classList.add('active-sub');
                         if (ytFollowActiveLine) scrollToSubtitleLine(line);
-                        else updateYtJumpButton();
                     }
                 } else {
                     line.classList.remove('active-sub');
                 }
             });
-            if (!activeLine) updateYtJumpButton();
+            updateYtJumpButton();
         }
         window.seekVideo = (seconds) => {
             if (ytPlayer && ytPlayer.seekTo) {
@@ -7864,9 +8354,48 @@
             return punctRatio <= 0.12 || (avgLen <= 48 && shortLines >= 0.65);
         }
 
+        // Split a single SRT cue that packs "…. Next sentence" so highlight can stop at the pause.
+        function splitProseCueSentences(text) {
+            const raw = String(text || '').replace(/\s+/g, ' ').trim();
+            if (!raw) return [];
+            const re = /[.!?…]["'»”)\]]*(?=\s+|$)/g;
+            const parts = [];
+            let last = 0;
+            let m;
+            while ((m = re.exec(raw)) !== null) {
+                const end = m.index + m[0].length;
+                const chunk = raw.slice(last, end).trim();
+                if (chunk) parts.push(chunk);
+                last = end;
+            }
+            const tail = raw.slice(last).trim();
+            if (tail) parts.push(tail);
+            return parts.length > 1 ? parts : [raw];
+        }
+
         function renderSubtitleLineHtml(sub, savedWordsMap, wordOccMap, lyricMode) {
             const cls = lyricMode ? 'yt-sub-line yt-lyric-line' : 'yt-sub-line';
-            return `<span class="${cls}" data-start="${sub.start}" data-end="${sub.end}" onclick="seekVideo(${sub.start})">${wrapWords(sub.text, savedWordsMap, wordOccMap)}</span>`;
+            const text = String(sub?.text || '');
+            if (lyricMode) {
+                return `<span class="${cls}" data-start="${sub.start}" data-end="${sub.end}" onclick="seekVideo(${sub.start})">${wrapWords(text, savedWordsMap, wordOccMap)}</span>`;
+            }
+            const parts = splitProseCueSentences(text);
+            if (parts.length <= 1) {
+                return `<span class="${cls}" data-start="${sub.start}" data-end="${sub.end}" onclick="seekVideo(${sub.start})">${wrapWords(text, savedWordsMap, wordOccMap)}</span>`;
+            }
+            const start = Number(sub.start);
+            const end = Number(sub.end);
+            const dur = Math.max(0.05, end - start);
+            const totalLen = parts.reduce((s, p) => s + Math.max(p.length, 1), 0);
+            let t = start;
+            return parts.map((part, i) => {
+                const portion = Math.max(part.length, 1) / totalLen;
+                const pStart = t;
+                const pEnd = i === parts.length - 1 ? end : (t + dur * portion);
+                t = pEnd;
+                const seek = pStart.toFixed(3);
+                return `<span class="${cls}" data-start="${pStart}" data-end="${pEnd}" onclick="seekVideo(${seek})">${wrapWords(part, savedWordsMap, wordOccMap)}</span>`;
+            }).join(' ');
         }
 
         function renderLyricsSubtitlesHtml(subs, savedWordsMap, wordOccMap) {
@@ -7934,10 +8463,12 @@
 
             if (currentMaterial.subtitles) {
                 const subs = currentPageData || [];
-                container.innerHTML = isLyricsLikeSubtitles(subs)
+                currentSubtitlesLyricMode = isLyricsLikeSubtitles(subs);
+                container.innerHTML = currentSubtitlesLyricMode
                     ? renderLyricsSubtitlesHtml(subs, savedWordsMap, wordOccMap)
                     : renderProseSubtitlesHtml(subs, savedWordsMap, wordOccMap);
             } else {
+                currentSubtitlesLyricMode = false;
                 const pageHtml = currentPageData || '';
                 container.innerHTML = wrapHtmlWords(pageHtml, savedWordsMap, wordOccMap);
             }
@@ -8198,6 +8729,518 @@
             // Spanish–English learning pair only
             if (learningLanguage === 'es' && translationLanguage === 'en') return `/spanish/${encodeURIComponent(q)}`;
             return null;
+        }
+
+        function mwHasEntries(data) {
+            return Array.isArray(data) && data.length > 0 && typeof data[0] === 'object'
+                && !!(data[0].hwi || data[0].fl || data[0].def || data[0].meta);
+        }
+
+        function mwIsSuggestionList(data) {
+            return Array.isArray(data) && data.length > 0 && typeof data[0] === 'string';
+        }
+
+        // Common irregulars / high-frequency forms → dictionary headword
+        const ES_LEMMA_IRREGULAR = {
+            soy: 'ser', eres: 'ser', es: 'ser', somos: 'ser', sois: 'ser', son: 'ser',
+            era: 'ser', eras: 'ser', eramos: 'ser', éramos: 'ser', erais: 'ser', eran: 'ser',
+            fui: 'ser', fue: 'ser', fuiste: 'ser', fuimos: 'ser', fueron: 'ser',
+            sido: 'ser', siendo: 'ser',
+            estoy: 'estar', estas: 'estar', estás: 'estar', estamos: 'estar', estais: 'estar', estáis: 'estar', estan: 'estar', están: 'estar',
+            estaba: 'estar', estado: 'estar', estando: 'estar',
+            voy: 'ir', vas: 'ir', va: 'ir', vamos: 'ir', vais: 'ir', van: 'ir',
+            iba: 'ir', ibas: 'ir', ibamos: 'ir', íbamos: 'ir', iban: 'ir',
+            ido: 'ir', yendo: 'ir', ve: 'ir', vaya: 'ir',
+            he: 'haber', has: 'haber', ha: 'haber', hemos: 'haber', habeis: 'haber', habéis: 'haber', han: 'haber',
+            hay: 'haber', hubo: 'haber', habia: 'haber', había: 'haber',
+            tengo: 'tener', tienes: 'tener', tiene: 'tener', tenemos: 'tener', teneis: 'tener', tenéis: 'tener', tienen: 'tener',
+            tuve: 'tener', tuvo: 'tener', tenido: 'tener',
+            hago: 'hacer', haces: 'hacer', hace: 'hacer', hacemos: 'hacer', hacen: 'hacer',
+            hice: 'hacer', hizo: 'hacer', hecho: 'hacer', haz: 'hacer',
+            puedo: 'poder', puedes: 'poder', puede: 'poder', podemos: 'poder', pueden: 'poder',
+            pude: 'poder', pudo: 'poder', podido: 'poder',
+            quiero: 'querer', quieres: 'querer', quiere: 'querer', queremos: 'querer', quieren: 'querer',
+            quise: 'querer', quiso: 'querer', querido: 'querer',
+            digo: 'decir', dices: 'decir', dice: 'decir', decimos: 'decir', dicen: 'decir',
+            dije: 'decir', dijo: 'decir', dicho: 'decir', di: 'decir',
+            vengo: 'venir', vienes: 'venir', viene: 'venir', venimos: 'venir', vienen: 'venir',
+            vine: 'venir', vino: 'venir', venido: 'venir', ven: 'venir',
+            veo: 'ver', ves: 'ver', vemos: 'ver', visto: 'ver',
+            sé: 'saber', sabes: 'saber', sabe: 'saber', sabemos: 'saber', saben: 'saber',
+            supe: 'saber', supo: 'saber', sabido: 'saber',
+            doy: 'dar', das: 'dar', da: 'dar', damos: 'dar', dan: 'dar', dio: 'dar', dado: 'dar',
+            pongo: 'poner', pones: 'poner', pone: 'poner', ponemos: 'poner', ponen: 'poner',
+            puse: 'poner', puso: 'poner', puesto: 'poner', pon: 'poner',
+            salgo: 'salir', sales: 'salir', sale: 'salir', salimos: 'salir', salen: 'salir', sal: 'salir',
+            oigo: 'oír', oyes: 'oír', oye: 'oír', oimos: 'oír', oímos: 'oír', oyen: 'oír', oido: 'oír', oído: 'oír',
+            caigo: 'caer', caes: 'caer', cae: 'caer', caemos: 'caer', caen: 'caer', caido: 'caer', caído: 'caer',
+            traigo: 'traer', traes: 'traer', trae: 'traer', traemos: 'traer', traen: 'traer', traido: 'traer', traído: 'traer'
+        };
+
+        const EN_LEMMA_IRREGULAR = {
+            was: 'be', were: 'be', am: 'be', is: 'be', are: 'be', been: 'be', being: 'be',
+            had: 'have', has: 'have', having: 'have',
+            did: 'do', does: 'do', done: 'do', doing: 'do',
+            went: 'go', goes: 'go', gone: 'go', going: 'go',
+            said: 'say', says: 'say', saying: 'say',
+            made: 'make', makes: 'make', making: 'make',
+            took: 'take', takes: 'take', taken: 'take', taking: 'take',
+            came: 'come', comes: 'come', coming: 'come',
+            saw: 'see', sees: 'see', seen: 'see', seeing: 'see',
+            knew: 'know', knows: 'know', known: 'know', knowing: 'know',
+            got: 'get', gets: 'get', gotten: 'get', getting: 'get',
+            gave: 'give', gives: 'give', given: 'give', giving: 'give',
+            found: 'find', finds: 'find', finding: 'find',
+            thought: 'think', thinks: 'think', thinking: 'think',
+            told: 'tell', tells: 'tell', telling: 'tell',
+            became: 'become', becomes: 'become', becoming: 'become',
+            showed: 'show', shows: 'show', shown: 'show', showing: 'show',
+            left: 'leave', leaves: 'leave', leaving: 'leave',
+            felt: 'feel', feels: 'feel', feeling: 'feel',
+            put: 'put', puts: 'put', putting: 'put',
+            brought: 'bring', brings: 'bring', bringing: 'bring',
+            began: 'begin', begins: 'begin', begun: 'begin', beginning: 'begin',
+            kept: 'keep', keeps: 'keep', keeping: 'keep',
+            held: 'hold', holds: 'hold', holding: 'hold',
+            wrote: 'write', writes: 'write', written: 'write', writing: 'write',
+            stood: 'stand', stands: 'stand', standing: 'stand',
+            heard: 'hear', hears: 'hear', hearing: 'hear',
+            let: 'let', lets: 'let', letting: 'let',
+            meant: 'mean', means: 'mean', meaning: 'mean',
+            set: 'set', sets: 'set', setting: 'set',
+            met: 'meet', meets: 'meet', meeting: 'meet',
+            ran: 'run', runs: 'run', running: 'run',
+            paid: 'pay', pays: 'pay', paying: 'pay',
+            sat: 'sit', sits: 'sit', sitting: 'sit',
+            spoke: 'speak', speaks: 'speak', spoken: 'speak', speaking: 'speak',
+            lay: 'lie', lies: 'lie', lain: 'lie', lying: 'lie',
+            led: 'lead', leads: 'lead', leading: 'lead',
+            read: 'read', reads: 'read', reading: 'read',
+            grew: 'grow', grows: 'grow', grown: 'grow', growing: 'grow',
+            lost: 'lose', loses: 'lose', losing: 'lose',
+            fell: 'fall', falls: 'fall', fallen: 'fall', falling: 'fall',
+            sent: 'send', sends: 'send', sending: 'send',
+            built: 'build', builds: 'build', building: 'build',
+            understood: 'understand', understands: 'understand', understanding: 'understand',
+            drew: 'draw', draws: 'draw', drawn: 'draw', drawing: 'draw',
+            broke: 'break', breaks: 'break', broken: 'break', breaking: 'break',
+            spent: 'spend', spends: 'spend', spending: 'spend',
+            cut: 'cut', cuts: 'cut', cutting: 'cut',
+            rose: 'rise', rises: 'rise', risen: 'rise', rising: 'rise',
+            drove: 'drive', drives: 'drive', driven: 'drive', driving: 'drive',
+            bought: 'buy', buys: 'buy', buying: 'buy',
+            wore: 'wear', wears: 'wear', worn: 'wear', wearing: 'wear',
+            chose: 'choose', chooses: 'choose', chosen: 'choose', choosing: 'choose',
+            children: 'child', men: 'man', women: 'woman', people: 'person',
+            mice: 'mouse', teeth: 'tooth', feet: 'foot', geese: 'goose'
+        };
+
+        function pushUniqueLemma(list, seen, w) {
+            const v = String(w || '').trim().toLowerCase();
+            if (!v || v.length < 2 || seen.has(v)) return;
+            seen.add(v);
+            list.push(v);
+        }
+
+        function stripSpanishClitics(word) {
+            let w = String(word || '').toLowerCase();
+            // Imperative / infinitive / gerund + clitics: dámelo, hacerlo, diciéndome…
+            const clitics = /(?:(?:me|te|se|nos|os|lo|la|le|los|las|les){1,3})$/;
+            if (w.length >= 6 && clitics.test(w)) {
+                const stripped = w.replace(clitics, '');
+                if (stripped.length >= 3) return stripped;
+            }
+            return w;
+        }
+
+        // Pattern table: orthographic undos for regular Spanish spelling changes.
+        // Surface form → infinitive guesses (no per-verb exception list).
+        // Examples: salpique→salpicar, llegue→llegar, empecé→empezar, conozco→conocer
+        const ES_ORTHO_UNDO_PATTERNS = [
+            // -car before e/é: que / qué / qués / …
+            { re: /^(.*)qu(?:é|e|es|en|emos|éis|eis)$/u, build: (s) => [`${s}car`] },
+            // -gar before e/é
+            { re: /^(.*)gu(?:é|e|es|en|emos|éis|eis)$/u, build: (s) => [`${s}gar`] },
+            // -guar before e/é (averigüe → averiguar)
+            { re: /^(.*)gü(?:é|e|es|en|emos|éis|eis)$/u, build: (s) => [`${s}guar`] },
+            // -zar before e/é (cace / empecé → cazar / empezar)
+            { re: /^(.*)c(?:é|e|es|en|emos|éis|eis)$/u, build: (s) => [`${s}zar`] },
+            // -cer / -cir yo & subjunctive: …zco / …zca…
+            { re: /^(.*)zc(?:o|a|as|amos|áis|an)$/u, build: (s) => [`${s}cer`, `${s}cir`] },
+            // -ger / -gir before a/o: …ja / …jo / …jan… → ger/gir (coja→coger)
+            { re: /^(.*)j(?:o|a|as|amos|áis|an)$/u, build: (s) => [`${s}ger`, `${s}gir`] },
+            // -guir: …go / …ga… after vowel+g? (distingo→distinguir) — stem ends with g from gu
+            { re: /^(.*)g(?:o|a|as|amos|áis|an)$/u, build: (s) => [`${s}guir`, `${s}ger`, `${s}gir`] }
+        ];
+
+        // Person/tense endings to peel, longest first. Value = infinitive endings to try on the stem.
+        const ES_CONJ_ENDING_PATTERNS = [
+            { re: /ábamos$/u, try: ['ar'] },
+            { re: /íamos$/u, try: ['er', 'ir'] },
+            { re: /asteis$/u, try: ['ar'] },
+            { re: /isteis$/u, try: ['er', 'ir'] },
+            { re: /áramos$/u, try: ['ar'] },
+            { re: /ásemos$/u, try: ['ar'] },
+            { re: /iéramos$/u, try: ['er', 'ir'] },
+            { re: /iésemos$/u, try: ['er', 'ir'] },
+            { re: /aremos$/u, try: ['ar'] },
+            { re: /eremos$/u, try: ['er'] },
+            { re: /iremos$/u, try: ['ir'] },
+            { re: /arían$/u, try: ['ar'] },
+            { re: /erían$/u, try: ['er'] },
+            { re: /irían$/u, try: ['ir'] },
+            { re: /ando$/u, try: ['ar'] },
+            { re: /iendo$/u, try: ['er', 'ir'] },
+            { re: /yendo$/u, try: ['er', 'ir'] },
+            { re: /aron$/u, try: ['ar'] },
+            { re: /ieron$/u, try: ['er', 'ir'] },
+            { re: /aste$/u, try: ['ar'] },
+            { re: /iste$/u, try: ['er', 'ir'] },
+            { re: /abas$/u, try: ['ar'] },
+            { re: /aban$/u, try: ['ar'] },
+            { re: /abais$/u, try: ['ar'] },
+            { re: /ías$/u, try: ['er', 'ir'] },
+            { re: /ían$/u, try: ['er', 'ir'] },
+            { re: /íais$/u, try: ['er', 'ir'] },
+            { re: /amos$/u, try: ['ar', 'er', 'ir'] },
+            { re: /emos$/u, try: ['er', 'ar'] },
+            { re: /imos$/u, try: ['ir', 'er'] },
+            { re: /áis$/u, try: ['ar'] },
+            { re: /éis$/u, try: ['er', 'ar'] },
+            { re: /ados$/u, try: ['ar'] },
+            { re: /adas$/u, try: ['ar'] },
+            { re: /idos$/u, try: ['er', 'ir'] },
+            { re: /idas$/u, try: ['er', 'ir'] },
+            { re: /aba$/u, try: ['ar'] },
+            { re: /ada$/u, try: ['ar'] },
+            { re: /ado$/u, try: ['ar'] },
+            { re: /ida$/u, try: ['er', 'ir'] },
+            { re: /ido$/u, try: ['er', 'ir'] },
+            { re: /ará$/u, try: ['ar'] },
+            { re: /ará$/u, try: ['ar'] },
+            { re: /aré$/u, try: ['ar'] },
+            { re: /arás$/u, try: ['ar'] },
+            { re: /arán$/u, try: ['ar'] },
+            { re: /aría$/u, try: ['ar'] },
+            { re: /aría$/u, try: ['ar'] },
+            { re: /eré$/u, try: ['er'] },
+            { re: /erá$/u, try: ['er'] },
+            { re: /iría$/u, try: ['ir'] },
+            { re: /irá$/u, try: ['ir'] },
+            { re: /ara$/u, try: ['ar'] },
+            { re: /ase$/u, try: ['ar'] },
+            { re: /iera$/u, try: ['er', 'ir'] },
+            { re: /iese$/u, try: ['er', 'ir'] },
+            { re: /an$/u, try: ['ar', 'er', 'ir'] },
+            { re: /as$/u, try: ['ar', 'er', 'ir'] },
+            { re: /en$/u, try: ['ar', 'er', 'ir'] },
+            { re: /es$/u, try: ['ar', 'er', 'ir'] },
+            { re: /ís$/u, try: ['ir'] },
+            { re: /ad$/u, try: ['ar'] },
+            { re: /ed$/u, try: ['er'] },
+            { re: /id$/u, try: ['ir'] },
+            { re: /ió$/u, try: ['er', 'ir'] },
+            { re: /ó$/u, try: ['ar'] },
+            { re: /é$/u, try: ['ar'] },
+            { re: /í$/u, try: ['er', 'ir'] },
+            { re: /o$/u, try: ['ar', 'er', 'ir'] },
+            { re: /a$/u, try: ['ar', 'er', 'ir'] },
+            { re: /e$/u, try: ['ar', 'er', 'ir'] },
+            { re: /á$/u, try: ['ar'] },
+            { re: /ía$/u, try: ['er', 'ir'] }
+        ];
+
+        function applySpanishOrthoUndos(surface) {
+            const w = String(surface || '').toLowerCase();
+            const out = [];
+            ES_ORTHO_UNDO_PATTERNS.forEach((p) => {
+                const m = w.match(p.re);
+                if (!m || !m[1] || m[1].length < 2) return;
+                (p.build(m[1]) || []).forEach((inf) => {
+                    if (/(ar|er|ir)$/.test(inf) && inf.length >= 4) out.push(inf);
+                });
+            });
+            return out;
+        }
+
+        function sharedPrefixLen(a, b) {
+            const x = String(a || '').toLowerCase();
+            const y = String(b || '').toLowerCase();
+            const n = Math.min(x.length, y.length);
+            let i = 0;
+            while (i < n && x[i] === y[i]) i++;
+            return i;
+        }
+
+        // How well an infinitive “explains” the surface form (blocks salpique→salar).
+        function scoreSpanishLemmaFit(surface, lemma) {
+            const s = String(surface || '').toLowerCase();
+            const l = String(lemma || '').toLowerCase();
+            if (!s || !l || !/(ar|er|ir)$/.test(l)) return -999;
+            const stem = l.slice(0, -2);
+            if (stem.length < 3) return -500;
+
+            // Normalize surface toward dictionary stem (undo que→c, gue→g, …)
+            const norm = s
+                .replace(/qu(?=[eéií])/g, 'c')
+                .replace(/gü(?=[eéií])/g, 'gu')
+                .replace(/gu(?=[eéií])/g, 'g')
+                .replace(/zc(?=[oaá])/g, 'c')
+                .replace(/j(?=[oaá])/g, 'g');
+
+            const prefRaw = sharedPrefixLen(s, l);
+            const prefNorm = Math.max(sharedPrefixLen(norm, stem), sharedPrefixLen(norm, l));
+            const pref = Math.max(prefRaw, prefNorm);
+
+            // Must share a meaningful prefix with the surface (or its orthographic undo)
+            if (pref < Math.min(4, Math.max(3, stem.length - 1))) return -200;
+
+            // Prefer lemmas whose stem is almost a prefix of the normalized surface
+            let score = pref * 10;
+            score += Math.max(0, 8 - Math.abs(stem.length - Math.min(norm.length, s.length)));
+            if (norm.startsWith(stem) || s.startsWith(stem.slice(0, Math.min(stem.length, s.length)))) score += 25;
+            if (stem.length + 2 === l.length) score += 2;
+            // Penalize very short accidental infinitives (salar, sacar…)
+            if (stem.length <= 3 && s.length >= 6) score -= 40;
+            return score;
+        }
+
+        function scoreDictLemmaFit(surface, lemma) {
+            if (learningLanguage === 'es') return scoreSpanishLemmaFit(surface, lemma);
+            const s = String(surface || '').toLowerCase();
+            const l = String(lemma || '').toLowerCase();
+            if (!s || !l) return -999;
+            const pref = sharedPrefixLen(s, l);
+            if (pref < 2) return -100;
+            return pref * 10 - Math.abs(s.length - l.length);
+        }
+
+        function spanishLemmaCandidates(word) {
+            const raw = String(word || '').trim().toLowerCase();
+            const scored = new Map(); // lemma → best score
+
+            const add = (lemma, baseScore = 0) => {
+                const v = String(lemma || '').trim().toLowerCase();
+                if (!v || v.length < 3) return;
+                const fit = /(ar|er|ir)$/.test(v) ? scoreSpanishLemmaFit(raw, v) : (v === raw ? 1000 : 0);
+                const score = fit + baseScore;
+                if (!scored.has(v) || scored.get(v) < score) scored.set(v, score);
+            };
+
+            add(raw, 1000);
+            const base0 = stripSpanishClitics(raw);
+            add(base0, 900);
+            if (ES_LEMMA_IRREGULAR[base0]) add(ES_LEMMA_IRREGULAR[base0], 800);
+            if (ES_LEMMA_IRREGULAR[raw]) add(ES_LEMMA_IRREGULAR[raw], 800);
+
+            // 1) Orthographic undos first (salpique→salpicar) — highest pattern priority
+            applySpanishOrthoUndos(base0).forEach((inf) => add(inf, 500));
+            applySpanishOrthoUndos(raw).forEach((inf) => add(inf, 500));
+
+            // Noun / adj plurals → singular
+            let w = base0;
+            if (w.endsWith('ces') && w.length > 4) add(w.slice(0, -3) + 'z', 50);
+            if (w.endsWith('es') && w.length > 4) add(w.slice(0, -2), 40);
+            if (w.endsWith('s') && !w.endsWith('es') && w.length > 3) add(w.slice(0, -1), 40);
+
+            // 2) Peel conjugation endings, then orthographic undo on the remainder + stem+ar/er/ir
+            ES_CONJ_ENDING_PATTERNS.forEach(({ re, try: endings }) => {
+                if (!re.test(w) || w.length < 5) return;
+                const stem = w.replace(re, '');
+                if (stem.length < 2) return;
+                endings.forEach((end) => add(stem + end, 80));
+                applySpanishOrthoUndos(stem + 'e').forEach((inf) => add(inf, 200));
+                applySpanishOrthoUndos(stem + 'é').forEach((inf) => add(inf, 200));
+                // If stem already ends with c/g/z from a peeled e-form that left "salpic"
+                if (/[cgz]$/u.test(stem)) endings.forEach((end) => add(stem + end, 120));
+            });
+
+            // Also run ortho undos on form with a synthetic trailing e if it ends in qu/gu/c
+            if (/qu$/u.test(w) || /gu$/u.test(w) || /gü$/u.test(w)) {
+                applySpanishOrthoUndos(w + 'e').forEach((inf) => add(inf, 400));
+            }
+
+            const ranked = [...scored.entries()]
+                .sort((a, b) => b[1] - a[1] || b[0].length - a[0].length)
+                .map(([lemma]) => lemma);
+
+            // Keep original first for MW exact hit, then best-fitting infinitives
+            const original = raw;
+            const rest = ranked.filter((c) => c !== original);
+            return [original, ...rest].slice(0, 12);
+        }
+
+        function englishLemmaCandidates(word) {
+            const raw = String(word || '').trim().toLowerCase();
+            const out = [];
+            const seen = new Set();
+            pushUniqueLemma(out, seen, raw);
+            if (EN_LEMMA_IRREGULAR[raw]) pushUniqueLemma(out, seen, EN_LEMMA_IRREGULAR[raw]);
+
+            let w = raw;
+            if (w.endsWith("'s") || w.endsWith("’s")) w = w.slice(0, -2);
+            pushUniqueLemma(out, seen, w);
+
+            if (w.endsWith('ies') && w.length > 4) pushUniqueLemma(out, seen, w.slice(0, -3) + 'y');
+            if (w.endsWith('ves') && w.length > 4) {
+                pushUniqueLemma(out, seen, w.slice(0, -3) + 'f');
+                pushUniqueLemma(out, seen, w.slice(0, -3) + 'fe');
+            }
+            if (w.endsWith('es') && w.length > 4) pushUniqueLemma(out, seen, w.slice(0, -2));
+            if (w.endsWith('s') && !w.endsWith('ss') && w.length > 3) pushUniqueLemma(out, seen, w.slice(0, -1));
+
+            if (w.endsWith('ying') && w.length > 5) pushUniqueLemma(out, seen, w.slice(0, -4) + 'ie');
+            if (w.endsWith('ing') && w.length > 5) {
+                const stem = w.slice(0, -3);
+                pushUniqueLemma(out, seen, stem);
+                pushUniqueLemma(out, seen, stem + 'e');
+                if (/(.)\1$/.test(stem)) pushUniqueLemma(out, seen, stem.slice(0, -1));
+            }
+            if (w.endsWith('ied') && w.length > 4) pushUniqueLemma(out, seen, w.slice(0, -3) + 'y');
+            if (w.endsWith('ed') && w.length > 4) {
+                const stem = w.slice(0, -2);
+                pushUniqueLemma(out, seen, stem);
+                pushUniqueLemma(out, seen, stem + 'e');
+                if (/(.)\1$/.test(stem)) pushUniqueLemma(out, seen, stem.slice(0, -1));
+            }
+            if (w.endsWith('ly') && w.length > 4) pushUniqueLemma(out, seen, w.slice(0, -2));
+            if (w.endsWith('ily') && w.length > 5) pushUniqueLemma(out, seen, w.slice(0, -3) + 'y');
+
+            return out.slice(0, 8);
+        }
+
+        function getDictLemmaCandidates(word) {
+            if (learningLanguage === 'es') return spanishLemmaCandidates(word);
+            if (learningLanguage === 'en') return englishLemmaCandidates(word);
+            return [String(word || '').trim().toLowerCase()].filter(Boolean);
+        }
+
+        async function fetchMerriamWebsterRaw(path) {
+            const res = await fetch(`${MERRIAM_PROXY}${path}`);
+            let data = null;
+            try { data = await res.json(); } catch (_) { data = null; }
+            return { res, data };
+        }
+
+        function surfaceLooksConjugatedSpanish(word) {
+            const s = String(word || '').trim().toLowerCase();
+            if (!s || s.length < 4) return false;
+            // Already an infinitive headword — never rewrite
+            if (/(ar|er|ir)$/u.test(s)) return false;
+            // Orthographic subjunctive / pret. yo patterns (salpique, llegue, empecé…)
+            if (applySpanishOrthoUndos(s).length) return true;
+            // Regular person/tense ending on a long enough stem
+            return ES_CONJ_ENDING_PATTERNS.some(({ re }) => re.test(s) && s.replace(re, '').length >= 3);
+        }
+
+        function surfaceLooksInflectedEnglish(word) {
+            const s = String(word || '').trim().toLowerCase();
+            if (!s || s.length < 4) return false;
+            if (EN_LEMMA_IRREGULAR[s]) return true;
+            return /(?:ing|ied|ies|ves|ed|ly|ily|'s|’s)$/u.test(s)
+                || (s.endsWith('s') && !s.endsWith('ss') && s.length > 4);
+        }
+
+        async function fetchMerriamWebster(word) {
+            const basePath = getMerriamDictPath(word);
+            if (!basePath) return { skip: true };
+            const dictKind = basePath.startsWith('/spanish/') ? 'spanish' : 'learners';
+            const prefix = basePath.startsWith('/spanish/') ? '/spanish/' : '/learners/';
+            const original = String(word || '').trim().toLowerCase();
+            const candidates = getDictLemmaCandidates(word);
+
+            const tryCand = async (cand) => {
+                const path = `${prefix}${encodeURIComponent(cand)}`;
+                const { res, data } = await fetchMerriamWebsterRaw(path);
+                return { cand, res, data };
+            };
+
+            const asEntries = (row) => {
+                if (!row?.res?.ok || !Array.isArray(row.data)) return null;
+                if (row.data && typeof row.data === 'object' && !Array.isArray(row.data) && row.data.error) {
+                    return { error: String(row.data.error) };
+                }
+                if (mwHasEntries(row.data)) {
+                    return {
+                        data: row.data,
+                        dictKind,
+                        resolvedLemma: row.cand !== original ? row.cand : null
+                    };
+                }
+                return null;
+            };
+
+            try {
+                // 1) Exact surface form — if MW has this noun/adj/verb as-is, keep it
+                const first = await tryCand(candidates[0] || original);
+                if (first.res && (first.res.status === 401 || first.res.status === 403 || first.res.status === 429)) {
+                    const msg = (first.data && first.data.error) ? String(first.data.error) : t('inline.dictError');
+                    return { error: msg, status: first.res.status };
+                }
+                if (first.data && typeof first.data === 'object' && !Array.isArray(first.data) && first.data.error) {
+                    return { error: String(first.data.error) };
+                }
+                const firstHit = asEntries(first);
+                if (firstHit?.error) return firstHit;
+                if (firstHit) return firstHit;
+
+                const suggestionPool = mwIsSuggestionList(first.data)
+                    ? first.data.map((s) => String(s).toLowerCase())
+                    : [];
+                const originalMissed = !mwHasEntries(first.data)
+                    && (suggestionPool.length > 0 || !Array.isArray(first.data) || first.data.length === 0);
+
+                // 2) Lemma patterns ONLY after a miss, and ONLY if surface looks conjugated —
+                // never rewrite a found noun into a verb infinitive.
+                const mayLemmatize = originalMissed && (
+                    (learningLanguage === 'es' && surfaceLooksConjugatedSpanish(original))
+                    || (learningLanguage === 'en' && surfaceLooksInflectedEnglish(original))
+                );
+
+                if (mayLemmatize) {
+                    const lemmas = candidates
+                        .filter((c) => c !== original)
+                        .sort((a, b) => scoreDictLemmaFit(original, b) - scoreDictLemmaFit(original, a))
+                        .slice(0, 8);
+                    if (lemmas.length) {
+                        const rows = await Promise.all(lemmas.map(tryCand));
+                        let best = null;
+                        let bestScore = -Infinity;
+                        for (const row of rows) {
+                            const hit = asEntries(row);
+                            if (hit?.error) return hit;
+                            if (!hit) continue;
+                            const score = scoreDictLemmaFit(original, row.cand);
+                            if (score > bestScore) {
+                                bestScore = score;
+                                best = hit;
+                            }
+                        }
+                        const minScore = learningLanguage === 'es' ? 35 : 8;
+                        if (best && bestScore >= minScore) return best;
+                    }
+
+                    const stem = original.replace(/[aeiouáéíóúü]+$/i, '');
+                    const preferred = suggestionPool.find((s) =>
+                        candidates.includes(s)
+                        || (stem.length >= 4 && s.startsWith(stem.slice(0, Math.min(stem.length, 6))) && /(ar|er|ir)$/.test(s))
+                    );
+                    if (preferred) {
+                        const row = await tryCand(preferred);
+                        const hit = asEntries(row);
+                        if (hit?.error) return hit;
+                        if (hit && scoreDictLemmaFit(original, preferred) >= (learningLanguage === 'es' ? 35 : 8)) {
+                            return hit;
+                        }
+                    }
+                }
+
+                // 3) MW lookalikes — do not force a verb lemma on real nouns / unknown words
+                if (suggestionPool.length) return { data: suggestionPool, dictKind };
+                return { data: [], dictKind };
+            } catch (e) {
+                return { network: true };
+            }
         }
 
         function mwEscapeHtml(s) {
@@ -8496,7 +9539,7 @@
             return html;
         }
 
-        function mwRenderResponse(data, dictKind = 'learners') {
+        function mwRenderResponse(data, dictKind = 'learners', resolvedLemma = null) {
             if (!Array.isArray(data) || data.length === 0) {
                 return `<p class="text-slate-400 text-xs">${t('inline.dictEmpty')}</p>`;
             }
@@ -8507,29 +9550,10 @@
             }
             const entries = data.filter(e => e && typeof e === 'object' && (e.hwi || e.fl || e.def || e.meta));
             if (!entries.length) return `<p class="text-slate-400 text-xs">${t('inline.dictEmpty')}</p>`;
-            return entries.map(e => mwRenderEntry(e, dictKind)).join('');
-        }
-
-        async function fetchMerriamWebster(word) {
-            const path = getMerriamDictPath(word);
-            if (!path) return { skip: true };
-            const dictKind = path.startsWith('/spanish/') ? 'spanish' : 'learners';
-            try {
-                const res = await fetch(`${MERRIAM_PROXY}${path}`);
-                let data = null;
-                try { data = await res.json(); } catch (_) { data = null; }
-                if (!res.ok) {
-                    const msg = (data && data.error) ? String(data.error) : t('inline.dictError');
-                    return { error: msg, status: res.status };
-                }
-                if (data && typeof data === 'object' && !Array.isArray(data) && data.error) {
-                    return { error: String(data.error) };
-                }
-                if (!Array.isArray(data)) return { error: t('inline.dictError') };
-                return { data, dictKind };
-            } catch (e) {
-                return { network: true };
-            }
+            const lemmaNote = resolvedLemma
+                ? `<p class="text-[10px] text-slate-400 mb-2">${t('inline.dictLemmaOf', { lemma: resolvedLemma })}</p>`
+                : '';
+            return lemmaNote + entries.map(e => mwRenderEntry(e, dictKind)).join('');
         }
 
         async function loadInlineMerriamDict(word, dictSection, dictContent, { expand = false } = {}) {
@@ -8565,7 +9589,7 @@
                 repositionInlinePopupSoon();
                 return;
             }
-            dictContent.innerHTML = mwRenderResponse(result.data, result.dictKind || 'learners');
+            dictContent.innerHTML = mwRenderResponse(result.data, result.dictKind || 'learners', result.resolvedLemma || null);
             // Keep manual open/close — only expand when navigating inside the dictionary
             if (expand) {
                 dictContent.classList.remove('hidden');
@@ -8673,7 +9697,7 @@
                 content.innerHTML = `<p class="text-rose-500 text-sm">${mwEscapeHtml(result.error)}</p>`;
                 return;
             }
-            content.innerHTML = mwRenderResponse(result.data, result.dictKind || 'learners');
+            content.innerHTML = mwRenderResponse(result.data, result.dictKind || 'learners', result.resolvedLemma || null);
         }
 
         window.openHomeMerriamDict = () => {
@@ -8788,15 +9812,16 @@
             const pageIdx = Math.max(0, (readerCurrentPage || 1) - 1);
             if (currentMaterial.subtitles) {
                 const pageSubs = readerPages[pageIdx];
-                // Keep cue/line breaks so lyrics don't become one giant “sentence”
-                if (Array.isArray(pageSubs)) {
-                    return pageSubs.map(s => String(s?.text || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join('\n');
-                }
+                // Lyrics: keep cue breaks so each line stays its own unit.
+                // Conversational: join with spaces so punctuation / 55-char clip can span cues.
+                const joiner = currentSubtitlesLyricMode ? '\n' : ' ';
+                const joinSubs = (subs) => (subs || [])
+                    .map(s => String(s?.text || '').replace(/\s+/g, ' ').trim())
+                    .filter(Boolean)
+                    .join(joiner);
+                if (Array.isArray(pageSubs)) return joinSubs(pageSubs);
                 try {
-                    return JSON.parse(currentMaterial.subtitles)
-                        .map(s => String(s?.text || '').replace(/\s+/g, ' ').trim())
-                        .filter(Boolean)
-                        .join('\n');
+                    return joinSubs(JSON.parse(currentMaterial.subtitles));
                 } catch (_) { return ''; }
             }
             const pageHtml = readerPages[pageIdx] || currentMaterial.content || '';
@@ -8817,6 +9842,77 @@
             return cleaned[0];
         }
 
+        function cueTextNormalized(el) {
+            return String(el?.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function cueLooksSentenceFinal(text) {
+            return /[.!?…]['"»”)\]]*$/.test(String(text || '').trim());
+        }
+
+        function cueLooksNewSentenceStart(text) {
+            return /^[¿¡"'«“]*[A-ZÁÉÍÓÚÜÑÀÈÌÒÙÄËÏÖÜ]/.test(String(text || '').trim());
+        }
+
+        function cueTimeGap(a, b) {
+            if (!a || !b) return 0;
+            const end = parseFloat(a.dataset?.end);
+            const start = parseFloat(b.dataset?.start);
+            if (!Number.isFinite(end) || !Number.isFinite(start)) return 0;
+            return Math.max(0, start - end);
+        }
+
+        // Conversational video: expand across neighboring subtitle cues until sentence bounds,
+        // so 🎯 is not stuck on the single highlighted cue (lyrics keep one cue only).
+        function getConversationalSubtitleContext(sub, preferWord = '') {
+            const reader = document.getElementById('reader-content');
+            if (!reader || !sub) return cueTextNormalized(sub) || null;
+            const all = [...reader.querySelectorAll('.yt-sub-line')];
+            const idx = all.indexOf(sub);
+            if (idx < 0) return cueTextNormalized(sub) || null;
+
+            let start = idx;
+            let end = idx;
+            const joinedLen = (a, b) => all.slice(a, b + 1).map(cueTextNormalized).filter(Boolean).join(' ').length;
+
+            while (start > 0) {
+                const prev = cueTextNormalized(all[start - 1]);
+                const cur = cueTextNormalized(all[start]);
+                // Don't cross into the previous sentence
+                if (cueLooksSentenceFinal(prev)) break;
+                // Previous cue ended; this one starts a new sentence after a pause
+                if (cueLooksNewSentenceStart(cur) && cueTimeGap(all[start - 1], all[start]) >= 0.25) break;
+                if (joinedLen(start - 1, end) > 260) break;
+                start--;
+            }
+            while (end < all.length - 1) {
+                const cur = cueTextNormalized(all[end]);
+                const next = cueTextNormalized(all[end + 1]);
+                if (cueLooksSentenceFinal(cur)) break;
+                // Narrator pause before a capitalised new sentence — don't pull it in
+                if (cueLooksNewSentenceStart(next) && (
+                    cueTimeGap(all[end], all[end + 1]) >= 0.25 || cueLooksSentenceFinal(cur)
+                )) break;
+                if (joinedLen(start, end + 1) > 260) break;
+                end++;
+            }
+
+            const windowText = all.slice(start, end + 1).map(cueTextNormalized).filter(Boolean).join(' ');
+            if (!windowText) return null;
+
+            // Prefer a punctuation / soft-comma clip around the tapped word when we can
+            const needle = String(preferWord || '').trim();
+            if (needle) {
+                const occ = findWordOccurrenceInText(windowText, needle, 0)
+                    || findWordOccurrenceNearOffset(windowText, needle, Math.floor(windowText.length / 2));
+                if (occ) {
+                    const clipped = extractMinimalContextClip(windowText, occ);
+                    if (clipped?.clip) return clipped.clip;
+                }
+            }
+            return windowText;
+        }
+
         function getLineContextFromNode(node, preferWord = '') {
             if (!node) return null;
             const el = node.nodeType === 1 ? node : node.parentElement;
@@ -8824,8 +9920,12 @@
 
             const sub = el.closest?.('.yt-sub-line');
             if (sub) {
-                const text = (sub.textContent || '').replace(/\s+/g, ' ').trim();
-                return text || null;
+                // Lyrics / verse: one cue = one context unit
+                if (sub.classList.contains('yt-lyric-line') || currentSubtitlesLyricMode) {
+                    return cueTextNormalized(sub) || null;
+                }
+                // Conversational dialogue: span cues like a normal sentence
+                return getConversationalSubtitleContext(sub, preferWord);
             }
 
             const reader = document.getElementById('reader-content');
@@ -9375,6 +10475,10 @@
                 ['a', 'fin', 'de', 'cuentas'], ['en', 'absoluto'], ['ni', 'modo'],
                 ['sin', 'falta'], ['sin', 'duda'], ['a', 'ciegas'], ['a', 'menudo'],
                 ['de', 'nuevo'], ['al', 'menos'], ['por', 'fin'], ['por', 'ahora'],
+                // a lo + …
+                ['a', 'lo', 'largo'], ['a', 'lo', 'largo', 'de'],
+                ['a', 'lo', 'lejos'], ['a', 'lo', 'sumo'], ['a', 'lo', 'grande'],
+                ['a', 'lo', 'loco'],
                 // Verb idioms / collocations (lemma = first token; conjugations via verbInflections)
                 ['dar', 'cuenta'], ['dar', 'cuenta', 'de'],
                 ['echar', 'de', 'menos'], ['caer', 'en', 'la', 'cuenta'],
@@ -9881,17 +10985,24 @@
                 .replace(/«([^»]+)»/g, '$1')
                 .replace(/\{\{([^}]+)\}\}/g, '$1')
                 .replace(/<<([^>]+)>>/g, '$1')
-                .replace(/「([^」]+)」/g, '$1');
+                .replace(/「([^」]+)」/g, '$1')
+                .replace(/\[\[([^\]]+)\]\]/g, '$1')
+                .replace(/\(\(([^)]+)\)\)/g, '$1');
         }
 
         // Light words GT often mis-attaches markers onto (esp. when EN phrase → one UK/ES word)
         const CONTEXT_ALIGN_STOPWORDS = new Set([
             'a', 'an', 'the', 'to', 'of', 'in', 'on', 'at', 'by', 'for', 'from', 'with', 'as', 'and', 'or', 'but',
             'into', 'onto', 'upon', 'over', 'under', 'about', 'than', 'that', 'this', 'these', 'those', 'it',
+            'is', 'are', 'was', 'were', 'be', 'been', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would',
+            'can', 'could', 'should', 'may', 'might', 'must', 'not', 'no', 'so', 'if', 'or', 'nor',
+            'he', 'she', 'we', 'they', 'you', 'i', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'our', 'their',
             'що', 'щоб', 'до', 'на', 'з', 'із', 'у', 'в', 'і', 'й', 'та', 'як', 'це', 'цей', 'ця', 'той', 'та',
-            'але', 'про', 'від', 'для', 'чи', 'же', 'би', 'б', 'не', 'ні',
+            'але', 'про', 'від', 'для', 'чи', 'же', 'би', 'б', 'не', 'ні', 'є', 'був', 'була', 'було',
             'de', 'a', 'en', 'el', 'la', 'los', 'las', 'un', 'una', 'y', 'o', 'que', 'por', 'con', 'del', 'al',
-            'lo', 'su', 'sus', 'se', 'es'
+            'lo', 'su', 'sus', 'se', 'es', 'me', 'te', 'le', 'les', 'nos', 'os', 'mi', 'tu', 'sí', 'no', 'ya',
+            'pero', 'como', 'más', 'muy', 'también', 'porque', 'cuando', 'donde', 'está', 'están', 'ser', 'estar',
+            'hay', 'fue', 'son', 'era', 'eran', 'este', 'esta', 'estos', 'estas', 'ese', 'esa', 'eso'
         ]);
 
         function isContextAlignStopword(w) {
@@ -9900,7 +11011,112 @@
             return CONTEXT_ALIGN_STOPWORDS.has(s);
         }
 
-        function pickBestContextWordTrans(sentenceTrans, markedExtract, isolatedTrans, sourcePhrase) {
+        function findWholeWordIndex(haystack, needle) {
+            const h = String(haystack || '');
+            const n = String(needle || '').trim();
+            if (!h || !n) return -1;
+            const escaped = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+            const re = new RegExp(`(?<![\\p{L}\\p{M}0-9])${escaped}(?![\\p{L}\\p{M}0-9])`, 'iu');
+            const m = re.exec(h);
+            return m ? m.index : -1;
+        }
+
+        // When markers vanish (common on ES→EN), recover the word that actually appears
+        // in the full fragment translation — exact match, stem/prefix, or position+isolated.
+        function locateTranslatedWordInSentence(sentenceTrans, isolatedTrans, wordMatch, sourceSentence) {
+            const sent = String(sentenceTrans || '');
+            if (!sent) return null;
+            const tokens = tokenizeForContextAlign(sent);
+            if (!tokens.length) return null;
+
+            const isoRaw = String(isolatedTrans || '').trim();
+            const isoTokens = tokenizeForContextAlign(isoRaw).filter((t) => !isContextAlignStopword(t));
+            const needles = isoTokens.length ? isoTokens : tokenizeForContextAlign(isoRaw);
+            const expected = wordMatch
+                ? (wordMatch.index / Math.max(String(sourceSentence || '').length, 1)) * sent.length
+                : sent.length / 2;
+
+            let best = null;
+            let bestScore = -Infinity;
+
+            const consider = (token, idxInSent, base) => {
+                if (!token || isContextAlignStopword(token)) return;
+                const at = findWholeWordIndex(sent, token);
+                const pos = at >= 0 ? at : idxInSent;
+                const dist = Math.abs(pos - expected) / Math.max(sent.length, 1);
+                let score = base - dist * 55;
+                if (best == null || score > bestScore) {
+                    best = token;
+                    bestScore = score;
+                }
+            };
+
+            // Exact / multi-word isolated phrase inside the sentence
+            if (isoRaw && findWholeWordIndex(sent, isoRaw) >= 0) return isoRaw;
+
+            needles.forEach((needle) => {
+                if (findWholeWordIndex(sent, needle) >= 0) consider(needle, findWholeWordIndex(sent, needle), 120);
+            });
+
+            tokens.forEach((tok, i) => {
+                const approxIdx = (() => {
+                    // rough char index of this token
+                    let pos = 0;
+                    let count = 0;
+                    const re = /[\p{L}\p{M}][\p{L}\p{M}'-]*|[\p{N}]+/gu;
+                    let m;
+                    while ((m = re.exec(sent)) !== null) {
+                        if (count === i) return m.index;
+                        count++;
+                        pos = m.index;
+                    }
+                    return pos;
+                })();
+
+                needles.forEach((needle) => {
+                    const n = needle.toLowerCase();
+                    const t = tok.toLowerCase();
+                    if (t === n) consider(tok, approxIdx, 110);
+                    else if (t.startsWith(n) || n.startsWith(t)) {
+                        if (Math.min(t.length, n.length) >= 3) consider(tok, approxIdx, 90);
+                    } else {
+                        const pre = sharedPrefixLen(t, n);
+                        if (pre >= 4 || (pre >= 3 && pre / Math.max(t.length, n.length) >= 0.6)) {
+                            consider(tok, approxIdx, 70 + pre);
+                        }
+                    }
+                });
+            });
+
+            // No isolated hint — take nearest content token to expected position
+            if (bestScore < 40) {
+                let nearest = null;
+                let nearestDist = Infinity;
+                tokens.forEach((tok) => {
+                    if (isContextAlignStopword(tok)) return;
+                    const at = findWholeWordIndex(sent, tok);
+                    if (at < 0) return;
+                    const d = Math.abs(at - expected);
+                    if (d < nearestDist) {
+                        nearestDist = d;
+                        nearest = tok;
+                    }
+                });
+                if (nearest) return nearest;
+            }
+
+            return bestScore >= 40 ? best : null;
+        }
+
+        function positionScoreInSentence(sentenceTrans, candidate, sourceSentence, wordMatch) {
+            const idx = findWholeWordIndex(sentenceTrans, candidate);
+            if (idx < 0) return -25;
+            const expected = (wordMatch.index / Math.max(String(sourceSentence || '').length, 1)) * Math.max(sentenceTrans.length, 1);
+            const dist = Math.abs(idx - expected) / Math.max(sentenceTrans.length, 1);
+            return 25 - dist * 50;
+        }
+
+        function pickBestContextWordTrans(sentenceTrans, markedExtract, isolatedTrans, sourcePhrase, wordMatch, sourceSentence) {
             const sent = String(sentenceTrans || '');
             const sentLower = sent.toLowerCase();
             const sourceIsMulti = /\s/.test(String(sourcePhrase || '').trim());
@@ -9914,16 +11130,18 @@
 
             if (markedExtract) {
                 let score = 40;
-                if (isContextAlignStopword(markedExtract) && sourceIsMulti) score -= 35;
-                if (sentLower.includes(markedExtract.toLowerCase())) score += 20;
+                if (isContextAlignStopword(markedExtract)) score -= sourceIsMulti ? 40 : 25;
+                if (sentLower.includes(markedExtract.toLowerCase())) score += 15;
+                if (wordMatch && sourceSentence) score += positionScoreInSentence(sent, markedExtract, sourceSentence, wordMatch);
                 push(markedExtract, score);
             }
             if (isolatedTrans) {
-                let score = 35;
-                if (sentLower.includes(isolatedTrans.toLowerCase())) score += 40;
-                if (isContextAlignStopword(isolatedTrans) && sourceIsMulti) score -= 30;
-                // Prefer a compact match when source is multi-word (typical one-word UK/ES renderings)
+                let score = 45;
+                if (findWholeWordIndex(sent, isolatedTrans) >= 0) score += 45;
+                else if (sentLower.includes(isolatedTrans.toLowerCase())) score += 10;
+                if (isContextAlignStopword(isolatedTrans)) score -= sourceIsMulti ? 35 : 20;
                 if (sourceIsMulti && !/\s/.test(isolatedTrans.trim())) score += 10;
+                if (wordMatch && sourceSentence) score += positionScoreInSentence(sent, isolatedTrans, sourceSentence, wordMatch);
                 push(isolatedTrans, score);
             }
 
@@ -9939,6 +11157,11 @@
                 /\{\{([^}]+)\}\}/,
                 /<<([^>]+)>>/,
                 /「([^」]+)」/,
+                /\[\[([^\]]+)\]\]/,
+                /\(\(([^)]+)\)\)/,
+                // GT sometimes keeps only one bracket or swaps to ASCII lookalikes
+                /\[([^\]]{1,40})\]/,
+                /\{([^{}]{1,40})\}/,
             ];
             for (const p of patterns) {
                 const m = translated.match(p);
@@ -10004,6 +11227,12 @@
             return tgtTokens[tgtIdx] || null;
         }
 
+        /**
+         * Context-accurate translation (🎯).
+         * IMPORTANT: call ONLY from fetchInlineContextTranslation (user press).
+         * Never invoke from processInlineTranslationRequest / word click / MW load —
+         * applies to every current and future language pair.
+         */
         async function prefetchContextTranslation(sentence, wordMatch) {
             if (!sentence || !wordMatch) return { sentenceTrans: null, contextWordTrans: null };
             if (learningLanguage === translationLanguage) {
@@ -10016,13 +11245,21 @@
             const before = sentence.slice(0, wordMatch.index);
             const target = sentence.slice(wordMatch.index, wordMatch.index + wordMatch.length);
             const after = sentence.slice(wordMatch.index + wordMatch.length);
+            // Unicode markers often drift or vanish on ES→EN — keep a «» fallback ready
             const marked = `${before}⟦${target}⟧${after}`;
+            const markedAlt = `${before}«${target}»${after}`;
 
-            const wantsIsolated = /\s/.test(target.trim()) || target.trim().length >= 8;
-            const [markedTrans, isolatedTrans] = await Promise.all([
+            // Always isolate too: short Spanish lemmas are where attachment drifts most
+            let [markedTrans, isolatedTrans] = await Promise.all([
                 fetchTranslationText(marked),
-                wantsIsolated ? fetchTranslationText(target, { lowercase: true }) : Promise.resolve(null)
+                fetchTranslationText(target, { lowercase: true })
             ]);
+
+            if (markedTrans && !extractMarkedWordFromTranslation(markedTrans)) {
+                const alt = await fetchTranslationText(markedAlt);
+                if (alt && (extractMarkedWordFromTranslation(alt) || !markedTrans)) markedTrans = alt;
+            }
+
             if (!markedTrans) {
                 return {
                     sentenceTrans: null,
@@ -10033,15 +11270,47 @@
             const sentenceTrans = stripContextMarkers(markedTrans);
             let contextWordTrans = extractMarkedWordFromTranslation(markedTrans);
 
-            contextWordTrans = pickBestContextWordTrans(sentenceTrans, contextWordTrans, isolatedTrans, target);
+            contextWordTrans = pickBestContextWordTrans(
+                sentenceTrans, contextWordTrans, isolatedTrans, target, wordMatch, sentence
+            );
 
-            if (!contextWordTrans || (isContextAlignStopword(contextWordTrans) && /\s/.test(target.trim()))) {
+            // Critical for ES→EN: markers often vanish, but the full fragment is correct —
+            // recover the word that actually sits in that translation.
+            const located = locateTranslatedWordInSentence(sentenceTrans, isolatedTrans, wordMatch, sentence);
+            if (located) {
+                if (!contextWordTrans
+                    || isContextAlignStopword(contextWordTrans)
+                    || findWholeWordIndex(sentenceTrans, contextWordTrans) < 0) {
+                    contextWordTrans = located;
+                } else if (findWholeWordIndex(sentenceTrans, contextWordTrans) >= 0
+                    && findWholeWordIndex(sentenceTrans, located) >= 0) {
+                    // Prefer the candidate closer to the source word's relative position
+                    const a = positionScoreInSentence(sentenceTrans, contextWordTrans, sentence, wordMatch);
+                    const b = positionScoreInSentence(sentenceTrans, located, sentence, wordMatch);
+                    if (b > a + 5) contextWordTrans = located;
+                }
+            }
+
+            if (!contextWordTrans || isContextAlignStopword(contextWordTrans)) {
                 contextWordTrans = alignWordByTokenIndex(sentence, sentenceTrans, wordMatch) || contextWordTrans;
             }
-            if (!contextWordTrans) {
-                contextWordTrans = alignWordByOffset(sentence, sentenceTrans, wordMatch.index, wordMatch.length);
+            if (!contextWordTrans || isContextAlignStopword(contextWordTrans)) {
+                const byOffset = alignWordByOffset(sentence, sentenceTrans, wordMatch.index, wordMatch.length);
+                if (byOffset && !isContextAlignStopword(byOffset)) contextWordTrans = byOffset;
             }
-            // Last resort: isolated phrase translation even if it is not found in the sentence
+            if (isolatedTrans && findWholeWordIndex(sentenceTrans, isolatedTrans) >= 0) {
+                if (!contextWordTrans || isContextAlignStopword(contextWordTrans)
+                    || findWholeWordIndex(sentenceTrans, contextWordTrans) < 0) {
+                    contextWordTrans = isolatedTrans;
+                }
+            }
+            // Last resort: if we still can't place it in the sentence, keep isolated for the input
+            // but try one more locate pass with token-align hint
+            if (contextWordTrans && findWholeWordIndex(sentenceTrans, contextWordTrans) < 0) {
+                const again = locateTranslatedWordInSentence(sentenceTrans, contextWordTrans, wordMatch, sentence)
+                    || locateTranslatedWordInSentence(sentenceTrans, isolatedTrans, wordMatch, sentence);
+                if (again) contextWordTrans = again;
+            }
             if ((!contextWordTrans || isContextAlignStopword(contextWordTrans)) && isolatedTrans) {
                 contextWordTrans = isolatedTrans;
             }
@@ -10059,7 +11328,12 @@
         function highlightPhraseInSentence(sentence, phrase) {
             if (!sentence) return '';
             if (!phrase) return escapeHtmlText(sentence);
-            const escaped = String(phrase).replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+            let needle = String(phrase).trim();
+            if (findWholeWordIndex(sentence, needle) < 0) {
+                const fuzzy = locateTranslatedWordInSentence(sentence, needle, { index: Math.floor(sentence.length / 2), length: needle.length }, sentence);
+                if (fuzzy) needle = fuzzy;
+            }
+            const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
             const re = new RegExp(`(?<![\\p{L}\\p{M}0-9])(${escaped})(?![\\p{L}\\p{M}0-9])`, 'iu');
             const m = re.exec(sentence);
             if (m) {
@@ -10173,6 +11447,17 @@
             const expanded = resolveContextPhraseExpansion(data);
             if (expanded) applyContextPhraseExpansion(data, expanded);
 
+            // Prefer the surface form that actually appears in the fragment translation
+            if (data.sentenceTrans && data.contextWordTrans) {
+                const surface = locateTranslatedWordInSentence(
+                    data.sentenceTrans,
+                    data.contextWordTrans,
+                    data.wordMatch,
+                    data.contextClip || data.context || ''
+                );
+                if (surface) data.contextWordTrans = surface.toLowerCase();
+            }
+
             if (data.contextWordTrans && input) {
                 input.value = data.contextWordTrans;
                 input.classList.add('ring-2', 'ring-indigo-300');
@@ -10205,6 +11490,7 @@
                 const expanded = resolveContextPhraseExpansion(data);
                 if (expanded) applyContextPhraseExpansion(data, expanded);
 
+                // On-demand only — no background / prefetch on word click
                 const result = await prefetchContextTranslation(data.contextClip, data.wordMatch);
                 if (!pendingInlineSaveData || pendingInlineSaveData.clickedWord !== data.clickedWord) return;
                 pendingInlineSaveData.sentenceTrans = result.sentenceTrans;
@@ -10805,8 +12091,16 @@
 
         function updateTrainSources() {
             const select = document.getElementById('train-source-select');
+            if (!select) return;
+            const prev = select.value || 'ALL';
             const sources = [...new Set(vocabulary.map(v => v.source))];
             select.innerHTML = `<option value="ALL">${t('dict.allWords')}</option>` + sources.map(s => `<option value="${s.replace(/"/g, '&quot;')}">📁 ${s === 'Імпорт' ? t('folder.import') : s}</option>`).join('');
+            if ([...select.options].some((o) => o.value === prev)) select.value = prev;
+            if (!select.dataset.reviewDueBound) {
+                select.dataset.reviewDueBound = '1';
+                select.addEventListener('change', () => updateReviewDueBadge());
+            }
+            updateReviewDueBadge();
         }
 
         window.startSession = (mode) => {
@@ -10896,17 +12190,52 @@
 
         window.startReviewSession = () => {
             const srcFilter = document.getElementById('train-source-select').value;
-            let pool = vocabulary.filter(w => isSrsMastered(w.srsLevel));
-            if(srcFilter !== 'ALL') pool = pool.filter(w => w.source === srcFilter);
-            if(pool.length === 0) return window.showModal(t('msg.noLearned'));
-            
+            const modes = selectedReviewModes.length ? selectedReviewModes : [...REVIEW_MODE_IDS];
+            if (!modes.length) return window.showModal(t('msg.reviewModesNeed'));
+
+            const learned = countLearnedWords(srcFilter);
+            if (learned === 0) return window.showModal(t('msg.noLearned'));
+
+            let pool = getReviewPool(srcFilter);
+            // Picture mode needs an image — if only picture is selected, filter
+            if (modes.length === 1 && modes[0] === 'picture') {
+                pool = pool.filter((w) => w.imageUrl);
+            }
+            if (pool.length === 0) return window.showModal(t('msg.noMaintDue'));
+
             activeSessionMode = 'review';
-            bsWords = pool.sort(() => 0.5 - Math.random()).slice(0, 10);
-            bsCurrentWordIdx = 0; bsCurrentStage = 1; bsTotalSteps = bsWords.length; bsCompletedSteps = 0; 
-            document.getElementById('train-hub-screen').classList.add('hidden'); document.getElementById('bs-results').classList.add('hidden'); document.getElementById('bs-workspace').classList.remove('hidden');
+            const picked = shuffleWords(pool).slice(0, 10).map((w) => {
+                let stageModes = modes;
+                if (!w.imageUrl) stageModes = modes.filter((m) => m !== 'picture');
+                if (!stageModes.length) stageModes = ['word-trans'];
+                return {
+                    ...w,
+                    failed: false,
+                    _reviewStage: pickReviewStageForWord(stageModes)
+                };
+            });
+            bsWords = picked;
+            bsCurrentWordIdx = 0;
+            bsCurrentStage = bsWords[0]?._reviewStage || 1;
+            bsTotalSteps = bsWords.length;
+            bsCompletedSteps = 0;
+
+            const mainEl = document.querySelector('main');
+            const mainCard = document.getElementById('bs-main-card');
+            const extClues = document.getElementById('bs-external-clues');
+            mainEl.classList.remove('cw-expanded-main', 'max-w-5xl');
+            mainEl.classList.add('max-w-4xl');
+            mainCard.className = "bg-white p-4 sm:p-5 rounded-2xl shadow-xl border border-slate-100 text-center relative overflow-hidden flex flex-col min-h-[300px] w-full";
+            extClues.classList.add('hidden');
+            document.getElementById('bs-workspace')?.classList.remove('cw-session');
+
+            document.getElementById('train-hub-screen').classList.add('hidden');
+            document.getElementById('bs-results').classList.add('hidden');
+            document.getElementById('bs-workspace').classList.remove('hidden');
             beginTrainingSession();
             syncCrosswordExpandButton();
-            updateBsProgress(); renderBsStage();
+            updateBsProgress();
+            renderBsStage();
         };
 
         window.endSession = () => { 
@@ -10928,11 +12257,18 @@
             }
             clearContextRoundTimer();
             syncCrosswordExpandButton();
+            closeReviewSetup();
+            updateReviewDueBadge();
         };
 
         function updateBsProgress() {
             document.getElementById('bs-progress-bar').style.width = `${(bsCompletedSteps / bsTotalSteps) * 100}%`;
-            document.getElementById('bs-overall-stage').textContent = activeSessionMode === 'review' ? t('stage.review') : t(`stage.${bsCurrentStage}`);
+            const stageEl = document.getElementById('bs-overall-stage');
+            if (activeSessionMode === 'review') {
+                stageEl.textContent = `${t('stage.review')} · ${t(`stage.${bsCurrentStage}`)}`;
+            } else {
+                stageEl.textContent = t(`stage.${bsCurrentStage}`);
+            }
             const counter = document.getElementById('bs-word-counter');
             if (!counter) return;
             if (activeSessionMode === 'crossword') {
@@ -10957,9 +12293,21 @@
                 return finishSprintSession();
             }
 
+            if (activeSessionMode === 'review') {
+                bsCompletedSteps++;
+                bsCurrentWordIdx++;
+                if (bsCurrentWordIdx >= bsWords.length) {
+                    return finishBrainstorm();
+                }
+                bsCurrentStage = bsWords[bsCurrentWordIdx]._reviewStage || 1;
+                updateBsProgress();
+                renderBsStage();
+                return;
+            }
+
             bsCompletedSteps++; bsCurrentWordIdx++;
             if (bsCurrentWordIdx >= bsWords.length) {
-                const stages = activeSessionMode==='review'? [1] : MODE_STAGES[activeSessionMode]; 
+                const stages = MODE_STAGES[activeSessionMode]; 
                 const currentStageIndex = stages.indexOf(bsCurrentStage);
                 
                 if(currentStageIndex + 1 < stages.length) {
@@ -11050,7 +12398,9 @@
             saveStatusEl.className = saveResult.className;
 
             document.getElementById('bs-results-list').innerHTML = bsWords.map(w => {
-                const displayLevel = clampSrsLevel(getWordModeLevel(w, activeSessionMode));
+                const isReview = activeSessionMode === 'review';
+                const displayLevel = isReview ? clampMaintLevel(w.maintLevel) : clampSrsLevel(getWordModeLevel(w, activeSessionMode));
+                const ringMax = isReview ? MAX_MAINT_LEVEL : MAX_SRS_LEVEL;
                 const wid = String(w.id || '').replace(/'/g, "\\'");
                 const zeroPass = !!w.contextZeroPass;
                 const ok = !w.failed;
@@ -11066,7 +12416,7 @@
                     titleAttr = ` title="${t('train.zeroPass').replace(/"/g, '&quot;')}"`;
                 }
                 return `<div class="bg-white rounded-xl border border-slate-100 px-2.5 py-2 flex items-center gap-2 min-w-0 shadow-sm">
-                    <button type="button" class="w-10 h-10 flex-shrink-0 rounded-full hover:ring-2 hover:ring-indigo-300 transition cursor-pointer flex items-center justify-center" title="${t('srs.ready')}" onclick="event.stopPropagation(); showSrsStatusFromTraining('${wid}')">${getSrsSvg(displayLevel, false, true, MAX_SRS_LEVEL, { compact: true })}</button>
+                    <button type="button" class="w-10 h-10 flex-shrink-0 rounded-full hover:ring-2 hover:ring-indigo-300 transition cursor-pointer flex items-center justify-center" title="${t('srs.ready')}" onclick="event.stopPropagation(); showSrsStatusFromTraining('${wid}')">${getSrsSvg(displayLevel, false, true, ringMax, { compact: true })}</button>
                     <div class="min-w-0 flex-1 leading-tight">
                         <p class="font-bold text-indigo-700 text-sm truncate">${w.word}</p>
                         <p class="font-medium text-slate-800 text-xs truncate">${w.translation}</p>
@@ -11081,6 +12431,7 @@
             }
             preserveTrainingFocusState();
             if (saveResult.ok) renderDictionary();
+            updateReviewDueBadge();
         }
 
         window.markWordAsFailed = () => {
@@ -12843,7 +14194,10 @@
             }
 
             if(tab !== 'library') closeReader(); 
-            if(tab !== 'training') endSession();
+            if(tab !== 'training') {
+                endSession();
+                closeReviewSetup();
+            }
         };
     </script>
 </body>
