@@ -2,7 +2,10 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#f8fafc">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>LinguaSpace</title>
     <!-- Додано емодзі як іконку вкладки (Favicon) та для ярликів на телефоні -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌌</text></svg>">
@@ -10,8 +13,20 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { padding-bottom: 140px; -webkit-tap-highlight-color: transparent; overflow-x: hidden; max-width: 100vw; }
-        html { overflow-x: hidden; max-width: 100%; }
+        html {
+            overflow-x: hidden;
+            max-width: 100%;
+            background-color: #f8fafc;
+        }
+        body {
+            /* Keep a little room for the home indicator — not a large empty strip */
+            padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            max-width: 100vw;
+            background-color: #f8fafc;
+            min-height: 100dvh;
+        }
         
         /* Smooth scrolling transitions for headers */
         header { position: sticky; top: 0px; z-index: 60; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -30,30 +45,21 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         #bs-success-reveal {
-            transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+            transition: border-color 0.3s ease, background 0.3s ease;
         }
         #bs-success-reveal.bs-reveal-success {
-            background: linear-gradient(145deg, #ecfdf5 0%, #f8fafc 55%, #eef2ff 100%);
-            border-color: #6ee7b7;
+            background: #f8fafc;
+            border-color: #c7d2fe;
         }
         #bs-success-reveal.bs-reveal-missed {
             background: #fff;
-            border-color: #cbd5e1;
-        }
-        #bs-success-reveal.bs-reveal-success,
-        #bs-success-reveal.bs-reveal-missed {
-            animation: bs-reveal-ring 1.1s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        @keyframes bs-reveal-ring {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.42); }
-            65% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+            border-color: #e2e8f0;
         }
         #bs-reveal-badge {
             letter-spacing: 0.06em;
         }
         #bs-reveal-badge.bs-reveal-badge-missed { color: #64748b; }
-        #bs-reveal-badge.bs-reveal-badge-success { color: #059669; }
+        #bs-reveal-badge.bs-reveal-badge-success { color: #4338ca; }
         #bs-success-word { color: #4338ca; }
         #bs-success-word.bs-word-highlight { color: #4338ca; }
         #bs-success-reveal.bs-reveal-missed #bs-success-word { color: #4338ca; }
@@ -521,9 +527,83 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.25);
             border-radius: 12px;
             top: auto !important;
+            display: flex !important;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .yt-pip-mode #reader-yt-player {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        #reader-yt-pip-handle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 18px;
+            background: rgba(15, 23, 42, 0.72);
+            color: #94a3b8;
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+        }
+        .yt-pip-mode #reader-yt-pip-handle { display: flex; }
+        #reader-yt-pip-handle:active { cursor: grabbing; }
+        #reader-yt-pip-spacer {
+            width: 100%;
+            margin-bottom: 1rem;
+            border-radius: 0.75rem;
+            background: #e2e8f0;
+            opacity: 0.55;
+            pointer-events: none;
+        }
+        #reader-yt-jump {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+            z-index: 1005;
+            width: 2.35rem;
+            height: 2.35rem;
+            border-radius: 9999px;
+            border: 1px solid #cbd5e1;
+            background: rgba(248, 250, 252, 0.92);
+            color: #94a3b8;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            line-height: 1;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        #reader-yt-jump.is-visible {
+            display: inline-flex;
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        #reader-yt-jump:hover {
+            color: #64748b;
+            border-color: #94a3b8;
         }
         @media (max-width: 640px) {
-            .yt-pip-mode { width: 250px !important; height: 140px !important; bottom: 80px; right: 10px; }
+            /* Phone: sit under the header, out of the main reading column */
+            .yt-pip-mode {
+                width: min(56vw, 210px) !important;
+                height: auto !important;
+                aspect-ratio: 16 / 9;
+                top: calc(60px + env(safe-area-inset-top, 0px) + 8px) !important;
+                right: 10px;
+                bottom: auto !important;
+                left: auto;
+            }
+            #reader-yt-jump {
+                bottom: max(5.5rem, calc(env(safe-area-inset-bottom, 0px) + 4.5rem));
+            }
         }
 
         .letter-slot { min-width: 2.2rem; min-height: 2.8rem; border-bottom: 3px solid #cbd5e1; transition: all 0.2s; }
@@ -716,105 +796,96 @@
         .lang-chip {
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
-            padding: 0.4rem 0.65rem;
+            gap: 0.4rem;
+            padding: 0.4rem 0.7rem;
             border-radius: 0.7rem;
             border: 1px solid #e2e8f0;
             background: #fff;
             color: #475569;
             font-weight: 700;
             font-size: 0.8rem;
+            transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
         }
         .lang-chip-flag { font-size: 1.05rem; line-height: 1; }
-        .lang-chip-code {
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-            background: #e2e8f0;
-            color: #334155;
-            border-radius: 4px;
-            padding: 1px 5px;
-            line-height: 1.4;
-        }
         .lang-chip.is-on {
             border-color: #818cf8;
             background: #eef2ff;
             color: #3730a3;
         }
-        .lang-chip.is-on .lang-chip-code {
-            background: #c7d2fe;
-            color: #3730a3;
-        }
         .lang-chip:disabled { opacity: 0.35; cursor: not-allowed; }
         .lang-chip-compact {
-            padding: 0.35rem 0.45rem;
-            gap: 0.3rem;
-            min-width: 2.6rem;
+            padding: 0.4rem 0.5rem;
+            min-width: 2.4rem;
             justify-content: center;
         }
-        .lang-chip-compact .lang-chip-flag { font-size: 0.95rem; }
-        .lang-chip-compact .lang-chip-code {
-            font-size: 11px;
-            background: transparent;
-            padding: 0;
-            color: inherit;
-        }
-        .lang-chip-compact.is-on .lang-chip-code { background: transparent; color: inherit; }
+        .lang-chip-compact .lang-chip-flag { font-size: 1.05rem; }
         .track-pair-chip {
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-            padding: 0.45rem 0.7rem;
+            padding: 0.4rem 0.65rem;
             border-radius: 0.7rem;
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            background: rgba(255, 255, 255, 0.14);
-            color: #eef2ff;
-            font-weight: 800;
-            font-size: 0.8rem;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            backdrop-filter: blur(4px);
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #334155;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
         }
         .track-pair-chip.is-on {
+            background: #eef2ff;
+            border-color: #a5b4fc;
+            color: #3730a3;
+            box-shadow: 0 0 0 1px rgba(165, 180, 252, 0.35);
+        }
+        .track-pair-chip .pair-arrow {
+            font-size: 0.85rem;
+            opacity: 0.55;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .settings-panel {
             background: #fff;
-            border-color: #fff;
-            color: #312e81;
-        }
-        .track-pair-chip .pair-arrow { font-size: 0.95rem; opacity: 0.85; }
-        /* Hierarchy: my pairs (dark) → pick languages (light) → interface (quietest) */
-        .settings-panel-pairs {
-            background: linear-gradient(145deg, #3730a3 0%, #312e81 55%, #1e1b4b 100%);
-            border: 1px solid #312e81;
+            border: 1px solid #e2e8f0;
             border-radius: 1rem;
-            padding: 0.85rem 0.9rem;
-            color: #e0e7ff;
-            box-shadow: 0 4px 14px rgba(49, 46, 129, 0.28);
+            padding: 0.85rem 0.95rem;
         }
-        .settings-panel-pairs .settings-panel-label {
-            color: #a5b4fc;
+        .settings-panel-label {
+            color: #64748b;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 0.55rem;
         }
-        .settings-panel-learn {
-            background: linear-gradient(160deg, #eef2ff 0%, #e0e7ff 100%);
-            border: 1px solid #c7d2fe;
-            border-radius: 1rem;
-            padding: 0.9rem;
+        .settings-panel-learn .settings-panel-sublabel {
+            color: #818cf8;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+        .settings-lang-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.85rem;
+        }
+        @media (min-width: 420px) {
+            .settings-lang-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem 1rem; }
         }
         .settings-panel-muted {
             background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.85rem;
-            padding: 0.45rem 0.6rem;
-            opacity: 0.92;
+            border-color: #e2e8f0;
+            padding: 0.55rem 0.75rem;
         }
         .settings-panel-muted .lang-chip-compact {
-            opacity: 0.85;
             border-color: #e2e8f0;
             background: #fff;
             color: #64748b;
-            padding: 0.28rem 0.4rem;
-            font-size: 0.72rem;
+            padding: 0.32rem 0.42rem;
         }
         .settings-panel-muted .lang-chip-compact.is-on {
-            opacity: 1;
             border-color: #cbd5e1;
             background: #f1f5f9;
             color: #475569;
@@ -842,7 +913,7 @@
         .header-track-pill {
             display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.28rem;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-weight: 800;
             font-size: 0.92rem;
@@ -850,20 +921,127 @@
             line-height: 1;
         }
         .header-track-arrow {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             font-weight: 900;
-            opacity: 0.95;
-            margin: 0 0.08rem;
+            opacity: 0.9;
+            margin: 0 0.04rem;
             line-height: 1;
         }
-        /* Desktop: codes only (no flag+code duplicate). Phone: show flags too. */
-        .header-track-flag { display: none; font-size: 0.95rem; line-height: 1; }
+        .header-track-flag { display: none; font-size: 1rem; line-height: 1; }
+        .header-track-code { display: inline; }
+        /* Phone: flags only. Desktop: codes only. */
         @media (max-width: 640px) {
             .header-track-flag { display: inline; }
-            .header-track-pill { font-size: 0.78rem; }
-            .header-track-arrow { font-size: 1.05rem; }
+            .header-track-code { display: none; }
+            .header-track-pill { gap: 0.2rem; font-size: 0.95rem; }
+            .header-track-arrow { font-size: 1rem; }
+            .header-profile-btn { padding: 0.38rem 0.55rem; gap: 0.35rem; }
         }
-        .track-pair-flag { font-size: 0.95rem; line-height: 1; }
+        .track-pair-flag { font-size: 1.05rem; line-height: 1; }
+
+        .train-mode-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1;
+            padding: 0.75rem 0.6rem;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            text-align: center;
+            overflow: hidden;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .train-mode-card:active { transform: scale(0.98); }
+        .train-mode-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 100%;
+        }
+        .train-mode-head {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        .train-mode-emoji {
+            font-size: 3.15rem;
+            line-height: 1;
+            margin-bottom: 0.75rem;
+            transition: transform 0.3s ease, font-size 0.3s ease, margin-bottom 0.3s ease;
+            will-change: transform;
+        }
+        .train-mode-title {
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #334155;
+            line-height: 1.25;
+        }
+        .train-mode-desc {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            margin: 0;
+            padding: 0 0.35rem;
+            font-size: 0.78rem;
+            line-height: 1.35;
+            font-weight: 600;
+            color: #64748b;
+            transition: max-height 0.3s ease, opacity 0.22s ease, margin-top 0.3s ease;
+        }
+        .train-mode-card.is-peek .train-mode-head {
+            transform: translateY(-0.7rem);
+        }
+        .train-mode-card.is-peek .train-mode-emoji {
+            font-size: 2.55rem;
+            margin-bottom: 0.4rem;
+            transform: scale(1.03);
+        }
+        .train-mode-card.is-peek .train-mode-desc {
+            max-height: 5.75rem;
+            opacity: 1;
+            margin-top: 0.6rem;
+        }
+        @media (hover: hover) and (pointer: fine) {
+            .train-mode-card:hover .train-mode-head,
+            .train-mode-card:focus-visible .train-mode-head {
+                transform: translateY(-0.7rem);
+            }
+            .train-mode-card:hover .train-mode-emoji,
+            .train-mode-card:focus-visible .train-mode-emoji {
+                font-size: 2.55rem;
+                margin-bottom: 0.4rem;
+                transform: scale(1.03);
+            }
+            .train-mode-card:hover .train-mode-desc,
+            .train-mode-card:focus-visible .train-mode-desc {
+                max-height: 5.75rem;
+                opacity: 1;
+                margin-top: 0.6rem;
+            }
+        }
+        .train-mode-card.border-hover-indigo:hover,
+        .train-mode-card.border-hover-indigo.is-peek { border-color: #818cf8; }
+        .train-mode-card.border-hover-violet:hover,
+        .train-mode-card.border-hover-violet.is-peek { border-color: #a78bfa; }
+        .train-mode-card.border-hover-fuchsia:hover,
+        .train-mode-card.border-hover-fuchsia.is-peek { border-color: #e879f9; }
+        .train-mode-card.border-hover-emerald:hover,
+        .train-mode-card.border-hover-emerald.is-peek { border-color: #34d399; }
+        .train-mode-card.border-hover-sky:hover,
+        .train-mode-card.border-hover-sky.is-peek { border-color: #38bdf8; }
+        .train-mode-card.border-hover-amber:hover,
+        .train-mode-card.border-hover-amber.is-peek { border-color: #fbbf24; }
+        .train-mode-card.border-hover-cyan:hover,
+        .train-mode-card.border-hover-cyan.is-peek { border-color: #22d3ee; }
 
         .inline-context-input {
             display: inline-block;
@@ -1186,21 +1364,26 @@
             <button onclick="closeSyncModal()" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700 font-bold text-2xl">&times;</button>
             <h3 class="text-xl font-bold text-slate-800 mb-4 text-center pr-6" data-i18n="profile.title">Профіль / Налаштування</h3>
 
-            <div id="known-tracks-section" class="settings-panel-pairs hidden mb-3">
-                <p class="text-[11px] font-bold uppercase tracking-wider mb-2 settings-panel-label" data-i18n="profile.myPairs">Мої пари</p>
+            <div id="known-tracks-section" class="settings-panel settings-panel-pairs hidden mb-3">
+                <p class="settings-panel-label" data-i18n="profile.myPairs">Мої пари</p>
                 <div id="known-tracks-options" class="flex flex-wrap gap-2"></div>
             </div>
-            <div class="settings-panel-learn mb-3">
-                <p class="text-xs font-bold text-indigo-700 uppercase tracking-wider mb-3" data-i18n="profile.learning">Мова навчання</p>
-                <p class="text-[11px] font-bold text-indigo-500 uppercase mb-1.5" data-i18n="profile.studying">Вивчаю</p>
-                <div id="learning-lang-options" class="flex flex-wrap gap-2 mb-3"></div>
-                <p class="text-[11px] font-bold text-indigo-500 uppercase mb-1.5" data-i18n="profile.translation">Переклад</p>
-                <div id="translation-lang-options" class="flex flex-wrap gap-2 mb-2"></div>
-                <p id="learn-pair-summary" class="text-xs font-bold text-indigo-600 font-mono tracking-wide"></p>
+            <div class="settings-panel settings-panel-learn mb-3">
+                <p class="settings-panel-label" data-i18n="profile.learning">Мова навчання</p>
+                <div class="settings-lang-grid">
+                    <div>
+                        <p class="settings-panel-sublabel" data-i18n="profile.studying">Вивчаю</p>
+                        <div id="learning-lang-options" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div>
+                        <p class="settings-panel-sublabel" data-i18n="profile.translation">Переклад</p>
+                        <div id="translation-lang-options" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
             </div>
-            <div class="settings-panel-muted mb-4">
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1" data-i18n="profile.interface">Мова інтерфейсу</p>
-                <div id="interface-lang-options" class="flex flex-wrap gap-1"></div>
+            <div class="settings-panel settings-panel-muted mb-4">
+                <p class="settings-panel-label mb-1.5" data-i18n="profile.interface">Мова інтерфейсу</p>
+                <div id="interface-lang-options" class="flex flex-wrap gap-1.5"></div>
             </div>
 
             <details id="sync-id-details" class="border-t border-slate-100 pt-3">
@@ -1555,8 +1738,10 @@
                 </div>
                 
                 <div id="reader-yt-wrapper" class="w-full aspect-video bg-black rounded-xl mb-4 hidden shadow-md overflow-hidden z-[100] transition-all duration-300">
+                    <div id="reader-yt-pip-handle" aria-hidden="true">⋮⋮</div>
                     <div id="reader-yt-player" class="w-full h-full"></div>
                 </div>
+                <button type="button" id="reader-yt-jump" onclick="jumpToActiveSubtitle()" aria-label="Current line" data-i18n-title="lib.jumpToLine" title="До поточного рядка">↓</button>
 
                 <div id="reader-pagination-top" class="hidden flex justify-between items-center bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
                     <button type="button" onclick="changeReaderPage(-1)" id="btn-reader-prev-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs sm:text-sm transition">← <span data-i18n="common.back">Назад</span></button>
@@ -1605,7 +1790,7 @@
                     <div class="absolute right-0 top-0 bottom-0 w-32 bg-indigo-500 opacity-20 skew-x-12 transform translate-x-4 group-hover:translate-x-0 transition-transform"></div>
                     <div>
                         <h3 class="text-2xl font-bold mb-1">🧠 Brainstorm</h3>
-                        <p class="text-indigo-100 text-sm font-medium" data-i18n="train.bsDesc">Інтенсивне комплексне опрацювання слів.</p>
+                        <p class="text-indigo-100 text-sm font-medium" data-i18n="train.bsDesc">Інтенсивне комплексне опрацювання слів</p>
                     </div>
                 </button>
 
@@ -1614,42 +1799,87 @@
                 </button>
 
                 <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 px-1" data-i18n="train.separate">Окремі вправи</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <button onclick="startSession('word-trans')" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-indigo-400 transition text-center flex flex-col items-center justify-center aspect-square group">
-                        <div id="train-flag-wt" class="text-5xl mb-3 group-hover:scale-110 transition-transform">🇬🇧➡️🇺🇦</div>
-                        <h4 class="font-bold text-slate-700 text-sm" data-i18n="mode.word-trans">Слово → Переклад</h4>
+                <div id="train-mode-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <button type="button" onclick="startSession('word-trans')" class="train-mode-card border-hover-indigo">
+                        <div class="train-mode-visual">
+                            <div class="train-mode-head">
+                                <div id="train-flag-wt" class="train-mode-emoji">🇬🇧➡️🇺🇦</div>
+                                <h4 class="train-mode-title" data-i18n="mode.word-trans">Слово → Переклад</h4>
+                            </div>
+                            <p class="train-mode-desc" data-i18n="mode.word-trans.desc">Обери переклад слова з чотирьох варіантів</p>
+                        </div>
                     </button>
-                    <button onclick="startSession('trans-word')" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-violet-400 transition text-center flex flex-col items-center justify-center aspect-square group">
-                        <div id="train-flag-tw" class="text-5xl mb-3 group-hover:scale-110 transition-transform">🇬🇧⬅️🇺🇦</div>
-                        <h4 class="font-bold text-slate-700 text-sm" data-i18n="mode.trans-word">Переклад → Слово</h4>
+                    <button type="button" onclick="startSession('trans-word')" class="train-mode-card border-hover-violet">
+                        <div class="train-mode-visual">
+                            <div class="train-mode-head">
+                                <div id="train-flag-tw" class="train-mode-emoji">🇬🇧⬅️🇺🇦</div>
+                                <h4 class="train-mode-title" data-i18n="mode.trans-word">Переклад → Слово</h4>
+                            </div>
+                            <p class="train-mode-desc" data-i18n="mode.trans-word.desc">Побач переклад — обери правильне слово з чотирьох</p>
+                        </div>
                     </button>
-                    <button onclick="startSession('constructor')" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-fuchsia-400 transition text-center flex flex-col items-center justify-center aspect-square group">
-                        <div class="text-5xl mb-3 group-hover:scale-110 transition-transform">🔠🔄</div>
-                        <h4 class="font-bold text-slate-700 text-sm" data-i18n="mode.constructor">Конструктор</h4>
+                    <button type="button" onclick="startSession('constructor')" class="train-mode-card border-hover-fuchsia">
+                        <div class="train-mode-visual">
+                            <div class="train-mode-head">
+                                <div class="train-mode-emoji">🔠🔄</div>
+                                <h4 class="train-mode-title" data-i18n="mode.constructor">Конструктор</h4>
+                            </div>
+                            <p class="train-mode-desc" data-i18n="mode.constructor.desc">Збери слово з перемішаних літер</p>
+                        </div>
                     </button>
-                    <button onclick="startSession('typing')" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-emerald-400 transition text-center flex flex-col items-center justify-center aspect-square group">
-                        <div class="text-5xl mb-3 group-hover:scale-110 transition-transform">⌨️✍️</div>
-                        <h4 class="font-bold text-slate-700 text-sm" data-i18n="mode.typing">Написання</h4>
+                    <button type="button" onclick="startSession('typing')" class="train-mode-card border-hover-emerald">
+                        <div class="train-mode-visual">
+                            <div class="train-mode-head">
+                                <div class="train-mode-emoji">⌨️✍️</div>
+                                <h4 class="train-mode-title" data-i18n="mode.typing">Написання</h4>
+                            </div>
+                            <p class="train-mode-desc" data-i18n="mode.typing.desc">Побач переклад і набери слово сам</p>
+                        </div>
                     </button>
-                    <button onclick="startSession('listening')" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-sky-400 transition text-center flex flex-col items-center justify-center aspect-square group">
-                        <div class="text-5xl mb-3 group-hover:scale-110 transition-transform">🎧👂</div>
-                        <h4 class="font-bold text-slate-700 text-sm" data-i18n="mode.listening">Аудіювання</h4>
+                    <button type="button" onclick="startSession('listening')" class="train-mode-card border-hover-sky">
+                        <div class="train-mode-visual">
+                            <div class="train-mode-head">
+                                <div class="train-mode-emoji">🎧👂</div>
+                                <h4 class="train-mode-title" data-i18n="mode.listening">Аудіювання</h4>
+                            </div>
+                            <p class="train-mode-desc" data-i18n="mode.listening.desc">Слухай і набери слово</p>
+                        </div>
                     </button>
-                    <button onclick="startSession('context')" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-amber-400 transition text-center flex flex-col items-center justify-center aspect-square group">
-                        <div class="text-5xl mb-3 group-hover:scale-110 transition-transform">🧩📄</div>
-                        <h4 class="font-bold text-slate-700 text-sm" data-i18n="mode.context">Контекст</h4>
+                    <button type="button" onclick="startSession('context')" class="train-mode-card border-hover-amber">
+                        <div class="train-mode-visual">
+                            <div class="train-mode-head">
+                                <div class="train-mode-emoji">🧩📄</div>
+                                <h4 class="train-mode-title" data-i18n="mode.context">Контекст</h4>
+                            </div>
+                            <p class="train-mode-desc" data-i18n="mode.context.desc">Встав слово в короткий уривок тексту на час</p>
+                        </div>
                     </button>
-                    <button onclick="startSession('crossword')" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-indigo-400 transition text-center flex flex-col items-center justify-center aspect-square group">
-                        <div class="text-5xl mb-3 group-hover:scale-110 transition-transform">🧩✍️</div>
-                        <h4 class="font-bold text-slate-700 text-sm" data-i18n="mode.crossword">Кросворд</h4>
+                    <button type="button" onclick="startSession('crossword')" class="train-mode-card border-hover-indigo">
+                        <div class="train-mode-visual">
+                            <div class="train-mode-head">
+                                <div class="train-mode-emoji">🧩✍️</div>
+                                <h4 class="train-mode-title" data-i18n="mode.crossword">Кросворд</h4>
+                            </div>
+                            <p class="train-mode-desc" data-i18n="mode.crossword.desc">Заповни клітинки словами зі словника</p>
+                        </div>
                     </button>
-                    <button onclick="startSession('sprint')" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-amber-400 transition text-center flex flex-col items-center justify-center aspect-square group">
-                        <div class="text-5xl mb-3 group-hover:scale-110 transition-transform">⚡🏃‍♂️</div>
-                        <h4 class="font-bold text-slate-700 text-sm" data-i18n="mode.sprint">Спринт</h4>
+                    <button type="button" onclick="startSession('sprint')" class="train-mode-card border-hover-amber">
+                        <div class="train-mode-visual">
+                            <div class="train-mode-head">
+                                <div class="train-mode-emoji">⚡🏃‍♂️</div>
+                                <h4 class="train-mode-title" data-i18n="mode.sprint">Спринт</h4>
+                            </div>
+                            <p class="train-mode-desc" data-i18n="mode.sprint.desc">Швидко вирішуй, чи підходить переклад до слова</p>
+                        </div>
                     </button>
-                    <button onclick="startSession('picture')" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-cyan-400 transition text-center flex flex-col items-center justify-center aspect-square group">
-                        <div class="text-5xl mb-3 group-hover:scale-110 transition-transform">🖼️🤔</div>
-                        <h4 class="font-bold text-slate-700 text-sm" data-i18n="mode.picture">По фото</h4>
+                    <button type="button" onclick="startSession('picture')" class="train-mode-card border-hover-cyan">
+                        <div class="train-mode-visual">
+                            <div class="train-mode-head">
+                                <div class="train-mode-emoji">🖼️🤔</div>
+                                <h4 class="train-mode-title" data-i18n="mode.picture">По фото</h4>
+                            </div>
+                            <p class="train-mode-desc" data-i18n="mode.picture.desc">Вгадай слово за зображенням</p>
+                        </div>
                     </button>
                 </div>
             </div>
@@ -1897,13 +2127,22 @@
                 'dict.allWords': 'Усі слова', 'folder.import': 'Імпорт', 'filter.all': 'Усі слова',
                 'filter.import': 'Імпорт', 'filter.materials': 'Матеріали',
                 'train.title': 'Тренування', 'train.bsCount': 'Слів у Brainstorm:', 'train.source': 'Джерело слів:',
-                'train.bsDesc': 'Інтенсивне комплексне опрацювання слів.',
+                'train.bsDesc': 'Інтенсивне комплексне опрацювання слів',
                 'train.review': 'Повторити вивчені слова', 'train.separate': 'Окремі вправи',
                 'train.wordsN': '{n} слів',
                 'mode.word-trans': 'Слово → Переклад', 'mode.trans-word': 'Переклад → Слово',
                 'mode.constructor': 'Конструктор', 'mode.typing': 'Написання', 'mode.listening': 'Аудіювання',
                 'mode.context': 'Контекст', 'mode.crossword': 'Кросворд', 'mode.sprint': 'Спринт',
                 'mode.picture': 'По фото', 'mode.brainstorm': 'Brainstorm', 'mode.all': 'Brainstorm',
+                'mode.word-trans.desc': 'Обери переклад слова з чотирьох варіантів',
+                'mode.trans-word.desc': 'Побач переклад — обери правильне слово з чотирьох',
+                'mode.constructor.desc': 'Збери слово з перемішаних літер',
+                'mode.typing.desc': 'Побач переклад і набери слово сам',
+                'mode.listening.desc': 'Слухай і набери слово',
+                'mode.context.desc': 'Встав слово в короткий уривок тексту на час',
+                'mode.crossword.desc': 'Заповни клітинки словами зі словника',
+                'mode.sprint.desc': 'Швидко вирішуй, чи підходить переклад до слова',
+                'mode.picture.desc': 'Вгадай слово за зображенням',
                 'stage.0': 'Ознайомлення', 'stage.1': 'Слово → Переклад', 'stage.2': 'Конструктор',
                 'stage.3': 'Написання', 'stage.4': 'Переклад → Слово', 'stage.5': 'Аудіювання',
                 'stage.6': 'Контекст', 'stage.7': 'Кросворд', 'stage.8': 'Спринт', 'stage.9': 'По фото',
@@ -2104,6 +2343,7 @@
                 'lib.read': 'Опрацьовано', 'lib.readAt': 'Опрацьовано: {date}',
                 'lib.video': 'Відео матеріал', 'lib.empty': 'Тут ще немає доданих матеріалів. Створіть перший!',
                 'lib.markRead': 'Позначити матеріал як опрацьований', 'lib.readDone': 'Матеріал опрацьовано',
+                'lib.jumpToLine': 'До поточного рядка',
                 'lib.subsLocked': 'Субтитри (не можна редагувати як текст)',
                 'header.home': 'До словника',
                 'searching': 'Шукаємо...', 'notFound': 'Не знайдено'
@@ -2126,13 +2366,22 @@
                 'dict.allWords': 'All words', 'folder.import': 'Import', 'filter.all': 'All words',
                 'filter.import': 'Import', 'filter.materials': 'Materials',
                 'train.title': 'Training', 'train.bsCount': 'Words in Brainstorm:', 'train.source': 'Word source:',
-                'train.bsDesc': 'Intensive mixed practice for your words.',
+                'train.bsDesc': 'Intensive mixed practice for your words',
                 'train.review': 'Review learned words', 'train.separate': 'Separate exercises',
                 'train.wordsN': '{n} words',
                 'mode.word-trans': 'Word → Translation', 'mode.trans-word': 'Translation → Word',
                 'mode.constructor': 'Constructor', 'mode.typing': 'Typing', 'mode.listening': 'Listening',
                 'mode.context': 'Context', 'mode.crossword': 'Crossword', 'mode.sprint': 'Sprint',
                 'mode.picture': 'From a picture', 'mode.brainstorm': 'Brainstorm', 'mode.all': 'Brainstorm',
+                'mode.word-trans.desc': 'Pick the translation from four options',
+                'mode.trans-word.desc': 'See the translation — pick the right word from four options',
+                'mode.constructor.desc': 'Rebuild the word from scrambled letters',
+                'mode.typing.desc': 'See the translation and type the word yourself',
+                'mode.listening.desc': 'Listen and type the word',
+                'mode.context.desc': 'Fill the word into a short text excerpt against the clock',
+                'mode.crossword.desc': 'Fill the grid with words from your dictionary',
+                'mode.sprint.desc': 'Quickly judge if a translation matches the word',
+                'mode.picture.desc': 'Guess the word from the image',
                 'stage.0': 'Introduction', 'stage.1': 'Word → Translation', 'stage.2': 'Constructor',
                 'stage.3': 'Typing', 'stage.4': 'Translation → Word', 'stage.5': 'Listening',
                 'stage.6': 'Context', 'stage.7': 'Crossword', 'stage.8': 'Sprint', 'stage.9': 'From a picture',
@@ -2328,6 +2577,7 @@
                 'lib.read': 'Read', 'lib.readAt': 'Read: {date}',
                 'lib.video': 'Video material', 'lib.empty': 'No materials yet. Add the first one!',
                 'lib.markRead': 'Mark material as read', 'lib.readDone': 'Material completed',
+                'lib.jumpToLine': 'Jump to current line',
                 'lib.subsLocked': 'Subtitles (cannot be edited as text)',
                 'header.home': 'Go to dictionary',
                 'searching': 'Searching...', 'notFound': 'Not found'
@@ -2350,13 +2600,22 @@
                 'dict.allWords': 'Todas las palabras', 'folder.import': 'Importar', 'filter.all': 'Todas las palabras',
                 'filter.import': 'Importar', 'filter.materials': 'Materiales',
                 'train.title': 'Entrenamiento', 'train.bsCount': 'Palabras en Brainstorm:', 'train.source': 'Fuente:',
-                'train.bsDesc': 'Práctica intensiva combinada de tus palabras.',
+                'train.bsDesc': 'Práctica intensiva combinada de tus palabras',
                 'train.review': 'Repasar palabras aprendidas', 'train.separate': 'Ejercicios sueltos',
                 'train.wordsN': '{n} palabras',
                 'mode.word-trans': 'Palabra → Traducción', 'mode.trans-word': 'Traducción → Palabra',
                 'mode.constructor': 'Constructor', 'mode.typing': 'Escritura', 'mode.listening': 'Escucha',
                 'mode.context': 'Contexto', 'mode.crossword': 'Crucigrama', 'mode.sprint': 'Sprint',
                 'mode.picture': 'Por imagen', 'mode.brainstorm': 'Brainstorm', 'mode.all': 'Brainstorm',
+                'mode.word-trans.desc': 'Elige la traducción entre cuatro opciones',
+                'mode.trans-word.desc': 'Ves la traducción — elige la palabra correcta entre cuatro',
+                'mode.constructor.desc': 'Forma la palabra con letras mezcladas',
+                'mode.typing.desc': 'Ves la traducción y escribe la palabra tú mismo',
+                'mode.listening.desc': 'Escucha y escribe la palabra',
+                'mode.context.desc': 'Completa la palabra en un fragmento a contrarreloj',
+                'mode.crossword.desc': 'Rellena la cuadrícula con palabras del diccionario',
+                'mode.sprint.desc': 'Decide rápido si la traducción corresponde a la palabra',
+                'mode.picture.desc': 'Adivina la palabra por la imagen',
                 'stage.0': 'Introducción', 'stage.1': 'Palabra → Traducción', 'stage.2': 'Constructor',
                 'stage.3': 'Escritura', 'stage.4': 'Traducción → Palabra', 'stage.5': 'Escucha',
                 'stage.6': 'Contexto', 'stage.7': 'Crucigrama', 'stage.8': 'Sprint', 'stage.9': 'Por imagen',
@@ -2552,6 +2811,7 @@
                 'lib.read': 'Leído', 'lib.readAt': 'Leído: {date}',
                 'lib.video': 'Material de vídeo', 'lib.empty': 'Aún no hay materiales. ¡Crea el primero!',
                 'lib.markRead': 'Marcar el material como leído', 'lib.readDone': 'Material completado',
+                'lib.jumpToLine': 'Ir a la línea actual',
                 'lib.subsLocked': 'Subtítulos (no se pueden editar como texto)',
                 'header.home': 'Ir al diccionario',
                 'searching': 'Buscando...', 'notFound': 'No encontrado'
@@ -2631,18 +2891,16 @@
             const a = LANG_META[learningLanguage] || {};
             const b = LANG_META[translationLanguage] || {};
             if (el) {
-                el.innerHTML = `<span class="header-track-flag" aria-hidden="true">${a.flag || ''}</span><span>${a.code || ''}</span><span class="header-track-arrow">→</span><span class="header-track-flag" aria-hidden="true">${b.flag || ''}</span><span>${b.code || ''}</span>`;
+                el.innerHTML = `<span class="header-track-flag" aria-hidden="true">${a.flag || ''}</span><span class="header-track-code">${a.code || ''}</span><span class="header-track-arrow">→</span><span class="header-track-flag" aria-hidden="true">${b.flag || ''}</span><span class="header-track-code">${b.code || ''}</span>`;
             }
-            const sum = document.getElementById('learn-pair-summary');
-            if (sum) sum.textContent = `${a.code || ''} → ${b.code || ''}`;
         }
         function updateLearningFlags() {
             const a = LANG_META[learningLanguage]?.flag || '';
             const b = LANG_META[translationLanguage]?.flag || '';
             const wt = document.getElementById('train-flag-wt');
             const tw = document.getElementById('train-flag-tw');
-            if (wt) { wt.className = 'text-5xl mb-3 group-hover:scale-110 transition-transform'; wt.textContent = `${a}➡️${b}`; }
-            if (tw) { tw.className = 'text-5xl mb-3 group-hover:scale-110 transition-transform'; tw.textContent = `${a}⬅️${b}`; }
+            if (wt) { wt.className = 'train-mode-emoji'; wt.textContent = `${a}➡️${b}`; }
+            if (tw) { tw.className = 'train-mode-emoji'; tw.textContent = `${a}⬅️${b}`; }
         }
         function wikiLangCode() {
             return ['en', 'es', 'uk'].includes(learningLanguage) ? learningLanguage : 'en';
@@ -2707,9 +2965,9 @@
             const chip = (code, selected, handler, disabled, compact = false) => {
                 const m = LANG_META[code];
                 if (compact) {
-                    return `<button type="button" ${disabled ? 'disabled' : ''} onclick="${handler}('${code}')" class="lang-chip lang-chip-compact${selected ? ' is-on' : ''}" title="${m.native}"><span class="lang-chip-flag">${m.flag}</span><span class="lang-chip-code">${m.code}</span></button>`;
+                    return `<button type="button" ${disabled ? 'disabled' : ''} onclick="${handler}('${code}')" class="lang-chip lang-chip-compact${selected ? ' is-on' : ''}" title="${m.native}"><span class="lang-chip-flag">${m.flag}</span></button>`;
                 }
-                return `<button type="button" ${disabled ? 'disabled' : ''} onclick="${handler}('${code}')" class="lang-chip${selected ? ' is-on' : ''}"><span class="lang-chip-flag">${m.flag}</span><span class="lang-chip-code">${m.code}</span><span>${m.native}</span></button>`;
+                return `<button type="button" ${disabled ? 'disabled' : ''} onclick="${handler}('${code}')" class="lang-chip${selected ? ' is-on' : ''}" title="${m.native}"><span class="lang-chip-flag">${m.flag}</span><span>${m.native}</span></button>`;
             };
             const iface = document.getElementById('interface-lang-options');
             if (iface) iface.innerHTML = INTERFACE_LANGS.map(c => chip(c, c === interfaceLanguage, 'setInterfaceLanguage', false, true)).join('');
@@ -2733,7 +2991,8 @@
                         const a = LANG_META[p.learn] || {};
                         const b = LANG_META[p.trans] || {};
                         const on = activeTrackId === p.id;
-                        return `<button type="button" onclick="selectKnownTrack('${p.id}')" class="track-pair-chip${on ? ' is-on' : ''}"><span class="track-pair-flag" aria-hidden="true">${a.flag || ''}</span>${a.code || ''}<span class="pair-arrow">→</span><span class="track-pair-flag" aria-hidden="true">${b.flag || ''}</span>${b.code || ''}</button>`;
+                        const label = `${a.native || a.code || ''} → ${b.native || b.code || ''}`;
+                        return `<button type="button" onclick="selectKnownTrack('${p.id}')" class="track-pair-chip${on ? ' is-on' : ''}" title="${label}"><span class="track-pair-flag" aria-hidden="true">${a.flag || ''}</span><span class="pair-arrow">→</span><span class="track-pair-flag" aria-hidden="true">${b.flag || ''}</span></button>`;
                     }).join('');
                 }
             }
@@ -2806,6 +3065,69 @@
         }
 
         try { applyI18n(); renderLanguagePickers(); } catch (e) { console.error(e); }
+
+        function initTrainModeCardPeek() {
+            const cards = document.querySelectorAll('.train-mode-card');
+            if (!cards.length) return;
+            const HOLD_MS = 340;
+            cards.forEach((card) => {
+                let holdTimer = null;
+                let peeked = false;
+                let startX = 0;
+                let startY = 0;
+
+                const clearHold = () => {
+                    if (holdTimer) {
+                        clearTimeout(holdTimer);
+                        holdTimer = null;
+                    }
+                };
+                const hidePeek = () => {
+                    clearHold();
+                    card.classList.remove('is-peek');
+                };
+
+                card.addEventListener('pointerdown', (e) => {
+                    if (e.pointerType === 'mouse') return;
+                    peeked = false;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    clearHold();
+                    holdTimer = setTimeout(() => {
+                        peeked = true;
+                        card.classList.add('is-peek');
+                        try { card.setPointerCapture(e.pointerId); } catch (_) {}
+                    }, HOLD_MS);
+                });
+
+                card.addEventListener('pointermove', (e) => {
+                    if (e.pointerType === 'mouse' || !holdTimer) return;
+                    if (Math.abs(e.clientX - startX) > 12 || Math.abs(e.clientY - startY) > 12) {
+                        hidePeek();
+                        peeked = false;
+                    }
+                });
+
+                card.addEventListener('pointerup', () => {
+                    hidePeek();
+                });
+                card.addEventListener('pointercancel', () => {
+                    hidePeek();
+                    peeked = false;
+                });
+                card.addEventListener('lostpointercapture', () => {
+                    hidePeek();
+                });
+
+                card.addEventListener('click', (e) => {
+                    if (!peeked) return;
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    peeked = false;
+                }, true);
+            });
+        }
+        initTrainModeCardPeek();
 
         const MAX_SRS_LEVEL = 6;
         const CORE_TRAIN_MODES = [
@@ -5472,19 +5794,26 @@
             const size = opts.sizeClass
                 || (isSmall ? "w-4 h-4" : (showLabel ? (compact ? "w-10 h-10" : "w-12 h-12") : "w-8 h-8"));
             const lvl = clampSrsLevel(level);
-            const circ = 62.8;
-            const dash = (circ / maxLevel) * lvl;
+            const r = 10;
+            const circ = 2 * Math.PI * r;
+            const slots = Math.max(1, maxLevel);
+            const slot = circ / slots;
+            // Subtle notches — visible as 6 parts, not a broken ring
+            const gap = isSmall ? 1.1 : (compact ? 1.3 : 1.5);
+            const seg = Math.max(0.8, slot - gap);
             const isDone = isSrsMastered(level);
-            const stroke = isDone ? '#10b981' : '#4f46e5';
+            const active = isDone ? '#10b981' : '#4f46e5';
+            const idle = '#e2e8f0';
             const sw = isSmall ? '4' : (compact ? '2.75' : '3');
-            // Compact tiles need a slightly larger label so “3/6” stays readable at small size
-            const labelFs = compact ? '7.25' : (showLabel ? '6.5' : '6');
-            const labelFw = compact ? '700' : '600';
-            const label = showLabel ? `<text x="12" y="12.5" text-anchor="middle" dominant-baseline="middle" fill="${stroke}" font-size="${labelFs}" font-weight="${labelFw}" transform="rotate(90 12 12)" class="pointer-events-none select-none">${lvl}/${maxLevel}</text>` : '';
-            return `<svg class="${size} transform -rotate-90 cursor-pointer hover:opacity-80 transition flex-shrink-0" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="#e2e8f0" stroke-width="${sw}" fill="none" />
-                <circle cx="12" cy="12" r="10" stroke="${stroke}" stroke-width="${sw}" fill="none" stroke-dasharray="${dash} 62.8" stroke-linecap="round" class="transition-all duration-500" />
-                ${label}
+            let segments = '';
+            for (let i = 0; i < slots; i++) {
+                const color = i < lvl ? active : idle;
+                const offset = -i * slot;
+                segments += `<circle cx="12" cy="12" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="butt" stroke-dasharray="${seg.toFixed(3)} ${(circ - seg).toFixed(3)}" stroke-dashoffset="${offset.toFixed(3)}" />`;
+            }
+            const aria = `${lvl}/${slots}`;
+            return `<svg class="${size} transform -rotate-90 cursor-pointer hover:opacity-80 transition flex-shrink-0" viewBox="0 0 24 24" role="img" aria-label="${aria}" title="${aria}">
+                ${segments}
             </svg>`;
         }
 
@@ -6568,6 +6897,13 @@
         };
 
         let ytPlayer = null; let syncInterval = null;
+        let ytPipPinned = false;
+        let ytFollowActiveLine = true;
+        let ytProgrammaticScroll = false;
+        let ytProgrammaticScrollTimer = null;
+        let ytLastScrollY = 0;
+        let ytPipDragBound = false;
+        let ytPipDragOffset = { x: 0, y: 0 };
 
         function paginateTextMaterial(content, limit = 8000) {
             const html = materialHtmlFromStored(content || '');
@@ -6729,9 +7065,25 @@
             readerCurrentPage = m.lastPage && m.lastPage <= readerTotalPages ? m.lastPage : 1;
 
             if(m.ytId) {
-                ytWrapper.classList.remove('hidden'); ytWrapper.classList.remove('yt-pip-mode'); initYouTubePlayer(m.ytId);
-                window.addEventListener('scroll', handlePiPScroll, { passive: true }); 
-            } else { ytWrapper.classList.add('hidden'); window.removeEventListener('scroll', handlePiPScroll); }
+                ytWrapper.classList.remove('hidden');
+                setYtPipMode(false);
+                ytPipPinned = false;
+                ytFollowActiveLine = true;
+                ytPipDragOffset = { x: 0, y: 0 };
+                ytWrapper.style.left = '';
+                ytWrapper.style.top = '';
+                ytWrapper.style.right = '';
+                ytWrapper.style.bottom = '';
+                initYouTubePlayer(m.ytId);
+                bindYtReaderScrollWatch();
+                bindYtPipDrag();
+                updateYtJumpButton();
+            } else {
+                ytWrapper.classList.add('hidden');
+                unbindYtReaderScrollWatch();
+                setYtPipMode(false);
+                hideYtJumpButton();
+            }
             
             applyReaderStyles();
             renderReaderContent();
@@ -6756,8 +7108,18 @@
             if (ytPlayer && typeof ytPlayer.destroy === 'function') { ytPlayer.destroy(); ytPlayer = null; }
             if (syncInterval) clearInterval(syncInterval);
             closeInlinePopup();
-            window.removeEventListener('scroll', handlePiPScroll);
-            document.getElementById('reader-yt-wrapper').classList.remove('yt-pip-mode');
+            unbindYtReaderScrollWatch();
+            setYtPipMode(false);
+            ytPipPinned = false;
+            ytFollowActiveLine = true;
+            hideYtJumpButton();
+            const ytWrapClose = document.getElementById('reader-yt-wrapper');
+            if (ytWrapClose) {
+                ytWrapClose.style.left = '';
+                ytWrapClose.style.top = '';
+                ytWrapClose.style.right = '';
+                ytWrapClose.style.bottom = '';
+            }
 
             if (activeUid && materialToSave) {
                 updateDoc(docRef('materials', materialToSave.id), { lastPage: pageToSave })
@@ -6766,12 +7128,203 @@
             }
         };
 
+        function getYtPipSpacer() {
+            return document.getElementById('reader-yt-pip-spacer');
+        }
+
+        function setYtPipMode(on) {
+            const ytWrapper = document.getElementById('reader-yt-wrapper');
+            if (!ytWrapper || ytWrapper.classList.contains('hidden')) return;
+            const isOn = ytWrapper.classList.contains('yt-pip-mode');
+            if (on === isOn) return;
+
+            if (on) {
+                const rect = ytWrapper.getBoundingClientRect();
+                const height = Math.max(120, Math.round(rect.height || ytWrapper.offsetHeight || 180));
+                let spacer = getYtPipSpacer();
+                if (!spacer) {
+                    spacer = document.createElement('div');
+                    spacer.id = 'reader-yt-pip-spacer';
+                    spacer.setAttribute('aria-hidden', 'true');
+                }
+                spacer.style.height = `${height}px`;
+                if (ytWrapper.parentNode && spacer.parentNode !== ytWrapper.parentNode) {
+                    ytWrapper.parentNode.insertBefore(spacer, ytWrapper);
+                }
+                ytWrapper.classList.add('yt-pip-mode');
+                // Keep phone default corner unless user already dragged
+                if (!ytPipDragOffset.x && !ytPipDragOffset.y) {
+                    ytWrapper.style.left = '';
+                    ytWrapper.style.top = '';
+                    ytWrapper.style.right = '';
+                    ytWrapper.style.bottom = '';
+                }
+            } else {
+                ytWrapper.classList.remove('yt-pip-mode');
+                ytWrapper.style.left = '';
+                ytWrapper.style.top = '';
+                ytWrapper.style.right = '';
+                ytWrapper.style.bottom = '';
+                ytPipDragOffset = { x: 0, y: 0 };
+                getYtPipSpacer()?.remove();
+            }
+        }
+
         function handlePiPScroll() {
             const ytWrapper = document.getElementById('reader-yt-wrapper');
-            if(currentMaterial && currentMaterial.ytId && ytWrapper && !ytWrapper.classList.contains('hidden')) {
-                if (window.scrollY > 100) ytWrapper.classList.add('yt-pip-mode');
-                else ytWrapper.classList.remove('yt-pip-mode');
+            if (!(currentMaterial && currentMaterial.ytId && ytWrapper && !ytWrapper.classList.contains('hidden'))) return;
+
+            const y = window.scrollY || 0;
+            // Hysteresis: once minimized, stay minimized until clearly back at the top.
+            if (y > 130) {
+                ytPipPinned = true;
+                setYtPipMode(true);
+            } else if (y < 36) {
+                ytPipPinned = false;
+                setYtPipMode(false);
+            } else if (ytPipPinned) {
+                setYtPipMode(true);
             }
+        }
+
+        function markYtProgrammaticScroll(ms = 450) {
+            ytProgrammaticScroll = true;
+            if (ytProgrammaticScrollTimer) clearTimeout(ytProgrammaticScrollTimer);
+            ytProgrammaticScrollTimer = setTimeout(() => {
+                ytProgrammaticScroll = false;
+                ytProgrammaticScrollTimer = null;
+                ytLastScrollY = window.scrollY || 0;
+            }, ms);
+        }
+
+        function scrollToSubtitleLine(line, behavior = 'smooth') {
+            if (!line) return;
+            markYtProgrammaticScroll(behavior === 'smooth' ? 520 : 180);
+            const yOffset = -220;
+            const y = line.getBoundingClientRect().top + window.scrollY + yOffset;
+            window.scrollTo({ top: Math.max(0, y), behavior });
+        }
+
+        function hideYtJumpButton() {
+            document.getElementById('reader-yt-jump')?.classList.remove('is-visible');
+        }
+
+        function updateYtJumpButton() {
+            const btn = document.getElementById('reader-yt-jump');
+            if (!btn) return;
+            const show = !!(currentMaterial?.ytId && !ytFollowActiveLine && document.querySelector('.yt-sub-line.active-sub'));
+            btn.classList.toggle('is-visible', show);
+            btn.setAttribute('title', t('lib.jumpToLine'));
+        }
+
+        window.jumpToActiveSubtitle = () => {
+            const active = document.querySelector('.yt-sub-line.active-sub');
+            ytFollowActiveLine = true;
+            hideYtJumpButton();
+            if (active) scrollToSubtitleLine(active);
+        };
+
+        function pauseYtFollowFromUser() {
+            if (!currentMaterial?.ytId) return;
+            if (!document.querySelector('.yt-sub-line.active-sub')) return;
+            if (ytFollowActiveLine) {
+                ytFollowActiveLine = false;
+                updateYtJumpButton();
+            }
+        }
+
+        function onYtReaderScroll() {
+            handlePiPScroll();
+            const y = window.scrollY || 0;
+            if (!ytProgrammaticScroll) {
+                // Deliberate upward scroll (or any manual scroll away) stops auto-dragging.
+                if (y + 2 < ytLastScrollY) pauseYtFollowFromUser();
+                else if (ytFollowActiveLine) {
+                    const active = document.querySelector('.yt-sub-line.active-sub');
+                    if (active) {
+                        const r = active.getBoundingClientRect();
+                        if (r.bottom < 70 || r.top > window.innerHeight * 0.78) pauseYtFollowFromUser();
+                    }
+                }
+            }
+            ytLastScrollY = y;
+            updateYtJumpButton();
+        }
+
+        function onYtReaderWheel(e) {
+            if (e.deltaY < 0) pauseYtFollowFromUser();
+        }
+
+        let ytTouchStartY = null;
+        function onYtReaderTouchStart(e) {
+            ytTouchStartY = e.touches?.[0]?.clientY ?? null;
+        }
+        function onYtReaderTouchMove(e) {
+            if (ytTouchStartY == null) return;
+            const y = e.touches?.[0]?.clientY;
+            if (y == null) return;
+            if (y - ytTouchStartY > 14) pauseYtFollowFromUser();
+        }
+
+        function bindYtReaderScrollWatch() {
+            unbindYtReaderScrollWatch();
+            ytLastScrollY = window.scrollY || 0;
+            window.addEventListener('scroll', onYtReaderScroll, { passive: true });
+            window.addEventListener('wheel', onYtReaderWheel, { passive: true });
+            window.addEventListener('touchstart', onYtReaderTouchStart, { passive: true });
+            window.addEventListener('touchmove', onYtReaderTouchMove, { passive: true });
+        }
+
+        function unbindYtReaderScrollWatch() {
+            window.removeEventListener('scroll', onYtReaderScroll);
+            window.removeEventListener('wheel', onYtReaderWheel);
+            window.removeEventListener('touchstart', onYtReaderTouchStart);
+            window.removeEventListener('touchmove', onYtReaderTouchMove);
+        }
+
+        function bindYtPipDrag() {
+            const wrap = document.getElementById('reader-yt-wrapper');
+            const handle = document.getElementById('reader-yt-pip-handle');
+            if (!wrap || !handle || ytPipDragBound) return;
+            ytPipDragBound = true;
+            let dragging = false;
+            let startX = 0;
+            let startY = 0;
+            let origLeft = 0;
+            let origTop = 0;
+
+            handle.addEventListener('pointerdown', (e) => {
+                if (!wrap.classList.contains('yt-pip-mode')) return;
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                e.preventDefault();
+                e.stopPropagation();
+                dragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                const rect = wrap.getBoundingClientRect();
+                origLeft = rect.left;
+                origTop = rect.top;
+                wrap.style.right = 'auto';
+                wrap.style.bottom = 'auto';
+                wrap.style.left = `${origLeft}px`;
+                wrap.style.top = `${origTop}px`;
+                try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+            });
+            handle.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                const w = wrap.offsetWidth;
+                const h = wrap.offsetHeight;
+                const left = Math.min(window.innerWidth - w - 6, Math.max(6, origLeft + dx));
+                const top = Math.min(window.innerHeight - h - 6, Math.max(6, origTop + dy));
+                wrap.style.left = `${left}px`;
+                wrap.style.top = `${top}px`;
+                ytPipDragOffset = { x: left, y: top };
+            });
+            const endDrag = () => { dragging = false; };
+            handle.addEventListener('pointerup', endDrag);
+            handle.addEventListener('pointercancel', endDrag);
         }
 
         function initYouTubePlayer(videoId) {
@@ -6780,24 +7333,47 @@
             else setTimeout(() => initYouTubePlayer(videoId), 500);
         }
 
-        function onPlayerStateChange(event) { if (event.data == YT.PlayerState.PLAYING) { if(!syncInterval) syncInterval = setInterval(syncSubtitles, 250); } else { if(syncInterval) { clearInterval(syncInterval); syncInterval = null; } } }
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                if (!syncInterval) syncInterval = setInterval(syncSubtitles, 250);
+                // Fresh play resumes gentle follow unless user left it off intentionally mid-session —
+                // keep current follow flag as-is.
+                updateYtJumpButton();
+            } else {
+                if (syncInterval) { clearInterval(syncInterval); syncInterval = null; }
+            }
+        }
 
         function syncSubtitles() {
-            if(!ytPlayer || !ytPlayer.getCurrentTime) return;
-            const time = ytPlayer.getCurrentTime(); const lines = document.querySelectorAll('.yt-sub-line');
+            if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+            const time = ytPlayer.getCurrentTime();
+            const lines = document.querySelectorAll('.yt-sub-line');
+            let activeLine = null;
             lines.forEach(line => {
-                const start = parseFloat(line.dataset.start); const end = parseFloat(line.dataset.end);
-                if(time >= start && time <= end) {
-                    if(!line.classList.contains('active-sub')) {
+                const start = parseFloat(line.dataset.start);
+                const end = parseFloat(line.dataset.end);
+                const on = time >= start && time <= end;
+                if (on) {
+                    activeLine = line;
+                    if (!line.classList.contains('active-sub')) {
                         line.classList.add('active-sub');
-                        const yOffset = -250; 
-                        const y = line.getBoundingClientRect().top + window.scrollY + yOffset;
-                        window.scrollTo({top: Math.max(0, y), behavior: 'smooth'}); 
+                        if (ytFollowActiveLine) scrollToSubtitleLine(line);
+                        else updateYtJumpButton();
                     }
-                } else line.classList.remove('active-sub');
+                } else {
+                    line.classList.remove('active-sub');
+                }
             });
+            if (!activeLine) updateYtJumpButton();
         }
-        window.seekVideo = (seconds) => { if(ytPlayer && ytPlayer.seekTo) { ytPlayer.seekTo(seconds, true); if(ytPlayer.getPlayerState() !== YT.PlayerState.PLAYING) ytPlayer.playVideo(); } };
+        window.seekVideo = (seconds) => {
+            if (ytPlayer && ytPlayer.seekTo) {
+                ytFollowActiveLine = true;
+                hideYtJumpButton();
+                ytPlayer.seekTo(seconds, true);
+                if (ytPlayer.getPlayerState() !== YT.PlayerState.PLAYING) ytPlayer.playVideo();
+            }
+        };
 
         function wrapWords(text, savedWordsMap, wordOccMap = null) {
             // Include Unicode letters + combining marks so Spanish/Ukrainian diacritics stay in the word
@@ -8408,6 +8984,16 @@
         let srsExtraModesVisible = false;
         let srsModalHighlightMode = null;
 
+        function syncSrsBrainstormVisibility() {
+            const panel = document.getElementById('srs-modes-panel');
+            const panelOpen = !!(panel && !panel.classList.contains('hidden'));
+            document.getElementById('srs-brainstorm-block')?.classList.toggle('hidden', panelOpen);
+            document.getElementById('srs-progress-dots')?.classList.toggle('hidden', panelOpen);
+            document.getElementById('srs-history-section')?.classList.toggle('hidden', panelOpen);
+            document.getElementById('srs-status-text-container')?.classList.toggle('hidden', panelOpen);
+            document.getElementById('btn-reset-srs')?.classList.toggle('hidden', panelOpen);
+        }
+
         function syncSrsModalLayout() {
             const dialog = document.getElementById('srs-status-dialog');
             const panel = document.getElementById('srs-modes-panel');
@@ -8415,6 +9001,7 @@
             const wide = !!(srsExtraModesVisible && panelOpen);
             dialog?.classList.toggle('srs-modes-wide', wide);
             panel?.classList.toggle('srs-modes-side', wide);
+            syncSrsBrainstormVisibility();
         }
 
         function closeSrsModal() {
