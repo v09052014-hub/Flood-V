@@ -17,14 +17,16 @@
             overflow-x: hidden;
             max-width: 100%;
             background-color: #f8fafc;
+            min-height: 100%;
         }
         body {
-            /* Keep a little room for the home indicator — not a large empty strip */
-            padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+            /* Only the real home-indicator inset — no extra empty strip */
+            padding-bottom: env(safe-area-inset-bottom, 0px);
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
             max-width: 100vw;
             background-color: #f8fafc;
+            min-height: 100%;
             min-height: 100dvh;
         }
         
@@ -75,7 +77,8 @@
             word-break: break-word;
             max-width: 100%;
         }
-        .text-reader p { margin: 0 0 1rem; text-align: justify; overflow-wrap: anywhere; max-width: 100%; }
+        .text-reader p,
+        .text-reader > div { margin: 0 0 1rem; text-align: justify; overflow-wrap: anywhere; max-width: 100%; }
         .text-reader h1, .text-reader h2, .text-reader h3 {
             font-weight: 800;
             color: #1e293b;
@@ -180,15 +183,110 @@
         }
         @media (max-width: 640px) {
             #reader-content-wrapper { padding-left: 0.75rem; padding-right: 0.75rem; }
-            .text-reader p { text-align: start; }
+            .text-reader p,
+            .text-reader > div { text-align: start; }
             main { max-width: 100% !important; }
             #view-library.reader-wide-mode { max-width: 100% !important; }
-            .word-clickable { padding: 0 1px; }
+                .word-clickable { padding: 0 1px; }
+        }
+        #home-mw-panel.home-mw-open {
+            display: block;
+        }
+        #home-mw-panel .home-mw-body {
+            max-height: min(72vh, 38rem);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            text-align: left;
+        }
+        #btn-home-mw,
+        #btn-home-tts {
+            font-size: 1.15rem;
+            line-height: 1;
+            transition: opacity 0.18s ease, color 0.18s ease, background-color 0.18s ease;
+        }
+        #btn-home-mw.home-aux-dim,
+        #btn-home-tts.home-aux-dim {
+            opacity: 0.38;
+        }
+        #btn-home-mw.home-aux-dim:hover,
+        #btn-home-tts.home-aux-dim:hover {
+            opacity: 0.85;
+        }
+        #edit-word-modal .edit-word-dialog {
+            max-height: min(92vh, 40rem);
+            overflow-y: auto;
+        }
+        #edit-img-options img {
+            height: 3.25rem;
         }
         #inline-popup {
             position: fixed;
             z-index: 200;
             box-sizing: border-box;
+            width: min(26rem, calc(100vw - 1.25rem));
+            max-width: calc(100vw - 1.25rem);
+            padding: 1rem 1.05rem 1.1rem;
+            border-radius: 1.15rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+        }
+        #inline-popup-word {
+            font-size: 1.2rem;
+            line-height: 1.25;
+        }
+        #inline-context-panel {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.9rem;
+            padding: 0.85rem 0.9rem;
+        }
+        #inline-context-phrase-hint {
+            font-size: 0.8125rem;
+            line-height: 1.35;
+            font-weight: 700;
+            color: #4338ca;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 0.65rem;
+            padding: 0.45rem 0.6rem;
+            margin-bottom: 0.65rem;
+        }
+        #inline-context-phrase-kind {
+            font-size: 0.68rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: lowercase;
+            color: #94a3b8;
+            margin: 0 0 0.55rem;
+        }
+        #inline-context-panel .inline-ctx-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+        #inline-context-source,
+        #inline-context-full {
+            font-size: 0.95rem;
+            line-height: 1.45;
+        }
+        #inline-popup-save-btn {
+            border-radius: 0.8rem;
+            padding-top: 0.7rem;
+            padding-bottom: 0.7rem;
+            font-size: 0.95rem;
+        }
+        @media (max-width: 640px) {
+            #inline-popup {
+                width: calc(100vw - 1rem);
+                max-width: calc(100vw - 1rem);
+                left: 0.5rem !important;
+                right: 0.5rem;
+            }
         }
 
         /* Crossword — normal size (original compact look) */
@@ -290,10 +388,13 @@
         body.crossword-expand-mode main {
             padding-top: 0.35rem;
         }
+        body.training-focus-mode {
+            padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+        }
 
         /* Expand: compact chrome, taller board, side action rail */
         body.crossword-expand-mode {
-            padding-bottom: 0.5rem !important;
+            padding-bottom: env(safe-area-inset-bottom, 0px) !important;
             overflow-x: hidden;
         }
         body.crossword-expand-mode main {
@@ -562,19 +663,20 @@
             position: fixed;
             left: 50%;
             transform: translateX(-50%) translateY(8px);
-            bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+            bottom: max(1rem, env(safe-area-inset-bottom, 0px));
             z-index: 1005;
-            width: 2.35rem;
-            height: 2.35rem;
+            width: 2.65rem;
+            height: 2.65rem;
             border-radius: 9999px;
-            border: 1px solid #cbd5e1;
-            background: rgba(248, 250, 252, 0.92);
-            color: #94a3b8;
-            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+            border: 1.5px solid #94a3b8;
+            background: rgba(255, 255, 255, 0.96);
+            color: #475569;
+            box-shadow: 0 3px 14px rgba(15, 23, 42, 0.14);
             display: none;
             align-items: center;
             justify-content: center;
-            font-size: 1.05rem;
+            font-size: 1.35rem;
+            font-weight: 800;
             line-height: 1;
             opacity: 0;
             pointer-events: none;
@@ -587,22 +689,27 @@
             transform: translateX(-50%) translateY(0);
         }
         #reader-yt-jump:hover {
-            color: #64748b;
-            border-color: #94a3b8;
+            color: #1e293b;
+            border-color: #64748b;
         }
         @media (max-width: 640px) {
-            /* Phone: sit under the header, out of the main reading column */
+            /* Phone: almost at the top (reader chrome is already compact) */
             .yt-pip-mode {
                 width: min(56vw, 210px) !important;
                 height: auto !important;
                 aspect-ratio: 16 / 9;
-                top: calc(60px + env(safe-area-inset-top, 0px) + 8px) !important;
-                right: 10px;
+                top: max(6px, env(safe-area-inset-top, 0px)) !important;
+                right: 8px;
                 bottom: auto !important;
                 left: auto;
             }
             #reader-yt-jump {
-                bottom: max(5.5rem, calc(env(safe-area-inset-bottom, 0px) + 4.5rem));
+                bottom: max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem));
+                width: 2.85rem;
+                height: 2.85rem;
+                font-size: 1.45rem;
+                color: #334155;
+                border-color: #64748b;
             }
         }
 
@@ -1294,10 +1401,10 @@
     </div>
 
     <!-- Modal: Edit Word -->
-    <div id="edit-word-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeEditModal()">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full relative">
-            <button type="button" onclick="closeEditModal()" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700 font-bold text-3xl z-20">&times;</button>
-            <h3 class="text-xl font-bold text-slate-800 mb-4" data-i18n="edit.title">Редагувати слово</h3>
+    <div id="edit-word-modal" class="hidden fixed inset-0 z-[160] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto" onclick="if(event.target === this) closeEditModal()">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-2xl max-w-md w-full relative edit-word-dialog custom-scroll my-auto">
+            <button type="button" onclick="closeEditModal()" class="absolute top-3 right-4 text-slate-400 hover:text-slate-700 font-bold text-3xl z-20">&times;</button>
+            <h3 class="text-xl font-bold text-slate-800 mb-3 pr-8" data-i18n="edit.title">Редагувати слово</h3>
             
             <input type="hidden" id="edit-word-id">
             <div class="mb-3">
@@ -1308,9 +1415,9 @@
                 <label class="text-xs font-bold text-slate-500 uppercase block mb-1" data-i18n="edit.trans">Переклад</label>
                 <input type="text" id="edit-word-uk" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-bold text-slate-800">
             </div>
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="text-xs font-bold text-slate-500 uppercase block mb-1" data-i18n="edit.context">Контекст (Речення)</label>
-                <textarea id="edit-word-ctx" rows="3" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm custom-scroll"></textarea>
+                <textarea id="edit-word-ctx" rows="2" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm custom-scroll"></textarea>
             </div>
             
             <div class="mb-4 border-t border-slate-100 pt-3">
@@ -1321,8 +1428,9 @@
                         <button type="button" onclick="searchEditImages()" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg font-bold transition shadow-sm border border-indigo-100 shrink-0 relative z-10" data-i18n="edit.search">Шукати</button>
                     </div>
                 </div>
-                <img id="edit-word-img-preview" class="w-full h-28 rounded-xl object-cover mb-2 hidden bg-slate-100 shadow-inner" onerror="imgError(this)">
-                <div id="edit-img-options" class="grid grid-cols-4 gap-2 hidden mb-2"></div>
+                <div id="edit-img-query-hints" class="hidden flex flex-wrap gap-1.5 mb-2"></div>
+                <img id="edit-word-img-preview" class="w-full h-24 rounded-xl object-cover mb-2 hidden bg-slate-100 shadow-inner" onerror="imgError(this)">
+                <div id="edit-img-options" class="grid grid-cols-4 gap-1.5 hidden mb-2"></div>
                 <p id="edit-img-status" class="text-xs text-slate-500 hidden font-bold"></p>
                 <input type="hidden" id="edit-word-new-imgUrl">
             </div>
@@ -1517,10 +1625,14 @@
                 <div class="flex flex-col gap-3">
                     <div class="flex flex-col sm:flex-row gap-3 relative">
                         <div class="flex-1 relative">
-                            <input type="text" id="manual-word" placeholder="Слово" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base" data-i18n-placeholder="dict.wordPlaceholder">
-                            <button onclick="autoTranslateManual()" class="absolute right-2 top-2 p-1.5 text-indigo-500 hover:bg-indigo-100 rounded-lg transition" data-i18n-title="dict.translate" title="Перекласти">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
-                            </button>
+                            <input type="text" id="manual-word" placeholder="Слово" class="w-full p-3 pr-[6.75rem] border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base" data-i18n-placeholder="dict.wordPlaceholder">
+                            <div class="absolute right-1.5 top-1.5 flex items-center">
+                                <button type="button" id="btn-home-tts" onclick="playManualWordAudio()" class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition" data-i18n-title="dict.listen" title="Прослухати" aria-label="Listen">🔊</button>
+                                <button type="button" id="btn-home-mw" onclick="openHomeMerriamDict()" class="hidden p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition" data-i18n-title="dict.mwOpen" title="Тлумачення" aria-label="Merriam-Webster">📖</button>
+                                <button type="button" onclick="autoTranslateManual()" class="p-1.5 text-indigo-500 hover:bg-indigo-100 rounded-lg transition" data-i18n-title="dict.translate" title="Перекласти">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
+                                </button>
+                            </div>
                         </div>
                         <div class="flex-1 relative">
                             <input type="text" id="manual-trans" placeholder="Переклад" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-base bg-white" autocomplete="off" data-i18n-placeholder="dict.transPlaceholder">
@@ -1529,7 +1641,22 @@
                             </div>
                         </div>
                     </div>
+                    <input type="text" id="manual-context" placeholder="Контекст (необовʼязково)" class="hidden w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-400 font-medium text-sm text-slate-600 bg-slate-50" data-i18n-placeholder="dict.contextPlaceholder" autocomplete="off">
                     <button onclick="addWordManual()" id="btn-add-manual" class="w-full bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-sm active:scale-95 text-base" data-i18n="dict.add">Додати до словника</button>
+                </div>
+            </div>
+
+            <div id="home-mw-panel" class="hidden max-w-3xl mx-auto mb-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-100">
+                        <button type="button" id="home-mw-back" onclick="homeMerriamGoBack()" class="hidden flex-shrink-0 w-8 h-8 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 font-bold text-sm transition" data-i18n-title="inline.back" title="Back">←</button>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Merriam-Webster</p>
+                            <p id="home-mw-word" class="font-bold text-indigo-700 truncate"></p>
+                        </div>
+                        <button type="button" onclick="closeHomeMerriamDict()" class="w-8 h-8 flex-shrink-0 inline-flex items-center justify-center text-slate-400 hover:text-slate-700 font-bold text-2xl leading-none rounded-lg hover:bg-slate-50 transition" aria-label="Close">&times;</button>
+                    </div>
+                    <div id="home-mw-content" class="px-4 py-3 overflow-y-auto custom-scroll home-mw-body text-slate-600 font-sans space-y-2"></div>
                 </div>
             </div>
 
@@ -1906,11 +2033,6 @@
                     <div id="bs-main-card" class="bg-white p-4 sm:p-5 rounded-2xl shadow-xl border border-slate-100 text-center relative overflow-hidden flex flex-col min-h-[260px] w-full">
                         <div id="bs-interactive-area" class="flex-1 flex flex-col justify-center relative z-10 w-full"></div>
                         <div id="bs-feedback" class="min-h-0 flex items-center justify-center font-bold text-lg relative z-10"></div>
-                        
-                        <div class="mt-3 flex gap-3 relative z-10 w-full">
-                            <button id="bs-btn-dont-know" onclick="markWordAsFailed()" class="flex-shrink-0 bg-slate-100 text-slate-500 hover:bg-slate-200 py-3 px-4 rounded-xl font-bold text-sm transition border border-slate-200 shadow-sm hidden" data-i18n-html="train.dontKnow">Не знаю<br>слово</button>
-                            <button id="bs-btn-next" onclick="nextBrainstormStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-lg hidden active:scale-95 shadow-md transition" data-i18n="train.next">Далі <span class="font-normal">↵</span></button>
-                        </div>
 
                         <div id="bs-success-reveal" class="hidden mt-4 p-3 rounded-2xl flex flex-col sm:flex-row items-center gap-3 text-left border fade-in z-10 shadow-sm">
                             <img id="bs-success-img" class="w-16 h-16 rounded-xl object-cover shadow-sm bg-slate-200 flex-shrink-0 mx-auto sm:mx-0 ring-2 ring-white">
@@ -1920,6 +2042,11 @@
                                 <p class="text-sm font-semibold text-slate-900 mb-1" id="bs-success-trans"></p>
                                 <p class="text-sm text-slate-500 font-medium leading-snug italic" id="bs-success-context"></p>
                             </div>
+                        </div>
+
+                        <div class="mt-3 flex gap-3 relative z-10 w-full">
+                            <button id="bs-btn-dont-know" onclick="markWordAsFailed()" class="flex-shrink-0 bg-slate-100 text-slate-500 hover:bg-slate-200 py-3 px-4 rounded-xl font-bold text-sm transition border border-slate-200 shadow-sm hidden" data-i18n-html="train.dontKnow">Не знаю<br>слово</button>
+                            <button id="bs-btn-next" onclick="nextBrainstormStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-lg hidden active:scale-95 shadow-md transition" data-i18n="train.next">Далі <span class="font-normal">↵</span></button>
                         </div>
                     </div>
                     <div id="bs-external-clues" class="w-full lg:w-5/12 hidden transition-all"></div>
@@ -1951,11 +2078,11 @@
     </main>
 
     <!-- Inline Popup -->
-    <div id="inline-popup" class="hidden fixed z-[200] bg-white rounded-xl shadow-2xl border border-slate-200 p-4 w-80 max-w-[calc(100vw-1.5rem)] transition-opacity">
-        <div class="flex justify-between items-center gap-2 mb-2">
+    <div id="inline-popup" class="hidden fixed z-[200] transition-opacity">
+        <div class="flex justify-between items-center gap-2 mb-2.5">
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
                 <button type="button" id="inline-popup-back" onclick="inlinePopupGoBack()" class="hidden flex-shrink-0 w-8 h-8 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 font-bold text-sm transition" title="Back" data-i18n-title="inline.back">←</button>
-                <strong id="inline-popup-word" class="text-lg text-indigo-700 font-bold break-words min-w-0"></strong>
+                <strong id="inline-popup-word" class="text-indigo-700 font-bold break-words min-w-0"></strong>
                 <button type="button" id="inline-popup-tts" onclick="playInlineWordAudio()" class="flex-shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 transition" title="Listen" data-i18n-title="inline.listen" aria-label="Listen">🔊</button>
             </div>
             <div class="flex items-center gap-1 flex-shrink-0">
@@ -1963,33 +2090,34 @@
                 <button onclick="closeInlinePopup()" class="w-8 h-8 inline-flex items-center justify-center text-slate-400 hover:text-slate-600 font-bold text-xl leading-none rounded-lg hover:bg-slate-50 transition">&times;</button>
             </div>
         </div>
-        <div id="inline-popup-loader" class="hidden text-indigo-500 font-bold text-xs flex items-center gap-2 mb-2"><div class="loader w-3 h-3"></div> <span data-i18n="inline.searching">Шукаємо...</span></div>
+        <div id="inline-popup-loader" class="hidden text-indigo-500 font-bold text-sm flex items-center gap-2 mb-2"><div class="loader w-3 h-3"></div> <span data-i18n="inline.searching">Шукаємо...</span></div>
         
-        <input type="text" id="inline-popup-trans-input" class="w-full mb-2 p-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-600 text-base font-bold text-slate-800 bg-slate-50" placeholder="Натисніть ↵" data-i18n-placeholder="inline.enter">
+        <input type="text" id="inline-popup-trans-input" class="w-full mb-2.5 p-2.5 border border-slate-200 rounded-xl outline-none focus:border-indigo-600 text-base font-bold text-slate-800 bg-slate-50" placeholder="Натисніть ↵" data-i18n-placeholder="inline.enter">
 
-        <div id="inline-context-panel" class="hidden mb-2 p-2.5 rounded-xl bg-gradient-to-br from-indigo-50/90 to-slate-50 border border-indigo-100 text-left">
-            <p id="inline-context-phrase-hint" class="hidden text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-100 rounded-md px-2 py-1 mb-2 leading-snug" data-i18n="inline.phraseHint">Збережіть всю фразу, а не одне слово</p>
-            <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-1" data-i18n="inline.contextSource">Речення</p>
-            <p id="inline-context-source" class="text-xs text-slate-600 italic leading-snug mb-2"></p>
-            <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-1" data-i18n="inline.contextFullTrans">Повний переклад</p>
-            <p id="inline-context-full" class="text-xs text-slate-700 leading-snug font-medium"></p>
+        <div id="inline-context-panel" class="hidden mb-2.5 text-left">
+            <p id="inline-context-phrase-kind" class="hidden"></p>
+            <p id="inline-context-phrase-hint" class="hidden" data-i18n="inline.phraseHint">Збережіть всю фразу, а не одне слово</p>
+            <p class="inline-ctx-label" data-i18n="inline.contextSource">Речення</p>
+            <p id="inline-context-source" class="text-slate-600 italic mb-2.5"></p>
+            <p class="inline-ctx-label" data-i18n="inline.contextFullTrans">Повний переклад</p>
+            <p id="inline-context-full" class="text-slate-800 font-medium"></p>
         </div>
         
-        <div id="inline-trans-dropdown" class="mb-3 max-h-32 overflow-y-auto custom-scroll border border-slate-100 rounded-lg hidden bg-white">
+        <div id="inline-trans-dropdown" class="mb-3 max-h-36 overflow-y-auto custom-scroll border border-slate-100 rounded-xl hidden bg-white">
             <ul id="inline-trans-options-list" class="flex flex-col"></ul>
         </div>
         
-        <button onclick="saveWordFromInlinePopup()" id="inline-popup-save-btn" class="w-full bg-emerald-500 text-white py-2 rounded-lg font-bold text-sm shadow-sm hover:bg-emerald-600 active:scale-95 transition hidden" data-i18n="inline.save">
+        <button onclick="saveWordFromInlinePopup()" id="inline-popup-save-btn" class="w-full bg-indigo-600 text-white font-bold shadow-sm hover:bg-indigo-700 active:scale-95 transition hidden" data-i18n="inline.save">
             Зберегти <span class="font-normal">↵</span>
         </button>
 
         <!-- Collapsible Dictionary Section -->
-        <div id="inline-dict-section" class="mt-2 pt-2 border-t border-slate-100 hidden">
-            <button onclick="toggleInlineDict()" class="w-full flex justify-between items-center text-xs font-bold text-slate-500 hover:text-indigo-600 transition outline-none">
+        <div id="inline-dict-section" class="mt-2.5 pt-2.5 border-t border-slate-100 hidden">
+            <button onclick="toggleInlineDict()" class="w-full flex justify-between items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition outline-none">
                 <span class="flex items-center gap-1">📖 <span data-i18n="inline.dict">Тлумачення</span></span>
                 <span id="inline-dict-arrow">▼</span>
             </button>
-            <div id="inline-dict-content" class="hidden mt-2 text-slate-600 text-[13px] max-h-64 overflow-y-auto custom-scroll space-y-2 text-left font-sans leading-snug"></div>
+            <div id="inline-dict-content" class="hidden mt-2 text-slate-600 text-sm max-h-64 overflow-y-auto custom-scroll space-y-2 text-left font-sans leading-snug"></div>
         </div>
     </div>
 
@@ -2229,6 +2357,10 @@
                 'inline.contextLoading': 'Контекст…',
                 'inline.contextFail': 'Не вдалося отримати контекстний переклад',
                 'inline.phraseHint': 'Збережіть всю фразу, а не одне слово',
+                'inline.kind.phrasal': 'фразове дієслово',
+                'inline.kind.idiom': 'ідіома',
+                'inline.kind.collocation': 'колокація',
+                'inline.kind.prep': 'прийм. фраза',
                 'move.title': 'Перенести слова', 'move.pick': 'Оберіть папку призначення', 'move.newFolder': 'Нова папка',
                 'folder.title': 'Нова папка', 'folder.hint': 'Введіть назву для групування слів',
                 'folder.ph': 'Назва папки...', 'folder.create': 'Створити',
@@ -2245,9 +2377,13 @@
                 'dict.back': 'Назад до папок', 'dict.newFolder': 'Створити папку', 'dict.export': 'Експорт',
                 'dict.selectAll': 'Вибрати всі', 'dict.selectNone': 'Зняти всі', 'dict.move': 'Перенести в іншу папку',
                 'dict.translate': 'Перекласти',
+                'dict.listen': 'Прослухати (Alt/⌥+↵)',
+                'dict.mwOpen': 'Тлумачення · Shift+↵',
+                'dict.contextPlaceholder': 'Контекст (необовʼязково)',
                 'status.connecting': 'Підключення...',
                 'img.searching': 'Шукаємо...', 'img.noKey': 'Немає ключа Unsplash. Показано стандартне.',
                 'img.none': 'Нічого не знайдено.', 'img.limit': 'Ліміт запитів вичерпано. Використовуйте стандартне.',
+                'img.tryAlso': 'Спробуйте:',
                 'msg.moved': 'Перенесено {n} слів у «{folder}».', 'msg.moveFail': 'Не вдалося перенести слова. Спробуйте ще раз.',
                 'msg.resetN': 'Скинути прогрес {n} вибраних слів?', 'msg.resetOk': 'Прогрес скинуто.',
                 'msg.deleteN': 'Видалити {n} вибраних слів? Цю дію не можна скасувати.',
@@ -2468,6 +2604,10 @@
                 'inline.contextLoading': 'Context…',
                 'inline.contextFail': 'Could not get contextual translation',
                 'inline.phraseHint': 'Save the whole phrase, not just one word',
+                'inline.kind.phrasal': 'phrasal verb',
+                'inline.kind.idiom': 'idiom',
+                'inline.kind.collocation': 'collocation',
+                'inline.kind.prep': 'prep. phrase',
                 'move.title': 'Move words', 'move.pick': 'Choose a destination folder', 'move.newFolder': 'New folder',
                 'folder.title': 'New folder', 'folder.hint': 'Enter a name to group words',
                 'folder.ph': 'Folder name...', 'folder.create': 'Create',
@@ -2484,9 +2624,13 @@
                 'dict.back': 'Back to folders', 'dict.newFolder': 'Create folder', 'dict.export': 'Export',
                 'dict.selectAll': 'Select all', 'dict.selectNone': 'Clear all', 'dict.move': 'Move to another folder',
                 'dict.translate': 'Translate',
+                'dict.listen': 'Listen (Alt/⌥+↵)',
+                'dict.mwOpen': 'Dictionary · Shift+↵',
+                'dict.contextPlaceholder': 'Context (optional)',
                 'status.connecting': 'Connecting...',
                 'img.searching': 'Searching...', 'img.noKey': 'No Unsplash key. Showing a default image.',
                 'img.none': 'Nothing found.', 'img.limit': 'Request limit reached. Using a default image.',
+                'img.tryAlso': 'Try:',
                 'msg.needUrl': 'Enter a link!', 'msg.extracting': 'Extracting...',
                 'msg.extracted': 'Text extracted and cleaned!', 'msg.extractFail': 'Could not extract the text. Check the link.',
                 'msg.newsExtract': 'Extracting the news text...', 'msg.wikiLoad': 'Loading the Wikipedia article...',
@@ -2702,6 +2846,10 @@
                 'inline.contextLoading': 'Contexto…',
                 'inline.contextFail': 'No se pudo obtener la traducción contextual',
                 'inline.phraseHint': 'Guarde la frase completa, no solo una palabra',
+                'inline.kind.phrasal': 'verbo frasal',
+                'inline.kind.idiom': 'modismo',
+                'inline.kind.collocation': 'colocación',
+                'inline.kind.prep': 'frase prep.',
                 'move.title': 'Mover palabras', 'move.pick': 'Elige la carpeta de destino', 'move.newFolder': 'Carpeta nueva',
                 'folder.title': 'Carpeta nueva', 'folder.hint': 'Escribe un nombre para agrupar palabras',
                 'folder.ph': 'Nombre de la carpeta...', 'folder.create': 'Crear',
@@ -2718,9 +2866,13 @@
                 'dict.back': 'Volver a las carpetas', 'dict.newFolder': 'Crear carpeta', 'dict.export': 'Exportar',
                 'dict.selectAll': 'Seleccionar todas', 'dict.selectNone': 'Quitar todas', 'dict.move': 'Mover a otra carpeta',
                 'dict.translate': 'Traducir',
+                'dict.listen': 'Escuchar (Alt/⌥+↵)',
+                'dict.mwOpen': 'Definición · Shift+↵',
+                'dict.contextPlaceholder': 'Contexto (opcional)',
                 'status.connecting': 'Conectando...',
                 'img.searching': 'Buscando...', 'img.noKey': 'No hay clave de Unsplash. Se muestra una imagen por defecto.',
                 'img.none': 'No se ha encontrado nada.', 'img.limit': 'Límite de peticiones. Se usa una imagen por defecto.',
+                'img.tryAlso': 'Prueba:',
                 'msg.needUrl': '¡Introduce un enlace!', 'msg.extracting': 'Extrayendo...',
                 'msg.extracted': '¡Texto extraído y limpio!', 'msg.extractFail': 'No se pudo extraer el texto. Revisa el enlace.',
                 'msg.newsExtract': 'Extrayendo el texto de la noticia...', 'msg.wikiLoad': 'Cargando el artículo de Wikipedia...',
@@ -2880,6 +3032,7 @@
             if (srsToggle) srsToggle.textContent = srsModesBtn(srsPanel && !srsPanel.classList.contains('hidden'));
             updateHeaderTrackFlags();
             updateLearningFlags();
+            if (typeof updateHomeMwAvailability === 'function') updateHomeMwAvailability();
         }
         function langPairLabel() {
             const a = LANG_META[learningLanguage] || {};
@@ -4051,15 +4204,172 @@
 
         async function getImageUrl(word) {
             try {
-                const cleanWord = word.trim();
+                const cleanWord = String(word || '').trim();
                 if (!cleanWord) return UNSPLASH_FALLBACK;
-                const res = await fetch(`${UNSPLASH_PROXY}/search/photos?query=${encodeURIComponent(cleanWord)}&per_page=1`);
+                const query = await pickBestVisualImageQuery(cleanWord);
+                const res = await fetch(`${UNSPLASH_PROXY}/search/photos?query=${encodeURIComponent(query)}&per_page=1`);
                 if (!res.ok) return UNSPLASH_FALLBACK;
                 const data = await res.json();
                 if (data.results && data.results.length > 0) return data.results[0].urls.regular;
             } catch (e) {}
             return UNSPLASH_FALLBACK;
         }
+
+        // Tiny local photo hints only for lemmas Unsplash almost never illustrates literally.
+        // Keep concrete & simple — never clever metaphors (no "eureka moment" style).
+        const VISUAL_IMAGE_HINTS = {
+            heuristic: ['lightbulb', 'puzzle'],
+            heuretic: ['lightbulb', 'puzzle'],
+            epiphany: ['lightbulb', 'idea'],
+            insight: ['lightbulb', 'understanding'],
+            procrastination: ['clock waiting', 'messy desk'],
+            nostalgia: ['old photo album', 'vintage'],
+            solitude: ['alone by window', 'quiet room'],
+            paradox: ['optical illusion', 'mirror'],
+            empathy: ['comforting friend', 'listening'],
+            bureaucracy: ['office paperwork', 'filing cabinet'],
+            ephemeral: ['soap bubble', 'dandelion seeds'],
+            hypothesis: ['science lab', 'experiment'],
+            innovation: ['lightbulb', 'workshop']
+        };
+
+        const visualQueryCache = new Map();
+        const FREE_DICT_API = 'https://api.dictionaryapi.dev/api/v2/entries';
+
+        function normalizeVisualHintList(list) {
+            return (list || [])
+                .map((s) => String(s || '').trim().toLowerCase())
+                .filter((s) => s.length >= 2);
+        }
+
+        function isUsefulImageHint(word, head) {
+            const w = String(word || '').trim().toLowerCase();
+            const h = String(head || '').trim().toLowerCase();
+            if (!w || w === h) return false;
+            if (w.length < 3 || w.length > 22) return false;
+            // Skip long idioms — harder for students and worse for photo search
+            const parts = w.split(/\s+/).filter(Boolean);
+            if (parts.length > 2) return false;
+            if (/^(as|the|a|an|to|of|in|on|for)\b/.test(w)) return false;
+            return true;
+        }
+
+        async function fetchFreeDictSynonyms(word) {
+            const q = String(word || '').trim().toLowerCase();
+            if (!q || /\s/.test(q)) return [];
+            const lang = learningLanguage === 'es' ? 'es' : 'en';
+            try {
+                const res = await fetch(`${FREE_DICT_API}/${lang}/${encodeURIComponent(q)}`);
+                if (!res.ok) return [];
+                const data = await res.json();
+                if (!Array.isArray(data)) return [];
+                const out = [];
+                const seen = new Set();
+                data.forEach((entry) => {
+                    (entry.meanings || []).forEach((meaning) => {
+                        const bag = [...(meaning.synonyms || [])];
+                        (meaning.definitions || []).forEach((def) => {
+                            (def.synonyms || []).forEach((s) => bag.push(s));
+                        });
+                        bag.forEach((s) => {
+                            const w = String(s || '').trim().toLowerCase();
+                            if (!isUsefulImageHint(w, q) || seen.has(w)) return;
+                            seen.add(w);
+                            out.push(w);
+                        });
+                    });
+                });
+                return out.slice(0, 6);
+            } catch (_) {
+                return [];
+            }
+        }
+
+        async function getVisualImageQueryOptions(word, opts = {}) {
+            const raw = String(word || '').trim();
+            const key = raw.toLowerCase();
+            if (!key) return { primary: '', alternatives: [] };
+            const forEdit = !!opts.forEdit;
+            const cacheKey = forEdit ? `edit:${key}` : key;
+            if (visualQueryCache.has(cacheKey)) return visualQueryCache.get(cacheKey);
+
+            const local = normalizeVisualHintList(VISUAL_IMAGE_HINTS[key]).filter((q) => isUsefulImageHint(q, key));
+            // Edit picker: Free Dictionary synonyms as optional "Try" chips.
+            // Auto-save: skip the network call — search the typed word only.
+            const remote = forEdit ? await fetchFreeDictSynonyms(key) : [];
+
+            const seen = new Set();
+            const ordered = [];
+            const push = (q) => {
+                const n = String(q || '').trim().toLowerCase();
+                if (!n || seen.has(n)) return;
+                seen.add(n);
+                ordered.push(String(q).trim());
+            };
+
+            // Always lead with the real word — never auto-promote a synonym/metaphor.
+            push(raw);
+            local.forEach(push);
+            remote.forEach(push);
+
+            const primary = ordered[0] || raw;
+            const alternatives = ordered.filter((q) => q.toLowerCase() !== primary.toLowerCase()).slice(0, 5);
+            const result = { primary, alternatives, all: ordered };
+            visualQueryCache.set(cacheKey, result);
+            return result;
+        }
+
+        async function pickBestVisualImageQuery(word) {
+            // Auto-picked cover image always uses the typed lemma (quota + predictability).
+            return String(word || '').trim();
+        }
+
+        function clearEditImageQueryHints() {
+            const wrap = document.getElementById('edit-img-query-hints');
+            if (!wrap) return;
+            wrap.classList.add('hidden');
+            wrap.innerHTML = '';
+        }
+
+        function renderEditImageQueryHints(headword, options, activeQuery) {
+            const wrap = document.getElementById('edit-img-query-hints');
+            if (!wrap) return;
+            const chips = [];
+            const active = String(activeQuery || '').trim().toLowerCase();
+            const head = String(headword || '').trim();
+            const pool = [];
+            if (head) pool.push(head);
+            if (options?.primary) pool.push(options.primary);
+            (options?.alternatives || []).forEach((q) => pool.push(q));
+
+            const seen = new Set();
+            pool.forEach((q) => {
+                const label = String(q || '').trim();
+                const k = label.toLowerCase();
+                if (!label || seen.has(k)) return;
+                seen.add(k);
+                const isActive = k === active;
+                const esc = label.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                chips.push(
+                    `<button type="button" onclick="applyEditImageQueryHint('${esc}')" class="text-[11px] font-bold px-2 py-1 rounded-lg border transition ${isActive ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200'}">${label.replace(/</g, '&lt;')}</button>`
+                );
+            });
+
+            if (chips.length <= 1) {
+                clearEditImageQueryHints();
+                return;
+            }
+            wrap.innerHTML = `<span class="text-[10px] font-bold uppercase tracking-wide text-slate-400 mr-1 self-center">${t('img.tryAlso')}</span>${chips.join('')}`;
+            wrap.classList.remove('hidden');
+        }
+
+        window.applyEditImageQueryHint = (query) => {
+            const q = String(query || '').trim();
+            if (!q) return;
+            const input = document.getElementById('edit-img-query');
+            if (input) input.value = q;
+            searchEditImages({ fromHint: true });
+        };
 
         async function fetchTranslationText(text, opts = {}) {
             if (!text) return null;
@@ -4088,8 +4398,54 @@
         }
 
         const inputWord = document.getElementById('manual-word'), inputTrans = document.getElementById('manual-trans'), dropdown = document.getElementById('trans-dropdown'), optionsList = document.getElementById('trans-options-list');
-        inputWord.addEventListener('keypress', (e) => { if(e.key === 'Enter') { e.preventDefault(); autoTranslateManual(); inputTrans.focus(); } });
-        inputTrans.addEventListener('keypress', (e) => { if(e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); addWordManual(); } });
+        const inputContext = document.getElementById('manual-context');
+        function syncManualContextVisibility() {
+            if (!inputContext) return;
+            const show = !!(inputWord && inputWord.value.trim());
+            inputContext.classList.toggle('hidden', !show);
+            if (!show) inputContext.value = '';
+        }
+        function handleManualAddKeydown(e) {
+            if (e.key !== 'Enter' || e.repeat) return;
+            // Shift+Enter → Merriam-Webster (Win + Mac)
+            if (e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                openHomeMerriamDict();
+                return;
+            }
+            // Alt/Option+Enter → play pronunciation (avoids Ctrl/Cmd browser shortcuts)
+            if (e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                playManualWordAudio();
+                return;
+            }
+            if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+            e.preventDefault();
+            if (e.target === inputWord) {
+                autoTranslateManual();
+                inputTrans.focus();
+            } else {
+                e.stopPropagation();
+                addWordManual();
+            }
+        }
+        inputWord.addEventListener('keydown', handleManualAddKeydown);
+        inputTrans.addEventListener('keydown', handleManualAddKeydown);
+        inputContext?.addEventListener('keydown', handleManualAddKeydown);
+        function syncHomeAuxButtonsOpacity() {
+            const tts = document.getElementById('btn-home-tts');
+            const mw = document.getElementById('btn-home-mw');
+            const engaged = !!(inputWord && (document.activeElement === inputWord || inputWord.value.trim()));
+            tts?.classList.toggle('home-aux-dim', !engaged);
+            mw?.classList.toggle('home-aux-dim', !engaged);
+        }
+        inputWord.addEventListener('input', () => {
+            syncManualContextVisibility();
+            syncHomeAuxButtonsOpacity();
+        });
+        inputWord.addEventListener('focus', syncHomeAuxButtonsOpacity);
+        inputWord.addEventListener('blur', () => setTimeout(syncHomeAuxButtonsOpacity, 0));
+        syncHomeAuxButtonsOpacity();
 
         window.autoTranslateManual = async () => {
             const word = inputWord.value.trim(); if(!word) return;
@@ -4119,6 +4475,11 @@
                 return;
             }
             if (trainingSessionActive) return;
+            if (typeof isHomeMwPanelOpen === 'function' && isHomeMwPanelOpen()) {
+                e.preventDefault();
+                closeHomeMerriamDict();
+                return;
+            }
             const moveModal = document.getElementById('move-words-modal');
             if (moveModal && !moveModal.classList.contains('hidden')) {
                 e.preventDefault();
@@ -5706,10 +6067,14 @@
             const btn = document.getElementById('btn-add-manual'); const orig = btn.textContent; btn.disabled = true; btn.textContent = "...";
             try {
                 const imgUrl = await getImageUrl(word);
-                const savePayload = { word, translation: trans, imageUrl: imgUrl, context: "", source: getSaveSource(), createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0, bsHistory: [] };
+                const ctx = (inputContext?.value || '').trim();
+                const savePayload = { word, translation: trans, imageUrl: imgUrl, context: ctx, source: getSaveSource(), createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0, bsHistory: [] };
                 if (activeMaterialId) savePayload.materialId = activeMaterialId;
                 await addDoc(colRef('words'), savePayload);
-                inputWord.value = ''; inputTrans.value = ''; dropdown.classList.add('hidden'); inputWord.focus();
+                inputWord.value = ''; inputTrans.value = ''; if (inputContext) inputContext.value = '';
+                syncManualContextVisibility();
+                dropdown.classList.add('hidden'); inputWord.focus();
+                if (typeof closeHomeMerriamDict === 'function') closeHomeMerriamDict();
             } catch (err) { window.showModal(t('msg.saveError')); } finally { btn.disabled = false; btn.textContent = orig; }
         };
 
@@ -5726,31 +6091,50 @@
             if (word.imageUrl) { imgPreview.src = word.imageUrl; imgPreview.classList.remove('hidden'); } else { imgPreview.classList.add('hidden'); }
             document.getElementById('edit-img-options').classList.add('hidden');
             document.getElementById('edit-img-status').classList.add('hidden');
+            clearEditImageQueryHints();
 
             document.getElementById('edit-word-modal').classList.remove('hidden');
         };
         window.closeEditModal = () => document.getElementById('edit-word-modal').classList.add('hidden');
-        
-        window.searchEditImages = async () => {
+
+        let editImageSearchToken = 0;
+        window.searchEditImages = async (opts = {}) => {
             const defaultWord = document.getElementById('edit-word-en').value.trim();
             const customQuery = document.getElementById('edit-img-query').value.trim();
-            const word = customQuery || defaultWord;
             const status = document.getElementById('edit-img-status');
             const optionsContainer = document.getElementById('edit-img-options');
-            if (!word) return;
+            if (!defaultWord && !customQuery) return;
 
+            const token = ++editImageSearchToken;
             status.textContent = t('img.searching'); status.classList.remove('hidden');
             optionsContainer.innerHTML = ''; optionsContainer.classList.add('hidden');
+            // Drop previous word's chips immediately so they never linger across searches
+            clearEditImageQueryHints();
 
             try {
-                const cleanWord = word.trim();
-                const res = await fetch(`${UNSPLASH_PROXY}/search/photos?query=${encodeURIComponent(cleanWord)}&per_page=4`);
+                const visualOpts = defaultWord
+                    ? await getVisualImageQueryOptions(defaultWord, { forEdit: true })
+                    : { primary: customQuery, alternatives: [] };
+                if (token !== editImageSearchToken) return;
+
+                // Always search the typed word (or whatever the user put in the query box).
+                // Synonym chips are optional — never auto-swap the query to a "clever" paraphrase.
+                let searchQuery = customQuery || defaultWord;
+                if (!opts.fromHint) {
+                    const input = document.getElementById('edit-img-query');
+                    if (input && !customQuery) input.value = '';
+                }
+
+                renderEditImageQueryHints(defaultWord, visualOpts, searchQuery);
+
+                const res = await fetch(`${UNSPLASH_PROXY}/search/photos?query=${encodeURIComponent(searchQuery)}&per_page=8`);
+                if (token !== editImageSearchToken) return;
                 if (!res.ok) throw new Error("API Limit");
                 const data = await res.json();
 
                 if (data.results && data.results.length > 0) {
                     optionsContainer.innerHTML = data.results.map(r => `
-                        <img src="${r.urls.regular}" class="w-full h-16 object-cover rounded-lg cursor-pointer hover:border-2 hover:border-indigo-500 transition shadow-sm" 
+                        <img src="${r.urls.regular}" class="w-full object-cover rounded-lg cursor-pointer hover:border-2 hover:border-indigo-500 transition shadow-sm" 
                              onclick="selectEditImage('${r.urls.regular}')" onerror="imgError(this)">
                     `).join('');
                     optionsContainer.classList.remove('hidden');
@@ -5759,8 +6143,9 @@
                     status.textContent = t('img.none');
                 }
             } catch (e) {
+                if (token !== editImageSearchToken) return;
                 status.textContent = t('img.limit');
-                optionsContainer.innerHTML = `<img src="${UNSPLASH_FALLBACK}" class="w-full h-16 object-cover rounded-lg cursor-pointer col-span-4 shadow-sm" onclick="selectEditImage('${UNSPLASH_FALLBACK}')">`;
+                optionsContainer.innerHTML = `<img src="${UNSPLASH_FALLBACK}" class="w-full object-cover rounded-lg cursor-pointer col-span-4 shadow-sm" onclick="selectEditImage('${UNSPLASH_FALLBACK}')">`;
                 optionsContainer.classList.remove('hidden');
             }
         };
@@ -7602,13 +7987,14 @@
             inlinePopup.style.position = 'fixed';
             inlinePopup.style.visibility = 'hidden';
 
-            const pad = 12;
+            const pad = 10;
             const gap = 10;
             const vw = window.innerWidth;
             const vh = window.innerHeight;
-            const maxW = Math.min(320, vw - pad * 2);
+            const maxW = Math.min(vw < 640 ? vw - pad * 2 : 420, vw - pad * 2);
             inlinePopup.style.width = maxW + 'px';
             inlinePopup.style.maxWidth = `calc(100vw - ${pad * 2}px)`;
+            inlinePopup.style.right = '';
 
             const pw = inlinePopup.offsetWidth || maxW;
             const ph = inlinePopup.offsetHeight || 180;
@@ -7692,7 +8078,8 @@
                 const occurrenceIndex = parseInt(e.target.getAttribute('data-occ') || '0', 10) || 0;
                 const rect = e.target.getBoundingClientRect();
                 positionInlinePopup(rect);
-                processInlineTranslationRequest(word, currentMaterial.content, { occurrenceIndex });
+                const lineContext = getLineContextFromNode(e.target, word);
+                processInlineTranslationRequest(word, currentMaterial.content, { occurrenceIndex, lineContext });
             }
         });
 
@@ -7738,7 +8125,8 @@
                 lastSelectedText = stableText;
                 scheduleInlinePopupReposition(latest.rect);
                 const textOffset = getPlainTextOffsetInReader(latest.range);
-                processInlineTranslationRequest(stableText, currentMaterial ? currentMaterial.content : '', { textOffset });
+                const lineContext = getLineContextFromNode(latest.range?.commonAncestorContainer, stableText);
+                processInlineTranslationRequest(stableText, currentMaterial ? currentMaterial.content : '', { textOffset, lineContext });
             }, 450);
         });
 
@@ -7821,7 +8209,7 @@
             if (!w) return '';
             const esc = mwEscapeHtml(w);
             const js = w.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-            return `<button type="button" class="mw-dict-tab inline-flex items-center max-w-full truncate rounded-lg border border-indigo-200 bg-indigo-50 px-2 py-1 text-[12px] font-bold text-indigo-700 hover:bg-indigo-100 hover:border-indigo-300 transition cursor-pointer" onclick="event.stopPropagation(); lookupInlineDictWord('${js}')">${esc}</button>`;
+            return `<button type="button" class="mw-dict-tab inline-flex items-center max-w-full truncate rounded-lg border border-indigo-200 bg-indigo-50 px-2 py-1 text-[12px] font-bold text-indigo-700 hover:bg-indigo-100 hover:border-indigo-300 transition cursor-pointer" onclick="event.stopPropagation(); lookupMwLinkedWord('${js}')">${esc}</button>`;
         }
 
         function mwFormatTokens(text) {
@@ -8214,22 +8602,278 @@
             processInlineTranslationRequest(w, currentMaterial ? currentMaterial.content : '', { keepDictOpen: true });
         };
 
+        function merriamDictAvailable() {
+            return learningLanguage === 'en' || (learningLanguage === 'es' && translationLanguage === 'en');
+        }
+
+        function updateHomeMwAvailability() {
+            const btn = document.getElementById('btn-home-mw');
+            if (!btn) return;
+            const on = merriamDictAvailable();
+            btn.classList.toggle('hidden', !on);
+            if (!on) closeHomeMerriamDict();
+        }
+
+        let homeMwLookupStack = [];
+        let homeMwCurrentWord = '';
+
+        function updateHomeMwBackBtn() {
+            const btn = document.getElementById('home-mw-back');
+            if (!btn) return;
+            btn.classList.toggle('hidden', homeMwLookupStack.length === 0);
+        }
+
+        function isHomeMwPanelOpen() {
+            const panel = document.getElementById('home-mw-panel');
+            return !!(panel && !panel.classList.contains('hidden'));
+        }
+
+        window.closeHomeMerriamDict = () => {
+            const panel = document.getElementById('home-mw-panel');
+            const content = document.getElementById('home-mw-content');
+            const wordEl = document.getElementById('home-mw-word');
+            panel?.classList.add('hidden');
+            if (content) content.innerHTML = '';
+            if (wordEl) wordEl.textContent = '';
+            homeMwLookupStack = [];
+            homeMwCurrentWord = '';
+            updateHomeMwBackBtn();
+        };
+
+        async function loadHomeMerriamDict(word, { pushCurrent = false } = {}) {
+            const panel = document.getElementById('home-mw-panel');
+            const content = document.getElementById('home-mw-content');
+            const wordEl = document.getElementById('home-mw-word');
+            if (!panel || !content) return;
+            const q = String(word || '').trim();
+            if (!q || !merriamDictAvailable()) return;
+
+            if (pushCurrent && homeMwCurrentWord && homeMwCurrentWord.toLowerCase() !== q.toLowerCase()) {
+                homeMwLookupStack.push(homeMwCurrentWord);
+            }
+            homeMwCurrentWord = q;
+            if (wordEl) wordEl.textContent = q;
+            updateHomeMwBackBtn();
+
+            panel.classList.remove('hidden');
+            content.innerHTML = `<p class="text-indigo-500 text-sm font-bold flex items-center gap-1.5"><span class="loader w-3 h-3 inline-block"></span>${t('inline.dictLoading')}</p>`;
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            const result = await fetchMerriamWebster(q);
+            if (!isHomeMwPanelOpen() || homeMwCurrentWord.toLowerCase() !== q.toLowerCase()) return;
+            if (result.skip) {
+                closeHomeMerriamDict();
+                return;
+            }
+            if (result.network) {
+                content.innerHTML = `<p class="text-rose-500 text-sm">${t('inline.dictNetwork')}</p>`;
+                return;
+            }
+            if (result.error) {
+                content.innerHTML = `<p class="text-rose-500 text-sm">${mwEscapeHtml(result.error)}</p>`;
+                return;
+            }
+            content.innerHTML = mwRenderResponse(result.data, result.dictKind || 'learners');
+        }
+
+        window.openHomeMerriamDict = () => {
+            const word = (inputWord?.value || '').trim();
+            if (!word) {
+                inputWord?.focus();
+                return;
+            }
+            if (!merriamDictAvailable()) return;
+            homeMwLookupStack = [];
+            loadHomeMerriamDict(word);
+        };
+
+        let manualTtsAudio = null;
+        window.playManualWordAudio = async () => {
+            const word = (inputWord?.value || '').trim();
+            if (!word || isGlobalAudioMuted) {
+                if (!word) inputWord?.focus();
+                return;
+            }
+            const btn = document.getElementById('btn-home-tts');
+            if (btn) btn.disabled = true;
+            try {
+                if (manualTtsAudio) {
+                    try { manualTtsAudio.pause(); } catch (_) {}
+                    manualTtsAudio = null;
+                }
+                try { window.speechSynthesis?.cancel(); } catch (_) {}
+                const res = await fetch(GOOGLE_TTS_PROXY.replace(/\/$/, '') + '/speak', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: word,
+                        lang: LANG_META[learningLanguage]?.bcp47 || 'en-US'
+                    })
+                });
+                if (!res.ok) throw new Error('tts-http');
+                const blob = await res.blob();
+                if (!blob || blob.size < 32) throw new Error('tts-empty');
+                const url = URL.createObjectURL(blob);
+                manualTtsAudio = new Audio(url);
+                manualTtsAudio.onended = () => { URL.revokeObjectURL(url); manualTtsAudio = null; };
+                await manualTtsAudio.play();
+            } catch (e) {
+                playAudioWord(word);
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        };
+
+        window.homeMerriamGoBack = () => {
+            const prev = homeMwLookupStack.pop();
+            updateHomeMwBackBtn();
+            if (!prev) return;
+            if (inputWord) {
+                inputWord.value = prev;
+                syncManualContextVisibility();
+            }
+            loadHomeMerriamDict(prev);
+        };
+
+        window.lookupHomeDictWord = (word) => {
+            const w = String(word || '').trim();
+            if (!w) return;
+            if (inputWord) {
+                inputWord.value = w;
+                syncManualContextVisibility();
+            }
+            loadHomeMerriamDict(w, { pushCurrent: true });
+        };
+
+        window.lookupMwLinkedWord = (word) => {
+            if (isHomeMwPanelOpen()) lookupHomeDictWord(word);
+            else lookupInlineDictWord(word);
+        };
+
         let pendingInlineSaveData = null;
+
+        function normalizeContextWhitespace(text) {
+            return String(text || '')
+                .replace(/\r\n/g, '\n')
+                .replace(/[^\S\n]+/g, ' ')
+                .replace(/ *\n */g, '\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+        }
+
+        function htmlToContextText(htmlOrEl) {
+            const root = typeof htmlOrEl === 'string'
+                ? Object.assign(document.createElement('div'), { innerHTML: htmlOrEl || '' })
+                : (htmlOrEl ? htmlOrEl.cloneNode(true) : null);
+            if (!root) return '';
+            root.querySelectorAll('br').forEach((br) => br.replaceWith('\n'));
+            // Insert breaks before AND after block nodes so Enter-separated div/p lines stay split
+            root.querySelectorAll('p, div, li, h1, h2, h3, h4, tr, blockquote').forEach((el) => {
+                if (el === root) return;
+                el.insertBefore(document.createTextNode('\n'), el.firstChild);
+                el.appendChild(document.createTextNode('\n'));
+            });
+            return normalizeContextWhitespace(root.textContent || '');
+        }
+
+        function plainContextFromMaterialText(textOrHtml) {
+            const raw = String(textOrHtml || '');
+            if (!raw) return '';
+            if (looksLikeMaterialHtml(raw)) return htmlToContextText(raw);
+            return normalizeContextWhitespace(raw);
+        }
 
         function getReaderContextText() {
             if (!currentMaterial) return '';
             const pageIdx = Math.max(0, (readerCurrentPage || 1) - 1);
             if (currentMaterial.subtitles) {
                 const pageSubs = readerPages[pageIdx];
-                if (Array.isArray(pageSubs)) return pageSubs.map(s => s.text).join(' ');
+                // Keep cue/line breaks so lyrics don't become one giant “sentence”
+                if (Array.isArray(pageSubs)) {
+                    return pageSubs.map(s => String(s?.text || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join('\n');
+                }
                 try {
-                    return JSON.parse(currentMaterial.subtitles).map(s => s.text).join(' ');
+                    return JSON.parse(currentMaterial.subtitles)
+                        .map(s => String(s?.text || '').replace(/\s+/g, ' ').trim())
+                        .filter(Boolean)
+                        .join('\n');
                 } catch (_) { return ''; }
             }
             const pageHtml = readerPages[pageIdx] || currentMaterial.content || '';
-            const tmp = document.createElement('div');
-            tmp.innerHTML = pageHtml;
-            return (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+            return htmlToContextText(pageHtml);
+        }
+
+        function pickContextLine(lines, preferWord = '') {
+            const cleaned = (lines || []).map((l) => String(l || '').replace(/\s+/g, ' ').trim()).filter(Boolean);
+            if (!cleaned.length) return null;
+            if (cleaned.length === 1) return cleaned[0];
+            const needle = String(preferWord || '').trim();
+            if (needle) {
+                const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+                const re = new RegExp(`(?<![\\p{L}\\p{M}0-9])${escaped}(?![\\p{L}\\p{M}0-9])`, 'iu');
+                const hit = cleaned.find((l) => re.test(l));
+                if (hit) return hit;
+            }
+            return cleaned[0];
+        }
+
+        function getLineContextFromNode(node, preferWord = '') {
+            if (!node) return null;
+            const el = node.nodeType === 1 ? node : node.parentElement;
+            if (!el) return null;
+
+            const sub = el.closest?.('.yt-sub-line');
+            if (sub) {
+                const text = (sub.textContent || '').replace(/\s+/g, ' ').trim();
+                return text || null;
+            }
+
+            const reader = document.getElementById('reader-content');
+            if (!reader || !reader.contains(el)) return null;
+
+            let block = el.closest('p, div, li, h1, h2, h3, h4, blockquote');
+            if (!block || !reader.contains(block)) return null;
+
+            // Never treat the whole reader as one line — prefer the direct child block
+            if (block === reader) {
+                let child = el;
+                while (child.parentElement && child.parentElement !== reader) child = child.parentElement;
+                if (child && child !== reader && reader.contains(child)) block = child;
+            } else {
+                // Prefer the nearest short block, not an outer wrapper that holds many Enter-lines
+                while (block.parentElement && block.parentElement !== reader) {
+                    const parent = block.parentElement.closest('p, div, li, h1, h2, h3, h4, blockquote');
+                    if (!parent || parent === reader || !reader.contains(parent)) break;
+                    if ((block.textContent || '').trim().length <= 180) break;
+                    block = parent;
+                }
+            }
+
+            const lines = htmlToContextText(block).split('\n');
+            return pickContextLine(lines, preferWord);
+        }
+
+        function findContextUnitBounds(pureText, idx, wordEnd) {
+            // Hard line breaks (lyrics / subtitle cues) always cap the unit
+            let lineStart = 0;
+            for (let i = idx - 1; i >= 0; i--) {
+                if (pureText[i] === '\n' || pureText[i] === '\r') { lineStart = i + 1; break; }
+            }
+            let lineEnd = pureText.length;
+            for (let i = wordEnd; i < pureText.length; i++) {
+                if (pureText[i] === '\n' || pureText[i] === '\r') { lineEnd = i; break; }
+            }
+
+            const sentenceBoundaries = /[.!?…]/;
+            let sStart = lineStart;
+            for (let i = idx - 1; i >= lineStart; i--) {
+                if (sentenceBoundaries.test(pureText[i])) { sStart = i + 1; break; }
+            }
+            let sEnd = lineEnd;
+            for (let i = wordEnd; i < lineEnd; i++) {
+                if (sentenceBoundaries.test(pureText[i])) { sEnd = i + 1; break; }
+            }
+            return { sStart, sEnd, lineStart, lineEnd };
         }
 
         function findWordOccurrenceInText(pureText, query, occurrenceIndex = 0) {
@@ -8290,16 +8934,9 @@
         function extractSentenceFromOccurrence(pureText, occ) {
             if (!pureText || !occ) return '';
             const idx = occ.index;
-            const boundaries = /[.!?…]/;
-            let start = 0;
-            for (let i = idx - 1; i >= 0; i--) {
-                if (boundaries.test(pureText[i])) { start = i + 1; break; }
-            }
-            let end = pureText.length;
-            for (let i = idx; i < pureText.length; i++) {
-                if (boundaries.test(pureText[i])) { end = i + 1; break; }
-            }
-            return pureText.substring(start, end).trim();
+            const wordEnd = idx + occ.length;
+            const { sStart, sEnd } = findContextUnitBounds(pureText, idx, wordEnd);
+            return pureText.substring(sStart, sEnd).trim();
         }
 
         function extractSentenceFromText(pureText, query, occurrenceIndex = 0) {
@@ -8343,18 +8980,12 @@
             if (!pureText || !wordMatch) return { clip: '', wordMatch: null };
             const idx = wordMatch.index;
             const wordEnd = idx + wordMatch.length;
-            const sentenceBoundaries = /[.!?…]/;
+            const { sStart, sEnd } = findContextUnitBounds(pureText, idx, wordEnd);
             const commaBreak = /,/;
             const otherClauseBreak = /[;:—–]/;
-
-            let sStart = 0;
-            for (let i = idx - 1; i >= 0; i--) {
-                if (sentenceBoundaries.test(pureText[i])) { sStart = i + 1; break; }
-            }
-            let sEnd = pureText.length;
-            for (let i = idx; i < pureText.length; i++) {
-                if (sentenceBoundaries.test(pureText[i])) { sEnd = i + 1; break; }
-            }
+            // After a comma, keep a short following window so discourse markers
+            // like "to make matters worse, …" still get clarifying context for GT.
+            const AFTER_COMMA_BUDGET = 55;
 
             const findBreakBefore = (pattern) => {
                 for (let i = idx - 1; i >= sStart; i--) {
@@ -8362,15 +8993,28 @@
                 }
                 return sStart;
             };
-            const findBreakAfter = (pattern) => {
+            const findBreakAfter = (pattern, { softComma = false } = {}) => {
                 for (let i = wordEnd; i < sEnd; i++) {
-                    if (pattern.test(pureText[i])) return i + 1;
+                    if (!pattern.test(pureText[i])) continue;
+                    if (softComma && pureText[i] === ',') {
+                        let j = i + 1;
+                        const cap = Math.min(sEnd, j + AFTER_COMMA_BUDGET);
+                        while (j < cap) {
+                            const ch = pureText[j];
+                            if (/[.!?;:—…]/.test(ch)) { j++; break; }
+                            if (ch === ',') break;
+                            j++;
+                        }
+                        while (j < sEnd && /\p{L}/u.test(pureText[j])) j++;
+                        return j;
+                    }
+                    return i + 1;
                 }
                 return sEnd;
             };
 
             let clipStart = findBreakBefore(commaBreak);
-            let clipEnd = findBreakAfter(commaBreak);
+            let clipEnd = findBreakAfter(commaBreak, { softComma: true });
             if (clipStart === sStart && clipEnd === sEnd) {
                 clipStart = findBreakBefore(otherClauseBreak);
                 clipEnd = findBreakAfter(otherClauseBreak);
@@ -8398,31 +9042,392 @@
             return { index: m.index, length: m[0].length, matchedText: m[0] };
         }
 
-        // Particles allowed for automatic verb+particle expansion (phrasal verbs).
-        // "of" is excluded on purpose — usually possessive ("the end of the day"), not a phrasal particle.
-        // Real "… of" phrases stay in CONTEXT_FIXED_PHRASES only (because of, instead of, …).
-        const CONTEXT_PHRASAL_PARTICLES = new Set([
-            'about', 'around', 'at', 'away', 'back', 'down', 'for', 'in', 'into', 'off', 'on', 'onto',
-            'out', 'over', 'through', 'to', 'up', 'upon', 'with', 'along', 'apart', 'aside', 'by', 'from', 'as'
-        ]);
-        const CONTEXT_FIXED_PHRASES = [
-            ['in', 'order', 'to'],
-            ['as', 'well', 'as'],
-            ['due', 'to'],
-            ['owing', 'to'],
-            ['according', 'to'],
-            ['thanks', 'to'],
-            ['prior', 'to'],
-            ['next', 'to'],
-            ['close', 'to'],
-            ['because', 'of'],
-            ['instead', 'of'],
-            ['out', 'of'],
-            ['such', 'as'],
-            ['rather', 'than'],
-            ['up', 'to'],
-            ['in', 'spite', 'of'],
-        ];
+        // --- Context phrase expansion (language-aware: EN / ES) -----------------
+        const CONTEXT_PHRASE_EN = {
+            phrasalParticles: new Set([
+                'about', 'around', 'at', 'away', 'back', 'down', 'for', 'in', 'into', 'off', 'on', 'onto',
+                'out', 'over', 'through', 'to', 'up', 'upon', 'with', 'along', 'apart', 'aside', 'by', 'from', 'as',
+                'forward'
+            ]),
+            // "of" excluded on purpose — usually possessive; real "… of" stays in fixedPhrases
+            // or as verb + particle + of (run out of).
+            objectPronouns: new Set(['me', 'you', 'him', 'her', 'it', 'us', 'them']),
+            separableParticles: new Set([
+                'apart', 'aside', 'away', 'back', 'down', 'off', 'on', 'out', 'over', 'up'
+            ]),
+            leftAnchors: new Set([
+                'beyond', 'above', 'under', 'beneath', 'without', 'past', 'beside', 'across', 'amid', 'amidst'
+            ]),
+            idiomFrameVerbs: new Set([
+                'jump', 'hit', 'break', 'spill', 'bite', 'kick', 'bury', 'cross', 'call', 'face', 'let',
+                'burn', 'cost', 'drop', 'beat', 'catch', 'cut', 'draw', 'drive', 'hang',
+                'keep', 'lay', 'leave', 'miss', 'pay', 'pick', 'play', 'put', 'run', 'see', 'show', 'sit', 'stand',
+                'turn', 'walk', 'wear', 'blow', 'buy', 'come', 'get', 'give', 'go', 'hold', 'lose', 'pass', 'raise',
+                'rock', 'shake', 'shoot', 'steal', 'stick', 'strike', 'tie', 'touch', 'wave', 'fall', 'tear'
+            ]),
+            idiomDets: new Set(['the', 'a', 'an']),
+            idiomFrameNouns: new Set([
+                'gun', 'ice', 'road', 'beans', 'bullet', 'hatchet', 'dust', 'buck', 'farm', 'mustard',
+                'sack', 'towel', 'breeze', 'candle', 'bag', 'boat', 'bus', 'deck', 'thunder', 'biscuit',
+                'can', 'carpet', 'cheese', 'fat', 'plank', 'raid', 'sponge', 'whistle', 'wound'
+            ]),
+            clitics: null,
+            // verb lemma → forms for the first token of verb-headed fixed phrases
+            verbInflections: {
+                get: ['get', 'gets', 'getting', 'got', 'gotten'],
+                fall: ['fall', 'falls', 'falling', 'fell', 'fallen'],
+                tear: ['tear', 'tears', 'tearing', 'tore', 'torn'],
+                put: ['put', 'puts', 'putting'],
+                call: ['call', 'calls', 'calling', 'called'],
+                break: ['break', 'breaks', 'breaking', 'broke', 'broken'],
+                hit: ['hit', 'hits', 'hitting'],
+                spill: ['spill', 'spills', 'spilling', 'spilled', 'spilt'],
+                bite: ['bite', 'bites', 'biting', 'bit', 'bitten'],
+                take: ['take', 'takes', 'taking', 'took', 'taken'],
+                make: ['make', 'makes', 'making', 'made'],
+                give: ['give', 'gives', 'giving', 'gave', 'given'],
+                come: ['come', 'comes', 'coming', 'came'],
+                go: ['go', 'goes', 'going', 'went', 'gone'],
+                let: ['let', 'lets', 'letting'],
+                keep: ['keep', 'keeps', 'keeping', 'kept'],
+                leave: ['leave', 'leaves', 'leaving', 'left'],
+                miss: ['miss', 'misses', 'missing', 'missed'],
+                see: ['see', 'sees', 'seeing', 'saw', 'seen'],
+                speak: ['speak', 'speaks', 'speaking', 'spoke', 'spoken'],
+                cut: ['cut', 'cuts', 'cutting'],
+                jump: ['jump', 'jumps', 'jumping', 'jumped'],
+                turn: ['turn', 'turns', 'turning', 'turned'],
+                fancy: ['fancy', 'fancies', 'fancying', 'fancied'],
+                mind: ['mind', 'minds', 'minding', 'minded'],
+                enjoy: ['enjoy', 'enjoys', 'enjoying', 'enjoyed'],
+                avoid: ['avoid', 'avoids', 'avoiding', 'avoided'],
+                consider: ['consider', 'considers', 'considering', 'considered'],
+                stop: ['stop', 'stops', 'stopping', 'stopped'],
+                bump: ['bump', 'bumps', 'bumping', 'bumped'],
+                run: ['run', 'runs', 'running', 'ran'],
+                look: ['look', 'looks', 'looking', 'looked'],
+                check: ['check', 'checks', 'checking', 'checked'],
+                have: ['have', 'has', 'having', 'had'],
+                pay: ['pay', 'pays', 'paying', 'paid'],
+                bring: ['bring', 'brings', 'bringing', 'brought'],
+                set: ['set', 'sets', 'setting'],
+                catch: ['catch', 'catches', 'catching', 'caught'],
+                find: ['find', 'finds', 'finding', 'found'],
+                feel: ['feel', 'feels', 'feeling', 'felt'],
+                deal: ['deal', 'deals', 'dealing', 'dealt'],
+                be: ['be', 'am', 'is', 'are', 'was', 'were', 'being', 'been']
+            },
+            // Verb + -ing collocations (fancy grabbing, enjoy doing, …)
+            gerundVerbs: new Set(['fancy', 'mind', 'enjoy', 'avoid', 'consider', 'keep', 'stop', 'admit', 'deny', 'miss', 'risk', 'suggest', 'finish', 'practice', 'practise', 'imagine']),
+            // Short base verbs that commonly head phrasals (bumped into, run out of, …)
+            // Kept separate from idiom frames so nouns like "way" never become phrasal heads.
+            phrasalHeadVerbs: new Set([
+                'ask', 'back', 'blow', 'break', 'bring', 'bump', 'call', 'carry', 'catch', 'check', 'clean',
+                'clear', 'come', 'count', 'cross', 'cut', 'deal', 'do', 'draw', 'drop', 'end', 'fall',
+                'feel', 'figure', 'fill', 'find', 'get', 'give', 'go', 'grow', 'hand', 'hang', 'head',
+                'help', 'hold', 'keep', 'kick', 'knock', 'lay', 'leave', 'let', 'look', 'lose', 'make',
+                'move', 'pass', 'pay', 'pick', 'point', 'pull', 'push', 'put', 'run', 'send', 'set',
+                'settle', 'shake', 'show', 'shut', 'sign', 'sit', 'sort', 'speak', 'stand', 'start',
+                'stay', 'stick', 'take', 'talk', 'tell', 'think', 'throw', 'try', 'turn', 'use', 'wait',
+                'wake', 'walk', 'watch', 'wear', 'wipe', 'work', 'wrap', 'write'
+            ]),
+            // verb + particle1 + particle2 (look forward to, put up with, …)
+            // Applied only after a real verb+particle match — never on bare nouns.
+            doubleParticlePairs: {
+                away: ['with', 'from'],
+                up: ['with', 'to', 'for', 'on', 'against'],
+                out: ['of', 'for', 'with', 'from'],
+                forward: ['to'],
+                along: ['with'],
+                down: ['to', 'on', 'with'],
+                on: ['with', 'to'],
+                off: ['with', 'of'],
+                in: ['for', 'on', 'with'],
+                back: ['on', 'to', 'from'],
+                around: ['to', 'with'],
+                through: ['with']
+            },
+            // Adjective + preposition (interested in, afraid of, …) — exact adj forms only
+            adjPrepPairs: {
+                interested: ['in'],
+                afraid: ['of'],
+                scared: ['of'],
+                fond: ['of'],
+                proud: ['of'],
+                full: ['of'],
+                tired: ['of'],
+                sick: ['of'],
+                aware: ['of'],
+                capable: ['of'],
+                jealous: ['of'],
+                short: ['of'],
+                good: ['at'],
+                bad: ['at'],
+                great: ['at'],
+                terrible: ['at'],
+                brilliant: ['at'],
+                angry: ['at', 'with'],
+                annoyed: ['at', 'with'],
+                surprised: ['at', 'by'],
+                shocked: ['at', 'by'],
+                responsible: ['for'],
+                ready: ['for'],
+                famous: ['for'],
+                suitable: ['for'],
+                sorry: ['for', 'about'],
+                worried: ['about'],
+                excited: ['about'],
+                nervous: ['about'],
+                crazy: ['about'],
+                keen: ['on'],
+                dependent: ['on'],
+                based: ['on'],
+                similar: ['to'],
+                used: ['to'],
+                close: ['to'],
+                kind: ['to'],
+                married: ['to'],
+                engaged: ['to'],
+                related: ['to'],
+                different: ['from'],
+                far: ['from'],
+                safe: ['from'],
+                free: ['from', 'of'],
+                happy: ['with', 'about'],
+                pleased: ['with'],
+                satisfied: ['with'],
+                crowded: ['with'],
+                covered: ['with', 'in'],
+                involved: ['in'],
+                successful: ['in'],
+                experienced: ['in']
+            },
+            // as + middle + as (as soon as, as long as, …)
+            asAsMiddles: new Set([
+                'soon', 'long', 'far', 'well', 'much', 'good', 'fast', 'early', 'often', 'many', 'few'
+            ]),
+            // Only expand verb+prep when this map allows the pair (Spanish); EN uses open particles instead.
+            verbPrepPairs: null,
+            needsInfinitiveAfter: null,
+            prepEndings: ['to', 'of', 'as', 'than', 'for', 'from', 'with', 'in', 'on', 'at', 'by'],
+            fixedPhrases: [
+                // Multi-word prepositions / connectors
+                ['in', 'order', 'to'], ['so', 'as', 'to'], ['as', 'well', 'as'],
+                ['due', 'to'], ['owing', 'to'], ['according', 'to'], ['thanks', 'to'],
+                ['prior', 'to'], ['next', 'to'], ['close', 'to'],
+                ['because', 'of'], ['instead', 'of'], ['out', 'of'], ['such', 'as'], ['rather', 'than'],
+                ['up', 'to'], ['in', 'spite', 'of'], ['in', 'front', 'of'], ['in', 'case', 'of'],
+                ['on', 'behalf', 'of'], ['by', 'means', 'of'], ['in', 'terms', 'of'],
+                // Discourse / sentence adverbs
+                ['at', 'least'], ['at', 'last'], ['at', 'first'], ['at', 'once'], ['at', 'all'],
+                ['as', 'usual'], ['as', 'always'], ['after', 'all'], ['by', 'the', 'way'],
+                ['in', 'fact'], ['in', 'short'], ['for', 'example'], ['for', 'instance'],
+                ['of', 'course'], ['in', 'general'], ['in', 'particular'], ['on', 'the', 'other', 'hand'],
+                ['in', 'other', 'words'], ['as', 'a', 'result'], ['for', 'sure'],
+                // Prep + the + noun (frozen)
+                ['in', 'the', 'end'], ['at', 'the', 'end'], ['in', 'the', 'morning'], ['in', 'the', 'afternoon'],
+                ['in', 'the', 'evening'], ['at', 'the', 'moment'], ['at', 'the', 'same', 'time'],
+                ['on', 'the', 'phone'], ['on', 'the', 'internet'], ['by', 'the', 'way'],
+                ['for', 'the', 'first', 'time'], ['for', 'the', 'time', 'being'],
+                ['in', 'the', 'long', 'run'], ['in', 'the', 'meantime'], ['on', 'the', 'whole'],
+                ['on', 'the', 'way', 'to'], ['on', 'the', 'way'],
+                // as … as (also matched by asAsMiddles; fixed keeps longest explicit forms)
+                ['as', 'soon', 'as'], ['as', 'long', 'as'], ['as', 'far', 'as'], ['as', 'well', 'as'],
+                ['as', 'much', 'as'], ['as', 'good', 'as'], ['as', 'fast', 'as'], ['as', 'often', 'as'],
+                // Light-verb + noun collocations
+                ['take', 'place'], ['take', 'care'], ['take', 'part'], ['take', 'advantage', 'of'],
+                ['take', 'a', 'look'], ['take', 'a', 'break'], ['take', 'it', 'easy'],
+                ['make', 'sense'], ['make', 'sure'], ['make', 'a', 'difference'], ['make', 'up', 'your', 'mind'],
+                ['make', 'friends'], ['make', 'progress'], ['make', 'a', 'decision'],
+                ['have', 'fun'], ['have', 'a', 'look'], ['have', 'a', 'break'], ['have', 'no', 'idea'],
+                ['pay', 'attention'], ['pay', 'a', 'visit'], ['keep', 'quiet'], ['keep', 'in', 'touch'],
+                ['keep', 'an', 'eye', 'on'], ['catch', 'a', 'cold'],
+                // get / be frames
+                ['get', 'rid', 'of'], ['get', 'used', 'to'], ['get', 'cold', 'feet'],
+                ['be', 'supposed', 'to'], ['be', 'about', 'to'], ['be', 'able', 'to'],
+                ['be', 'in', 'love'], ['fall', 'in', 'love'],
+                // Reflexive / stance
+                ['by', 'myself'], ['by', 'yourself'], ['by', 'himself'], ['by', 'herself'],
+                ['by', 'itself'], ['by', 'ourselves'], ['by', 'themselves'],
+                ['on', 'my', 'own'], ['on', 'your', 'own'], ['on', 'his', 'own'], ['on', 'her', 'own'],
+                ['on', 'our', 'own'], ['on', 'their', 'own'],
+                ['in', 'my', 'opinion'], ['in', 'your', 'opinion'],
+                // Triple phrasals (also covered by doubleParticlePairs when conjugated)
+                ['look', 'forward', 'to'], ['put', 'up', 'with'], ['get', 'away', 'with'],
+                ['get', 'along', 'with'], ['catch', 'up', 'with'], ['come', 'up', 'with'],
+                ['come', 'up', 'to'], ['end', 'up', 'with'], ['keep', 'up', 'with'],
+                ['run', 'out', 'of'], ['get', 'out', 'of'], ['look', 'up', 'to'],
+                ['look', 'down', 'on'], ['get', 'on', 'with'], ['go', 'along', 'with'],
+                ['make', 'up', 'for'], ['cut', 'down', 'on'], ['drop', 'out', 'of'],
+                // Intensifiers / discourse
+                ['what', 'on', 'earth'], ['on', 'earth'],
+                ['to', 'make', 'matters', 'worse'], ['make', 'matters', 'worse'],
+                ['to', 'make', 'the', 'matters', 'worse'],
+                ['turn', 'out'],
+                // Classic idioms
+                ['beyond', 'measure'], ['beyond', 'belief'], ['beyond', 'repair'], ['beyond', 'doubt'],
+                ['beyond', 'recognition'], ['without', 'fail'], ['without', 'delay'],
+                ['on', 'cloud', 'nine'], ['cloud', 'nine'],
+                ['jump', 'the', 'gun'], ['break', 'the', 'ice'], ['hit', 'the', 'road'],
+                ['spill', 'the', 'beans'], ['bite', 'the', 'bullet'],
+                ['cost', 'an', 'arm', 'and', 'a', 'leg'], ['once', 'in', 'a', 'blue', 'moon'],
+                ['piece', 'of', 'cake'], ['a', 'piece', 'of', 'cake'], ['under', 'the', 'weather'],
+                ['hit', 'the', 'nail', 'on', 'the', 'head'], ['call', 'it', 'a', 'day'], ['cut', 'corners'],
+                ['tear', 'apart'], ['let', 'the', 'cat', 'out', 'of', 'the', 'bag'], ['miss', 'the', 'boat'],
+                ['see', 'eye', 'to', 'eye'], ['speak', 'of', 'the', 'devil'],
+                ['the', 'ball', 'is', 'in', 'your', 'court'], ['through', 'thick', 'and', 'thin'],
+                ['when', 'pigs', 'fly'], ['the', 'last', 'straw'], ['last', 'straw'],
+                ['rule', 'of', 'thumb'], ['a', 'blessing', 'in', 'disguise'], ['blessing', 'in', 'disguise']
+            ]
+        };
+
+        const CONTEXT_PHRASE_ES = {
+            // No open English-style phrasal sweep — Spanish uses verbPrepPairs + fixed list (avoids "voy a Madrid").
+            phrasalParticles: new Set(),
+            objectPronouns: new Set(['me', 'te', 'se', 'lo', 'la', 'le', 'nos', 'os', 'los', 'las', 'les']),
+            separableParticles: new Set(),
+            leftAnchors: new Set(['sin', 'bajo', 'tras', 'ante', 'mediante']),
+            idiomFrameVerbs: new Set([
+                'meter', 'tomar', 'echar', 'hacer', 'dar', 'poner', 'sacar', 'perder', 'romper',
+                'costar', 'matar', 'tirar', 'buscar', 'encontrar', 'pedir'
+            ]),
+            idiomDets: new Set(['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas']),
+            idiomFrameNouns: new Set([
+                'pata', 'pelo', 'cuenta', 'mano', 'pie', 'ojos', 'ojo', 'cara', 'risa', 'susto',
+                'prisa', 'culpa', 'razón', 'caso', 'lado', 'cuenta'
+            ]),
+            clitics: new Set(['me', 'te', 'se', 'lo', 'la', 'le', 'nos', 'os', 'los', 'las', 'les']),
+            verbInflections: {
+                dar: ['dar', 'doy', 'das', 'da', 'damos', 'dais', 'dan', 'di', 'diste', 'dio', 'dimos', 'disteis', 'dieron', 'dado', 'dando', 'daré', 'darás', 'dará', 'daremos', 'darán', 'daría', 'darías', 'daríamos', 'darían', 'dé', 'des', 'demos', 'den', 'darme', 'darte', 'darle', 'darnos', 'daros', 'darles', 'darse', 'dándome', 'dándote', 'dándose'],
+                echar: ['echar', 'echo', 'echas', 'echa', 'echamos', 'echáis', 'echan', 'eché', 'echaste', 'echó', 'echamos', 'echaron', 'echado', 'echando', 'echaré', 'echará', 'echaría', 'eche', 'eches', 'echen', 'echarme', 'echarte', 'echarle', 'echarnos', 'echarse'],
+                caer: ['caer', 'caigo', 'caes', 'cae', 'caemos', 'caéis', 'caen', 'caí', 'caíste', 'cayó', 'caímos', 'cayeron', 'caído', 'cayendo', 'caeré', 'caerá', 'caería', 'caiga', 'caigas', 'caigan', 'caerme', 'caerte', 'caerse'],
+                tener: ['tener', 'tengo', 'tienes', 'tiene', 'tenemos', 'tenéis', 'tienen', 'tuve', 'tuviste', 'tuvo', 'tuvimos', 'tuvieron', 'tenido', 'teniendo', 'tendré', 'tendrá', 'tendría', 'tenga', 'tengas', 'tengan'],
+                hacer: ['hacer', 'hago', 'haces', 'hace', 'hacemos', 'hacéis', 'hacen', 'hice', 'hiciste', 'hizo', 'hicimos', 'hicieron', 'hecho', 'haciendo', 'haré', 'hará', 'haría', 'haga', 'hagas', 'hagan', 'hacerme', 'hacerse'],
+                ir: ['ir', 'voy', 'vas', 'va', 'vamos', 'vais', 'van', 'fui', 'fuiste', 'fue', 'fuimos', 'fueron', 'ido', 'yendo', 'iré', 'irá', 'iría', 'vaya', 'vayas', 'vayan', 'irme', 'irte', 'irse', 'vámonos'],
+                acabar: ['acabar', 'acabo', 'acabas', 'acaba', 'acabamos', 'acabáis', 'acaban', 'acabé', 'acabaste', 'acabó', 'acabaron', 'acabado', 'acabando', 'acabaré', 'acabará', 'acabaría', 'acabar'],
+                volver: ['volver', 'vuelvo', 'vuelves', 'vuelve', 'volvemos', 'volvéis', 'vuelven', 'volví', 'volviste', 'volvió', 'volvimos', 'volvieron', 'vuelto', 'volviendo', 'volveré', 'volverá', 'volvería', 'vuelva', 'vuelvas', 'vuelvan'],
+                dejar: ['dejar', 'dejo', 'dejas', 'deja', 'dejamos', 'dejáis', 'dejan', 'dejé', 'dejaste', 'dejó', 'dejaron', 'dejado', 'dejando', 'dejaré', 'dejará', 'dejaría', 'deje', 'dejes', 'dejen', 'dejarme', 'dejarte', 'dejarse'],
+                poner: ['poner', 'pongo', 'pones', 'pone', 'ponemos', 'ponéis', 'ponen', 'puse', 'pusiste', 'puso', 'pusimos', 'pusieron', 'puesto', 'poniendo', 'pondré', 'pondrá', 'pondría', 'ponga', 'pongas', 'pongan', 'ponerme', 'ponerse', 'ponerse'],
+                contar: ['contar', 'cuento', 'cuentas', 'cuenta', 'contamos', 'contáis', 'cuentan', 'conté', 'contaste', 'contó', 'contaron', 'contado', 'contando', 'contaré', 'contará', 'contaría'],
+                soñar: ['soñar', 'sueño', 'sueñas', 'sueña', 'soñamos', 'soñáis', 'sueñan', 'soñé', 'soñaste', 'soñó', 'soñaron', 'soñado', 'soñando', 'soñaré', 'soñará', 'soñaría'],
+                depender: ['depender', 'dependo', 'dependes', 'depende', 'dependemos', 'dependéis', 'dependen', 'dependí', 'dependiste', 'dependió', 'dependieron', 'dependido', 'dependiendo'],
+                consistir: ['consistir', 'consisto', 'consistes', 'consiste', 'consistimos', 'consistís', 'consisten', 'consistió', 'consistieron', 'consistido', 'consistiendo'],
+                pensar: ['pensar', 'pienso', 'piensas', 'piensa', 'pensamos', 'pensáis', 'piensan', 'pensé', 'pensaste', 'pensó', 'pensaron', 'pensado', 'pensando', 'pensaré', 'pensará'],
+                tratar: ['tratar', 'trato', 'tratas', 'trata', 'tratamos', 'tratáis', 'tratan', 'traté', 'trataste', 'trató', 'trataron', 'tratado', 'tratando'],
+                acordar: ['acordar', 'acuerdo', 'acuerdas', 'acuerda', 'acordamos', 'acordáis', 'acuerdan', 'acordé', 'acordaste', 'acordó', 'acordaron', 'acordado', 'acordando', 'acordarme', 'acordarse'],
+                enamorar: ['enamorar', 'enamoro', 'enamoras', 'enamora', 'enamoramos', 'enamoráis', 'enamoran', 'enamoré', 'enamoraste', 'enamoró', 'enamoraron', 'enamorado', 'enamorando', 'enamorarme', 'enamorarte', 'enamorarse'],
+                estar: ['estar', 'estoy', 'estás', 'está', 'estamos', 'estáis', 'están', 'estuve', 'estuviste', 'estuvo', 'estuvimos', 'estuvieron', 'estado', 'estando', 'estaré', 'estará', 'estaría', 'esté', 'estés', 'estén'],
+                ser: ['ser', 'soy', 'eres', 'es', 'somos', 'sois', 'son', 'fui', 'fuiste', 'fue', 'fuimos', 'fueron', 'sido', 'siendo', 'seré', 'será', 'sería', 'sea', 'seas', 'sean'],
+                meter: ['meter', 'meto', 'metes', 'mete', 'metemos', 'metéis', 'meten', 'metí', 'metiste', 'metió', 'metieron', 'metido', 'metiendo', 'meterme', 'meterse'],
+                tomar: ['tomar', 'tomo', 'tomas', 'toma', 'tomamos', 'tomáis', 'toman', 'tomé', 'tomaste', 'tomó', 'tomaron', 'tomado', 'tomando'],
+                costar: ['costar', 'cuesto', 'cuestas', 'cuesta', 'costamos', 'costáis', 'cuestan', 'costó', 'costaron', 'costado', 'costando'],
+                perder: ['perder', 'pierdo', 'pierdes', 'pierde', 'perdemos', 'perdéis', 'pierden', 'perdí', 'perdiste', 'perdió', 'perdieron', 'perdido', 'perdiendo'],
+                valer: ['valer', 'valgo', 'vales', 'vale', 'valemos', 'valéis', 'valen', 'valió', 'valieron', 'valido', 'valiendo'],
+                romper: ['romper', 'rompo', 'rompes', 'rompe', 'rompemos', 'rompéis', 'rompen', 'rompí', 'rompiste', 'rompió', 'rompieron', 'roto', 'rompiendo'],
+                matar: ['matar', 'mato', 'matas', 'mata', 'matamos', 'matáis', 'matan', 'maté', 'mataste', 'mató', 'mataron', 'matado', 'matando'],
+                buscar: ['buscar', 'busco', 'buscas', 'busca', 'buscamos', 'buscáis', 'buscan', 'busqué', 'buscaste', 'buscó', 'buscaron', 'buscado', 'buscando']
+            },
+            // Safe verb+prep pairs (learner phrasals / régimen preposicional).
+            // Periphrases marked in needsInfinitiveAfter also require a following infinitive
+            // so "voy a Madrid" does not become "voy a".
+            verbPrepPairs: {
+                acabar: ['de', 'con'],
+                volver: ['a'],
+                dejar: ['de'],
+                contar: ['con'],
+                soñar: ['con'],
+                depender: ['de'],
+                consistir: ['en'],
+                pensar: ['en'],
+                tratar: ['de'],
+                acordar: ['de'],
+                enamorar: ['de'],
+                ir: ['a'],
+                echar: ['de'],
+                caer: ['en', 'bien', 'mal'],
+                dar: ['con'],
+                poner: ['a']
+            },
+            // lemma → preps that only count when an infinitive follows (perífrasis)
+            needsInfinitiveAfter: {
+                ir: ['a'],
+                acabar: ['de'],
+                volver: ['a'],
+                dejar: ['de'],
+                poner: ['a']
+            },
+            prepEndings: ['de', 'a', 'con', 'en', 'por', 'para', 'sobre', 'sin', 'hacia', 'entre'],
+            fixedPhrases: [
+                // Multi-word prepositions / connectors
+                ['a', 'pesar', 'de'], ['en', 'lugar', 'de'], ['en', 'vez', 'de'],
+                ['delante', 'de'], ['detrás', 'de'], ['encima', 'de'], ['debajo', 'de'],
+                ['cerca', 'de'], ['lejos', 'de'], ['junto', 'a'], ['debido', 'a'], ['gracias', 'a'],
+                ['frente', 'a'], ['acerca', 'de'], ['además', 'de'], ['antes', 'de'], ['después', 'de'],
+                ['dentro', 'de'], ['fuera', 'de'], ['al', 'lado', 'de'], ['a', 'través', 'de'],
+                ['con', 'respecto', 'a'], ['en', 'cuanto', 'a'], ['a', 'partir', 'de'],
+                ['por', 'medio', 'de'], ['en', 'cuanto'], ['tan', 'pronto', 'como'],
+                // Discourse / frozen adverbials
+                ['de', 'vez', 'en', 'cuando'], ['a', 'lo', 'mejor'], ['por', 'supuesto'],
+                ['sin', 'embargo'], ['no', 'obstante'], ['desde', 'luego'], ['por', 'lo', 'menos'],
+                ['a', 'veces'], ['otra', 'vez'], ['cada', 'vez'], ['tal', 'vez'],
+                ['de', 'pronto'], ['de', 'repente'], ['poco', 'a', 'poco'], ['más', 'o', 'menos'],
+                ['cuanto', 'antes'], ['o', 'sea'], ['es', 'decir'], ['por', 'cierto'],
+                ['a', 'fin', 'de', 'cuentas'], ['en', 'absoluto'], ['ni', 'modo'],
+                ['sin', 'falta'], ['sin', 'duda'], ['a', 'ciegas'], ['a', 'menudo'],
+                ['de', 'nuevo'], ['al', 'menos'], ['por', 'fin'], ['por', 'ahora'],
+                // Verb idioms / collocations (lemma = first token; conjugations via verbInflections)
+                ['dar', 'cuenta'], ['dar', 'cuenta', 'de'],
+                ['echar', 'de', 'menos'], ['caer', 'en', 'la', 'cuenta'],
+                ['tener', 'ganas', 'de'], ['hacer', 'falta'], ['valer', 'la', 'pena'],
+                ['acabar', 'de'], ['acabar', 'con'], ['volver', 'a'], ['dejar', 'de'],
+                ['poner', 'a'], ['ir', 'a'],
+                ['contar', 'con'], ['soñar', 'con'], ['depender', 'de'], ['consistir', 'en'],
+                ['pensar', 'en'], ['tratar', 'de'], ['acordar', 'de'],
+                ['enamorar', 'de'], ['estar', 'enamorado', 'de'], ['estar', 'enamorada', 'de'],
+                ['caer', 'bien'], ['caer', 'mal'],
+                ['meter', 'la', 'pata'], ['tomar', 'el', 'pelo'], ['echar', 'un', 'vistazo'],
+                ['perder', 'de', 'vista'], ['dar', 'prisa'],
+                ['costar', 'un', 'ojo', 'de', 'la', 'cara'],
+                ['ser', 'pan', 'comido'], ['estar', 'en', 'las', 'nubes'],
+                ['poner', 'los', 'cuernos'], ['romper', 'el', 'hielo'],
+                ['matar', 'el', 'tiempo'], ['buscar', 'tres', 'pies', 'al', 'gato']
+            ]
+        };
+
+        function getContextPhraseRules() {
+            if (learningLanguage === 'es') return CONTEXT_PHRASE_ES;
+            if (learningLanguage === 'en') return CONTEXT_PHRASE_EN;
+            return null;
+        }
+
+        function contextVerbTokenMatches(tokenLower, lemmaLower, verbInflections) {
+            if (tokenLower === lemmaLower) return true;
+            const forms = verbInflections?.[lemmaLower];
+            return !!(forms && forms.includes(tokenLower));
+        }
+
+        function contextFixedPartMatches(tokenLower, part, isFirstVerbSlot, verbInflections) {
+            if (tokenLower === part) return true;
+            if (isFirstVerbSlot && verbInflections?.[part]) {
+                return contextVerbTokenMatches(tokenLower, part, verbInflections);
+            }
+            // Attached clitics on infinitive/gerund: "darme", "dándose", "contarlo"
+            if (isFirstVerbSlot && verbInflections?.[part]) {
+                const clitics = ['me', 'te', 'se', 'nos', 'os', 'lo', 'la', 'le', 'los', 'las', 'les'];
+                for (const c of clitics) {
+                    if (tokenLower.endsWith(c) && tokenLower.length > c.length + 2) {
+                        const stem = tokenLower.slice(0, -c.length);
+                        if (contextVerbTokenMatches(stem, part, verbInflections) || stem === part) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function phraseKindLabel(kind) {
+            if (!kind) return '';
+            return t(`inline.kind.${kind}`) || '';
+        }
 
         function tokenizeWithSpans(text) {
             const re = /[\p{L}\p{M}][\p{L}\p{M}'-]*|[\p{N}]+/gu;
@@ -8439,14 +9444,56 @@
             return tokens;
         }
 
+        function findVerbLemmaForToken(tokenLower, rules) {
+            if (!rules?.verbInflections) return null;
+            if (rules.verbInflections[tokenLower]) return tokenLower;
+            for (const lemma of Object.keys(rules.verbInflections)) {
+                if (contextVerbTokenMatches(tokenLower, lemma, rules.verbInflections)) return lemma;
+            }
+            // Strip trailing clitic and retry
+            const clitics = ['me', 'te', 'se', 'nos', 'os', 'lo', 'la', 'le', 'los', 'las', 'les'];
+            for (const c of clitics) {
+                if (tokenLower.endsWith(c) && tokenLower.length > c.length + 2) {
+                    const stem = tokenLower.slice(0, -c.length);
+                    if (rules.verbInflections[stem]) return stem;
+                    for (const lemma of Object.keys(rules.verbInflections)) {
+                        if (contextVerbTokenMatches(stem, lemma, rules.verbInflections)) return lemma;
+                    }
+                }
+            }
+            return null;
+        }
+
+        function looksLikeSpanishInfinitive(lower) {
+            const t = String(lower || '');
+            if (t.length < 4) return false;
+            return /(?:ar|er|ir|arse|erse|irse|arte|erte|irte|arlo|erlo|irlo|arla|erla|irla)$/i.test(t);
+        }
+
+        function phraseNeedsFollowingInfinitive(parts, rules, tokens, endIdx) {
+            const needMap = rules.needsInfinitiveAfter;
+            if (!needMap || !parts?.length) return false;
+            const lemma = parts[0];
+            const prep = parts[parts.length - 1];
+            const needed = needMap[lemma];
+            if (!needed || !needed.includes(prep)) return false;
+            const next = tokens[endIdx + 1];
+            return !(next && looksLikeSpanishInfinitive(next.lower));
+        }
+
         function expandContextPhraseInClip(clip, wordMatch) {
             if (!clip || !wordMatch) {
-                return { phrase: wordMatch?.matchedText || '', wordMatch, expanded: false };
+                return { phrase: wordMatch?.matchedText || '', wordMatch, expanded: false, kind: null };
+            }
+
+            const rules = getContextPhraseRules();
+            if (!rules) {
+                return { phrase: wordMatch.matchedText, wordMatch, expanded: false, kind: null };
             }
 
             const tokens = tokenizeWithSpans(clip);
             if (!tokens.length) {
-                return { phrase: wordMatch.matchedText, wordMatch, expanded: false };
+                return { phrase: wordMatch.matchedText, wordMatch, expanded: false, kind: null };
             }
 
             let tokenIdx = -1;
@@ -8458,38 +9505,269 @@
                 }
             }
             if (tokenIdx < 0) {
-                return { phrase: wordMatch.matchedText, wordMatch, expanded: false };
+                return { phrase: wordMatch.matchedText, wordMatch, expanded: false, kind: null };
             }
 
-            const buildSpan = (startIdx, endIdx) => {
+            const buildSpan = (startIdx, endIdx, kind) => {
                 const spanStart = tokens[startIdx].start;
                 const spanEnd = tokens[endIdx].end;
                 const phrase = clip.slice(spanStart, spanEnd);
                 return {
                     phrase,
                     wordMatch: { index: spanStart, length: spanEnd - spanStart, matchedText: phrase },
-                    expanded: phrase.toLowerCase() !== wordMatch.matchedText.toLowerCase()
+                    expanded: phrase.toLowerCase() !== wordMatch.matchedText.toLowerCase(),
+                    kind: kind || null
                 };
             };
 
-            for (const parts of CONTEXT_FIXED_PHRASES) {
-                for (let start = Math.max(0, tokenIdx - parts.length + 1); start <= tokenIdx; start++) {
-                    const end = start + parts.length - 1;
-                    if (end >= tokens.length || tokenIdx > end) continue;
-                    const matches = parts.every((part, j) => tokens[start + j].lower === part);
-                    if (matches) return buildSpan(start, end);
+            const fixedKind = (parts) => {
+                if (rules.verbInflections[parts[0]] && parts.length >= 2) return 'idiom';
+                const last = parts[parts.length - 1];
+                if ((rules.prepEndings || []).includes(last) && parts.length <= 3) return 'prep';
+                if (parts.length >= 2) return 'idiom';
+                return 'collocation';
+            };
+
+            // Longest fixed match; verb lemmas match conjugations; ES may include leading clitics
+            // ("me doy cuenta de", "te echo de menos").
+            let bestFixed = null;
+            for (const parts of rules.fixedPhrases) {
+                const verbHeaded = !!rules.verbInflections[parts[0]];
+                const maxClitics = (verbHeaded && rules.clitics) ? 2 : 0;
+                for (let verbStart = Math.max(0, tokenIdx - parts.length + 1 - maxClitics); verbStart <= tokenIdx; verbStart++) {
+                    const end = verbStart + parts.length - 1;
+                    if (end >= tokens.length || verbStart < 0) continue;
+                    // Clicked token must lie inside [phraseStart .. end]
+                    let phraseStart = verbStart;
+                    let cliticCount = 0;
+                    if (maxClitics) {
+                        while (
+                            phraseStart > 0
+                            && cliticCount < maxClitics
+                            && rules.clitics.has(tokens[phraseStart - 1].lower)
+                        ) {
+                            phraseStart--;
+                            cliticCount++;
+                        }
+                    }
+                    if (tokenIdx < phraseStart || tokenIdx > end) continue;
+                    const matches = parts.every((part, j) =>
+                        contextFixedPartMatches(
+                            tokens[verbStart + j].lower,
+                            part,
+                            verbHeaded && j === 0,
+                            rules.verbInflections
+                        )
+                    );
+                    if (!matches) continue;
+                    if (phraseNeedsFollowingInfinitive(parts, rules, tokens, end)) continue;
+                    const score = parts.length + cliticCount;
+                    if (!bestFixed || score > bestFixed.score) {
+                        bestFixed = { start: phraseStart, end, parts, score };
+                    }
+                }
+            }
+            if (bestFixed) return buildSpan(bestFixed.start, bestFixed.end, fixedKind(bestFixed.parts));
+
+            // verb + det + known idiom noun (EN: jump the gun / ES: meter la pata)
+            if (
+                tokenIdx >= 2
+                && rules.idiomFrameNouns.has(tokens[tokenIdx].lower)
+                && rules.idiomDets.has(tokens[tokenIdx - 1].lower)
+                && rules.idiomFrameVerbs.has(tokens[tokenIdx - 2].lower)
+            ) {
+                return buildSpan(tokenIdx - 2, tokenIdx, 'idiom');
+            }
+            if (
+                tokenIdx + 2 < tokens.length
+                && rules.idiomFrameVerbs.has(tokens[tokenIdx].lower)
+                && rules.idiomDets.has(tokens[tokenIdx + 1].lower)
+                && rules.idiomFrameNouns.has(tokens[tokenIdx + 2].lower)
+            ) {
+                return buildSpan(tokenIdx, tokenIdx + 2, 'idiom');
+            }
+            if (
+                tokenIdx >= 1
+                && tokenIdx + 1 < tokens.length
+                && rules.idiomDets.has(tokens[tokenIdx].lower)
+                && rules.idiomFrameVerbs.has(tokens[tokenIdx - 1].lower)
+                && rules.idiomFrameNouns.has(tokens[tokenIdx + 1].lower)
+            ) {
+                return buildSpan(tokenIdx - 1, tokenIdx + 1, 'idiom');
+            }
+
+            // Left anchors: beyond measure / sin falta
+            if (tokenIdx > 0 && rules.leftAnchors.has(tokens[tokenIdx - 1].lower)) {
+                return buildSpan(tokenIdx - 1, tokenIdx, 'idiom');
+            }
+            if (tokenIdx + 1 < tokens.length && rules.leftAnchors.has(tokens[tokenIdx].lower)) {
+                return buildSpan(tokenIdx, tokenIdx + 1, 'idiom');
+            }
+
+            // EN separable phrasals: tear me apart
+            if (rules.separableParticles.size && rules.objectPronouns.size) {
+                const verbLooksOk = (lower) => (
+                    rules.idiomFrameVerbs.has(lower)
+                    || !!findVerbLemmaForToken(lower, rules)
+                );
+                if (
+                    tokenIdx + 2 < tokens.length
+                    && verbLooksOk(tokens[tokenIdx].lower)
+                    && rules.objectPronouns.has(tokens[tokenIdx + 1].lower)
+                    && rules.separableParticles.has(tokens[tokenIdx + 2].lower)
+                ) {
+                    return buildSpan(tokenIdx, tokenIdx + 2, 'phrasal');
+                }
+                if (
+                    tokenIdx >= 2
+                    && rules.separableParticles.has(tokens[tokenIdx].lower)
+                    && rules.objectPronouns.has(tokens[tokenIdx - 1].lower)
+                    && verbLooksOk(tokens[tokenIdx - 2].lower)
+                ) {
+                    return buildSpan(tokenIdx - 2, tokenIdx, 'phrasal');
+                }
+                if (
+                    tokenIdx >= 1
+                    && tokenIdx + 1 < tokens.length
+                    && rules.objectPronouns.has(tokens[tokenIdx].lower)
+                    && rules.separableParticles.has(tokens[tokenIdx + 1].lower)
+                    && verbLooksOk(tokens[tokenIdx - 1].lower)
+                ) {
+                    return buildSpan(tokenIdx - 1, tokenIdx + 1, 'phrasal');
                 }
             }
 
-            if (tokenIdx + 1 < tokens.length && CONTEXT_PHRASAL_PARTICLES.has(tokens[tokenIdx + 1].lower)) {
-                return buildSpan(tokenIdx, tokenIdx + 1);
+            // ES: optional clitic(s) + verb + allowed prep (me acuerdo de / depende de)
+            if (rules.verbPrepPairs) {
+                const tryVerbPrep = (verbAt) => {
+                    if (verbAt < 0 || verbAt + 1 >= tokens.length) return null;
+                    const lemma = findVerbLemmaForToken(tokens[verbAt].lower, rules);
+                    if (!lemma) return null;
+                    const allowed = rules.verbPrepPairs[lemma];
+                    const prep = tokens[verbAt + 1].lower;
+                    if (!allowed || !allowed.includes(prep)) return null;
+                    if (phraseNeedsFollowingInfinitive([lemma, prep], rules, tokens, verbAt + 1)) return null;
+                    let start = verbAt;
+                    let cliticCount = 0;
+                    while (
+                        start > 0
+                        && cliticCount < 2
+                        && rules.clitics
+                        && rules.clitics.has(tokens[start - 1].lower)
+                    ) {
+                        start--;
+                        cliticCount++;
+                    }
+                    if (tokenIdx < start || tokenIdx > verbAt + 1) return null;
+                    return buildSpan(start, verbAt + 1, 'phrasal');
+                };
+                const hit =
+                    tryVerbPrep(tokenIdx)
+                    || tryVerbPrep(tokenIdx - 1)
+                    || (rules.clitics?.has(tokens[tokenIdx]?.lower) ? tryVerbPrep(tokenIdx + 1) : null);
+                if (hit) return hit;
             }
 
-            if (tokenIdx > 0 && CONTEXT_PHRASAL_PARTICLES.has(tokens[tokenIdx].lower)) {
-                return buildSpan(tokenIdx - 1, tokenIdx);
+            // EN open verb + particle — only when the left token is a real verb form,
+            // so "way to" / "end of" do not steal frozen phrases like "on the way to".
+            // Extends with "of" (run out of) or a second particle (look forward to, put up with).
+            if (rules.phrasalParticles.size) {
+                const verbLooksOk = (lower) => {
+                    if (rules.idiomFrameVerbs.has(lower)) return true;
+                    if (rules.phrasalHeadVerbs?.has(lower)) return true;
+                    if (findVerbLemmaForToken(lower, rules)) return true;
+                    // bumped / looking — open-class past & progressive forms
+                    if (lower.length >= 5 && /(ed|ing)$/i.test(lower)) return true;
+                    return false;
+                };
+                const extendPhrasalTail = (verbAt, particleAt) => {
+                    let end = particleAt;
+                    const p1 = tokens[particleAt].lower;
+                    const next = tokens[end + 1];
+                    if (next) {
+                        const p2 = next.lower;
+                        const doubles = rules.doubleParticlePairs?.[p1];
+                        if (p2 === 'of' || (doubles && doubles.includes(p2))) {
+                            end += 1;
+                        }
+                    }
+                    return buildSpan(verbAt, end, 'phrasal');
+                };
+                if (
+                    tokenIdx + 1 < tokens.length
+                    && rules.phrasalParticles.has(tokens[tokenIdx + 1].lower)
+                    && verbLooksOk(tokens[tokenIdx].lower)
+                ) {
+                    return extendPhrasalTail(tokenIdx, tokenIdx + 1);
+                }
+                if (
+                    tokenIdx > 0
+                    && rules.phrasalParticles.has(tokens[tokenIdx].lower)
+                    && verbLooksOk(tokens[tokenIdx - 1].lower)
+                ) {
+                    return extendPhrasalTail(tokenIdx - 1, tokenIdx);
+                }
+                // Tapped the trailing of / second particle in "run out of" / "put up with"
+                if (
+                    tokenIdx >= 2
+                    && verbLooksOk(tokens[tokenIdx - 2].lower)
+                    && rules.phrasalParticles.has(tokens[tokenIdx - 1].lower)
+                ) {
+                    const p1 = tokens[tokenIdx - 1].lower;
+                    const p2 = tokens[tokenIdx].lower;
+                    const doubles = rules.doubleParticlePairs?.[p1];
+                    if (p2 === 'of' || (doubles && doubles.includes(p2))) {
+                        return buildSpan(tokenIdx - 2, tokenIdx, 'phrasal');
+                    }
+                }
             }
 
-            return { phrase: wordMatch.matchedText, wordMatch, expanded: false };
+            // EN: fancy grabbing / enjoy doing — verb + gerund (small allow-list)
+            if (rules.gerundVerbs?.size) {
+                const tryGerund = (verbAt) => {
+                    if (verbAt < 0 || verbAt + 1 >= tokens.length) return null;
+                    const lemma = findVerbLemmaForToken(tokens[verbAt].lower, rules);
+                    if (!lemma || !rules.gerundVerbs.has(lemma)) return null;
+                    const next = tokens[verbAt + 1].lower;
+                    if (!/ing$/i.test(next) || next.length < 5) return null;
+                    if (rules.phrasalParticles.has(next)) return null;
+                    if (tokenIdx < verbAt || tokenIdx > verbAt + 1) return null;
+                    return buildSpan(verbAt, verbAt + 1, 'collocation');
+                };
+                const gHit = tryGerund(tokenIdx) || tryGerund(tokenIdx - 1);
+                if (gHit) return gHit;
+            }
+
+            // EN: as soon as / as long as — only allow-listed middles
+            if (rules.asAsMiddles?.size) {
+                const tryAsAs = (midAt) => {
+                    if (midAt < 1 || midAt + 1 >= tokens.length) return null;
+                    if (tokens[midAt - 1].lower !== 'as' || tokens[midAt + 1].lower !== 'as') return null;
+                    if (!rules.asAsMiddles.has(tokens[midAt].lower)) return null;
+                    if (tokenIdx < midAt - 1 || tokenIdx > midAt + 1) return null;
+                    return buildSpan(midAt - 1, midAt + 1, 'prep');
+                };
+                const asHit = tryAsAs(tokenIdx) || tryAsAs(tokenIdx - 1) || tryAsAs(tokenIdx + 1);
+                if (asHit) return asHit;
+            }
+
+            // EN: interested in / afraid of — adjective allow-list + prep
+            if (rules.adjPrepPairs) {
+                const tryAdjPrep = (adjAt) => {
+                    if (adjAt < 0 || adjAt + 1 >= tokens.length) return null;
+                    const adj = tokens[adjAt].lower;
+                    const allowed = rules.adjPrepPairs[adj];
+                    if (!allowed) return null;
+                    const prep = tokens[adjAt + 1].lower;
+                    if (!allowed.includes(prep)) return null;
+                    if (tokenIdx < adjAt || tokenIdx > adjAt + 1) return null;
+                    return buildSpan(adjAt, adjAt + 1, 'collocation');
+                };
+                const adjHit = tryAdjPrep(tokenIdx) || tryAdjPrep(tokenIdx - 1);
+                if (adjHit) return adjHit;
+            }
+
+            return { phrase: wordMatch.matchedText, wordMatch, expanded: false, kind: null };
         }
 
         function resolveContextPhraseExpansion(data) {
@@ -8516,7 +9794,8 @@
                 return {
                     phrase: inClip.matchedText,
                     wordMatch: inClip,
-                    expanded: true
+                    expanded: true,
+                    kind: sentExpanded.kind || null
                 };
             }
 
@@ -8529,11 +9808,25 @@
                 return {
                     phrase: widened.wordMatch.matchedText,
                     wordMatch: widened.wordMatch,
-                    expanded: true
+                    expanded: true,
+                    kind: sentExpanded.kind || null
                 };
             }
 
             return sentExpanded;
+        }
+
+        function setInlinePhraseKindLabel(kind) {
+            const el = document.getElementById('inline-context-phrase-kind');
+            if (!el) return;
+            const label = phraseKindLabel(kind);
+            if (!label) {
+                el.textContent = '';
+                el.classList.add('hidden');
+                return;
+            }
+            el.textContent = label;
+            el.classList.remove('hidden');
         }
 
         function applyContextPhraseExpansion(data, expanded) {
@@ -8541,13 +9834,16 @@
             const wordEl = document.getElementById('inline-popup-word');
             if (!expanded?.expanded) {
                 data.phraseExpanded = false;
+                data.phraseKind = null;
                 hint?.classList.add('hidden');
+                setInlinePhraseKindLabel(null);
                 return;
             }
 
             data.word = expanded.phrase;
             data.wordMatch = expanded.wordMatch;
             data.phraseExpanded = true;
+            data.phraseKind = expanded.kind || null;
             if (wordEl) {
                 wordEl.textContent = expanded.phrase;
                 wordEl.classList.add('ring-2', 'ring-amber-300', 'rounded-md', 'px-1', '-mx-1');
@@ -8557,14 +9853,17 @@
                 hint.textContent = t('inline.phraseHint');
                 hint.classList.remove('hidden');
             }
+            setInlinePhraseKindLabel(data.phraseKind);
         }
 
         function revertContextPhraseExpansion(data) {
             const hint = document.getElementById('inline-context-phrase-hint');
             hint?.classList.add('hidden');
+            setInlinePhraseKindLabel(null);
             if (!data?.clickedWord) return;
             data.word = data.clickedWord;
             data.phraseExpanded = false;
+            data.phraseKind = null;
             data.wordMatch = data.anchorWordMatch || data.wordMatch;
             const wordEl = document.getElementById('inline-popup-word');
             if (wordEl) wordEl.textContent = data.clickedWord;
@@ -8583,6 +9882,53 @@
                 .replace(/\{\{([^}]+)\}\}/g, '$1')
                 .replace(/<<([^>]+)>>/g, '$1')
                 .replace(/「([^」]+)」/g, '$1');
+        }
+
+        // Light words GT often mis-attaches markers onto (esp. when EN phrase → one UK/ES word)
+        const CONTEXT_ALIGN_STOPWORDS = new Set([
+            'a', 'an', 'the', 'to', 'of', 'in', 'on', 'at', 'by', 'for', 'from', 'with', 'as', 'and', 'or', 'but',
+            'into', 'onto', 'upon', 'over', 'under', 'about', 'than', 'that', 'this', 'these', 'those', 'it',
+            'що', 'щоб', 'до', 'на', 'з', 'із', 'у', 'в', 'і', 'й', 'та', 'як', 'це', 'цей', 'ця', 'той', 'та',
+            'але', 'про', 'від', 'для', 'чи', 'же', 'би', 'б', 'не', 'ні',
+            'de', 'a', 'en', 'el', 'la', 'los', 'las', 'un', 'una', 'y', 'o', 'que', 'por', 'con', 'del', 'al',
+            'lo', 'su', 'sus', 'se', 'es'
+        ]);
+
+        function isContextAlignStopword(w) {
+            const s = String(w || '').toLowerCase().trim().replace(/^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/gu, '');
+            if (!s) return true;
+            return CONTEXT_ALIGN_STOPWORDS.has(s);
+        }
+
+        function pickBestContextWordTrans(sentenceTrans, markedExtract, isolatedTrans, sourcePhrase) {
+            const sent = String(sentenceTrans || '');
+            const sentLower = sent.toLowerCase();
+            const sourceIsMulti = /\s/.test(String(sourcePhrase || '').trim());
+            const candidates = [];
+
+            const push = (raw, score) => {
+                const v = String(raw || '').trim();
+                if (!v) return;
+                candidates.push({ v, score });
+            };
+
+            if (markedExtract) {
+                let score = 40;
+                if (isContextAlignStopword(markedExtract) && sourceIsMulti) score -= 35;
+                if (sentLower.includes(markedExtract.toLowerCase())) score += 20;
+                push(markedExtract, score);
+            }
+            if (isolatedTrans) {
+                let score = 35;
+                if (sentLower.includes(isolatedTrans.toLowerCase())) score += 40;
+                if (isContextAlignStopword(isolatedTrans) && sourceIsMulti) score -= 30;
+                // Prefer a compact match when source is multi-word (typical one-word UK/ES renderings)
+                if (sourceIsMulti && !/\s/.test(isolatedTrans.trim())) score += 10;
+                push(isolatedTrans, score);
+            }
+
+            candidates.sort((a, b) => b.score - a.score);
+            return candidates[0]?.v || markedExtract || isolatedTrans || null;
         }
 
         function extractMarkedWordFromTranslation(translated) {
@@ -8638,6 +9984,21 @@
                 tokenIdx = i;
             }
 
+            // Multi-token EN phrase → prefer a single nearby content word in the target,
+            // not the next function word after a proportional index.
+            const matchTokens = tokenizeForContextAlign(wordMatch.matchedText || '');
+            if (matchTokens.length > 1 && tgtTokens.length) {
+                const ratio = tokenIdx / Math.max(srcTokens.length - 1, 1);
+                let tgtIdx = Math.min(Math.round(ratio * (tgtTokens.length - 1)), tgtTokens.length - 1);
+                for (let step = 0; step < tgtTokens.length; step++) {
+                    for (const dir of [0, -1, 1]) {
+                        const j = tgtIdx + dir * step;
+                        if (j < 0 || j >= tgtTokens.length) continue;
+                        if (!isContextAlignStopword(tgtTokens[j])) return tgtTokens[j];
+                    }
+                }
+            }
+
             const ratio = tokenIdx / Math.max(srcTokens.length - 1, 1);
             const tgtIdx = Math.min(Math.round(ratio * (tgtTokens.length - 1)), tgtTokens.length - 1);
             return tgtTokens[tgtIdx] || null;
@@ -8657,17 +10018,32 @@
             const after = sentence.slice(wordMatch.index + wordMatch.length);
             const marked = `${before}⟦${target}⟧${after}`;
 
-            const markedTrans = await fetchTranslationText(marked);
-            if (!markedTrans) return { sentenceTrans: null, contextWordTrans: null };
+            const wantsIsolated = /\s/.test(target.trim()) || target.trim().length >= 8;
+            const [markedTrans, isolatedTrans] = await Promise.all([
+                fetchTranslationText(marked),
+                wantsIsolated ? fetchTranslationText(target, { lowercase: true }) : Promise.resolve(null)
+            ]);
+            if (!markedTrans) {
+                return {
+                    sentenceTrans: null,
+                    contextWordTrans: isolatedTrans ? isolatedTrans.toLowerCase() : null
+                };
+            }
 
             const sentenceTrans = stripContextMarkers(markedTrans);
             let contextWordTrans = extractMarkedWordFromTranslation(markedTrans);
 
-            if (!contextWordTrans) {
-                contextWordTrans = alignWordByTokenIndex(sentence, sentenceTrans, wordMatch);
+            contextWordTrans = pickBestContextWordTrans(sentenceTrans, contextWordTrans, isolatedTrans, target);
+
+            if (!contextWordTrans || (isContextAlignStopword(contextWordTrans) && /\s/.test(target.trim()))) {
+                contextWordTrans = alignWordByTokenIndex(sentence, sentenceTrans, wordMatch) || contextWordTrans;
             }
             if (!contextWordTrans) {
                 contextWordTrans = alignWordByOffset(sentence, sentenceTrans, wordMatch.index, wordMatch.length);
+            }
+            // Last resort: isolated phrase translation even if it is not found in the sentence
+            if ((!contextWordTrans || isContextAlignStopword(contextWordTrans)) && isolatedTrans) {
+                contextWordTrans = isolatedTrans;
             }
 
             return {
@@ -8752,6 +10128,7 @@
         function resetInlineContextPanel() {
             document.getElementById('inline-context-panel')?.classList.add('hidden');
             document.getElementById('inline-context-phrase-hint')?.classList.add('hidden');
+            setInlinePhraseKindLabel(null);
             const src = document.getElementById('inline-context-source');
             const full = document.getElementById('inline-context-full');
             if (src) src.textContent = '';
@@ -8874,16 +10251,32 @@
             }
 
             let fullSentence = "";
-            let clipSource = getReaderContextText() || fullText || '';
-            let wordOccurrence = resolveWordOccurrenceInClip(clipSource, queryStr, opts);
+            let clipSource = getReaderContextText() || plainContextFromMaterialText(fullText) || '';
+
+            // Lyrics / subtitle cues / Enter-separated material lines: prefer the tapped line
+            const lineContext = String(opts.lineContext || '').replace(/\s+/g, ' ').trim();
+            if (lineContext) {
+                clipSource = lineContext;
+            }
+
+            let wordOccurrence = resolveWordOccurrenceInClip(clipSource, queryStr, lineContext ? {} : opts);
+
+            if (!wordOccurrence && lineContext) {
+                // Fall back to page text if the line alone didn't match (rare encoding drift)
+                clipSource = getReaderContextText() || plainContextFromMaterialText(fullText) || '';
+                wordOccurrence = resolveWordOccurrenceInClip(clipSource, queryStr, opts);
+            }
 
             if (wordOccurrence) {
                 fullSentence = extractSentenceFromOccurrence(clipSource, wordOccurrence);
-            } else if (fullText && fullText !== clipSource) {
-                wordOccurrence = resolveWordOccurrenceInClip(fullText, queryStr, opts);
-                if (wordOccurrence) {
-                    clipSource = fullText;
-                    fullSentence = extractSentenceFromOccurrence(clipSource, wordOccurrence);
+            } else {
+                const plainFull = plainContextFromMaterialText(fullText);
+                if (plainFull && plainFull !== clipSource) {
+                    wordOccurrence = resolveWordOccurrenceInClip(plainFull, queryStr, opts);
+                    if (wordOccurrence) {
+                        clipSource = plainFull;
+                        fullSentence = extractSentenceFromOccurrence(clipSource, wordOccurrence);
+                    }
                 }
             }
 
@@ -8912,6 +10305,7 @@
                 contextReady: false,
                 contextActive: false,
                 phraseExpanded: false,
+                phraseKind: null,
                 hadTranslationOptions: false,
                 contextWordTrans: null,
                 sentenceTrans: null,
@@ -9732,6 +11126,36 @@
             }
         }
 
+        function collapseWrongTestOptions(word) {
+            const opts = document.getElementById('bs-test-opts');
+            if (!opts) return false;
+            const buttons = [...opts.querySelectorAll('button')];
+            if (buttons.length < 2) return false;
+            buttons.forEach((btn) => {
+                if (btn.dataset.id === String(word.id)) {
+                    btn.classList.remove('hidden');
+                    btn.style.display = '';
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
+            opts.className = 'grid grid-cols-1 gap-3 max-w-md mx-auto w-full';
+            return true;
+        }
+
+        function ensureSuccessRevealVisible() {
+            const reveal = document.getElementById('bs-success-reveal');
+            if (!reveal || reveal.classList.contains('hidden')) return;
+            requestAnimationFrame(() => {
+                const rect = reveal.getBoundingClientRect();
+                const topSafe = 72;
+                const bottomSafe = window.innerHeight - 16;
+                if (rect.top < topSafe || rect.bottom > bottomSafe) {
+                    reveal.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                }
+            });
+        }
+
         function triggerSuccessReveal(word) {
             const reveal = document.getElementById('bs-success-reveal');
             const feedback = document.getElementById('bs-feedback');
@@ -9739,6 +11163,9 @@
             const failed = !!word.failed && !zeroPass;
 
             if (feedback) feedback.innerHTML = '';
+
+            // Free vertical space on phone (esp. multiple-choice) so context stays on-screen
+            collapseWrongTestOptions(word);
 
             reveal.classList.remove('bs-reveal-success', 'bs-reveal-missed', 'hidden');
             reveal.classList.add(failed ? 'bs-reveal-missed' : 'bs-reveal-success');
@@ -9782,6 +11209,8 @@
                 btnNext.classList.remove('hidden');
             }
             document.getElementById('bs-btn-dont-know').classList.add('hidden');
+            ensureSuccessRevealVisible();
+            setTimeout(ensureSuccessRevealVisible, 120);
         }
 
         function renderBsStage() {
