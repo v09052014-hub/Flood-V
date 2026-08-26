@@ -992,6 +992,107 @@
             opacity: 1;
         }
 
+        /* Material cards: actions overlay — text keeps full width */
+        .mat-card { position: relative; }
+        .mat-card-body { min-width: 0; padding-right: 2.5rem; }
+        @media (min-width: 640px) {
+            .mat-card-body { padding-right: 0.5rem; }
+            .mat-card:hover .mat-card-body { padding-right: 7.5rem; }
+        }
+        .mat-card-actions-desktop {
+            display: none;
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            gap: 0.15rem;
+            padding: 0.2rem;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 5;
+        }
+        @media (min-width: 640px) {
+            .mat-card-actions-desktop { display: flex; }
+            .mat-card:hover .mat-card-actions-desktop,
+            .mat-card:focus-within .mat-card-actions-desktop {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+        .mat-card-actions-desktop button {
+            width: 2.25rem;
+            height: 2.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            font-size: 1rem;
+            line-height: 1;
+            color: #94a3b8;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        .mat-card-actions-desktop button:hover { color: #4f46e5; background: #eef2ff; }
+        .mat-card-actions-desktop button.mat-card-del:hover { color: #e11d48; background: #fff1f2; }
+        .mat-card-more-wrap {
+            position: absolute;
+            right: 0.4rem;
+            top: 0.55rem;
+            z-index: 6;
+        }
+        @media (min-width: 640px) {
+            .mat-card-more-wrap { display: none; }
+        }
+        .mat-card-more-btn {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #64748b;
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+        }
+        .mat-card-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.25rem);
+            min-width: 11rem;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.85rem;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+            padding: 0.35rem;
+            z-index: 30;
+        }
+        .mat-card-menu.hidden { display: none; }
+        .mat-card-menu button {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            gap: 0.5rem;
+            text-align: left;
+            padding: 0.65rem 0.75rem;
+            border-radius: 0.65rem;
+            border: none;
+            background: transparent;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+        }
+        .mat-card-menu button:hover { background: #f8fafc; }
+        .mat-card-menu button.mat-card-del { color: #e11d48; }
+        .mat-card-menu button.mat-card-del:hover { background: #fff1f2; }
+
         #bulk-add-dialog.bulk-photo-results #bulk-photo-drop-copy {
             display: block;
             font-size: 0.7rem;
@@ -2162,7 +2263,7 @@
                 <div id="mode-url-area" class="hidden mb-4">
                     <div class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
                         <label class="text-xs font-bold text-slate-600 uppercase mb-1 flex items-center gap-1.5">
-                            <span id="article-source-icon" class="inline-flex items-center" aria-hidden="true">🌐</span>
+                            <span id="article-source-icon" class="inline-flex items-center" aria-hidden="true">🔗</span>
                             <span id="article-source-label" data-i18n="lib.importUrl">Посилання на статтю</span>
                         </label>
                         <div class="flex flex-col sm:flex-row gap-2 w-full">
@@ -2300,20 +2401,35 @@
                     <button onclick="document.getElementById('train-settings').classList.toggle('hidden')" class="text-slate-400 hover:text-slate-600 text-2xl transition">⚙️</button>
                 </div>
 
-                <div id="train-settings" class="hidden bg-slate-100 p-4 rounded-xl mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center border border-slate-200">
-                    <div class="flex flex-col flex-1 w-full">
-                        <label class="font-bold text-slate-600 text-xs uppercase mb-1" data-i18n="train.bsCount">Слів у Brainstorm:</label>
-                        <select id="bs-word-count" class="p-2 border border-slate-300 rounded-lg bg-white font-bold text-indigo-700 outline-none text-sm cursor-pointer w-full">
-                            <option value="1">1 слово</option>
-                            <option value="4">4 слова</option>
-                            <option value="6" selected>6 слів</option>
-                            <option value="10">10 слів</option>
-                        </select>
+                <div id="train-settings" class="hidden bg-slate-100 p-4 rounded-xl mb-6 flex flex-col gap-4 border border-slate-200">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-between items-stretch w-full">
+                        <div class="flex flex-col flex-1 w-full">
+                            <label class="font-bold text-slate-600 text-xs uppercase mb-1" data-i18n="train.bsCount">Слів у Brainstorm:</label>
+                            <select id="bs-word-count" class="p-2 border border-slate-300 rounded-lg bg-white font-bold text-indigo-700 outline-none text-sm cursor-pointer w-full">
+                                <option value="1">1 слово</option>
+                                <option value="4">4 слова</option>
+                                <option value="6" selected>6 слів</option>
+                                <option value="10">10 слів</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col flex-1 w-full">
+                            <label class="font-bold text-slate-600 text-xs uppercase mb-1" data-i18n="train.source">Джерело слів:</label>
+                            <select id="train-source-select" class="p-2 border border-slate-300 rounded-lg bg-white font-bold text-indigo-700 outline-none text-sm cursor-pointer w-full">
+                            </select>
+                        </div>
                     </div>
-                    <div class="flex flex-col flex-1 w-full">
-                        <label class="font-bold text-slate-600 text-xs uppercase mb-1" data-i18n="train.source">Джерело слів:</label>
-                        <select id="train-source-select" class="p-2 border border-slate-300 rounded-lg bg-white font-bold text-indigo-700 outline-none text-sm cursor-pointer w-full">
-                        </select>
+                    <div class="flex flex-col w-full pt-1 border-t border-slate-200/80">
+                        <label class="font-bold text-slate-600 text-xs uppercase mb-2" data-i18n="train.bsOrder">Порядок Brainstorm:</label>
+                        <div class="flex flex-col sm:flex-row gap-2" id="bs-order-options">
+                            <button type="button" id="bs-order-new" onclick="setBrainstormOrder('new')" class="flex-1 text-left p-3 rounded-xl border-2 border-indigo-500 bg-white shadow-sm transition">
+                                <span class="block text-sm font-bold text-indigo-700" data-i18n="train.bsOrderNew">Prefer new words</span>
+                                <span class="block text-[11px] text-slate-500 mt-0.5 leading-snug" data-i18n="train.bsOrderNewHint">Freshly added words first</span>
+                            </button>
+                            <button type="button" id="bs-order-reviews" onclick="setBrainstormOrder('reviews')" class="flex-1 text-left p-3 rounded-xl border-2 border-slate-200 bg-white/80 hover:border-slate-300 transition">
+                                <span class="block text-sm font-bold text-slate-700" data-i18n="train.bsOrderReviews">Prefer reviews</span>
+                                <span class="block text-[11px] text-slate-500 mt-0.5 leading-snug" data-i18n="train.bsOrderReviewsHint">Words returning from later stages first</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -2708,6 +2824,17 @@
                 'dict.allWords': 'Усі слова', 'folder.import': 'Імпорт', 'filter.all': 'Усі слова',
                 'filter.import': 'Імпорт', 'filter.materials': 'Матеріали',
                 'train.title': 'Тренування', 'train.bsCount': 'Слів у Brainstorm:', 'train.source': 'Джерело слів:',
+                'train.bsOrder': 'Порядок Brainstorm:',
+                'train.bsOrderNew': 'Спочатку нові слова',
+                'train.bsOrderNewHint': 'Свіжо додані слова першими',
+                'train.bsOrderReviews': 'Спочатку повторення',
+                'train.bsOrderReviewsHint': 'Слова з пізніших етапів першими',
+                'train.bsStage': 'Етап {n}',
+                'train.ctorStrictTip': 'З 4-го етапу помилка в літері означає, що слово не перейде далі — навіть якщо ви потім виправите.',
+                'train.sprintRulesTitle': 'Фінальний спринт',
+                'train.sprintRulesBody': 'У вас буде 60 секунд. Потрібно правильно відповісти {reps} раз(и) на кожне з {n} слів (усього {total}). Будь-яка помилка блокує просування цього слова. Випадкові правильні й хибні переклади.',
+                'train.sprintStart': 'Старт',
+                'train.sprintProgress': '{done} / {total}',
                 'train.bsDesc': 'Інтенсивне комплексне опрацювання слів',
                 'train.review': 'Повторити вивчені слова', 'train.separate': 'Окремі вправи',
                 'train.reviewModes': 'Вправи в повторенні',
@@ -2947,6 +3074,12 @@
                 'persist.noWords': '⚠️ Немає слів для збереження', 'persist.saved': '✅ Прогрес збережено',
                 'lib.read': 'Опрацьовано', 'lib.readAt': 'Опрацьовано: {date}',
                 'lib.video': 'Відео матеріал', 'lib.empty': 'Тут ще немає доданих матеріалів. Створіть перший!',
+                'lib.copyLink': 'Копіювати посилання',
+                'lib.moreActions': 'Дії з матеріалом',
+                'lib.editMatShort': 'Редагувати',
+                'lib.deleteMatShort': 'Видалити',
+                'msg.linkCopied': 'Посилання на матеріал скопійовано!',
+                'msg.matLinkMissing': 'Матеріал за цим посиланням не знайдено в поточному словнику.',
                 'lib.markRead': 'Позначити матеріал як опрацьований', 'lib.readDone': 'Матеріал опрацьовано',
                 'lib.jumpToLine': 'До поточного рядка',
                 'lib.subsLocked': 'Субтитри (не можна редагувати як текст)',
@@ -2980,6 +3113,17 @@
                 'dict.allWords': 'All words', 'folder.import': 'Import', 'filter.all': 'All words',
                 'filter.import': 'Import', 'filter.materials': 'Materials',
                 'train.title': 'Training', 'train.bsCount': 'Words in Brainstorm:', 'train.source': 'Word source:',
+                'train.bsOrder': 'Brainstorm order:',
+                'train.bsOrderNew': 'Prefer new words',
+                'train.bsOrderNewHint': 'Freshly added words first',
+                'train.bsOrderReviews': 'Prefer reviews',
+                'train.bsOrderReviewsHint': 'Words returning from later stages first',
+                'train.bsStage': 'Stage {n}',
+                'train.ctorStrictTip': 'From stage 4 onward, a wrong letter means this word will not advance — even if you fix it afterward.',
+                'train.sprintRulesTitle': 'Final sprint',
+                'train.sprintRulesBody': 'You have 60 seconds. Answer correctly {reps} time(s) for each of {n} words ({total} total). Any mistake blocks that word from advancing. Translations are randomly right or wrong.',
+                'train.sprintStart': 'Start',
+                'train.sprintProgress': '{done} / {total}',
                 'train.bsDesc': 'Intensive mixed practice for your words',
                 'train.review': 'Review learned words', 'train.separate': 'Separate exercises',
                 'train.reviewModes': 'Review exercises',
@@ -3214,6 +3358,12 @@
                 'persist.noWords': '⚠️ No words to save', 'persist.saved': '✅ Progress saved',
                 'lib.read': 'Read', 'lib.readAt': 'Read: {date}',
                 'lib.video': 'Video material', 'lib.empty': 'No materials yet. Add the first one!',
+                'lib.copyLink': 'Copy link',
+                'lib.moreActions': 'Material actions',
+                'lib.editMatShort': 'Edit',
+                'lib.deleteMatShort': 'Delete',
+                'msg.linkCopied': 'Material link copied!',
+                'msg.matLinkMissing': 'This material was not found in the current dictionary.',
                 'lib.markRead': 'Mark material as read', 'lib.readDone': 'Material completed',
                 'lib.jumpToLine': 'Jump to current line',
                 'lib.subsLocked': 'Subtitles (cannot be edited as text)',
@@ -3247,6 +3397,17 @@
                 'dict.allWords': 'Todas las palabras', 'folder.import': 'Importar', 'filter.all': 'Todas las palabras',
                 'filter.import': 'Importar', 'filter.materials': 'Materiales',
                 'train.title': 'Entrenamiento', 'train.bsCount': 'Palabras en Brainstorm:', 'train.source': 'Fuente:',
+                'train.bsOrder': 'Orden del Brainstorm:',
+                'train.bsOrderNew': 'Preferir palabras nuevas',
+                'train.bsOrderNewHint': 'Primero las recién añadidas',
+                'train.bsOrderReviews': 'Preferir repasos',
+                'train.bsOrderReviewsHint': 'Primero las que vuelven de etapas posteriores',
+                'train.bsStage': 'Etapa {n}',
+                'train.ctorStrictTip': 'Desde la etapa 4, una letra incorrecta hace que la palabra no avance, aunque la corrijas después.',
+                'train.sprintRulesTitle': 'Sprint final',
+                'train.sprintRulesBody': 'Tienes 60 segundos. Debes acertar {reps} vez(ces) cada una de las {n} palabras ({total} en total). Cualquier error bloquea el avance de esa palabra. Las traducciones salen al azar correctas o incorrectas.',
+                'train.sprintStart': 'Empezar',
+                'train.sprintProgress': '{done} / {total}',
                 'train.bsDesc': 'Práctica intensiva combinada de tus palabras',
                 'train.review': 'Repasar palabras aprendidas', 'train.separate': 'Ejercicios sueltos',
                 'train.reviewModes': 'Ejercicios de repaso',
@@ -3481,6 +3642,12 @@
                 'persist.noWords': '⚠️ No hay palabras para guardar', 'persist.saved': '✅ Progreso guardado',
                 'lib.read': 'Leído', 'lib.readAt': 'Leído: {date}',
                 'lib.video': 'Material de vídeo', 'lib.empty': 'Aún no hay materiales. ¡Crea el primero!',
+                'lib.copyLink': 'Copiar enlace',
+                'lib.moreActions': 'Acciones del material',
+                'lib.editMatShort': 'Editar',
+                'lib.deleteMatShort': 'Eliminar',
+                'msg.linkCopied': '¡Enlace del material copiado!',
+                'msg.matLinkMissing': 'No se encontró este material en el diccionario actual.',
                 'lib.markRead': 'Marcar el material como leído', 'lib.readDone': 'Material completado',
                 'lib.jumpToLine': 'Ir a la línea actual',
                 'lib.subsLocked': 'Subtítulos (no se pueden editar como texto)',
@@ -3537,6 +3704,7 @@
             document.querySelectorAll('[data-i18n-title]').forEach(el => { el.setAttribute('title', t(el.getAttribute('data-i18n-title'))); });
             const countSel = document.getElementById('bs-word-count');
             if (countSel) [...countSel.options].forEach(opt => { opt.textContent = t('train.wordsN', { n: opt.value }); });
+            if (typeof syncBrainstormOrderUI === 'function') syncBrainstormOrderUI();
             const wikiOpt = document.querySelector('#article-search-source option[value="wiki-en"]');
             if (wikiOpt) wikiOpt.textContent = `Wikipedia (${LANG_META[learningLanguage]?.code || 'EN'})`;
             const urlOpt = document.querySelector('#article-search-source option[value="url"]');
@@ -3823,7 +3991,7 @@
             if (parsed.id === activeTrackId) return;
             learningLanguage = parsed.learn;
             translationLanguage = parsed.trans;
-            await applyTrackChange();
+            await applyTrackChange({ fromDeepLink: false });
         };
         window.setInterfaceLanguage = async (code) => {
             if (!INTERFACE_LANGS.includes(code) || code === interfaceLanguage) return;
@@ -3841,14 +4009,15 @@
             if (!CONTENT_LANGS.includes(code)) return;
             if (code === translationLanguage) translationLanguage = code === 'en' ? 'uk' : 'en';
             learningLanguage = code;
-            await applyTrackChange();
+            await applyTrackChange({ fromDeepLink: false });
         };
         window.setTranslationLanguage = async (code) => {
             if (!CONTENT_LANGS.includes(code) || code === learningLanguage) return;
             translationLanguage = code;
-            await applyTrackChange();
+            await applyTrackChange({ fromDeepLink: false });
         };
-        async function applyTrackChange() {
+        async function applyTrackChange(opts = {}) {
+            const fromDeepLink = !!opts.fromDeepLink;
             activeTrackId = `${learningLanguage}-${translationLanguage}`;
             persistLangLocal();
             currentDictFilter = 'all';
@@ -3856,6 +4025,23 @@
             activeMaterialId = null;
             specificMaterialName = '';
             if (typeof exitDictSelectMode === 'function') exitDictSelectMode();
+
+            // Manual pair switch must not be overridden by a leftover #/m/...?track= deep link
+            if (!fromDeepLink && typeof dismissMaterialDeepLink === 'function') {
+                dismissMaterialDeepLink();
+            }
+            // Leave the reader so chips/UI match the new dictionary
+            if (!fromDeepLink && typeof closeReader === 'function') {
+                try { closeReader(); } catch (_) {}
+            }
+            if (!fromDeepLink && typeof endSession === 'function') {
+                try { endSession(); } catch (_) {}
+            }
+
+            if (typeof bindYearActivityToTrack === 'function') {
+                bindYearActivityToTrack();
+                if (typeof refreshYearRingUI === 'function') refreshYearRingUI();
+            }
             applyI18n();
             renderLanguagePickers();
             await saveUserPrefs();
@@ -3877,21 +4063,37 @@
                         knownTracks = [...new Set([...knownTracks, ...fromCloud])];
                         persistKnownTracksLocal();
                     }
-                    if (d.yearActivity && typeof d.yearActivity === 'object') {
-                        const cloudDays = (d.yearActivity.days && typeof d.yearActivity.days === 'object') ? d.yearActivity.days : {};
-                        for (const [k, v] of Object.entries(cloudDays)) {
-                            const cur = yearActivity.days[k] || { heavy: 0, other: 0 };
-                            yearActivity.days[k] = {
-                                heavy: Math.max(cur.heavy || 0, v.heavy || 0),
-                                other: Math.max(cur.other || 0, v.other || 0)
-                            };
-                        }
-                        if (d.yearActivity.cycleStart) {
-                            if (!yearActivity.cycleStart || d.yearActivity.cycleStart < yearActivity.cycleStart) {
-                                yearActivity.cycleStart = d.yearActivity.cycleStart;
+                    if (d.yearActivityByTrack && typeof d.yearActivityByTrack === 'object') {
+                        for (const [tid, ya] of Object.entries(d.yearActivityByTrack)) {
+                            if (!ya || typeof ya !== 'object') continue;
+                            const cloudDays = (ya.days && typeof ya.days === 'object') ? ya.days : {};
+                            if (!yearActivityStore[tid]) {
+                                yearActivityStore[tid] = emptyYearActivity();
                             }
+                            const local = yearActivityStore[tid];
+                            // Prefer per-track v2 data; older polluted blobs get rebuilt on seed
+                            for (const [k, v] of Object.entries(cloudDays)) {
+                                const cur = local.days[k] || { heavy: 0, other: 0 };
+                                local.days[k] = {
+                                    heavy: Math.max(cur.heavy || 0, v.heavy || 0),
+                                    other: Math.max(cur.other || 0, v.other || 0)
+                                };
+                            }
+                            if (ya.cycleStart) {
+                                if (!local.cycleStart || ya.cycleStart < local.cycleStart) {
+                                    local.cycleStart = ya.cycleStart;
+                                }
+                            }
+                            if (ya.seeded) local.seeded = true;
+                            if (ya.v) local.v = Math.max(local.v || 0, ya.v || 0);
                         }
-                        if (d.yearActivity.seeded) yearActivity.seeded = true;
+                        bindYearActivityToTrack();
+                        persistYearActivityLocal();
+                    }
+                    // Legacy single-cycle cloud → English–Ukrainian only (never the active track blindly)
+                    if (d.yearActivity && typeof d.yearActivity === 'object') {
+                        migrateLegacyYearActivityBlob(d.yearActivity, 'cloud');
+                        bindYearActivityToTrack();
                         persistYearActivityLocal();
                     }
                     persistLangLocal();
@@ -3902,34 +4104,110 @@
             if (typeof refreshYearRingUI === 'function') refreshYearRingUI();
         }
 
-        // ——— 365-day learning year (soft activity ring) ———
-        const ACTIVITY_KEY = 'linguaspace_year_activity_v1';
+        // ——— 365-day learning year (soft activity ring), per language track ———
+        const ACTIVITY_KEY = 'linguaspace_year_activity_v1'; // legacy flat blob
+        const ACTIVITY_STORE_KEY = 'linguaspace_year_activity_by_track_v1';
+        const ACTIVITY_LEGACY_MIGRATE_FLAG = 'linguaspace_year_legacy_migrated_enuk_v1';
+        const YEAR_ACTIVITY_TRACK_VERSION = 2; // rebuild polluted pre-split cycles from vocab
         const YEAR_CYCLE_DAYS = 365;
         const ACTIVITY_SESSION_GAP_MS = 45 * 60 * 1000;
-        let yearActivity = { days: {}, cycleStart: null, seeded: false };
+        let yearActivityStore = {}; // trackId → { days, cycleStart, seeded, v }
+        let yearActivity = { days: {}, cycleStart: null, seeded: false, v: 0 };
         let yearCalCursor = null; // Date for calendar month
+
+        function activityTrackId() {
+            return activeTrackId || `${learningLanguage}-${translationLanguage}` || 'en-uk';
+        }
+
+        function emptyYearActivity() {
+            return { days: {}, cycleStart: null, seeded: false, v: 0 };
+        }
+
+        function bindYearActivityToTrack() {
+            const tid = activityTrackId();
+            if (!yearActivityStore[tid]) yearActivityStore[tid] = emptyYearActivity();
+            // Keep a live reference so mutations write into the store
+            yearActivity = yearActivityStore[tid];
+            if (!yearActivity.days || typeof yearActivity.days !== 'object') yearActivity.days = {};
+        }
+
+        /** Old single-circle data belonged to the original EN–UK dictionary — never dump it onto es-en etc. */
+        function migrateLegacyYearActivityBlob(legacy, sourceTag) {
+            if (!legacy || typeof legacy !== 'object') return;
+            try {
+                if (localStorage.getItem(ACTIVITY_LEGACY_MIGRATE_FLAG) === '1') return;
+            } catch (_) {}
+            const targetTid = 'en-uk';
+            const cloudDays = (legacy.days && typeof legacy.days === 'object') ? legacy.days : {};
+            if (!Object.keys(cloudDays).length && !legacy.cycleStart) {
+                try { localStorage.setItem(ACTIVITY_LEGACY_MIGRATE_FLAG, '1'); } catch (_) {}
+                return;
+            }
+            if (!yearActivityStore[targetTid]) yearActivityStore[targetTid] = emptyYearActivity();
+            const local = yearActivityStore[targetTid];
+            // Only fill en-uk if it has no real data yet
+            const localHasDays = Object.keys(local.days || {}).some((k) => dayHasAnyActivity(local.days[k]));
+            if (!localHasDays) {
+                for (const [k, v] of Object.entries(cloudDays)) {
+                    local.days[k] = {
+                        heavy: v.heavy || 0,
+                        other: v.other || 0
+                    };
+                }
+                if (legacy.cycleStart) local.cycleStart = legacy.cycleStart;
+                if (legacy.seeded) local.seeded = true;
+                local.v = 1; // pre-rebuild; seed may refresh from en-uk vocab later
+            }
+            try { localStorage.setItem(ACTIVITY_LEGACY_MIGRATE_FLAG, '1'); } catch (_) {}
+        }
 
         function loadYearActivityLocal() {
             try {
-                const raw = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || 'null');
-                if (raw && typeof raw === 'object') {
-                    yearActivity = {
-                        days: (raw.days && typeof raw.days === 'object') ? raw.days : {},
-                        cycleStart: raw.cycleStart || null,
-                        seeded: !!raw.seeded
-                    };
+                const raw = JSON.parse(localStorage.getItem(ACTIVITY_STORE_KEY) || 'null');
+                if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+                    // Detect legacy flat shape accidentally saved under v2 key
+                    if (raw.days && typeof raw.days === 'object' && !Object.keys(raw).some((k) => /-/.test(k))) {
+                        yearActivityStore = {};
+                        migrateLegacyYearActivityBlob(raw, 'local-flat-store');
+                    } else {
+                        yearActivityStore = {};
+                        for (const [tid, ya] of Object.entries(raw)) {
+                            if (!ya || typeof ya !== 'object') continue;
+                            if (ya.days || ya.cycleStart != null || 'seeded' in ya) {
+                                yearActivityStore[tid] = {
+                                    days: (ya.days && typeof ya.days === 'object') ? ya.days : {},
+                                    cycleStart: ya.cycleStart || null,
+                                    seeded: !!ya.seeded,
+                                    v: ya.v || 0
+                                };
+                            }
+                        }
+                    }
                 }
             } catch (_) {}
+            // Migrate legacy single-cycle localStorage into en-uk only (once)
+            try {
+                const legacy = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || 'null');
+                if (legacy && typeof legacy === 'object' && (legacy.days || legacy.cycleStart)) {
+                    migrateLegacyYearActivityBlob(legacy, 'local-v1');
+                }
+            } catch (_) {}
+            bindYearActivityToTrack();
+            try { localStorage.setItem(ACTIVITY_STORE_KEY, JSON.stringify(yearActivityStore)); } catch (_) {}
         }
         loadYearActivityLocal();
 
         function persistYearActivityLocal() {
-            try { localStorage.setItem(ACTIVITY_KEY, JSON.stringify(yearActivity)); } catch (_) {}
+            yearActivityStore[activityTrackId()] = yearActivity;
+            try { localStorage.setItem(ACTIVITY_STORE_KEY, JSON.stringify(yearActivityStore)); } catch (_) {}
         }
         async function persistYearActivityCloud() {
             if (!activeUid || !db) return;
             try {
-                await setDoc(doc(db, 'users', activeUid), { yearActivity }, { merge: true });
+                const tid = activityTrackId();
+                await setDoc(doc(db, 'users', activeUid), {
+                    yearActivityByTrack: { [tid]: { ...yearActivity } }
+                }, { merge: true });
             } catch (e) { console.error(e); }
         }
 
@@ -4037,11 +4315,26 @@
 
         function seedYearActivityFromVocabulary() {
             const sessions = inferSessionsFromVocabulary();
+            const before = JSON.stringify(yearActivity);
+
+            // One-time per-track rebuild: wipe days copied from the old shared EN–UK circle
+            if ((yearActivity.v || 0) < YEAR_ACTIVITY_TRACK_VERSION) {
+                yearActivity.days = {};
+                yearActivity.cycleStart = null;
+                yearActivity.seeded = false;
+                yearActivity.v = YEAR_ACTIVITY_TRACK_VERSION;
+            }
+
             if (!sessions.length) {
+                // Still persist version bump so we don't keep showing a foreign cycle
+                if (JSON.stringify(yearActivity) !== before) {
+                    persistYearActivityLocal();
+                    persistYearActivityCloud();
+                }
                 refreshYearRingUI();
                 return;
             }
-            const before = JSON.stringify(yearActivity);
+
             const fromHist = {};
             for (const s of sessions) {
                 const key = dayKeyFromDate(s.at);
@@ -4050,6 +4343,9 @@
                 if (isHeavyTrainingMode(s.mode)) fromHist[key].heavy++;
                 else fromHist[key].other++;
             }
+
+            // After rebuild, days start empty then fill from THIS track's vocabulary only.
+            // Later calls (v already 2) still merge max() so live sessions aren't lost.
             for (const [k, v] of Object.entries(fromHist)) {
                 const cur = yearActivity.days[k] || { heavy: 0, other: 0 };
                 yearActivity.days[k] = {
@@ -4057,13 +4353,16 @@
                     other: Math.max(cur.other || 0, v.other || 0)
                 };
             }
-            const keys = Object.keys(yearActivity.days).sort();
-            if (keys.length) {
-                if (!yearActivity.cycleStart || keys[0] < yearActivity.cycleStart) {
-                    yearActivity.cycleStart = keys[0];
-                }
+
+            // Cycle start = earliest day that actually has activity on this track
+            const activeKeys = Object.keys(yearActivity.days)
+                .filter((k) => dayHasAnyActivity(yearActivity.days[k]))
+                .sort();
+            if (activeKeys.length) {
+                yearActivity.cycleStart = activeKeys[0];
             }
             yearActivity.seeded = true;
+            yearActivity.v = YEAR_ACTIVITY_TRACK_VERSION;
             ensureYearCycleCurrent();
             if (JSON.stringify(yearActivity) !== before) {
                 persistYearActivityLocal();
@@ -5391,6 +5690,7 @@
             if (!activeUid) return;
             srsInitialRepairDone = false;
             legacyMigrationChecked = false;
+            materialsSnapshotReady = false;
             if (unsubscribeWords) unsubscribeWords();
             if (unsubscribeMaterials) unsubscribeMaterials();
             if (unsubscribeFolders) unsubscribeFolders();
@@ -5420,9 +5720,11 @@
                 materials = [];
                 snap.forEach(d => materials.push({ id: d.id, ...d.data() }));
                 materials.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                materialsSnapshotReady = true;
                 renderMaterials();
                 renderDictContextDropdown();
                 renderBulkFolderDropdown();
+                tryOpenMaterialDeepLink();
             });
 
             unsubscribeFolders = onSnapshot(foldersPath, (snap) => {
@@ -8254,7 +8556,7 @@
             }
 
             if (isUrl) {
-                if (icon) icon.textContent = '🌐';
+                if (icon) icon.textContent = '🔗';
                 if (label) label.textContent = t('lib.importUrl');
                 if (input) input.setAttribute('data-i18n-placeholder', 'lib.urlPh');
                 input?.setAttribute('placeholder', t('lib.urlPh'));
@@ -8853,6 +9155,218 @@
             }
         };
 
+        // ——— Material deep links (#/m/ID?track=es-en) — works on Netlify / GitHub Pages ———
+        let pendingMaterialDeepLink = null;
+        let deepLinkOpenInProgress = false;
+        let deepLinkHandled = false; // consumed for this page load (don't re-force track from hash)
+        let materialsSnapshotReady = false;
+        let deepLinkMissingNotified = false;
+
+        function parseAppDeepLink(fromHash = location.hash, fromSearch = location.search) {
+            let materialId = null;
+            let track = null;
+            try {
+                const params = new URLSearchParams(fromSearch || '');
+                materialId = params.get('m') || params.get('material');
+                track = params.get('track') || params.get('t');
+            } catch (_) {}
+
+            const hash = String(fromHash || '');
+            const pathMatch = hash.match(/^#\/m\/([^/?#]+)(?:\?(.*))?$/i);
+            if (pathMatch) {
+                try { materialId = decodeURIComponent(pathMatch[1]); } catch (_) { materialId = pathMatch[1]; }
+                if (pathMatch[2]) {
+                    try {
+                        const hp = new URLSearchParams(pathMatch[2]);
+                        track = hp.get('track') || hp.get('t') || track;
+                    } catch (_) {}
+                }
+            } else if (hash.length > 1) {
+                try {
+                    const hp = new URLSearchParams(hash.replace(/^#/, ''));
+                    materialId = hp.get('m') || hp.get('material') || materialId;
+                    track = hp.get('track') || hp.get('t') || track;
+                } catch (_) {}
+            }
+            if (!materialId) return null;
+            return { materialId: String(materialId).trim(), track: track ? String(track).trim() : null };
+        }
+
+        function buildMaterialDeepLink(materialId, trackId = activeTrackId) {
+            const url = new URL(location.href);
+            url.search = '';
+            const tid = trackId || activeTrackId || '';
+            const idPart = encodeURIComponent(materialId);
+            url.hash = tid
+                ? `#/m/${idPart}?track=${encodeURIComponent(tid)}`
+                : `#/m/${idPart}`;
+            return url.toString();
+        }
+
+        function setMaterialDeepLinkHash(materialId) {
+            if (!materialId || deepLinkOpenInProgress) return;
+            const full = buildMaterialDeepLink(materialId);
+            const nextHash = new URL(full).hash;
+            if (location.hash !== nextHash) {
+                history.replaceState(null, '', `${location.pathname}${location.search}${nextHash}`);
+            }
+        }
+
+        function clearMaterialDeepLinkHash() {
+            if (!parseAppDeepLink()) return;
+            history.replaceState(null, '', `${location.pathname}${location.search}`);
+        }
+
+        function dismissMaterialDeepLink() {
+            pendingMaterialDeepLink = null;
+            deepLinkHandled = true;
+            deepLinkMissingNotified = false;
+            clearMaterialDeepLinkHash();
+        }
+
+        async function tryOpenMaterialDeepLink() {
+            if (deepLinkOpenInProgress) return;
+            // After a successful open (or user dismissed), ignore leftover hash on materials reload
+            const link = pendingMaterialDeepLink || (deepLinkHandled ? null : parseAppDeepLink());
+            if (!link?.materialId) return;
+            pendingMaterialDeepLink = link;
+
+            if (link.track && link.track !== activeTrackId) {
+                const parsed = parseTrackId(link.track);
+                if (parsed) {
+                    deepLinkOpenInProgress = true;
+                    try {
+                        learningLanguage = parsed.learn;
+                        translationLanguage = parsed.trans;
+                        materialsSnapshotReady = false;
+                        await applyTrackChange({ fromDeepLink: true });
+                    } finally {
+                        deepLinkOpenInProgress = false;
+                    }
+                    return; // materials snapshot will retry after track reload
+                }
+            }
+
+            if (!materialsSnapshotReady) return;
+
+            const m = materials.find((x) => x.id === link.materialId);
+            if (!m) {
+                if (!deepLinkMissingNotified) {
+                    deepLinkMissingNotified = true;
+                    deepLinkHandled = true;
+                    pendingMaterialDeepLink = null;
+                    window.showModal(t('msg.matLinkMissing'));
+                    clearMaterialDeepLinkHash();
+                }
+                return;
+            }
+
+            pendingMaterialDeepLink = null;
+            deepLinkMissingNotified = false;
+            deepLinkHandled = true;
+            deepLinkOpenInProgress = true;
+            try {
+                if (currentMaterial) closeReader();
+                switchTab('library');
+                openReader(m.id);
+                const full = buildMaterialDeepLink(m.id, link.track || activeTrackId);
+                const nextHash = new URL(full).hash;
+                if (location.hash !== nextHash) {
+                    history.replaceState(null, '', `${location.pathname}${location.search}${nextHash}`);
+                }
+            } finally {
+                deepLinkOpenInProgress = false;
+            }
+        }
+
+        window.copyMaterialLink = async (id, event) => {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            closeAllMaterialCardMenus();
+            if (!id) return;
+            const url = buildMaterialDeepLink(id);
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(url);
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = url;
+                    ta.setAttribute('readonly', '');
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+                window.showModal(t('msg.linkCopied'));
+            } catch (_) {
+                window.showModal(url);
+            }
+        };
+
+        function closeAllMaterialCardMenus() {
+            document.querySelectorAll('.mat-card-menu').forEach((el) => el.classList.add('hidden'));
+        }
+        window.closeAllMaterialCardMenus = closeAllMaterialCardMenus;
+
+        window.toggleMaterialCardMenu = (btn, event) => {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            const wrap = btn?.closest?.('.mat-card-more-wrap');
+            const menu = wrap?.querySelector('.mat-card-menu');
+            if (!menu) return;
+            const willOpen = menu.classList.contains('hidden');
+            closeAllMaterialCardMenus();
+            if (willOpen) menu.classList.remove('hidden');
+        };
+
+        window.openMaterialCardEdit = (id, event) => {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            closeAllMaterialCardMenus();
+            openEditMaterialModal(id);
+        };
+
+        window.openMaterialCardDelete = (id, event) => {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            closeAllMaterialCardMenus();
+            deleteMaterial(id);
+        };
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.mat-card-more-wrap')) return;
+            closeAllMaterialCardMenus();
+        });
+
+        // Capture link early (before auth) so track/material survive load
+        try {
+            pendingMaterialDeepLink = parseAppDeepLink();
+            if (pendingMaterialDeepLink) {
+                deepLinkHandled = false;
+                deepLinkMissingNotified = false;
+            }
+        } catch (_) {}
+
+        window.addEventListener('hashchange', () => {
+            if (deepLinkOpenInProgress) return;
+            const link = parseAppDeepLink();
+            if (!link) return;
+            pendingMaterialDeepLink = link;
+            deepLinkHandled = false;
+            deepLinkMissingNotified = false;
+            tryOpenMaterialDeepLink();
+        });
+
         function renderMaterials() {
             const totalPages = Math.ceil(materials.length / MATERIALS_PER_PAGE) || 1;
             if (libraryCurrentPage > totalPages) libraryCurrentPage = totalPages;
@@ -8863,22 +9377,33 @@
             let html = currentItems.map(m => {
                 const isRead = m.isRead;
                 const readDate = isRead && m.readAt ? new Date(m.readAt).toLocaleString(uiLocale(), { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+                const safeId = String(m.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
                 return `
-                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border ${isRead ? 'border-slate-300 bg-slate-50/70' : 'border-slate-200'} cursor-pointer hover:border-indigo-400 transition flex justify-between items-center group relative overflow-hidden" onclick="openReader('${m.id}')">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${m.ytId ? 'bg-red-500' : 'bg-indigo-500'} opacity-0 group-hover:opacity-100 transition"></div>
-                    <div class="flex-1 truncate pl-2 ${isRead ? 'opacity-80' : ''}">
+                <div class="mat-card bg-white p-4 sm:p-5 rounded-2xl shadow-sm border ${isRead ? 'border-slate-300 bg-slate-50/70' : 'border-slate-200'} cursor-pointer hover:border-indigo-400 transition group overflow-hidden" onclick="closeAllMaterialCardMenus(); openReader('${safeId}')">
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${m.ytId ? 'bg-red-500' : 'bg-indigo-500'} opacity-0 group-hover:opacity-100 transition pointer-events-none"></div>
+                    <div class="mat-card-body pl-2 ${isRead ? 'opacity-80' : ''}">
                         <h3 class="font-bold ${isRead ? 'text-slate-600' : 'text-slate-800'} truncate text-lg flex items-center gap-2">
-                            ${isRead ? `<span class="text-slate-400" title="${t('lib.read')}">✅</span>` : ''} 
-                            ${m.ytId ? '<span class="text-red-500 text-xl">📺</span>' : '<span class="text-amber-600 text-xl">📜</span>'} ${m.title}
+                            ${isRead ? `<span class="text-slate-400 shrink-0" title="${t('lib.read')}">✅</span>` : ''} 
+                            ${m.ytId ? '<span class="text-red-500 text-xl shrink-0">📺</span>' : '<span class="text-amber-600 text-xl shrink-0">📜</span>'}
+                            <span class="truncate">${m.title}</span>
                         </h3>
                         <p class="text-sm text-slate-500 mt-1 truncate font-medium">
                             ${isRead && readDate ? `<span class="text-slate-400 text-xs font-medium mr-2 bg-slate-100 px-1.5 py-0.5 rounded shadow-sm border border-slate-200">${t('lib.readAt', { date: readDate })}</span>` : ''}
                             ${m.content ? materialPlainPreview(m.content) : t('lib.video')}
                         </p>
                     </div>
-                    <div class="flex gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition ml-2">
-                        <button onclick="event.stopPropagation(); openEditMaterialModal('${m.id}')" class="text-slate-400 hover:text-indigo-600 p-2 text-xl font-bold bg-white rounded-full">✏️</button>
-                        <button onclick="event.stopPropagation(); deleteMaterial('${m.id}')" class="text-slate-300 hover:text-rose-500 p-2 text-2xl font-bold bg-white rounded-full">&times;</button>
+                    <div class="mat-card-actions-desktop" onclick="event.stopPropagation()">
+                        <button type="button" onclick="copyMaterialLink('${safeId}', event)" title="${t('lib.copyLink')}" aria-label="${t('lib.copyLink')}">🔗</button>
+                        <button type="button" onclick="openMaterialCardEdit('${safeId}', event)" title="${t('lib.editMatShort')}" aria-label="${t('lib.editMatShort')}">✏️</button>
+                        <button type="button" class="mat-card-del" onclick="openMaterialCardDelete('${safeId}', event)" title="${t('lib.deleteMatShort')}" aria-label="${t('lib.deleteMatShort')}">&times;</button>
+                    </div>
+                    <div class="mat-card-more-wrap">
+                        <button type="button" class="mat-card-more-btn" onclick="toggleMaterialCardMenu(this, event)" title="${t('lib.moreActions')}" aria-label="${t('lib.moreActions')}" aria-haspopup="menu">⋯</button>
+                        <div class="mat-card-menu hidden" role="menu" onclick="event.stopPropagation()">
+                            <button type="button" role="menuitem" onclick="copyMaterialLink('${safeId}', event)">🔗 ${t('lib.copyLink')}</button>
+                            <button type="button" role="menuitem" onclick="openMaterialCardEdit('${safeId}', event)">✏️ ${t('lib.editMatShort')}</button>
+                            <button type="button" role="menuitem" class="mat-card-del" onclick="openMaterialCardDelete('${safeId}', event)">× ${t('lib.deleteMatShort')}</button>
+                        </div>
                     </div>
                 </div>
                 `;
@@ -9157,6 +9682,7 @@
             const readerBar = document.getElementById('reader-sticky-bar');
             if (readerBar) readerBar.style.top = '';
             window.scrollTo({top: 0});
+            setMaterialDeepLinkHash(m.id);
         };
 
         window.closeReader = () => {
@@ -9187,6 +9713,8 @@
                 ytWrapClose.style.right = '';
                 ytWrapClose.style.bottom = '';
             }
+
+            if (!deepLinkOpenInProgress) clearMaterialDeepLinkHash();
 
             if (activeUid && materialToSave) {
                 updateDoc(docRef('materials', materialToSave.id), { lastPage: pageToSave })
@@ -11665,7 +12193,11 @@
                 valer: ['valer', 'valgo', 'vales', 'vale', 'valemos', 'valéis', 'valen', 'valió', 'valieron', 'valido', 'valiendo'],
                 romper: ['romper', 'rompo', 'rompes', 'rompe', 'rompemos', 'rompéis', 'rompen', 'rompí', 'rompiste', 'rompió', 'rompieron', 'roto', 'rompiendo'],
                 matar: ['matar', 'mato', 'matas', 'mata', 'matamos', 'matáis', 'matan', 'maté', 'mataste', 'mató', 'mataron', 'matado', 'matando'],
-                buscar: ['buscar', 'busco', 'buscas', 'busca', 'buscamos', 'buscáis', 'buscan', 'busqué', 'buscaste', 'buscó', 'buscaron', 'buscado', 'buscando']
+                buscar: ['buscar', 'busco', 'buscas', 'busca', 'buscamos', 'buscáis', 'buscan', 'busqué', 'buscaste', 'buscó', 'buscaron', 'buscado', 'buscando'],
+                llevar: ['llevar', 'llevo', 'llevas', 'lleva', 'llevamos', 'lleváis', 'llevan', 'llevé', 'llevaste', 'llevó', 'llevaron', 'llevado', 'llevando', 'llevaré', 'llevará', 'llevaría', 'lleve', 'lleves', 'lleven', 'llevarme', 'llevarse'],
+                conducir: ['conducir', 'conduzco', 'conduces', 'conduce', 'conducimos', 'conducís', 'conducen', 'conduje', 'condujo', 'condujeron', 'conducido', 'conduciendo', 'conduciré', 'conducirá'],
+                basar: ['basar', 'baso', 'basas', 'basa', 'basamos', 'basan', 'basé', 'basó', 'basaron', 'basado', 'basando', 'basarse'],
+                referir: ['referir', 'refiero', 'refieres', 'refiere', 'referimos', 'refieren', 'referí', 'refirió', 'referido', 'refiriéndose', 'referirse']
             },
             // Safe verb+prep pairs (learner phrasals / régimen preposicional).
             // Periphrases marked in needsInfinitiveAfter also require a following infinitive
@@ -11686,7 +12218,11 @@
                 echar: ['de'],
                 caer: ['en', 'bien', 'mal'],
                 dar: ['con'],
-                poner: ['a']
+                poner: ['a'],
+                llevar: ['a'],
+                conducir: ['a'],
+                basar: ['en'],
+                referir: ['a']
             },
             // lemma → preps that only count when an infinitive follows (perífrasis)
             needsInfinitiveAfter: {
@@ -11706,6 +12242,23 @@
                 ['dentro', 'de'], ['fuera', 'de'], ['al', 'lado', 'de'], ['a', 'través', 'de'],
                 ['con', 'respecto', 'a'], ['en', 'cuanto', 'a'], ['a', 'partir', 'de'],
                 ['por', 'medio', 'de'], ['en', 'cuanto'], ['tan', 'pronto', 'como'],
+                ['con', 'base', 'en'], ['en', 'base', 'a'], ['a', 'base', 'de'],
+                ['a', 'la', 'hora', 'de'], ['a', 'la', 'hora'],
+                ['a', 'propósito', 'de'], ['a', 'propósito'], ['a', 'proposito', 'de'], ['a', 'proposito'],
+                ['de', 'acuerdo', 'con'], ['en', 'relación', 'con'], ['con', 'relación', 'a'],
+                ['a', 'cargo', 'de'], ['a', 'favor', 'de'], ['en', 'contra', 'de'],
+                ['a', 'causa', 'de'], ['por', 'causa', 'de'], ['a', 'raíz', 'de'],
+                ['en', 'función', 'de'], ['con', 'motivo', 'de'], ['en', 'torno', 'a'],
+                ['respecto', 'a'], ['respecto', 'de'], ['junto', 'con'],
+                ['con', 'el', 'fin', 'de'], ['a', 'fin', 'de'], ['en', 'caso', 'de'],
+                ['a', 'excepción', 'de'], ['al', 'igual', 'que'], ['así', 'como'],
+                ['por', 'lo', 'tanto'], ['por', 'tanto'], ['por', 'consiguiente'],
+                ['por', 'eso'], ['por', 'ello'], ['así', 'que'],
+                ['por', 'un', 'lado'], ['por', 'otro', 'lado'], ['en', 'cambio'],
+                ['al', 'contrario'], ['por', 'el', 'contrario'], ['en', 'efecto'],
+                ['a', 'continuación'], ['en', 'resumen'], ['en', 'definitiva'],
+                ['siempre', 'y', 'cuando'], ['a', 'menos', 'que'], ['por', 'más', 'que'],
+                ['tal', 'y', 'como'], ['cara', 'a'],
                 // Discourse / frozen adverbials
                 ['de', 'vez', 'en', 'cuando'], ['a', 'lo', 'mejor'], ['por', 'supuesto'],
                 ['sin', 'embargo'], ['no', 'obstante'], ['desde', 'luego'], ['por', 'lo', 'menos'],
@@ -11725,6 +12278,7 @@
                 ['tener', 'ganas', 'de'], ['hacer', 'falta'], ['valer', 'la', 'pena'],
                 ['acabar', 'de'], ['acabar', 'con'], ['volver', 'a'], ['dejar', 'de'],
                 ['poner', 'a'], ['ir', 'a'],
+                ['llevar', 'a'], ['conducir', 'a'], ['basar', 'en'], ['referir', 'a'],
                 ['contar', 'con'], ['soñar', 'con'], ['depender', 'de'], ['consistir', 'en'],
                 ['pensar', 'en'], ['tratar', 'de'], ['acordar', 'de'],
                 ['enamorar', 'de'], ['estar', 'enamorado', 'de'], ['estar', 'enamorada', 'de'],
@@ -12380,7 +12934,8 @@
                 if (findWholeWordIndex(sent, isolatedTrans) >= 0) score += 45;
                 else if (sentLower.includes(isolatedTrans.toLowerCase())) score += 10;
                 if (isContextAlignStopword(isolatedTrans)) score -= sourceIsMulti ? 35 : 20;
-                if (sourceIsMulti && !/\s/.test(isolatedTrans.trim())) score += 10;
+                if (sourceIsMulti) score += 35;
+                if (sourceIsMulti && !/\s/.test(isolatedTrans.trim())) score += 5;
                 if (wordMatch && sourceSentence) score += positionScoreInSentence(sent, isolatedTrans, sourceSentence, wordMatch);
                 push(isolatedTrans, score);
             }
@@ -12509,7 +13064,7 @@
         }
 
         /** Diff full translation vs blanked translation to recover the target word span. */
-        function extractDiffFromBlankedTranslation(fullTrans, blankedTrans) {
+        function extractDiffFromBlankedTranslation(fullTrans, blankedTrans, maxExtraTokens = 2) {
             const full = stripHtmlTagsKeepText(fullTrans);
             const blank = stripHtmlTagsKeepText(blankedTrans)
                 .replace(/⌀+/g, ' ')
@@ -12549,26 +13104,59 @@
             }
             let start = extraIdx[bestL];
             let end = extraIdx[bestR];
-            // Cap multi-word spans (1–3 tokens) — longer diffs are usually noise
-            if (end - start > 2) end = start + 2;
+            const cap = Math.max(0, Math.min(4, maxExtraTokens | 0));
+            if (end - start > cap) end = start + cap;
             return fullToks.slice(start, end + 1).join(' ');
         }
 
         async function reverseAlignScore(candidate, sourceWord) {
             const cand = String(candidate || '').trim();
             if (!cand || !sourceWord) return 0;
-            if (isContextAlignStopword(cand)) return -20;
+            if (isContextAlignStopword(cand) && !/\s/.test(cand)) return -20;
+            const allSourceParts = tokenizeForContextAlign(sourceWord);
+            // Keep function words for multi-word preps ("a través de") — they are the phrase
+            const sourceParts = allSourceParts.length >= 2
+                ? allSourceParts
+                : allSourceParts.filter((p) => !isContextAlignStopword(p));
             const back = await fetchTranslationText(cand, {
                 lowercase: true,
                 from: translationLanguage,
                 to: learningLanguage
             });
             if (!back) return 0;
-            if (stemsLooselyMatch(back, sourceWord)) return 90;
-            // Multi-word back-translation: any token match
-            const parts = tokenizeForContextAlign(back);
-            if (parts.some((p) => stemsLooselyMatch(p, sourceWord))) return 70;
+            if (stemsLooselyMatch(back, sourceWord)) return 100;
+            const backParts = tokenizeForContextAlign(back);
+            const backContent = backParts.filter((p) => !isContextAlignStopword(p));
+            // Whole multi-word source ↔ back (order-insensitive content overlap)
+            if (allSourceParts.length >= 2 && backParts.length) {
+                let hits = 0;
+                allSourceParts.forEach((sp) => {
+                    if (backParts.some((bp) => stemsLooselyMatch(bp, sp))) hits++;
+                });
+                const contentHits = (allSourceParts.filter((p) => !isContextAlignStopword(p))).filter((sp) =>
+                    backParts.some((bp) => stemsLooselyMatch(bp, sp))
+                ).length;
+                if (contentHits >= 1 && hits >= 1) return 95;
+                if (hits >= Math.min(2, allSourceParts.length)) return 90;
+                if (contentHits >= 1) return 60;
+            }
+            // Multi-word back-translation: any token match to source lemma/content
+            if (backContent.some((p) => stemsLooselyMatch(p, sourceWord))) return 70;
+            if (sourceParts.some((sp) => backParts.some((bp) => stemsLooselyMatch(bp, sp)))) return 65;
+            // Candidate reverse-translates to an unrelated content word → strong penalty for multi-word sources
+            if (allSourceParts.length >= 2 && backContent.length && hitsAreUnrelated(
+                allSourceParts.filter((p) => !isContextAlignStopword(p)).length
+                    ? allSourceParts.filter((p) => !isContextAlignStopword(p))
+                    : allSourceParts,
+                backContent
+            )) {
+                return -25;
+            }
             return -10;
+        }
+
+        function hitsAreUnrelated(sourceParts, backParts) {
+            return !sourceParts.some((sp) => backParts.some((bp) => stemsLooselyMatch(bp, sp)));
         }
 
         /**
@@ -12621,9 +13209,12 @@
                 };
             }
 
+            const sourceTokCount = tokenizeForContextAlign(target).length;
+            const sourceIsMulti = sourceTokCount >= 2;
             const fromDiff = extractDiffFromBlankedTranslation(
                 sentenceTrans,
-                blankedTrans || ''
+                blankedTrans || '',
+                sourceIsMulti ? Math.min(4, Math.max(1, sourceTokCount)) : 2
             );
             const markedExtract = extractMarkedWordFromTranslation(markedTrans);
 
@@ -12654,22 +13245,35 @@
                 if (pool.some((p) => p.v.toLowerCase() === s.toLowerCase())) return;
                 pool.push({ v: s, base });
             };
-            pushUnique(htmlBold, 80);
-            pushUnique(fromDiff, 75);
-            pushUnique(markedExtract, 55);
-            pushUnique(contextWordTrans, 50);
-            pushUnique(isolatedTrans, 45);
-            pushUnique(located, 35);
+            // Multi-word Spanish/English phrases: trust isolated + blanking diff more than a lone nearby noun
+            if (sourceIsMulti) {
+                pushUnique(isolatedTrans, 95);
+                pushUnique(fromDiff, 90);
+                pushUnique(htmlBold, 70);
+                pushUnique(markedExtract, 55);
+                pushUnique(contextWordTrans, 45);
+                pushUnique(located, 20);
+            } else {
+                pushUnique(htmlBold, 80);
+                pushUnique(fromDiff, 75);
+                pushUnique(markedExtract, 55);
+                pushUnique(contextWordTrans, 50);
+                pushUnique(isolatedTrans, 45);
+                pushUnique(located, 35);
+            }
 
             // When signals disagree, ask the translator which candidate maps back to the source word
             const inSent = pool.filter((p) => findWholeWordIndex(sentenceTrans, p.v) >= 0);
-            const toCheck = (inSent.length ? inSent : pool).slice(0, 3);
+            const toCheck = (inSent.length ? inSent : pool).slice(0, sourceIsMulti ? 4 : 3);
             if (toCheck.length >= 2 || (toCheck.length === 1 && learningLanguage === 'es')) {
                 const scored = await Promise.all(toCheck.map(async (p) => {
                     let score = p.base;
                     score += positionScoreInSentence(sentenceTrans, p.v, sentence, wordMatch);
                     if (findWholeWordIndex(sentenceTrans, p.v) >= 0) score += 25;
-                    if (isContextAlignStopword(p.v)) score -= 40;
+                    if (isContextAlignStopword(p.v)) score -= sourceIsMulti ? 55 : 40;
+                    // Lone content noun after a prep phrase is a common GT trap ("across cultures")
+                    if (sourceIsMulti && !/\s/.test(p.v) && !isContextAlignStopword(p.v)) score -= 15;
+                    if (sourceIsMulti && /\s/.test(p.v)) score += 20;
                     score += await reverseAlignScore(p.v, target);
                     return { v: p.v, score };
                 }));
@@ -13390,7 +13994,7 @@
         let activeCharIndex = null;
 
         const MODE_STAGES = { 
-            'all': [0, 1, 2, 5], 
+            'all': [0, 1, 2, 5], // fallback; brainstorm uses BRAINSTORM_STAGES_BY_LEVEL
             'word-trans': [1], 
             'trans-word': [4], 
             'constructor': [2], 
@@ -13401,6 +14005,18 @@
             'sprint': [8],
             'picture': [9]
         };
+        // Brainstorm SRS level → exercise sequence (user stages 1–6)
+        // 0→1 intro; 1→2 TW; 2→3 WT; 3→4 hard TW; 4→5 hard WT; 5→6 blind ctor + sprint
+        const BRAINSTORM_STAGES_BY_LEVEL = {
+            0: [0, 1, 2, 5],
+            1: [4, 2, 3, 5],
+            2: [1, 2, 3, 5],
+            3: [4, 2, 3, 5],
+            4: [1, 2, 3, 5],
+            5: [2, 3, 5, 8]
+        };
+        const BS_ORDER_KEY = 'linguaspace_bs_order_v1';
+        const BS_DAY_LEVELS_KEY = 'linguaspace_bs_day_levels_v1';
         const STAGE_NAMES = { 
             0: "Ознайомлення", 
             1: "Слово → Переклад", 
@@ -13413,6 +14029,131 @@
             8: "Спринт",
             9: "По фото"
         };
+
+        let bsSessionStages = null;
+        let bsSessionLevel = 0;
+        let bsHardMcq = false;
+        let bsStrictConstructor = false;
+        let bsBlindConstructor = false;
+        let bsSprintGraduation = false;
+        let sprintQuestionQueue = [];
+        let sprintQueueIndex = 0;
+        let sprintRepsPerWord = 5;
+        let sprintTargetTotal = 30;
+        let sprintAnsweredCount = 0;
+
+        function loadBrainstormOrder() {
+            try {
+                const v = localStorage.getItem(BS_ORDER_KEY);
+                if (v === 'reviews' || v === 'new') return v;
+            } catch (_) {}
+            return 'new';
+        }
+        let brainstormOrderPref = loadBrainstormOrder();
+
+        function getBrainstormOrder() {
+            return brainstormOrderPref === 'reviews' ? 'reviews' : 'new';
+        }
+
+        window.setBrainstormOrder = (pref) => {
+            brainstormOrderPref = pref === 'reviews' ? 'reviews' : 'new';
+            try { localStorage.setItem(BS_ORDER_KEY, brainstormOrderPref); } catch (_) {}
+            syncBrainstormOrderUI();
+        };
+
+        function syncBrainstormOrderUI() {
+            const pref = getBrainstormOrder();
+            const btnNew = document.getElementById('bs-order-new');
+            const btnRev = document.getElementById('bs-order-reviews');
+            if (!btnNew || !btnRev) return;
+            const on = 'flex-1 text-left p-3 rounded-xl border-2 border-indigo-500 bg-white shadow-sm transition';
+            const off = 'flex-1 text-left p-3 rounded-xl border-2 border-slate-200 bg-white/80 hover:border-slate-300 transition';
+            btnNew.className = pref === 'new' ? on : off;
+            btnRev.className = pref === 'reviews' ? on : off;
+            const titleNew = btnNew.querySelector('[data-i18n="train.bsOrderNew"]');
+            const titleRev = btnRev.querySelector('[data-i18n="train.bsOrderReviews"]');
+            if (titleNew) titleNew.className = `block text-sm font-bold ${pref === 'new' ? 'text-indigo-700' : 'text-slate-700'}`;
+            if (titleRev) titleRev.className = `block text-sm font-bold ${pref === 'reviews' ? 'text-indigo-700' : 'text-slate-700'}`;
+        }
+        try { syncBrainstormOrderUI(); } catch (_) {}
+
+        function bsTodayKey() {
+            const d = new Date();
+            return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+        }
+
+        function getBsDayState() {
+            try {
+                const raw = JSON.parse(localStorage.getItem(BS_DAY_LEVELS_KEY) || 'null');
+                if (raw && raw.day === bsTodayKey() && Array.isArray(raw.levels)) return raw;
+            } catch (_) {}
+            return { day: bsTodayKey(), levels: [] };
+        }
+
+        function markBsLevelTrainedToday(level) {
+            const st = getBsDayState();
+            const L = level || 0;
+            if (!st.levels.includes(L)) st.levels.push(L);
+            try { localStorage.setItem(BS_DAY_LEVELS_KEY, JSON.stringify(st)); } catch (_) {}
+        }
+
+        function isWordHeavilyOverdue(w, now = Date.now()) {
+            const level = w.srsLevel || 0;
+            const interval = SRS_INTERVALS[level] || 0;
+            if (!interval) return false;
+            const next = w.nextReviewTime || 0;
+            if (!next) return false;
+            return (now - next) >= (2 * interval);
+        }
+
+        function getBrainstormStagesForLevel(level) {
+            const L = Math.min(Math.max(0, level || 0), 5);
+            return [...(BRAINSTORM_STAGES_BY_LEVEL[L] || BRAINSTORM_STAGES_BY_LEVEL[0])];
+        }
+
+        function pickBrainstormLevel(dueWords, now = Date.now()) {
+            const byLevel = new Map();
+            dueWords.forEach((w) => {
+                const L = w.srsLevel || 0;
+                if (!byLevel.has(L)) byLevel.set(L, []);
+                byLevel.get(L).push(w);
+            });
+            const levels = [...byLevel.keys()].sort((a, b) => a - b);
+            if (!levels.length) return null;
+
+            const emergency = levels.filter((L) => byLevel.get(L).some((w) => isWordHeavilyOverdue(w, now)));
+            const order = getBrainstormOrder();
+            if (emergency.length) {
+                return order === 'reviews' ? Math.max(...emergency) : Math.min(...emergency);
+            }
+
+            if (order === 'reviews') return Math.max(...levels);
+
+            // Prefer new: lowest due, but if stage-1 already trained today and higher is due → higher
+            const day = getBsDayState();
+            const hasHigher = levels.some((L) => L > 0);
+            const trained0Today = day.levels.includes(0);
+            if (levels.includes(0) && !(trained0Today && hasHigher)) return 0;
+            const rest = levels.filter((L) => L !== 0);
+            return rest.length ? Math.min(...rest) : levels[0];
+        }
+
+        function pickBrainstormWords(dueWords, reqCount, now = Date.now()) {
+            const level = pickBrainstormLevel(dueWords, now);
+            if (level == null) return { level: 0, words: [] };
+            const cohort = shuffleWords(dueWords.filter((w) => (w.srsLevel || 0) === level));
+            return { level, words: cohort.slice(0, reqCount).map((w) => ({ ...w, failed: false })) };
+        }
+
+        function configureBrainstormSessionFlags(level) {
+            bsSessionLevel = level || 0;
+            bsSessionStages = getBrainstormStagesForLevel(bsSessionLevel);
+            bsHardMcq = bsSessionLevel >= 3;
+            bsStrictConstructor = bsSessionLevel >= 3;
+            bsBlindConstructor = bsSessionLevel >= 5;
+            bsSprintGraduation = bsSessionStages.includes(8);
+            window._bsCtorStrictTipShown = false;
+        }
 
         window.toggleMute = () => {
             isGlobalAudioMuted = !isGlobalAudioMuted;
@@ -13506,6 +14247,15 @@
             const mainCard = document.getElementById('bs-main-card');
             const extClues = document.getElementById('bs-external-clues');
 
+            bsSessionStages = null;
+            bsHardMcq = false;
+            bsStrictConstructor = false;
+            bsBlindConstructor = false;
+            bsSprintGraduation = false;
+            sprintQuestionQueue = [];
+            sprintQueueIndex = 0;
+            sprintAnsweredCount = 0;
+
             if (mode === 'crossword') {
                 currentCrossword = makeCrossword(dueWords, 15); 
                 if (!currentCrossword || currentCrossword.placed.length < 2) {
@@ -13530,6 +14280,7 @@
             } else {
                 if (mode === 'sprint') {
                     window._sprintCountdownActive = true;
+                    window._sprintRulesPending = false;
                     sprintTimeLeft = 60;
                     sprintScore = 0;
                     sprintStreak = 0;
@@ -13538,7 +14289,13 @@
                         clearInterval(sprintTimer);
                         sprintTimer = null;
                     }
-                    bsWords = dueWords;
+                    bsWords = dueWords.map((w) => ({ ...w, failed: false }));
+                } else if (mode === 'all') {
+                    const picked = pickBrainstormWords(dueWords, reqCount, now);
+                    if (!picked.words.length) return window.showModal(t('msg.noDueWords'));
+                    configureBrainstormSessionFlags(picked.level);
+                    markBsLevelTrainedToday(picked.level);
+                    bsWords = picked.words;
                 } else {
                     if (mode === 'context') {
                         contextScore = 0;
@@ -13546,7 +14303,7 @@
                         contextPerfectCount = 0;
                         clearContextRoundTimer();
                     }
-                    bsWords = dueWords.slice(0, reqCount);
+                    bsWords = dueWords.slice(0, reqCount).map((w) => ({ ...w, failed: false }));
                 }
                 
                 if(bsWords.length === 0) return window.showModal(t('msg.noDueWords'));
@@ -13558,11 +14315,17 @@
                 document.getElementById('bs-workspace')?.classList.remove('cw-session');
             }
 
-            bsCurrentWordIdx = 0; const stagesForMode = MODE_STAGES[mode]; bsCurrentStage = stagesForMode[0]; 
+            bsCurrentWordIdx = 0;
+            const stagesForMode = (mode === 'all' && bsSessionStages) ? bsSessionStages : MODE_STAGES[mode];
+            bsCurrentStage = stagesForMode[0];
             bsTotalSteps = bsWords.length * stagesForMode.length; bsCompletedSteps = 0;
             
             if (mode === 'sprint') {
                 bsTotalSteps = 60; 
+            }
+            if (mode === 'all' && bsSprintGraduation) {
+                // Sprint is one section for the whole set, not per word
+                bsTotalSteps = bsWords.length * (stagesForMode.length - 1) + 1;
             }
             
             document.getElementById('train-hub-screen').classList.add('hidden'); document.getElementById('bs-results').classList.add('hidden'); document.getElementById('bs-workspace').classList.remove('hidden');
@@ -13649,6 +14412,8 @@
             const stageEl = document.getElementById('bs-overall-stage');
             if (activeSessionMode === 'review') {
                 stageEl.textContent = `${t('stage.review')} · ${t(`stage.${bsCurrentStage}`)}`;
+            } else if (activeSessionMode === 'all' && bsSessionStages) {
+                stageEl.textContent = `${t('train.bsStage', { n: (bsSessionLevel || 0) + 1 })} · ${t(`stage.${bsCurrentStage}`)}`;
             } else {
                 stageEl.textContent = t(`stage.${bsCurrentStage}`);
             }
@@ -13657,7 +14422,7 @@
             if (activeSessionMode === 'crossword') {
                 counter.classList.remove('hidden');
                 counter.textContent = String(bsWords.length);
-            } else if (activeSessionMode === 'sprint') {
+            } else if (activeSessionMode === 'sprint' || (activeSessionMode === 'all' && bsCurrentStage === 8)) {
                 counter.textContent = '';
                 counter.classList.add('hidden');
             } else {
@@ -13690,12 +14455,23 @@
 
             bsCompletedSteps++; bsCurrentWordIdx++;
             if (bsCurrentWordIdx >= bsWords.length) {
-                const stages = MODE_STAGES[activeSessionMode]; 
+                const stages = (activeSessionMode === 'all' && bsSessionStages) ? bsSessionStages : MODE_STAGES[activeSessionMode];
                 const currentStageIndex = stages.indexOf(bsCurrentStage);
                 
                 if(currentStageIndex + 1 < stages.length) {
                     bsCurrentStage = stages[currentStageIndex + 1];
-                    bsCurrentWordIdx = 0; 
+                    bsCurrentWordIdx = 0;
+                    if (bsCurrentStage === 8 && activeSessionMode === 'all') {
+                        window._sprintRulesPending = true;
+                        window._sprintCountdownActive = false;
+                        sprintTimeLeft = 60;
+                        sprintScore = 0;
+                        sprintStreak = 0;
+                        sprintWordsStats = {};
+                        sprintAnsweredCount = 0;
+                        if (sprintTimer) { clearInterval(sprintTimer); sprintTimer = null; }
+                        prepareBrainstormSprintQueue();
+                    }
                 } else {
                     return finishBrainstorm();
                 }
@@ -13855,7 +14631,7 @@
             }
             const btnNext = document.getElementById('bs-btn-next');
             if(e.key === 'Enter' && !btnNext.classList.contains('hidden')) { e.preventDefault(); e.stopPropagation(); btnNext.click(); return; }
-            if (['1', '2', '3', '4'].includes(e.key) && (bsCurrentStage === 1 || bsCurrentStage === 4)) {
+            if (['1', '2', '3', '4', '5', '6'].includes(e.key) && (bsCurrentStage === 1 || bsCurrentStage === 4)) {
                 const idx = parseInt(e.key) - 1; const buttons = document.querySelectorAll('#bs-test-opts button');
                 if(buttons[idx] && !buttons[idx].disabled) buttons[idx].click();
             }
@@ -13950,7 +14726,8 @@
 
         function renderBsStage() {
             const word = bsWords[bsCurrentWordIdx];
-            word.failed = false;
+            // Keep failed across exercises in the same session (any miss blocks advancement)
+            if (word.failed === undefined) word.failed = false;
             word.contextZeroPass = false;
             clearContextRoundTimer();
             const area = document.getElementById('bs-interactive-area'); const btnNext = document.getElementById('bs-btn-next'), feedback = document.getElementById('bs-feedback');
@@ -13993,21 +14770,55 @@
             document.getElementById('btn-intro-audio').onclick = () => playAudioWord(word.word); btnNext.innerHTML = withEnterHint(t('train.gotIt')); btnNext.classList.remove('hidden');
         }
 
-        function getOptions(correctWord) {
-            let filler = vocabulary.filter(v => v.id !== correctWord.id).sort(() => 0.5 - Math.random()); let opts = [correctWord, ...filler].slice(0, 4);
-            if(!opts.includes(correctWord)) opts[opts.length-1] = correctWord;
-            return opts.sort(() => 0.5 - Math.random());
+        function scoreMcqDistractor(candidate, target, field) {
+            const a = String(field === 'word' ? candidate.word : candidate.translation || '').trim().toLowerCase();
+            const b = String(field === 'word' ? target.word : target.translation || '').trim().toLowerCase();
+            if (!a || !b) return 0;
+            let score = 0;
+            if (a[0] === b[0]) score += 100;
+            const lenDiff = Math.abs(a.length - b.length);
+            score += Math.max(0, 40 - lenDiff * 8);
+            if (candidate.source && target.source && candidate.source === target.source) score += 25;
+            return score;
+        }
+
+        function getOptions(correctWord, opts = {}) {
+            const count = Math.max(2, opts.count || 4);
+            const field = opts.field === 'word' ? 'word' : 'translation';
+            const hard = !!opts.hard;
+            const pool = vocabulary.filter((v) => v.id !== correctWord.id);
+            let fillers;
+            if (hard && pool.length) {
+                fillers = [...pool].sort((a, b) => {
+                    const diff = scoreMcqDistractor(b, correctWord, field) - scoreMcqDistractor(a, correctWord, field);
+                    return diff !== 0 ? diff : (Math.random() - 0.5);
+                });
+            } else {
+                fillers = [...pool].sort(() => 0.5 - Math.random());
+            }
+            const picked = fillers.slice(0, count - 1);
+            let options = [correctWord, ...picked];
+            while (options.length < count && pool.length) {
+                const extra = pool[Math.floor(Math.random() * pool.length)];
+                if (!options.some((o) => o.id === extra.id)) options.push(extra);
+                else break;
+            }
+            return options.sort(() => 0.5 - Math.random());
         }
 
         function renderStageTestWT(word, area, btnNext, feedback) {
-            const opts = getOptions(word);
-            area.innerHTML = `<h3 class="text-3xl font-bold text-slate-800 mb-6 tracking-tight">${word.word}</h3><div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-base sm:text-lg shadow-sm flex justify-between items-center"><span>${o.translation}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
+            const hard = activeSessionMode === 'all' && bsHardMcq;
+            const opts = getOptions(word, { count: hard ? 6 : 4, hard, field: 'translation' });
+            const grid = hard ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-4';
+            area.innerHTML = `<h3 class="text-3xl font-bold text-slate-800 mb-6 tracking-tight">${word.word}</h3><div class="${grid}" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-base sm:text-lg shadow-sm flex justify-between items-center"><span>${o.translation}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
             bindTestButtons(word, feedback);
         }
 
         function renderStageTestTW(word, area, btnNext, feedback) {
-            const opts = getOptions(word);
-            area.innerHTML = `<h3 class="text-2xl font-bold text-indigo-700 uppercase mb-6 tracking-wider">${word.translation}</h3><div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-xl shadow-sm flex justify-between items-center"><span>${o.word}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
+            const hard = activeSessionMode === 'all' && bsHardMcq;
+            const opts = getOptions(word, { count: hard ? 6 : 4, hard, field: 'word' });
+            const grid = hard ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-4';
+            area.innerHTML = `<h3 class="text-2xl font-bold text-indigo-700 uppercase mb-6 tracking-wider">${word.translation}</h3><div class="${grid}" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-xl shadow-sm flex justify-between items-center"><span>${o.word}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
             bindTestButtons(word, feedback);
         }
 
@@ -14146,8 +14957,41 @@
                 articleGender
             })).sort(() => 0.5 - Math.random());
             bsSelectedLetters = [];
-            area.innerHTML = `<p class="text-xl text-indigo-600 font-bold mb-6 uppercase tracking-wider">${escapeHtmlText(word.translation)}</p><div id="bs-c-slots" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 min-h-[3.5rem]"></div><div id="bs-c-pool" class="flex flex-wrap justify-center gap-2 sm:gap-2.5 min-h-[3.5rem]"></div>`;
+            const strict = activeSessionMode === 'all' && bsStrictConstructor;
+            const blind = activeSessionMode === 'all' && bsBlindConstructor;
+            let ctorLastLen = 0;
+            const promptHtml = blind
+                ? `<p class="text-sm text-slate-400 font-bold mb-6 uppercase tracking-wider">${t('stage.2')}</p>`
+                : `<p class="text-xl text-indigo-600 font-bold mb-6 uppercase tracking-wider">${escapeHtmlText(word.translation)}</p>`;
+            area.innerHTML = `${promptHtml}<div id="bs-c-slots" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 min-h-[3.5rem]"></div><div id="bs-c-pool" class="flex flex-wrap justify-center gap-2 sm:gap-2.5 min-h-[3.5rem]"></div>`;
             document.addEventListener('keydown', handleConstructorKeyboard);
+
+            const flashWrongSlots = (slots) => {
+                slots.classList.add('animate-shake');
+                slots.querySelectorAll('.letter-slot.filled').forEach(el => {
+                    el.classList.remove('bg-indigo-600');
+                    el.classList.add('constructor-wrong');
+                });
+                if (bsCtorWrongFlashTimer) clearTimeout(bsCtorWrongFlashTimer);
+                bsCtorWrongFlashTimer = setTimeout(() => {
+                    bsCtorWrongFlashTimer = null;
+                    slots.classList.remove('animate-shake');
+                    slots.querySelectorAll('.letter-slot.constructor-wrong').forEach(el => {
+                        el.classList.remove('constructor-wrong');
+                        if (!el.classList.contains('bg-emerald-500')) el.classList.add('bg-indigo-600');
+                    });
+                }, 480);
+            };
+
+            const noteStrictFail = () => {
+                const firstFail = !word.failed;
+                word.failed = true;
+                if (strict && firstFail && !window._bsCtorStrictTipShown) {
+                    window._bsCtorStrictTipShown = true;
+                    window.showModal(t('train.ctorStrictTip'));
+                }
+            };
+
             window._renderBsC = () => {
                 if (bsCtorWrongFlashTimer) { clearTimeout(bsCtorWrongFlashTimer); bsCtorWrongFlashTimer = null; }
                 const slots = document.getElementById('bs-c-slots'), pool = document.getElementById('bs-c-pool');
@@ -14175,6 +15019,17 @@
                     btn.onclick = () => { bsSelectedLetters.push(bsLetterPool.splice(idx, 1)[0]); _renderBsC(); };
                     pool.appendChild(btn);
                 });
+
+                // Strict (stages 4+): flag fail when a newly placed letter is wrong
+                if (strict && bsSelectedLetters.length > ctorLastLen) {
+                    const i = bsSelectedLetters.length - 1;
+                    if (bsSelectedLetters[i].char !== expectedWordStr[i]) {
+                        noteStrictFail();
+                        flashWrongSlots(slots);
+                    }
+                }
+                ctorLastLen = bsSelectedLetters.length;
+
                 if(bsLetterPool.length === 0) {
                     if(bsSelectedLetters.map(x=>x.char).join('') === expectedWordStr) {
                         document.querySelectorAll('#bs-c-slots .letter-slot.filled').forEach(e => {
@@ -14185,22 +15040,9 @@
                         document.removeEventListener('keydown', handleConstructorKeyboard);
                         triggerSuccessReveal(word);
                     } else {
-                        // Wrong full arrangement: red shake, count as fail, still allow rearrange
+                        noteStrictFail();
                         word.failed = true;
-                        slots.classList.add('animate-shake');
-                        slots.querySelectorAll('.letter-slot.filled').forEach(el => {
-                            el.classList.remove('bg-indigo-600');
-                            el.classList.add('constructor-wrong');
-                        });
-                        if (bsCtorWrongFlashTimer) clearTimeout(bsCtorWrongFlashTimer);
-                        bsCtorWrongFlashTimer = setTimeout(() => {
-                            bsCtorWrongFlashTimer = null;
-                            slots.classList.remove('animate-shake');
-                            slots.querySelectorAll('.letter-slot.constructor-wrong').forEach(el => {
-                                el.classList.remove('constructor-wrong');
-                                if (!el.classList.contains('bg-emerald-500')) el.classList.add('bg-indigo-600');
-                            });
-                        }, 480);
+                        flashWrongSlots(slots);
                     }
                 } else { feedback.innerHTML = ''; btnNext.classList.add('hidden'); }
             }; _renderBsC();
@@ -15485,9 +16327,49 @@
             focusCell(currentCrossword.placed[0].origIndex, 0);
         }
 
+        function prepareBrainstormSprintQueue() {
+            const n = Math.max(1, bsWords.length);
+            sprintRepsPerWord = Math.ceil(30 / n);
+            sprintTargetTotal = sprintRepsPerWord * n;
+            sprintAnsweredCount = 0;
+            sprintQueueIndex = 0;
+            const queue = [];
+            bsWords.forEach((w) => {
+                for (let i = 0; i < sprintRepsPerWord; i++) queue.push(w);
+            });
+            sprintQuestionQueue = shuffleWords(queue);
+            bsWords.forEach((w) => {
+                if (!sprintWordsStats[w.id]) sprintWordsStats[w.id] = { correct: 0, wrong: 0 };
+            });
+        }
+
         function renderStageSprint(area, btnNext, feedback) {
             document.getElementById('bs-btn-dont-know').classList.add('hidden');
             document.getElementById('bs-btn-next').classList.add('hidden');
+
+            const graduation = activeSessionMode === 'all' && bsSprintGraduation;
+
+            if (graduation && window._sprintRulesPending) {
+                if (!sprintQuestionQueue.length) prepareBrainstormSprintQueue();
+                area.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-8 px-2 max-w-md mx-auto text-center">
+                        <div class="text-4xl mb-3">⚡</div>
+                        <h3 class="text-2xl font-black text-slate-800 mb-3">${t('train.sprintRulesTitle')}</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-6">${t('train.sprintRulesBody', {
+                            n: bsWords.length,
+                            reps: sprintRepsPerWord,
+                            total: sprintTargetTotal
+                        })}</p>
+                        <button type="button" id="btn-sprint-rules-start" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-2xl font-bold text-lg shadow-md active:scale-95 transition">${t('train.sprintStart')}</button>
+                    </div>
+                `;
+                document.getElementById('btn-sprint-rules-start').onclick = () => {
+                    window._sprintRulesPending = false;
+                    window._sprintCountdownActive = true;
+                    renderStageSprint(area, btnNext, feedback);
+                };
+                return;
+            }
 
             if (window._sprintCountdownActive) {
                 if (!isGlobalAudioMuted) {
@@ -15529,6 +16411,10 @@
                 return;
             }
 
+            const progressHtml = graduation
+                ? `<div id="sprint-grad-progress" class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">${t('train.sprintProgress', { done: sprintAnsweredCount, total: sprintTargetTotal })}</div>`
+                : '';
+
             area.innerHTML = `
                 <div class="flex flex-col items-center justify-center w-full max-w-md mx-auto py-2">
                     <div class="flex justify-between items-center w-full mb-6 px-4 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/50 shadow-inner">
@@ -15541,6 +16427,8 @@
                             <span id="sprint-score-val" class="font-black text-2xl text-indigo-600 tabular-nums">${sprintScore}</span>
                         </div>
                     </div>
+
+                    ${progressHtml}
 
                     <div id="sprint-streak-container" class="${sprintStreak > 0 ? '' : 'invisible'} mb-5 flex items-center gap-2 bg-amber-50 border border-amber-200/60 px-4 py-1.5 rounded-full shadow-sm transition-all duration-300">
                         <span class="text-sm">🔥</span>
@@ -15566,7 +16454,7 @@
             if (!sprintTimer) {
                 sprintTimer = setInterval(() => {
                     sprintTimeLeft--;
-                    bsCompletedSteps = 60 - sprintTimeLeft;
+                    if (!graduation) bsCompletedSteps = 60 - sprintTimeLeft;
                     
                     const timerEl = document.getElementById('sprint-timer-val');
                     if (timerEl) {
@@ -15586,16 +16474,27 @@
         }
 
         window.generateNextSprintQ = () => {
-            const word = bsWords[Math.floor(Math.random() * bsWords.length)];
+            const graduation = activeSessionMode === 'all' && bsSprintGraduation;
+            let word;
+            if (graduation) {
+                if (sprintQueueIndex >= sprintQuestionQueue.length) {
+                    finishSprintSession();
+                    return;
+                }
+                word = sprintQuestionQueue[sprintQueueIndex];
+            } else {
+                word = bsWords[Math.floor(Math.random() * bsWords.length)];
+            }
             const isCorrect = Math.random() < 0.5;
             let shownTranslation = word.translation;
 
             if (!isCorrect) {
-                const pool = vocabulary.filter(v => v.id !== word.id);
+                const sessionPool = bsWords.filter(v => v.id !== word.id);
+                const pool = sessionPool.length ? sessionPool : vocabulary.filter(v => v.id !== word.id);
                 if (pool.length > 0) {
                     shownTranslation = pool[Math.floor(Math.random() * pool.length)].translation;
                 } else {
-                    shownTranslation = word.translation + " (невірно)";
+                    shownTranslation = word.translation + " ✗";
                 }
             }
 
@@ -15612,6 +16511,7 @@
         window.submitSprintAnswer = (userChoice) => {
             if (!currentSprintQ) return;
 
+            const graduation = activeSessionMode === 'all' && bsSprintGraduation;
             const isCorrectAnswer = (userChoice === currentSprintQ.isCorrect);
             const wordId = currentSprintQ.word.id;
             
@@ -15653,7 +16553,11 @@
                 }
 
                 sprintWordsStats[wordId].wrong++;
-                sprintStreak = 0; 
+                sprintStreak = 0;
+                if (graduation) {
+                    const target = bsWords.find((w) => w.id === wordId);
+                    if (target) target.failed = true;
+                }
 
                 if (cardEl) {
                     cardEl.classList.remove('border-slate-100');
@@ -15674,11 +16578,28 @@
                 scoreEl.textContent = sprintScore;
             }
 
+            if (graduation) {
+                sprintQueueIndex++;
+                sprintAnsweredCount = Math.min(sprintTargetTotal, sprintAnsweredCount + 1);
+            }
+
+            if (graduation && sprintQueueIndex >= sprintQuestionQueue.length) {
+                finishSprintSession();
+                return;
+            }
+
             generateNextSprintQ();
+
+            if (graduation) {
+                const label = document.getElementById('sprint-grad-progress');
+                if (label) label.textContent = t('train.sprintProgress', { done: sprintAnsweredCount, total: sprintTargetTotal });
+            }
         };
 
         window.handleSprintKeyboard = (e) => {
-            if (activeSessionMode !== 'sprint' || bsCurrentStage !== 8) return;
+            if (bsCurrentStage !== 8) return;
+            if (activeSessionMode !== 'sprint' && !(activeSessionMode === 'all' && bsSprintGraduation)) return;
+            if (window._sprintRulesPending || window._sprintCountdownActive) return;
             if (e.key === 'ArrowLeft') {
                 e.preventDefault();
                 submitSprintAnswer(false);
@@ -15691,6 +16612,16 @@
         window.finishSprintSession = async () => {
             if (sprintTimer) { clearInterval(sprintTimer); sprintTimer = null; }
             document.removeEventListener('keydown', handleSprintKeyboard);
+
+            const graduation = activeSessionMode === 'all' && bsSprintGraduation;
+
+            if (graduation) {
+                for (let w of bsWords) {
+                    const stats = sprintWordsStats[w.id] || { correct: 0, wrong: 0 };
+                    if (stats.wrong > 0 || stats.correct < sprintRepsPerWord) w.failed = true;
+                }
+                return finishBrainstorm();
+            }
 
             const finalReviewedWords = [];
             for (let w of bsWords) {
