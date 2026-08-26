@@ -993,38 +993,51 @@
         }
 
         /* Material cards: actions overlay — text keeps full width */
-        .mat-card { position: relative; }
-        .mat-card-body { min-width: 0; padding-right: 2.5rem; }
-        @media (min-width: 640px) {
-            .mat-card-body { padding-right: 0.5rem; }
-            .mat-card:hover .mat-card-body { padding-right: 7.5rem; }
+        .mat-card {
+            position: relative;
+            z-index: 0;
+            -webkit-touch-callout: none;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
         }
-        .mat-card-actions-desktop {
-            display: none;
+        .mat-card.is-actions-open { z-index: 50; }
+        .mat-card-body { min-width: 0; }
+        .mat-card-actions {
+            display: flex;
             position: absolute;
             right: 0.5rem;
             top: 50%;
             transform: translateY(-50%);
-            gap: 0.15rem;
-            padding: 0.2rem;
-            border-radius: 9999px;
-            background: rgba(255, 255, 255, 0.96);
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+            gap: 0.35rem;
+            padding: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.15s ease;
             z-index: 5;
         }
         @media (min-width: 640px) {
-            .mat-card-actions-desktop { display: flex; }
-            .mat-card:hover .mat-card-actions-desktop,
-            .mat-card:focus-within .mat-card-actions-desktop {
+            .mat-card:hover .mat-card-actions,
+            .mat-card:focus-within .mat-card-actions {
                 opacity: 1;
                 pointer-events: auto;
             }
+            .mat-card:hover .mat-card-body,
+            .mat-card:focus-within .mat-card-body {
+                padding-right: 7.5rem;
+            }
         }
-        .mat-card-actions-desktop button {
+        .mat-card.is-actions-open .mat-card-actions {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .mat-card.is-actions-open .mat-card-body {
+            padding-right: 7.5rem;
+        }
+        .mat-card-actions button {
             width: 2.25rem;
             height: 2.25rem;
             display: inline-flex;
@@ -1034,64 +1047,31 @@
             font-size: 1rem;
             line-height: 1;
             color: #94a3b8;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-        }
-        .mat-card-actions-desktop button:hover { color: #4f46e5; background: #eef2ff; }
-        .mat-card-actions-desktop button.mat-card-del:hover { color: #e11d48; background: #fff1f2; }
-        .mat-card-more-wrap {
-            position: absolute;
-            right: 0.4rem;
-            top: 0.55rem;
-            z-index: 6;
-        }
-        @media (min-width: 640px) {
-            .mat-card-more-wrap { display: none; }
-        }
-        .mat-card-more-btn {
-            width: 2.25rem;
-            height: 2.25rem;
-            border-radius: 9999px;
-            border: 1px solid #e2e8f0;
             background: #fff;
-            color: #64748b;
-            font-size: 1.25rem;
-            font-weight: 700;
-            line-height: 1;
+            border: 1px solid #e2e8f0;
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-        }
-        .mat-card-menu {
-            position: absolute;
-            right: 0;
-            top: calc(100% + 0.25rem);
-            min-width: 11rem;
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.85rem;
-            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
-            padding: 0.35rem;
-            z-index: 30;
-        }
-        .mat-card-menu.hidden { display: none; }
-        .mat-card-menu button {
-            display: flex;
-            width: 100%;
-            align-items: center;
-            gap: 0.5rem;
-            text-align: left;
-            padding: 0.65rem 0.75rem;
-            border-radius: 0.65rem;
-            border: none;
-            background: transparent;
-            font-size: 0.875rem;
-            font-weight: 700;
-            color: #334155;
             cursor: pointer;
+            transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
         }
-        .mat-card-menu button:hover { background: #f8fafc; }
-        .mat-card-menu button.mat-card-del { color: #e11d48; }
-        .mat-card-menu button.mat-card-del:hover { background: #fff1f2; }
+        .mat-card-actions button:hover,
+        .mat-card-actions button:active { color: #4f46e5; background: #eef2ff; border-color: #c7d2fe; }
+        .mat-card-actions button.mat-card-del:hover,
+        .mat-card-actions button.mat-card-del:active { color: #e11d48; background: #fff1f2; border-color: #fecdd3; }
+        .mat-card-actions button.is-copied {
+            color: #059669;
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+        }
+        #mat-actions-scrim {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 45;
+            background: rgba(15, 23, 42, 0.28);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+        #mat-actions-scrim.is-on { display: block; }
 
         #bulk-add-dialog.bulk-photo-results #bulk-photo-drop-copy {
             display: block;
@@ -1830,6 +1810,7 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased font-sans">
+    <div id="mat-actions-scrim" onclick="closeMatCardActions()" aria-hidden="true"></div>
     <div id="system-status" class="bg-blue-500 text-white text-center py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-500 shadow-md z-[100] relative" data-i18n="status.connecting">Підключення...</div>
     <script>
         (function () {
@@ -2093,8 +2074,10 @@
     <div id="year-activity-modal" class="hidden fixed inset-0 z-[170] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeYearActivityModal()">
         <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-2xl max-w-md w-full relative max-h-[92vh] overflow-y-auto custom-scroll" role="dialog" aria-modal="true" aria-labelledby="year-activity-title">
             <button type="button" onclick="closeYearActivityModal()" class="absolute top-3 right-4 text-slate-400 hover:text-slate-700 font-bold text-3xl leading-none" aria-label="Close">&times;</button>
-            <h3 id="year-activity-title" class="text-lg font-bold text-slate-800 mb-1 pr-8" data-i18n="year.modalTitle">Рік навчання</h3>
+            <button type="button" id="btn-year-rules-info" onclick="toggleYearRulesTip(event)" onmouseenter="showYearRulesTip()" onmouseleave="hideYearRulesTip()" class="absolute top-3.5 right-12 w-8 h-8 rounded-full border border-slate-200 bg-slate-50 hover:bg-indigo-50 text-base leading-none flex items-center justify-center transition" data-i18n-title="year.ruleHint" title="Green day rules" aria-label="Info">ℹ️</button>
+            <h3 id="year-activity-title" class="text-lg font-bold text-slate-800 mb-1 pr-20" data-i18n="year.modalTitle">Рік навчання</h3>
             <p id="year-activity-sub" class="text-xs text-slate-500 mb-4"></p>
+            <div id="year-rules-tip" class="hidden mb-4 text-[12px] leading-relaxed text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5" data-i18n-html="year.ruleHintHtml"></div>
             <div id="year-activity-disk" class="year-activity-disk mb-3"></div>
             <p id="year-activity-pct" class="text-center text-2xl font-black text-emerald-600 tabular-nums mb-1"></p>
             <p id="year-activity-detail" class="text-center text-xs font-semibold text-slate-500 mb-5"></p>
@@ -2104,8 +2087,7 @@
                 <button type="button" id="btn-year-cal-next" onclick="shiftYearCalendar(1)" class="w-9 h-9 rounded-xl border border-slate-200 bg-slate-50 hover:bg-indigo-50 text-slate-600 font-bold transition">›</button>
             </div>
             <div id="year-cal-dow" class="year-cal-grid mb-1"></div>
-            <div id="year-cal-grid" class="year-cal-grid mb-4"></div>
-            <p class="text-[11px] text-slate-400 leading-relaxed" data-i18n="year.ruleHint">Зелений день: 1 Brainstorm (або повторення) чи 2 інші тренування.</p>
+            <div id="year-cal-grid" class="year-cal-grid mb-1"></div>
         </div>
     </div>
 
@@ -3091,7 +3073,8 @@
                 'year.daysDone': '{done} з {total} днів',
                 'year.cycleFrom': 'Цикл від {date}',
                 'year.empty': 'Пройдіть перше тренування — коло почнеться з цього дня',
-                'year.ruleHint': 'Зелений день: 1 Brainstorm (або повторення) чи 2 інші тренування.',
+                'year.ruleHint': 'Що потрібно для зеленого дня',
+                'year.ruleHintHtml': 'День стає зеленим, якщо виконано <b>будь-яку одну</b> з умов:<br>• пройти 1 сесію Brainstorm <i>або</i> 1 повторення вивчених слів;<br>• завершити 2 інші тренування (не Brainstorm / не повторення);<br>• додати до словника щонайменше 3 нові слова;<br>• позначити як опрацьований матеріал із текстом приблизно від 400 символів.',
                 'year.partial': 'Було тренування, але ще не «зелений» день',
                 'searching': 'Шукаємо...', 'notFound': 'Не знайдено'
             },
@@ -3375,7 +3358,8 @@
                 'year.daysDone': '{done} of {total} days',
                 'year.cycleFrom': 'Cycle from {date}',
                 'year.empty': 'Finish your first training — the circle starts that day',
-                'year.ruleHint': 'Green day: 1 Brainstorm (or review) or 2 other trainings.',
+                'year.ruleHint': 'What counts as a green day',
+                'year.ruleHintHtml': 'A day turns green when you meet <b>any one</b> of these:<br>• complete 1 Brainstorm session <i>or</i> 1 review of learned words;<br>• finish 2 other trainings (not Brainstorm / not review);<br>• add at least 3 new words to the dictionary;<br>• mark as read a material with roughly 400+ characters of text.',
                 'year.partial': 'Some training, but not a green day yet',
                 'searching': 'Searching...', 'notFound': 'Not found'
             },
@@ -3659,7 +3643,8 @@
                 'year.daysDone': '{done} de {total} días',
                 'year.cycleFrom': 'Ciclo desde {date}',
                 'year.empty': 'Haz el primer entrenamiento — el círculo empieza ese día',
-                'year.ruleHint': 'Día verde: 1 Brainstorm (o repaso) o 2 entrenamientos más.',
+                'year.ruleHint': 'Qué cuenta como día verde',
+                'year.ruleHintHtml': 'Un día se pone verde si cumples <b>cualquiera</b> de estas condiciones:<br>• completar 1 sesión de Brainstorm <i>o</i> 1 repaso de palabras aprendidas;<br>• terminar 2 entrenamientos distintos (no Brainstorm / no repaso);<br>• añadir al menos 3 palabras nuevas al diccionario;<br>• marcar como leído un material con unos 400+ caracteres de texto.',
                 'year.partial': 'Hubo entrenamiento, pero aún no es un día verde',
                 'searching': 'Buscando...', 'notFound': 'No encontrado'
             }
@@ -4233,17 +4218,91 @@
         function isHeavyTrainingMode(mode) {
             return mode === 'brainstorm' || mode === 'review' || mode === 'all';
         }
+        const YEAR_WORDS_FOR_GREEN = 3;
+        const YEAR_READING_MIN_CHARS = 400;
+
         function dayMeetsYearGoal(rec) {
             if (!rec) return false;
-            return (rec.heavy || 0) >= 1 || (rec.other || 0) >= 2;
+            return (rec.heavy || 0) >= 1
+                || (rec.other || 0) >= 2
+                || (rec.wordsAdded || 0) >= YEAR_WORDS_FOR_GREEN
+                || (rec.reading || 0) >= 1;
         }
         function dayHasAnyActivity(rec) {
-            return !!rec && ((rec.heavy || 0) + (rec.other || 0) > 0);
+            return !!rec && ((rec.heavy || 0) + (rec.other || 0) + (rec.wordsAdded || 0) + (rec.reading || 0) > 0);
         }
         function ensureYearDayRec(key) {
-            if (!yearActivity.days[key]) yearActivity.days[key] = { heavy: 0, other: 0 };
-            return yearActivity.days[key];
+            if (!yearActivity.days[key]) yearActivity.days[key] = { heavy: 0, other: 0, wordsAdded: 0, reading: 0 };
+            const rec = yearActivity.days[key];
+            if (rec.wordsAdded == null) rec.wordsAdded = 0;
+            if (rec.reading == null) rec.reading = 0;
+            return rec;
         }
+        function persistYearDayBump() {
+            const key = dayKeyFromDate(new Date());
+            if (!key) return null;
+            if (!yearActivity.cycleStart || key < yearActivity.cycleStart) yearActivity.cycleStart = key;
+            ensureYearCycleCurrent();
+            persistYearActivityLocal();
+            persistYearActivityCloud();
+            refreshYearRingUI();
+            const modal = document.getElementById('year-activity-modal');
+            if (modal && !modal.classList.contains('hidden')) renderYearActivityModal();
+            return key;
+        }
+        function recordWordsAdded(n = 1) {
+            const count = Math.max(0, Math.floor(+n || 0));
+            if (!count) return;
+            const key = dayKeyFromDate(new Date());
+            if (!key) return;
+            const rec = ensureYearDayRec(key);
+            rec.wordsAdded = (rec.wordsAdded || 0) + count;
+            persistYearDayBump();
+        }
+        function materialTextCharCount(m) {
+            if (!m) return 0;
+            if (Array.isArray(m.subtitles) && m.subtitles.length) {
+                return m.subtitles.map((s) => String(s?.text || '')).join(' ').replace(/\s+/g, ' ').trim().length;
+            }
+            try {
+                const tmp = document.createElement('div');
+                tmp.innerHTML = materialHtmlFromStored(m.content || '');
+                return (tmp.textContent || '').replace(/\s+/g, ' ').trim().length;
+            } catch (_) {
+                return String(m.content || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().length;
+            }
+        }
+        function recordSubstantialReading(m) {
+            if (materialTextCharCount(m) < YEAR_READING_MIN_CHARS) return;
+            const key = dayKeyFromDate(new Date());
+            if (!key) return;
+            const rec = ensureYearDayRec(key);
+            rec.reading = (rec.reading || 0) + 1;
+            persistYearDayBump();
+        }
+        window.toggleYearRulesTip = (event) => {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            const tip = document.getElementById('year-rules-tip');
+            if (!tip) return;
+            // Touch / click: toggle. Pointer hover uses show/hide separately.
+            if (event && event.pointerType === 'mouse') return;
+            tip.classList.toggle('hidden');
+            if (!tip.classList.contains('hidden')) {
+                tip.innerHTML = t('year.ruleHintHtml');
+            }
+        };
+        window.showYearRulesTip = () => {
+            const tip = document.getElementById('year-rules-tip');
+            if (!tip) return;
+            tip.innerHTML = t('year.ruleHintHtml');
+            tip.classList.remove('hidden');
+        };
+        window.hideYearRulesTip = () => {
+            document.getElementById('year-rules-tip')?.classList.add('hidden');
+        };
         function ensureYearCycleCurrent() {
             if (!yearActivity.cycleStart) return;
             const today = dayKeyFromDate(new Date());
@@ -4278,13 +4337,7 @@
             const rec = ensureYearDayRec(key);
             if (isHeavyTrainingMode(mode)) rec.heavy = (rec.heavy || 0) + 1;
             else rec.other = (rec.other || 0) + 1;
-            if (!yearActivity.cycleStart || key < yearActivity.cycleStart) yearActivity.cycleStart = key;
-            ensureYearCycleCurrent();
-            persistYearActivityLocal();
-            persistYearActivityCloud();
-            refreshYearRingUI();
-            const modal = document.getElementById('year-activity-modal');
-            if (modal && !modal.classList.contains('hidden')) renderYearActivityModal();
+            persistYearDayBump();
         }
 
         function inferSessionsFromVocabulary() {
@@ -4507,10 +4560,12 @@
 
         window.openYearActivityModal = () => {
             if (!yearCalCursor) yearCalCursor = new Date();
+            document.getElementById('year-rules-tip')?.classList.add('hidden');
             renderYearActivityModal();
             document.getElementById('year-activity-modal')?.classList.remove('hidden');
         };
         window.closeYearActivityModal = () => {
+            document.getElementById('year-rules-tip')?.classList.add('hidden');
             document.getElementById('year-activity-modal')?.classList.add('hidden');
         };
         window.shiftYearCalendar = (delta) => {
@@ -5833,7 +5888,10 @@
             if (!q || /\s/.test(q)) return [];
             const dictLang = lang || (learningLanguage === 'es' ? 'es' : 'en');
             try {
-                const res = await fetch(`${FREE_DICT_API}/${dictLang}/${encodeURIComponent(q)}`);
+                const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+                const timer = ctrl ? setTimeout(() => ctrl.abort(), 1800) : null;
+                const res = await fetch(`${FREE_DICT_API}/${dictLang}/${encodeURIComponent(q)}`, ctrl ? { signal: ctrl.signal } : undefined);
+                if (timer) clearTimeout(timer);
                 if (!res.ok) return [];
                 const data = await res.json();
                 if (!Array.isArray(data)) return [];
@@ -5866,8 +5924,9 @@
             const key = raw.toLowerCase();
             if (!key) return { primary: '', alternatives: [] };
             const forEdit = !!opts.forEdit;
+            const skipRemote = !!opts.skipRemote;
             const cacheKey = forEdit ? `edit:${key}:${learned.toLowerCase()}` : `${key}:${learned.toLowerCase()}`;
-            if (visualQueryCache.has(cacheKey)) return visualQueryCache.get(cacheKey);
+            if (!skipRemote && visualQueryCache.has(cacheKey)) return visualQueryCache.get(cacheKey);
 
             const hintKey = VISUAL_IMAGE_HINTS[key] ? key : learned.toLowerCase();
             const local = normalizeVisualHintList(VISUAL_IMAGE_HINTS[hintKey]).filter((q) => isUsefulImageHint(q, key));
@@ -5875,8 +5934,8 @@
                 ? 'en'
                 : (learningLanguage === 'es' ? 'es' : 'en');
             // Edit picker: Free Dictionary synonyms as optional "Try" chips.
-            // Auto-save: skip the network call — search the typed word only.
-            const remote = forEdit ? await fetchFreeDictSynonyms(key, dictLang) : [];
+            // Auto-save / skipRemote: search the typed word only (no blocking network).
+            const remote = (forEdit && !skipRemote) ? await fetchFreeDictSynonyms(key, dictLang) : [];
 
             const seen = new Set();
             const ordered = [];
@@ -5896,7 +5955,7 @@
             const primary = ordered[0] || raw;
             const alternatives = ordered.filter((q) => q.toLowerCase() !== primary.toLowerCase()).slice(0, 5);
             const result = { primary, alternatives, all: ordered };
-            visualQueryCache.set(cacheKey, result);
+            if (!skipRemote) visualQueryCache.set(cacheKey, result);
             return result;
         }
 
@@ -7732,6 +7791,7 @@
                 const savePayload = { word, translation: trans, imageUrl: imgUrl, context: ctx, source: getSaveSource(), createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0, bsHistory: [] };
                 if (activeMaterialId) savePayload.materialId = activeMaterialId;
                 await addDoc(colRef('words'), savePayload);
+                try { recordWordsAdded(1); } catch (_) {}
                 inputWord.value = ''; inputTrans.value = ''; if (inputContext) inputContext.value = '';
                 syncManualContextVisibility();
                 dropdown.classList.add('hidden'); inputWord.focus();
@@ -7775,11 +7835,6 @@
             clearEditImageQueryHints();
 
             try {
-                const visualOpts = learnedWord || translation
-                    ? await getVisualImageQueryOptions(learnedWord, { forEdit: true, translation })
-                    : { primary: customQuery, alternatives: [] };
-                if (token !== editImageSearchToken) return;
-
                 // Default to EN gloss for es-en (etc.); user can override in the query box.
                 let searchQuery = customQuery || imageSearchWord || learnedWord;
                 if (!opts.fromHint) {
@@ -7787,7 +7842,16 @@
                     if (input && !customQuery) input.value = '';
                 }
 
-                renderEditImageQueryHints(learnedWord, visualOpts, searchQuery);
+                // Local hints immediately; Free Dictionary chips load in the background (non-blocking).
+                if (learnedWord || translation) {
+                    const quickOpts = await getVisualImageQueryOptions(learnedWord, { forEdit: true, translation, skipRemote: true });
+                    if (token !== editImageSearchToken) return;
+                    renderEditImageQueryHints(learnedWord, quickOpts, searchQuery);
+                    getVisualImageQueryOptions(learnedWord, { forEdit: true, translation }).then((visualOpts) => {
+                        if (token !== editImageSearchToken) return;
+                        renderEditImageQueryHints(learnedWord, visualOpts, searchQuery);
+                    }).catch(() => {});
+                }
 
                 const res = await fetch(`${UNSPLASH_PROXY}/search/photos?query=${encodeURIComponent(searchQuery)}&per_page=8`);
                 if (token !== editImageSearchToken) return;
@@ -8194,6 +8258,7 @@
                     if (item.publishedAt) payload.publishedAt = item.publishedAt;
                     await addDoc(colRef('words'), payload);
                 }
+                try { recordWordsAdded(toSave.length); } catch (_) {}
                 closeBulkModal(); window.showModal(t('msg.importDone', { folder: importSource }));
             } catch(e) {} finally { btn.textContent = t('bulk.save'); btn.disabled = false; }
         };
@@ -9284,9 +9349,20 @@
                 event.stopPropagation();
                 event.preventDefault();
             }
-            closeAllMaterialCardMenus();
             if (!id) return;
+            const btn = event?.currentTarget?.closest?.('button') || event?.target?.closest?.('button') || null;
             const url = buildMaterialDeepLink(id);
+            const flashCopied = () => {
+                if (!btn) return;
+                if (btn._copyFlash) clearTimeout(btn._copyFlash);
+                btn.classList.add('is-copied');
+                btn.textContent = '✅';
+                btn._copyFlash = setTimeout(() => {
+                    btn.classList.remove('is-copied');
+                    btn.textContent = '🔗';
+                    btn._copyFlash = null;
+                }, 1600);
+            };
             try {
                 if (navigator.clipboard?.writeText) {
                     await navigator.clipboard.writeText(url);
@@ -9301,28 +9377,93 @@
                     document.execCommand('copy');
                     document.body.removeChild(ta);
                 }
-                window.showModal(t('msg.linkCopied'));
+                flashCopied();
             } catch (_) {
                 window.showModal(url);
             }
         };
 
-        function closeAllMaterialCardMenus() {
-            document.querySelectorAll('.mat-card-menu').forEach((el) => el.classList.add('hidden'));
-        }
-        window.closeAllMaterialCardMenus = closeAllMaterialCardMenus;
+        const MAT_HOLD_MS = 420;
+        const MAT_HOLD_MOVE_PX = 10;
+        let matHoldTimer = null;
+        let matHoldStart = null;
+        let matSuppressOpen = false;
 
-        window.toggleMaterialCardMenu = (btn, event) => {
-            if (event) {
-                event.stopPropagation();
-                event.preventDefault();
+        function closeMatCardActions() {
+            document.querySelectorAll('.mat-card.is-actions-open').forEach((el) => el.classList.remove('is-actions-open'));
+            document.getElementById('mat-actions-scrim')?.classList.remove('is-on');
+        }
+        window.closeMatCardActions = closeMatCardActions;
+        // Back-compat aliases (older inline handlers / callers)
+        window.closeAllMaterialCardMenus = closeMatCardActions;
+
+        function openMatCardActions(card) {
+            if (!card) return;
+            closeMatCardActions();
+            card.classList.add('is-actions-open');
+            document.getElementById('mat-actions-scrim')?.classList.add('is-on');
+        }
+
+        function clearMatHoldTimer() {
+            if (matHoldTimer) {
+                clearTimeout(matHoldTimer);
+                matHoldTimer = null;
             }
-            const wrap = btn?.closest?.('.mat-card-more-wrap');
-            const menu = wrap?.querySelector('.mat-card-menu');
-            if (!menu) return;
-            const willOpen = menu.classList.contains('hidden');
-            closeAllMaterialCardMenus();
-            if (willOpen) menu.classList.remove('hidden');
+        }
+
+        window.matCardPointerDown = (e) => {
+            if (e.pointerType === 'mouse') return;
+            if (e.target.closest('.mat-card-actions')) return;
+            const card = e.currentTarget;
+            matHoldStart = { x: e.clientX, y: e.clientY };
+            matSuppressOpen = false;
+            clearMatHoldTimer();
+            matHoldTimer = setTimeout(() => {
+                matHoldTimer = null;
+                matSuppressOpen = true;
+                openMatCardActions(card);
+                try { if (navigator.vibrate) navigator.vibrate(12); } catch (_) {}
+            }, MAT_HOLD_MS);
+        };
+
+        window.matCardPointerMove = (e) => {
+            if (!matHoldStart || !matHoldTimer) return;
+            const dx = e.clientX - matHoldStart.x;
+            const dy = e.clientY - matHoldStart.y;
+            if ((dx * dx + dy * dy) > (MAT_HOLD_MOVE_PX * MAT_HOLD_MOVE_PX)) {
+                clearMatHoldTimer();
+            }
+        };
+
+        window.matCardPointerUp = (e) => {
+            if (e.pointerType === 'mouse') return;
+            clearMatHoldTimer();
+            matHoldStart = null;
+        };
+
+        window.matCardPointerCancel = () => {
+            clearMatHoldTimer();
+            matHoldStart = null;
+        };
+
+        window.matCardClick = (e) => {
+            if (e.target.closest('.mat-card-actions')) return;
+            const card = e.currentTarget;
+            if (matSuppressOpen) {
+                matSuppressOpen = false;
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            if (card.classList.contains('is-actions-open')) {
+                closeMatCardActions();
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            const id = card.getAttribute('data-mat-id');
+            closeMatCardActions();
+            if (id) openReader(id);
         };
 
         window.openMaterialCardEdit = (id, event) => {
@@ -9330,7 +9471,7 @@
                 event.stopPropagation();
                 event.preventDefault();
             }
-            closeAllMaterialCardMenus();
+            closeMatCardActions();
             openEditMaterialModal(id);
         };
 
@@ -9339,13 +9480,12 @@
                 event.stopPropagation();
                 event.preventDefault();
             }
-            closeAllMaterialCardMenus();
+            closeMatCardActions();
             deleteMaterial(id);
         };
 
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.mat-card-more-wrap')) return;
-            closeAllMaterialCardMenus();
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMatCardActions();
         });
 
         // Capture link early (before auth) so track/material survive load
@@ -9379,7 +9519,13 @@
                 const readDate = isRead && m.readAt ? new Date(m.readAt).toLocaleString(uiLocale(), { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
                 const safeId = String(m.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
                 return `
-                <div class="mat-card bg-white p-4 sm:p-5 rounded-2xl shadow-sm border ${isRead ? 'border-slate-300 bg-slate-50/70' : 'border-slate-200'} cursor-pointer hover:border-indigo-400 transition group overflow-hidden" onclick="closeAllMaterialCardMenus(); openReader('${safeId}')">
+                <div class="mat-card bg-white p-4 sm:p-5 rounded-2xl shadow-sm border ${isRead ? 'border-slate-300 bg-slate-50/70' : 'border-slate-200'} cursor-pointer hover:border-indigo-400 transition group overflow-hidden"
+                    data-mat-id="${safeId}"
+                    onpointerdown="matCardPointerDown(event)"
+                    onpointermove="matCardPointerMove(event)"
+                    onpointerup="matCardPointerUp(event)"
+                    onpointercancel="matCardPointerCancel(event)"
+                    onclick="matCardClick(event)">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${m.ytId ? 'bg-red-500' : 'bg-indigo-500'} opacity-0 group-hover:opacity-100 transition pointer-events-none"></div>
                     <div class="mat-card-body pl-2 ${isRead ? 'opacity-80' : ''}">
                         <h3 class="font-bold ${isRead ? 'text-slate-600' : 'text-slate-800'} truncate text-lg flex items-center gap-2">
@@ -9392,18 +9538,10 @@
                             ${m.content ? materialPlainPreview(m.content) : t('lib.video')}
                         </p>
                     </div>
-                    <div class="mat-card-actions-desktop" onclick="event.stopPropagation()">
+                    <div class="mat-card-actions" onclick="event.stopPropagation()">
                         <button type="button" onclick="copyMaterialLink('${safeId}', event)" title="${t('lib.copyLink')}" aria-label="${t('lib.copyLink')}">🔗</button>
                         <button type="button" onclick="openMaterialCardEdit('${safeId}', event)" title="${t('lib.editMatShort')}" aria-label="${t('lib.editMatShort')}">✏️</button>
                         <button type="button" class="mat-card-del" onclick="openMaterialCardDelete('${safeId}', event)" title="${t('lib.deleteMatShort')}" aria-label="${t('lib.deleteMatShort')}">&times;</button>
-                    </div>
-                    <div class="mat-card-more-wrap">
-                        <button type="button" class="mat-card-more-btn" onclick="toggleMaterialCardMenu(this, event)" title="${t('lib.moreActions')}" aria-label="${t('lib.moreActions')}" aria-haspopup="menu">⋯</button>
-                        <div class="mat-card-menu hidden" role="menu" onclick="event.stopPropagation()">
-                            <button type="button" role="menuitem" onclick="copyMaterialLink('${safeId}', event)">🔗 ${t('lib.copyLink')}</button>
-                            <button type="button" role="menuitem" onclick="openMaterialCardEdit('${safeId}', event)">✏️ ${t('lib.editMatShort')}</button>
-                            <button type="button" role="menuitem" class="mat-card-del" onclick="openMaterialCardDelete('${safeId}', event)">× ${t('lib.deleteMatShort')}</button>
-                        </div>
                     </div>
                 </div>
                 `;
@@ -10083,12 +10221,14 @@
         window.markCurrentAsRead = async () => {
             if (!activeUid || !currentMaterial) return;
             try {
+                const matSnap = currentMaterial;
                 await updateDoc(docRef('materials', currentMaterial.id), {
                     isRead: true,
                     readAt: Date.now()
                 });
                 currentMaterial.isRead = true;
                 currentMaterial.readAt = Date.now();
+                try { recordSubstantialReading(matSnap); } catch (_) {}
                 renderReaderContent();
                 window.showModal(t('msg.matRead'));
                 closeReader();
@@ -10484,6 +10624,7 @@
                 const saveData = { word: pendingInlineSaveData.word, translation: trans, context: pendingInlineSaveData.context, imageUrl: imgUrl, source: getSaveSource(), createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0, bsHistory: [] };
                 if (currentMaterial) saveData.materialId = currentMaterial.id;
                 await addDoc(colRef('words'), saveData);
+                if (!existing) { try { recordWordsAdded(1); } catch (_) {} }
                 const words = document.getElementById('reader-content').querySelectorAll(`[data-word="${pendingInlineSaveData.word.toLowerCase()}"]`);
                 words.forEach(w => w.classList.add('word-saved')); closeInlinePopup();
             } catch(e) {} finally { btn.disabled = false; btn.innerHTML = orig; }
