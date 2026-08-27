@@ -168,8 +168,8 @@
             display: flex;
             padding: 0.3rem;
             border-radius: 9999px;
-            border: 1px solid rgba(226, 232, 240, 0.2);
-            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(226, 232, 240, 0.35);
+            background: rgba(255, 255, 255, 0.42);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
             box-shadow: none;
@@ -179,10 +179,10 @@
             width: 2.65rem;
             height: 2.65rem;
             border-radius: 9999px;
-            border: 1px solid rgba(226, 232, 240, 0.28);
-            background: rgba(255, 255, 255, 0.28);
+            border: 1px solid transparent;
+            background: transparent;
             box-shadow: none;
-            opacity: 0.62;
+            opacity: 0.34;
             transition: background 0.22s ease, border-color 0.22s ease, opacity 0.22s ease, box-shadow 0.22s ease;
         }
         #reader-float-tools.is-docked:hover,
@@ -199,26 +199,136 @@
             opacity: 1;
         }
         #reader-float-tools.is-docked .reader-tool-btn.is-active {
-            opacity: 1;
+            opacity: 0.9;
             box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.35);
+            background: rgba(254, 249, 195, 0.75);
+            border-color: rgba(253, 224, 71, 0.55);
         }
         @media (max-width: 640px) {
             #reader-float-tools.is-docked {
-                background: rgba(255, 255, 255, 0.12);
-                border-color: rgba(226, 232, 240, 0.14);
+                background: rgba(255, 255, 255, 0.38);
+                border-color: rgba(226, 232, 240, 0.28);
             }
             #reader-float-tools.is-docked .reader-tool-btn {
-                opacity: 0.5;
-                background: rgba(255, 255, 255, 0.2);
+                opacity: 0.28;
+                background: transparent;
             }
         }
         #library-read-view.reader-hl-mode .yt-sub-line {
             cursor: text;
         }
+        #library-read-view.reader-hl-mode .text-reader .word-clickable {
+            cursor: text;
+        }
+        #library-read-view.reader-hl-mode .text-reader .word-clickable:hover {
+            background-color: transparent;
+            color: inherit;
+            border-bottom-color: transparent;
+        }
+        .reader-audio-block {
+            margin: 1rem 0;
+            padding: 0.85rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .reader-audio-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .reader-audio-voice {
+            flex: 1 1 11rem;
+            min-width: 9.5rem;
+            max-width: 18rem;
+            min-height: 2.25rem;
+            padding: 0.35rem 0.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #334155;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: inherit;
+            outline: none;
+        }
+        .reader-audio-voice:focus { border-color: #a5b4fc; }
+        .reader-audio-rate {
+            display: inline-flex;
+            align-items: stretch;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: #fff;
+            flex-shrink: 0;
+        }
+        .reader-audio-rate button {
+            min-width: 2.35rem;
+            min-height: 2.25rem;
+            padding: 0 0.45rem;
+            border: 0;
+            border-right: 1px solid #e2e8f0;
+            background: transparent;
+            color: #64748b;
+            font-size: 0.72rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .reader-audio-rate button:last-child { border-right: 0; }
+        .reader-audio-rate button.is-on {
+            background: #eef2ff;
+            color: #3730a3;
+        }
+        .reader-audio-rate button:hover { background: #f8fafc; }
+        .reader-audio-rate button.is-on:hover { background: #e0e7ff; }
+        .reader-audio-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            min-height: 2.25rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #334155;
+            font-size: 0.8rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .reader-audio-btn:hover { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; }
+        .reader-audio-btn.is-playing { background: #eef2ff; border-color: #a5b4fc; color: #3730a3; }
+        .reader-audio-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+            pointer-events: none;
+        }
+        .reader-audio-transcript {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #e2e8f0;
+            color: inherit;
+            line-height: 1.55;
+        }
+        .reader-audio-transcript.is-hidden-transcript {
+            display: none;
+        }
+        .reader-audio-transcript p {
+            margin: 0 0 0.85em;
+        }
+        .reader-audio-transcript p:last-child {
+            margin-bottom: 0;
+        }
         #reader-settings-panel {
             position: fixed;
             z-index: 150;
-            width: 15rem;
+            width: 16.5rem;
             max-width: calc(100vw - 1.5rem);
         }
         .text-reader mark.reader-hl {
@@ -283,6 +393,11 @@
         }
         #library-read-view.reader-hl-mode .word-clickable {
             cursor: text;
+        }
+        #library-read-view.reader-hl-mode .word-clickable:hover {
+            background-color: transparent !important;
+            color: inherit !important;
+            border-bottom-color: transparent !important;
         }
 
         .fade-in { animation: fadeIn 0.2s ease-out; }
@@ -1323,7 +1438,7 @@
             }
             .mat-card:hover .mat-card-body,
             .mat-card:focus-within .mat-card-body {
-                padding-right: 7.5rem;
+                padding-right: 10rem;
             }
         }
         .mat-card.is-actions-open .mat-card-actions {
@@ -1331,7 +1446,15 @@
             pointer-events: auto;
         }
         .mat-card.is-actions-open .mat-card-body {
-            padding-right: 7.5rem;
+            padding-right: 10rem;
+        }
+        .review-mode-marker {
+            display: inline;
+            margin: 0 0.15em;
+            font-size: 0.95em;
+            line-height: 1;
+            vertical-align: baseline;
+            user-select: none;
         }
         .mat-card-actions button {
             width: 2.25rem;
@@ -2771,7 +2894,7 @@
                             <p class="settings-panel-label" data-i18n="profile.myPairs">Мої пари</p>
                             <div id="known-tracks-options" class="flex flex-wrap gap-2"></div>
                         </div>
-                        <div class="settings-panel settings-panel-learn mb-3">
+                        <div id="settings-panel-learn" class="settings-panel settings-panel-learn mb-3">
                             <p class="settings-panel-label" data-i18n="profile.learning">Мова навчання</p>
                             <div class="settings-lang-grid">
                                 <div>
@@ -2783,6 +2906,10 @@
                                     <div id="translation-lang-options" class="flex flex-wrap gap-2"></div>
                                 </div>
                             </div>
+                        </div>
+                        <div id="settings-student-pair" class="settings-panel settings-panel-learn mb-3 hidden">
+                            <p class="settings-panel-label" data-i18n="profile.learning">Мова навчання</p>
+                            <p id="settings-student-pair-label" class="text-sm font-bold text-slate-700 flex items-center gap-2 flex-wrap"></p>
                         </div>
                         <div class="settings-panel settings-panel-muted">
                             <p class="settings-panel-label mb-1.5" data-i18n="profile.interface">Мова інтерфейсу</p>
@@ -3052,6 +3179,7 @@
                     <div class="flex items-center gap-1 flex-shrink-0">
                         <button type="button" id="btn-dict-select" onclick="toggleDictSelectMode()" class="dict-icon-btn dict-chrome-dim" title="Вибрати слова" data-i18n-title="dict.select">☑️</button>
                         <button type="button" onclick="openBulkModal()" class="dict-icon-btn dict-chrome-dim" title="Імпорт" data-i18n-title="filter.import">📥</button>
+                        <button type="button" onclick="copyDictionaryWordsColumn()" class="dict-icon-btn dict-chrome-dim" title="Копіювати слова" data-i18n-title="dict.copyWords">📋</button>
                         <button type="button" onclick="exportWordsJSON()" class="dict-icon-btn dict-chrome-dim" title="Експорт" data-i18n-title="dict.export">📤</button>
                     </div>
                 </div>
@@ -3071,6 +3199,7 @@
                     <button type="button" id="btn-select-none" onclick="setDictSelection(false)" class="dict-icon-btn" data-i18n-title="dict.selectNone" title="Зняти всі">☐</button>
                     <button type="button" id="btn-select-all" onclick="setDictSelection(true)" class="dict-icon-btn" data-i18n-title="dict.selectAll" title="Вибрати всі">☑️</button>
                     <button type="button" id="btn-move-words" onclick="openMoveWordsModal()" class="dict-icon-btn" data-i18n-title="dict.move" title="Перенести в іншу папку">➡️</button>
+                    <button type="button" id="btn-copy-selected-words" onclick="copyDictionaryWordsColumn()" class="dict-icon-btn" data-i18n-title="dict.copyWords" title="Копіювати слова">📋</button>
                     <button type="button" id="btn-reset-selected" onclick="resetSelectedWordsProgress()" class="dict-icon-btn" data-i18n-title="dict.resetProgress" title="Скинути прогрес">↺</button>
                     <button type="button" id="btn-delete-selected" onclick="deleteSelectedWords()" class="dict-icon-btn" data-i18n-title="dict.deleteSelected" title="Видалити вибрані">🗑️</button>
                     <span id="dict-selected-count" class="text-xs font-bold text-slate-400 min-w-[1.25rem]"></span>
@@ -3681,13 +3810,56 @@
         const TRANS_LANG_KEY = 'linguaspace_translation_lang';
         const KNOWN_TRACKS_KEY = 'linguaspace_known_tracks';
         const LEGACY_TRACK_ID = 'en-uk';
-        const INTERFACE_LANGS = ['uk', 'en', 'es'];
-        const CONTENT_LANGS = ['en', 'es', 'uk'];
+
+        // ═══════════════════════════════════════════════════════════════════
+        // STUDENT EDITION (EN → UK class build)
+        // ───────────────────────────────────────────────────────────────────
+        // true  = students: English→Ukrainian only, no Spanish, UK/EN UI OK
+        // false = your full app (all languages)
+        //
+        // Give students a copy with true. For your own ongoing edits, set false.
+        // Temporary override without editing the file:
+        //   ?student=1   force student mode
+        //   ?student=0   force full mode
+        // ═══════════════════════════════════════════════════════════════════
+        const STUDENT_EDITION_DEFAULT = false;
+        function resolveStudentEdition() {
+            try {
+                const q = String(new URLSearchParams(location.search).get('student') || '').trim().toLowerCase();
+                if (q === '0' || q === 'false' || q === 'off' || q === 'no') return false;
+                if (q === '1' || q === 'true' || q === 'on' || q === 'yes') return true;
+            } catch (_) {}
+            return STUDENT_EDITION_DEFAULT;
+        }
+        const STUDENT_EDITION = resolveStudentEdition();
+        const STUDENT_LEARN = 'en';
+        const STUDENT_TRANS = 'uk';
+
+        const INTERFACE_LANGS_ALL = ['uk', 'en', 'es'];
+        const CONTENT_LANGS_ALL = ['en', 'es', 'uk'];
+        const INTERFACE_LANGS = STUDENT_EDITION ? ['uk', 'en'] : INTERFACE_LANGS_ALL;
+        const CONTENT_LANGS = STUDENT_EDITION ? ['en', 'uk'] : CONTENT_LANGS_ALL;
         const LANG_META = {
             uk: { code: 'UK', iso2: 'ua', flag: '🇺🇦', native: 'Українська', bcp47: 'uk-UA', locale: 'uk-UA' },
             en: { code: 'EN', iso2: 'gb', flag: '🇬🇧', native: 'English', bcp47: 'en-US', locale: 'en-GB' },
             es: { code: 'ES', iso2: 'es', flag: '🇪🇸', native: 'Español', bcp47: 'es-ES', locale: 'es-ES' }
         };
+
+        function enforceStudentLanguageLock() {
+            if (!STUDENT_EDITION) return false;
+            let changed = false;
+            if (!INTERFACE_LANGS.includes(interfaceLanguage)) {
+                interfaceLanguage = 'uk';
+                changed = true;
+            }
+            if (learningLanguage !== STUDENT_LEARN || translationLanguage !== STUDENT_TRANS) {
+                learningLanguage = STUDENT_LEARN;
+                translationLanguage = STUDENT_TRANS;
+                changed = true;
+            }
+            activeTrackId = `${learningLanguage}-${translationLanguage}`;
+            return changed;
+        }
 
         function langFlagImgHtml(langCode, extraClass = '') {
             const m = LANG_META[langCode] || {};
@@ -3751,7 +3923,7 @@
                 'train.bsStage': 'Етап {n}',
                 'train.ctorStrictTip': 'З 4-го етапу помилка в літері означає, що слово не перейде далі — навіть якщо ви потім виправите.',
                 'train.sprintRulesTitle': 'Фінальний спринт',
-                'train.sprintRulesBody': 'У вас буде 60 секунд. Потрібно правильно відповісти {reps} раз(и) на кожне з {n} слів (усього {total}). Будь-яка помилка блокує просування цього слова. Випадкові правильні й хибні переклади.',
+                'train.sprintRulesBody': 'У вас буде {sec} с. П’ять кіл по {n} слів (усього {total}): слово→переклад, переклад→слово, і знову навпаки. Будь-яка помилка блокує просування цього слова.',
                 'train.sprintStart': 'Старт',
                 'train.sprintProgress': '{done} / {total}',
                 'train.bsDesc': 'Інтенсивне комплексне опрацювання слів',
@@ -3852,10 +4024,17 @@
                 'lib.downsub': 'Завантажити з DownSub', 'lib.saveMat': 'Зберегти матеріал',
                 'reader.fontSize': 'Розмір тексту', 'reader.width': 'Ширина вікна', 'reader.font': 'Шрифт',
                 'reader.settings': 'Налаштування читання', 'reader.highlight': 'Маркер',
-                'reader.highlightOn': 'Маркер увімкнено — виділіть текст', 'reader.highlightOff': 'Маркер вимкнено',
+                'reader.highlightOn': 'Маркер увімкнено — торкніться слова або виділіть текст', 'reader.highlightOff': 'Маркер вимкнено',
                 'reader.prevPage': 'Попередня сторінка', 'reader.nextPage': 'Наступна сторінка',
                 'reader.narrow': 'Вужче', 'reader.wide': 'Ширше',
                 'reader.georgia': 'Georgia (із засічками)', 'reader.inter': 'Inter (без засічок)',
+                'reader.voiceDefault': 'Авто',
+                'reader.audioPlay': 'Слухати',
+                'reader.audioStop': 'Стоп',
+                'reader.audioPause': 'Пауза',
+                'reader.audioResume': 'Далі',
+                'reader.audioShow': 'Текст',
+                'reader.audioHide': 'Сховати',
                 'train.stop': 'Стоп', 'train.dontKnow': 'Не знаю слово', 'train.next': 'Далі',
                 'train.saving': 'Зберігаємо результати...', 'train.wait': 'Зачекайте кілька секунд',
                 'train.done': 'Завершено!', 'train.records': 'Рекорди:', 'train.backHub': 'До вибору тренувань',
@@ -3909,6 +4088,9 @@
                 'msg.resetPick': 'Оберіть хоча б одне тренування.',
                 'dict.back': 'Назад до папок', 'dict.newFolder': 'Створити папку', 'dict.export': 'Експорт',
                 'dict.exportDone': 'Експортовано · {n} слів',
+                'dict.copyWords': 'Копіювати слова',
+                'dict.copyWordsDone': 'Слова скопійовано · {n}',
+                'dict.copyWordsEmpty': 'Немає слів для копіювання',
                 'dict.selectAll': 'Вибрати всі', 'dict.selectNone': 'Зняти всі', 'dict.move': 'Перенести в іншу папку',
                 'dict.translate': 'Перекласти',
                 'dict.reverseTranslate': 'Зворотний переклад у поле слова',
@@ -4019,10 +4201,14 @@
                 'lib.read': 'Опрацьовано', 'lib.readAt': 'Опрацьовано: {date}',
                 'lib.video': 'Відео матеріал', 'lib.empty': 'Тут ще немає доданих матеріалів. Створіть перший!',
                 'lib.copyLink': 'Копіювати посилання',
+                'lib.copyWords': 'Копіювати слова',
+                'lib.reviewMode': 'Режим повторення',
                 'lib.moreActions': 'Дії з матеріалом',
                 'lib.editMatShort': 'Редагувати',
                 'lib.deleteMatShort': 'Видалити',
                 'msg.linkCopied': 'Посилання на матеріал скопійовано!',
+                'msg.wordsCopied': 'Слова скопійовано · {n}',
+                'msg.wordsCopyEmpty': 'Немає слів для копіювання',
                 'msg.matLinkMissing': 'Матеріал за цим посиланням не знайдено в поточному словнику.',
                 'lib.markRead': 'Позначити матеріал як опрацьований', 'lib.readDone': 'Матеріал опрацьовано',
                 'lib.jumpToLine': 'До поточного рядка',
@@ -4086,7 +4272,7 @@
                 'train.bsStage': 'Stage {n}',
                 'train.ctorStrictTip': 'From stage 4 onward, a wrong letter means this word will not advance — even if you fix it afterward.',
                 'train.sprintRulesTitle': 'Final sprint',
-                'train.sprintRulesBody': 'You have 60 seconds. Answer correctly {reps} time(s) for each of {n} words ({total} total). Any mistake blocks that word from advancing. Translations are randomly right or wrong.',
+                'train.sprintRulesBody': 'You have {sec} seconds. Five rounds of {n} words ({total} total): word→translation, translation→word, then alternating again. Any mistake blocks that word from advancing.',
                 'train.sprintStart': 'Start',
                 'train.sprintProgress': '{done} / {total}',
                 'train.bsDesc': 'Intensive mixed practice for your words',
@@ -4187,10 +4373,17 @@
                 'lib.downsub': 'Download from DownSub', 'lib.saveMat': 'Save material',
                 'reader.fontSize': 'Text size', 'reader.width': 'Window width', 'reader.font': 'Font',
                 'reader.settings': 'Reading settings', 'reader.highlight': 'Highlighter',
-                'reader.highlightOn': 'Highlighter on — select text', 'reader.highlightOff': 'Highlighter off',
+                'reader.highlightOn': 'Highlighter on — tap a word or select text', 'reader.highlightOff': 'Highlighter off',
                 'reader.prevPage': 'Previous page', 'reader.nextPage': 'Next page',
                 'reader.narrow': 'Narrower', 'reader.wide': 'Wider',
                 'reader.georgia': 'Georgia (serif)', 'reader.inter': 'Inter (sans-serif)',
+                'reader.voiceDefault': 'Auto',
+                'reader.audioPlay': 'Listen',
+                'reader.audioStop': 'Stop',
+                'reader.audioPause': 'Pause',
+                'reader.audioResume': 'Resume',
+                'reader.audioShow': 'Text',
+                'reader.audioHide': 'Hide',
                 'train.stop': 'Stop', 'train.dontKnow': "I don't<br>know", 'train.next': 'Next',
                 'train.saving': 'Saving results...', 'train.wait': 'Please wait a few seconds',
                 'train.done': 'Done!', 'train.records': 'Records:', 'train.backHub': 'Back to training',
@@ -4244,6 +4437,9 @@
                 'msg.resetPick': 'Select at least one training.',
                 'dict.back': 'Back to folders', 'dict.newFolder': 'Create folder', 'dict.export': 'Export',
                 'dict.exportDone': 'Exported · {n} words',
+                'dict.copyWords': 'Copy words',
+                'dict.copyWordsDone': 'Words copied · {n}',
+                'dict.copyWordsEmpty': 'No words to copy',
                 'dict.selectAll': 'Select all', 'dict.selectNone': 'Clear all', 'dict.move': 'Move to another folder',
                 'dict.translate': 'Translate',
                 'dict.reverseTranslate': 'Reverse-translate into the word field',
@@ -4349,10 +4545,14 @@
                 'lib.read': 'Read', 'lib.readAt': 'Read: {date}',
                 'lib.video': 'Video material', 'lib.empty': 'No materials yet. Add the first one!',
                 'lib.copyLink': 'Copy link',
+                'lib.copyWords': 'Copy words',
+                'lib.reviewMode': 'Review mode',
                 'lib.moreActions': 'Material actions',
                 'lib.editMatShort': 'Edit',
                 'lib.deleteMatShort': 'Delete',
                 'msg.linkCopied': 'Material link copied!',
+                'msg.wordsCopied': 'Words copied · {n}',
+                'msg.wordsCopyEmpty': 'No words to copy',
                 'msg.matLinkMissing': 'This material was not found in the current dictionary.',
                 'lib.markRead': 'Mark material as read', 'lib.readDone': 'Material completed',
                 'lib.jumpToLine': 'Jump to current line',
@@ -4416,7 +4616,7 @@
                 'train.bsStage': 'Etapa {n}',
                 'train.ctorStrictTip': 'Desde la etapa 4, una letra incorrecta hace que la palabra no avance, aunque la corrijas después.',
                 'train.sprintRulesTitle': 'Sprint final',
-                'train.sprintRulesBody': 'Tienes 60 segundos. Debes acertar {reps} vez(ces) cada una de las {n} palabras ({total} en total). Cualquier error bloquea el avance de esa palabra. Las traducciones salen al azar correctas o incorrectas.',
+                'train.sprintRulesBody': 'Tienes {sec} segundos. Cinco rondas de {n} palabras ({total} en total): palabra→traducción, traducción→palabra, y otra vez al revés. Cualquier error bloquea el avance de esa palabra.',
                 'train.sprintStart': 'Empezar',
                 'train.sprintProgress': '{done} / {total}',
                 'train.bsDesc': 'Práctica intensiva combinada de tus palabras',
@@ -4517,10 +4717,17 @@
                 'lib.downsub': 'Descargar con DownSub', 'lib.saveMat': 'Guardar material',
                 'reader.fontSize': 'Tamaño del texto', 'reader.width': 'Ancho de la ventana', 'reader.font': 'Fuente',
                 'reader.settings': 'Ajustes de lectura', 'reader.highlight': 'Subrayador',
-                'reader.highlightOn': 'Subrayador activo — selecciona texto', 'reader.highlightOff': 'Subrayador desactivado',
+                'reader.highlightOn': 'Subrayador activo — toca una palabra o selecciona texto', 'reader.highlightOff': 'Subrayador desactivado',
                 'reader.prevPage': 'Página anterior', 'reader.nextPage': 'Página siguiente',
                 'reader.narrow': 'Más estrecho', 'reader.wide': 'Más ancho',
                 'reader.georgia': 'Georgia (con serifa)', 'reader.inter': 'Inter (sin serifa)',
+                'reader.voiceDefault': 'Auto',
+                'reader.audioPlay': 'Escuchar',
+                'reader.audioStop': 'Parar',
+                'reader.audioPause': 'Pausa',
+                'reader.audioResume': 'Seguir',
+                'reader.audioShow': 'Texto',
+                'reader.audioHide': 'Ocultar',
                 'train.stop': 'Parar', 'train.dontKnow': 'No lo<br>sé', 'train.next': 'Siguiente',
                 'train.saving': 'Guardando resultados...', 'train.wait': 'Espera unos segundos',
                 'train.done': '¡Listo!', 'train.records': 'Récords:', 'train.backHub': 'Volver a los entrenamientos',
@@ -4574,6 +4781,9 @@
                 'msg.resetPick': 'Selecciona al menos un entrenamiento.',
                 'dict.back': 'Volver a las carpetas', 'dict.newFolder': 'Crear carpeta', 'dict.export': 'Exportar',
                 'dict.exportDone': 'Exportadas · {n} palabras',
+                'dict.copyWords': 'Copiar palabras',
+                'dict.copyWordsDone': 'Palabras copiadas · {n}',
+                'dict.copyWordsEmpty': 'No hay palabras para copiar',
                 'dict.selectAll': 'Seleccionar todas', 'dict.selectNone': 'Quitar todas', 'dict.move': 'Mover a otra carpeta',
                 'dict.translate': 'Traducir',
                 'dict.reverseTranslate': 'Traducción inversa al campo de la palabra',
@@ -4679,10 +4889,14 @@
                 'lib.read': 'Leído', 'lib.readAt': 'Leído: {date}',
                 'lib.video': 'Material de vídeo', 'lib.empty': 'Aún no hay materiales. ¡Crea el primero!',
                 'lib.copyLink': 'Copiar enlace',
+                'lib.copyWords': 'Copiar palabras',
+                'lib.reviewMode': 'Modo de repaso',
                 'lib.moreActions': 'Acciones del material',
                 'lib.editMatShort': 'Editar',
                 'lib.deleteMatShort': 'Eliminar',
                 'msg.linkCopied': '¡Enlace del material copiado!',
+                'msg.wordsCopied': 'Palabras copiadas · {n}',
+                'msg.wordsCopyEmpty': 'No hay palabras para copiar',
                 'msg.matLinkMissing': 'No se encontró este material en el diccionario actual.',
                 'lib.markRead': 'Marcar el material como leído', 'lib.readDone': 'Material completado',
                 'lib.jumpToLine': 'Ir a la línea actual',
@@ -4711,6 +4925,7 @@
         let translationLanguage = readStoredLang(TRANS_LANG_KEY, CONTENT_LANGS, 'uk');
         if (learningLanguage === translationLanguage) translationLanguage = learningLanguage === 'en' ? 'uk' : 'en';
         let activeTrackId = `${learningLanguage}-${translationLanguage}`;
+        enforceStudentLanguageLock();
         let knownTracks = [];
         const SHOW_IPA_KEY = 'linguaspace_show_ipa_v1';
         const SHOW_IPA_SOURCE_KEY = 'linguaspace_show_ipa_source_v1';
@@ -5020,6 +5235,7 @@
             localStorage.setItem(LEARN_LANG_KEY, learningLanguage);
             localStorage.setItem(TRANS_LANG_KEY, translationLanguage);
         }
+        if (STUDENT_EDITION) persistLangLocal();
         async function saveUserPrefs() {
             persistLangLocal();
             localStorage.setItem(SHOW_IPA_KEY, showTrainingPronunciation ? '1' : '0');
@@ -5048,18 +5264,37 @@
             };
             const iface = document.getElementById('interface-lang-options');
             if (iface) iface.innerHTML = INTERFACE_LANGS.map(c => chip(c, c === interfaceLanguage, 'setInterfaceLanguage', false, true)).join('');
-            const learn = document.getElementById('learning-lang-options');
-            if (learn) learn.innerHTML = CONTENT_LANGS.map(c => chip(c, c === learningLanguage, 'setLearningLanguage', false, false)).join('');
-            const trans = document.getElementById('translation-lang-options');
-            if (trans) trans.innerHTML = CONTENT_LANGS.map(c => chip(c, c === translationLanguage, 'setTranslationLanguage', c === learningLanguage, false)).join('');
+
+            const learnPanel = document.getElementById('settings-panel-learn');
+            const studentPair = document.getElementById('settings-student-pair');
+            const studentPairLabel = document.getElementById('settings-student-pair-label');
+            if (STUDENT_EDITION) {
+                learnPanel?.classList.add('hidden');
+                studentPair?.classList.remove('hidden');
+                if (studentPairLabel) {
+                    const a = LANG_META[STUDENT_LEARN] || {};
+                    const b = LANG_META[STUDENT_TRANS] || {};
+                    studentPairLabel.innerHTML = `${langFlagImgHtml(STUDENT_LEARN)} <span>${a.native || 'English'}</span> <span class="text-slate-400">→</span> ${langFlagImgHtml(STUDENT_TRANS)} <span>${b.native || 'Українська'}</span>`;
+                }
+            } else {
+                learnPanel?.classList.remove('hidden');
+                studentPair?.classList.add('hidden');
+                const learn = document.getElementById('learning-lang-options');
+                if (learn) learn.innerHTML = CONTENT_LANGS.map(c => chip(c, c === learningLanguage, 'setLearningLanguage', false, false)).join('');
+                const trans = document.getElementById('translation-lang-options');
+                if (trans) trans.innerHTML = CONTENT_LANGS.map(c => chip(c, c === translationLanguage, 'setTranslationLanguage', c === learningLanguage, false)).join('');
+            }
 
             const knownSection = document.getElementById('known-tracks-section');
             const knownBox = document.getElementById('known-tracks-options');
-            const pairs = [...new Set(knownTracks.map(parseTrackId).filter(Boolean).map(p => p.id))]
+            let pairs = [...new Set(knownTracks.map(parseTrackId).filter(Boolean).map(p => p.id))]
                 .map(parseTrackId)
                 .filter(Boolean);
+            if (STUDENT_EDITION) {
+                pairs = pairs.filter((p) => p.id === `${STUDENT_LEARN}-${STUDENT_TRANS}`);
+            }
             if (knownSection && knownBox) {
-                if (pairs.length === 0) {
+                if (STUDENT_EDITION || pairs.length === 0) {
                     knownSection.classList.add('hidden');
                     knownBox.innerHTML = '';
                 } else {
@@ -5075,6 +5310,7 @@
             }
         }
         window.selectKnownTrack = async (trackId) => {
+            if (STUDENT_EDITION) return;
             const parsed = parseTrackId(trackId);
             if (!parsed) return;
             if (parsed.id === activeTrackId) return;
@@ -5095,12 +5331,14 @@
             await saveUserPrefs();
         };
         window.setLearningLanguage = async (code) => {
+            if (STUDENT_EDITION) return;
             if (!CONTENT_LANGS.includes(code)) return;
             if (code === translationLanguage) translationLanguage = code === 'en' ? 'uk' : 'en';
             learningLanguage = code;
             await applyTrackChange({ fromDeepLink: false });
         };
         window.setTranslationLanguage = async (code) => {
+            if (STUDENT_EDITION) return;
             if (!CONTENT_LANGS.includes(code) || code === learningLanguage) return;
             translationLanguage = code;
             await applyTrackChange({ fromDeepLink: false });
@@ -5151,6 +5389,7 @@
                     if (CONTENT_LANGS.includes(d.learningLanguage)) learningLanguage = d.learningLanguage;
                     if (CONTENT_LANGS.includes(d.translationLanguage)) translationLanguage = d.translationLanguage;
                     if (learningLanguage === translationLanguage) translationLanguage = learningLanguage === 'en' ? 'uk' : 'en';
+                    enforceStudentLanguageLock();
                     activeTrackId = `${learningLanguage}-${translationLanguage}`;
                     if (Array.isArray(d.knownTracks)) {
                         const fromCloud = d.knownTracks.map(parseTrackId).filter(Boolean).map(p => p.id);
@@ -5854,7 +6093,15 @@
 
         try { refreshYearRingUI(); } catch (_) {}
 
-        try { applyI18n(); renderLanguagePickers(); syncDefinitionModeCard(); syncTrainModeVisibility(); applyDictGridCols(); applyReaderHighlightColor(); } catch (e) { console.error(e); }
+        try {
+            document.documentElement.dataset.edition = STUDENT_EDITION ? 'student' : 'full';
+            applyI18n();
+            renderLanguagePickers();
+            syncDefinitionModeCard();
+            syncTrainModeVisibility();
+            applyDictGridCols();
+            applyReaderHighlightColor();
+        } catch (e) { console.error(e); }
 
         // Edge-to-edge / chin diagnostics (Chrome Android). Run: window.debugViewportFit()
         window.debugViewportFit = function debugViewportFit() {
@@ -6248,7 +6495,10 @@
                     };
                 })
                 .filter(h => h.at > 0)
-                .filter(h => modeId === 'brainstorm' ? h.mode === 'brainstorm' : h.mode === modeId)
+                .filter(h => {
+                    if (modeId === 'brainstorm') return h.mode === 'brainstorm' || h.mode === 'review-peek';
+                    return h.mode === modeId;
+                })
                 .sort((a, b) => b.at - a.at);
         }
 
@@ -6265,10 +6515,14 @@
         function renderHistoryEntries(history, emptyText) {
             if (!history.length) return `<p class="text-xs text-slate-400 text-center py-2 italic">${emptyText}</p>`;
             return history.map(h => {
+                const isPeek = h.mode === 'review-peek';
                 const ok = h.ok !== false;
                 const lvl = h.level != null ? h.level : '—';
+                const icon = isPeek ? '🔁' : (ok ? '✓' : '↺');
+                const iconCls = isPeek ? 'text-amber-500' : (ok ? 'text-emerald-500' : 'text-rose-400');
+                const label = isPeek ? `−1 · ${lvl}` : `Рів. ${lvl}`;
                 return `<div class="flex justify-between items-center text-xs text-slate-400 px-2 py-1 rounded-lg bg-white border border-slate-100">
-                    <span class="flex items-center gap-1.5"><span class="${ok ? 'text-emerald-500' : 'text-rose-400'}">${ok ? '✓' : '↺'}</span><span>Рів. ${lvl}</span></span>
+                    <span class="flex items-center gap-1.5"><span class="${iconCls}">${icon}</span><span>${label}</span></span>
                     <span class="font-mono text-[11px] text-slate-400">${formatBsDate(h.at)}</span>
                 </div>`;
             }).join('');
@@ -6494,11 +6748,34 @@
 
         let sprintTimer = null;
         let sprintTimeLeft = 60;
+        let sprintDurationTotal = 60;
         let sprintScore = 0;
         let sprintStreak = 0;
         let sprintWordsStats = {};
         let currentSprintQ = null;
         let sprintHighScores = [];
+        const SPRINT_REPS_PER_WORD = 5;
+        const SPRINT_SECONDS_PER_REP = 2;
+
+        function getSprintDurationSec(wordCount) {
+            const n = Math.max(1, wordCount || 1);
+            return n * SPRINT_REPS_PER_WORD * SPRINT_SECONDS_PER_REP;
+        }
+
+        function resetSprintRuntimeState(wordCount) {
+            sprintDurationTotal = getSprintDurationSec(wordCount);
+            sprintTimeLeft = sprintDurationTotal;
+            sprintScore = 0;
+            sprintStreak = 0;
+            sprintWordsStats = {};
+            sprintAnsweredCount = 0;
+            sprintQueueIndex = 0;
+            if (sprintTimer) {
+                clearInterval(sprintTimer);
+                sprintTimer = null;
+            }
+        }
+
         let contextHighScores = [];
         let contextScore = 0;
         let contextPerfectStreak = 0;
@@ -8902,6 +9179,7 @@
             const moveBtn = document.getElementById('btn-move-words');
             const resetBtn = document.getElementById('btn-reset-selected');
             const deleteBtn = document.getElementById('btn-delete-selected');
+            const copyBtn = document.getElementById('btn-copy-selected-words');
             const showingFolders = currentDictFilter === 'materials';
             const inFolder = currentDictFilter === 'material_specific';
             const n = showingFolders ? selectedFolderNames.size : selectedWordIds.size;
@@ -8916,7 +9194,7 @@
                 moveBtn.classList.toggle('hidden', showingFolders);
                 moveBtn.disabled = n === 0;
             }
-            [resetBtn, deleteBtn].forEach((el) => {
+            [resetBtn, deleteBtn, copyBtn].forEach((el) => {
                 if (el) el.disabled = n === 0;
             });
 
@@ -10737,9 +11015,24 @@
                 if (node.tagName === 'BR') return document.createElement('br');
                 const kids = [...node.childNodes].map(clean).filter(Boolean);
                 const style = (node.getAttribute && (node.getAttribute('style') || '')) || '';
+                const cls = (node.getAttribute && (node.getAttribute('class') || '')) || '';
+                const isReaderUi = !!(node.getAttribute && (
+                    node.getAttribute('data-reader-ui') != null
+                    || /reader-audio/i.test(cls)
+                ));
                 const isHighlightSpan = (node.tagName === 'SPAN' || node.tagName === 'FONT') && /background/i.test(style);
                 if (isHighlightSpan) {
                     const el = document.createElement('mark');
+                    appendKids(el, kids);
+                    return el;
+                }
+                if (isReaderUi && (node.tagName === 'DIV' || node.tagName === 'SPAN')) {
+                    const el = document.createElement(node.tagName.toLowerCase());
+                    [...node.attributes].forEach((attr) => {
+                        if (attr.name === 'class' || attr.name === 'title' || attr.name.startsWith('data-')) {
+                            el.setAttribute(attr.name, attr.value);
+                        }
+                    });
                     appendKids(el, kids);
                     return el;
                 }
@@ -10782,12 +11075,169 @@
             if (!html || html === '<br>' || html === '<p><br></p>' || html === '<p></p>') return '';
             return html;
         }
+        const REVIEW_MODE_MARKER_RE = /\[\s*review(?:\s+mode)?\s*\]/gi;
+        function stripReviewModeMarkerText(s) {
+            return String(s || '').replace(REVIEW_MODE_MARKER_RE, '').replace(/\s+/g, ' ').trim();
+        }
+        function materialHasReviewMode(m) {
+            const hay = `${m?.title || ''}\n${m?.content || ''}`;
+            REVIEW_MODE_MARKER_RE.lastIndex = 0;
+            return REVIEW_MODE_MARKER_RE.test(hay);
+        }
+        function materialDisplayTitle(m) {
+            const cleaned = stripReviewModeMarkerText(m?.title);
+            return cleaned || String(m?.title || '').trim();
+        }
+        function stripReviewModeMarkersInHtml(html) {
+            return String(html || '').replace(REVIEW_MODE_MARKER_RE, '');
+        }
+        const READER_AUDIO_BLOCK_RE = /\[\s*audio([^\]]*)\]([\s\S]*?)\[\s*\/\s*audio\s*\]/gi;
+        let readerAudioStore = {};
+        let readerAudioSeq = 0;
+        let readerAudioUtterance = null;
+        let readerAudioActiveId = null;
+        let readerAudioGen = 0;
+        let readerAudioKeepAlive = null;
+        let readerAudioPaused = false;
+        const READER_TTS_VOICE_KEY = 'linguaspace_reader_tts_voice_v1';
+        const READER_TTS_RATE_KEY = 'linguaspace_reader_tts_rate_v1';
+        const READER_TTS_RATES = [0.8, 1, 1.2];
+        let readerTtsVoiceURI = localStorage.getItem(READER_TTS_VOICE_KEY) || '';
+        let readerTtsRate = (() => {
+            const n = parseFloat(localStorage.getItem(READER_TTS_RATE_KEY) || '1');
+            return READER_TTS_RATES.includes(n) ? n : 1;
+        })();
+
+        function parseReaderAudioAttrs(raw) {
+            const attrs = String(raw || '').trim();
+            let lang = '';
+            let voiceHint = '';
+            if (!attrs) return { lang, voiceHint };
+            const voiceEq = /voice\s*=\s*["']?([^"'\s\]]+)/i.exec(attrs);
+            if (voiceEq) voiceHint = voiceEq[1].trim();
+            const langTok = attrs.replace(/voice\s*=\s*["']?[^"'\s\]]+/ig, '').trim();
+            if (langTok) {
+                const m = /([a-z]{2}(?:-[A-Za-z]{2})?)/i.exec(langTok);
+                if (m) lang = m[1];
+            }
+            return { lang, voiceHint };
+        }
+
+        function plainTextFromHtmlFragment(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = String(html || '');
+            return (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function normalizeAudioBodyHtml(body) {
+            const raw = String(body || '').trim();
+            const plain = plainTextFromHtmlFragment(raw);
+            if (!plain) return { plain: '', bodyHtml: '' };
+            if (/<[a-z][\s\S]*>/i.test(raw)) {
+                let cleaned = sanitizeMaterialHtml(raw).trim();
+                if (!cleaned) cleaned = `<p>${escapeHtmlText(plain)}</p>`;
+                else if (!/<(p|div|h[1-3]|br)\b/i.test(cleaned)) cleaned = `<p>${cleaned}</p>`;
+                return { plain, bodyHtml: cleaned };
+            }
+            const paras = raw.split(/\n+/).map((p) => p.trim()).filter(Boolean);
+            const bodyHtml = (paras.length ? paras : [plain])
+                .map((p) => `<p>${escapeHtmlText(p)}</p>`)
+                .join('');
+            return { plain, bodyHtml };
+        }
+
+        function materialHasAudio(m) {
+            const raw = String(m?.content || '');
+            READER_AUDIO_BLOCK_RE.lastIndex = 0;
+            return READER_AUDIO_BLOCK_RE.test(raw);
+        }
+
+        function getMaterialMediaFlags(m) {
+            const raw = String(m?.content || '');
+            READER_AUDIO_BLOCK_RE.lastIndex = 0;
+            const hasAudio = READER_AUDIO_BLOCK_RE.test(raw);
+            READER_AUDIO_BLOCK_RE.lastIndex = 0;
+            const withoutAudio = raw.replace(READER_AUDIO_BLOCK_RE, ' ');
+            const tmp = document.createElement('div');
+            tmp.innerHTML = materialHtmlFromStored(withoutAudio);
+            const rest = stripReviewModeMarkerText(tmp.textContent || '').replace(/\s+/g, ' ').trim();
+            const hasText = rest.length >= 8;
+            return {
+                isReview: materialHasReviewMode(m),
+                hasYt: !!m?.ytId,
+                hasAudio,
+                hasText: hasText || (!hasAudio && !m?.ytId && !!(raw || '').trim())
+            };
+        }
+
+        function materialTypeIconsHtml(m) {
+            const f = getMaterialMediaFlags(m);
+            const bits = [];
+            if (f.isReview) bits.push(`<span class="text-amber-600 text-xl shrink-0" title="${t('lib.reviewMode')}">🔁</span>`);
+            if (f.hasYt) bits.push('<span class="text-red-500 text-xl shrink-0">📺</span>');
+            if (f.hasAudio) bits.push('<span class="text-indigo-500 text-xl shrink-0">🔊</span>');
+            if (f.hasText) bits.push('<span class="text-amber-600 text-xl shrink-0">📜</span>');
+            if (!bits.length) bits.push('<span class="text-amber-600 text-xl shrink-0">📜</span>');
+            return `<span class="inline-flex items-center gap-1 shrink-0">${bits.join('')}</span>`;
+        }
+
+        function replaceReaderAudioBlocksInHtml(html) {
+            READER_AUDIO_BLOCK_RE.lastIndex = 0;
+            return String(html || '').replace(READER_AUDIO_BLOCK_RE, (_, attrStr, body) => {
+                const id = `ra_${++readerAudioSeq}`;
+                const meta = parseReaderAudioAttrs(attrStr);
+                const { plain, bodyHtml } = normalizeAudioBodyHtml(body);
+                readerAudioStore[id] = { id, plain, bodyHtml, lang: meta.lang, voiceHint: meta.voiceHint };
+                return `<div data-reader-ui="1" class="reader-audio-mount" data-audio-id="${id}"></div>`;
+            });
+        }
+
         function materialPlainPreview(raw, n = 80) {
             const tmp = document.createElement('div');
             tmp.innerHTML = materialHtmlFromStored(raw);
-            const text = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+            let text = stripReviewModeMarkerText(tmp.textContent || '');
+            READER_AUDIO_BLOCK_RE.lastIndex = 0;
+            text = text.replace(READER_AUDIO_BLOCK_RE, ' ').replace(/\s+/g, ' ').trim();
             if (!text) return '';
             return text.length > n ? text.slice(0, n) + '...' : text;
+        }
+
+        function splitTextForTts(text, maxLen = 160) {
+            const cleaned = String(text || '').replace(/\s+/g, ' ').trim();
+            if (!cleaned) return [];
+            if (cleaned.length <= maxLen) return [cleaned];
+            const sentences = cleaned.match(/[^.!?…]+(?:[.!?…]+["'»”)\]]*)?\s*|[^.!?…]+$/g) || [cleaned];
+            const parts = [];
+            let buf = '';
+            const pushBuf = () => {
+                if (buf) {
+                    parts.push(buf);
+                    buf = '';
+                }
+            };
+            sentences.forEach((raw) => {
+                const piece = String(raw || '').trim();
+                if (!piece) return;
+                if (!buf) {
+                    if (piece.length <= maxLen) {
+                        buf = piece;
+                        return;
+                    }
+                    for (let i = 0; i < piece.length; i += maxLen) parts.push(piece.slice(i, i + maxLen));
+                    return;
+                }
+                if ((buf + ' ' + piece).length <= maxLen) {
+                    buf = `${buf} ${piece}`;
+                    return;
+                }
+                pushBuf();
+                if (piece.length <= maxLen) buf = piece;
+                else {
+                    for (let i = 0; i < piece.length; i += maxLen) parts.push(piece.slice(i, i + maxLen));
+                }
+            });
+            pushBuf();
+            return parts;
         }
         const FMT_HIGHLIGHT = 'rgba(253, 224, 71, 0.35)';
         function findFormatAncestor(tagNames) {
@@ -11668,16 +12118,22 @@
             if (link.track && link.track !== activeTrackId) {
                 const parsed = parseTrackId(link.track);
                 if (parsed) {
-                    deepLinkOpenInProgress = true;
-                    try {
-                        learningLanguage = parsed.learn;
-                        translationLanguage = parsed.trans;
-                        materialsSnapshotReady = false;
-                        await applyTrackChange({ fromDeepLink: true });
-                    } finally {
-                        deepLinkOpenInProgress = false;
+                    if (STUDENT_EDITION && parsed.id !== `${STUDENT_LEARN}-${STUDENT_TRANS}`) {
+                        // Ignore foreign tracks in the class build
+                        link.track = `${STUDENT_LEARN}-${STUDENT_TRANS}`;
+                    } else {
+                        deepLinkOpenInProgress = true;
+                        try {
+                            learningLanguage = parsed.learn;
+                            translationLanguage = parsed.trans;
+                            enforceStudentLanguageLock();
+                            materialsSnapshotReady = false;
+                            await applyTrackChange({ fromDeepLink: true });
+                        } finally {
+                            deepLinkOpenInProgress = false;
+                        }
+                        return; // materials snapshot will retry after track reload
                     }
-                    return; // materials snapshot will retry after track reload
                 }
             }
 
@@ -11733,22 +12189,96 @@
                 }, 1600);
             };
             try {
-                if (navigator.clipboard?.writeText) {
-                    await navigator.clipboard.writeText(url);
-                } else {
-                    const ta = document.createElement('textarea');
-                    ta.value = url;
-                    ta.setAttribute('readonly', '');
-                    ta.style.position = 'fixed';
-                    ta.style.left = '-9999px';
-                    document.body.appendChild(ta);
-                    ta.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(ta);
-                }
+                await writeTextToClipboard(url);
                 flashCopied();
-            } catch (_) {
-                window.showModal(url);
+                showAppToast(t('msg.linkCopied'));
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        async function writeTextToClipboard(text) {
+            const value = String(text ?? '');
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(value);
+                return;
+            }
+            const ta = document.createElement('textarea');
+            ta.value = value;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        }
+
+        function formatWordsColumn(words) {
+            const seen = new Set();
+            const lines = [];
+            (words || []).forEach((w) => {
+                const lemma = String(w?.word || '').trim();
+                if (!lemma) return;
+                const key = lemma.toLowerCase();
+                if (seen.has(key)) return;
+                seen.add(key);
+                lines.push(lemma);
+            });
+            return lines.join('\n');
+        }
+
+        function getWordsForMaterialId(id) {
+            const m = materials.find((x) => x.id === id);
+            if (!m) return [];
+            const aliases = getMaterialAliases(m);
+            return vocabulary.filter((v) => v.materialId === m.id || aliases.includes(v.source));
+        }
+
+        window.copyMaterialWords = async (id, event) => {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            if (!id) return;
+            const btn = event?.currentTarget?.closest?.('button') || event?.target?.closest?.('button') || null;
+            const words = getWordsForMaterialId(id);
+            const column = formatWordsColumn(words);
+            if (!column) {
+                showAppToast(t('msg.wordsCopyEmpty'));
+                return;
+            }
+            try {
+                await writeTextToClipboard(column);
+                if (btn) {
+                    if (btn._copyFlash) clearTimeout(btn._copyFlash);
+                    btn.classList.add('is-copied');
+                    const prev = btn.textContent;
+                    btn.textContent = '✅';
+                    btn._copyFlash = setTimeout(() => {
+                        btn.classList.remove('is-copied');
+                        btn.textContent = prev || '📋';
+                        btn._copyFlash = null;
+                    }, 1600);
+                }
+                showAppToast(t('msg.wordsCopied', { n: column.split('\n').length }));
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        window.copyDictionaryWordsColumn = async () => {
+            const scope = getDictionaryExportScope();
+            const column = formatWordsColumn(scope.words || []);
+            if (!column) {
+                showAppToast(t('dict.copyWordsEmpty'));
+                return;
+            }
+            try {
+                await writeTextToClipboard(column);
+                showAppToast(t('dict.copyWordsDone', { n: column.split('\n').length }));
+            } catch (e) {
+                console.error(e);
             }
         };
 
@@ -11893,7 +12423,9 @@
                     <div class="mat-card-cover shrink-0">
                         <img src="${coverEsc}" alt="" loading="lazy" onerror="matCoverImgError(this)">
                     </div>` : '';
-                const typeIcon = m.ytId ? '<span class="text-red-500 text-xl shrink-0">📺</span>' : '<span class="text-amber-600 text-xl shrink-0">📜</span>';
+                const isReview = materialHasReviewMode(m);
+                const typeIcon = materialTypeIconsHtml(m);
+                const flags = getMaterialMediaFlags(m);
                 return `
                 <div class="mat-card ${hasCover ? 'has-cover' : ''} bg-white p-4 sm:p-5 rounded-2xl shadow-sm border ${isRead ? 'border-slate-300 bg-slate-50/70' : 'border-slate-200'} cursor-pointer hover:border-indigo-400 transition group overflow-hidden"
                     data-mat-id="${safeId}"
@@ -11902,13 +12434,13 @@
                     onpointerup="matCardPointerUp(event)"
                     onpointercancel="matCardPointerCancel(event)"
                     onclick="matCardClick(event)">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${m.ytId ? 'bg-red-500' : 'bg-indigo-500'} opacity-0 group-hover:opacity-100 transition pointer-events-none"></div>
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${isReview ? 'bg-amber-500' : (flags.hasAudio ? 'bg-indigo-400' : (m.ytId ? 'bg-red-500' : 'bg-indigo-500'))} opacity-0 group-hover:opacity-100 transition pointer-events-none"></div>
                     ${coverHtml}
                     <div class="mat-card-body pl-2 ${isRead ? 'opacity-80' : ''}">
                         <h3 class="font-bold ${isRead ? 'text-slate-600' : 'text-slate-800'} truncate text-lg flex items-center gap-2">
                             ${isRead ? `<span class="text-slate-400 shrink-0" title="${t('lib.read')}">✅</span>` : ''} 
-                            ${hasCover ? '' : typeIcon}
-                            <span class="truncate">${m.title}</span>
+                            ${typeIcon}
+                            <span class="truncate">${escapeHtmlText(materialDisplayTitle(m))}</span>
                         </h3>
                         <p class="text-sm text-slate-500 mt-1 truncate font-medium">
                             ${isRead && readDate ? `<span class="text-slate-400 text-xs font-medium mr-2 bg-slate-100 px-1.5 py-0.5 rounded shadow-sm border border-slate-200">${t('lib.readAt', { date: readDate })}</span>` : ''}
@@ -11916,6 +12448,7 @@
                         </p>
                     </div>
                     <div class="mat-card-actions" onclick="event.stopPropagation()">
+                        <button type="button" onclick="copyMaterialWords('${safeId}', event)" title="${t('lib.copyWords')}" aria-label="${t('lib.copyWords')}">📋</button>
                         <button type="button" onclick="copyMaterialLink('${safeId}', event)" title="${t('lib.copyLink')}" aria-label="${t('lib.copyLink')}">🔗</button>
                         <button type="button" onclick="openMaterialCardEdit('${safeId}', event)" title="${t('lib.editMatShort')}" aria-label="${t('lib.editMatShort')}">✏️</button>
                         <button type="button" class="mat-card-del" onclick="openMaterialCardDelete('${safeId}', event)" title="${t('lib.deleteMatShort')}" aria-label="${t('lib.deleteMatShort')}">&times;</button>
@@ -12013,7 +12546,9 @@
         let currentSubtitlesLyricMode = false;
 
         function paginateTextMaterial(content, limit = 8000) {
-            const html = materialHtmlFromStored(content || '');
+            const html = replaceReaderAudioBlocksInHtml(
+                stripReviewModeMarkersInHtml(materialHtmlFromStored(content || ''))
+            );
             if (!html) return [''];
             const tmp = document.createElement('div');
             tmp.innerHTML = html;
@@ -12085,6 +12620,9 @@
         };
 
         let readerHighlightMode = false;
+        let readerReviewMode = false;
+        let readerReviewRevealed = new Set();
+        let readerReviewPeeked = new Set();
         let readerHighlightsPages = {};
         let readerHighlightSaveTimer = null;
         let readerHighlightSelectTimer = null;
@@ -12477,12 +13015,29 @@
             ensureAppChromeVisible();
             currentMaterial = m;
             activeMaterialId = m.id;
-            readerSaveSource = m.title;
+            readerSaveSource = materialDisplayTitle(m) || m.title;
+            readerReviewMode = materialHasReviewMode(m);
+            readerReviewRevealed = new Set();
+            readerReviewPeeked = new Set();
+            readerAudioStore = {};
+            readerAudioSeq = 0;
+            stopReaderAudioPlayback();
             document.getElementById('library-list-view').classList.add('hidden'); 
             document.getElementById('library-add-view').classList.add('hidden');
             document.getElementById('library-read-view').classList.remove('hidden');
             document.getElementById('main-tabs-nav').classList.add('hidden');
-            document.getElementById('reader-title').textContent = m.title;
+            const titleEl = document.getElementById('reader-title');
+            if (titleEl) {
+                const displayTitle = materialDisplayTitle(m);
+                if (readerReviewMode) {
+                    titleEl.innerHTML = `<span class="shrink-0" title="${escapeHtmlText(t('lib.reviewMode'))}">🔁</span><span class="truncate">${escapeHtmlText(displayTitle)}</span>`;
+                    titleEl.classList.add('flex', 'items-center', 'gap-2');
+                } else {
+                    titleEl.textContent = displayTitle;
+                    titleEl.classList.remove('flex', 'items-center', 'gap-2');
+                }
+            }
+            document.getElementById('library-read-view')?.classList.toggle('reader-review-mode', readerReviewMode);
             const ytWrapper = document.getElementById('reader-yt-wrapper');
 
             if (m.subtitles) {
@@ -12534,6 +13089,11 @@
             const pageToSave = readerCurrentPage;
             readerSaveSource = null;
             currentMaterial = null;
+            readerReviewMode = false;
+            readerReviewRevealed = new Set();
+            readerReviewPeeked = new Set();
+            stopReaderAudioPlayback();
+            document.getElementById('library-read-view')?.classList.remove('reader-review-mode');
 
             document.getElementById('library-read-view').classList.add('hidden');
             document.getElementById('library-list-view').classList.remove('hidden');
@@ -12966,7 +13526,13 @@
                 wordOccMap.set(phraseKey, occ + 1);
                 occAttr = ` data-occ="${occ}"`;
             }
-            return `<span class="word-clickable word-saved-phrase" data-word="${attrWord}" data-phrase="1"${occAttr}>${esc}</span>`;
+            let css = 'word-clickable word-saved-phrase';
+            if (readerReviewMode) {
+                css = readerReviewRevealed.has(phraseKey)
+                    ? 'word-clickable word-saved-phrase'
+                    : 'word-clickable';
+            }
+            return `<span class="${css}" data-word="${attrWord}" data-phrase="1"${occAttr}>${esc}</span>`;
         }
 
         function wrapWordsTokens(text, savedWords, wordOccMap = null) {
@@ -12976,7 +13542,12 @@
                 if (match[1]) {
                     const raw = match[1];
                     const cleanWord = raw.toLowerCase();
-                    const css = savedWords.has(cleanWord) ? 'word-clickable word-saved' : 'word-clickable';
+                    let css = 'word-clickable';
+                    if (readerReviewMode) {
+                        if (readerReviewRevealed.has(cleanWord)) css = 'word-clickable word-saved';
+                    } else if (savedWords.has(cleanWord)) {
+                        css = 'word-clickable word-saved';
+                    }
                     const esc = escapeReaderHtml(raw);
                     let occAttr = '';
                     if (wordOccMap) {
@@ -13019,6 +13590,10 @@
                 }
                 if (node.nodeType !== 1) return;
                 if (node.classList && node.classList.contains('word-clickable')) return;
+                if (node.classList && node.classList.contains('review-mode-marker')) return;
+                if (node.getAttribute && node.getAttribute('data-reader-ui') != null) return;
+                if (node.classList && node.classList.contains('reader-audio-mount')) return;
+                if (node.classList && node.classList.contains('reader-audio-block')) return;
                 [...node.childNodes].forEach(collect);
             })(root);
             textNodes.forEach(textNode => {
@@ -13029,6 +13604,59 @@
                 parent.removeChild(textNode);
             });
             return root.innerHTML;
+        }
+
+        function revealReviewSpansForKey(key) {
+            const needle = String(key || '').toLowerCase();
+            if (!needle) return;
+            document.querySelectorAll('#reader-content .word-clickable[data-word]').forEach((span) => {
+                const w = (span.getAttribute('data-word') || '').toLowerCase();
+                if (w !== needle) return;
+                if (span.getAttribute('data-phrase') === '1') {
+                    span.classList.add('word-saved-phrase');
+                } else {
+                    span.classList.add('word-saved');
+                }
+            });
+        }
+
+        function handleReviewWordReveal(el, wordRaw) {
+            if (!readerReviewMode || !wordRaw) return;
+            const key = String(wordRaw).toLowerCase().trim();
+            if (!key) return;
+            const existing = vocabulary.find((v) => String(v.word || '').toLowerCase() === key);
+            if (!existing) return;
+            readerReviewRevealed.add(key);
+            revealReviewSpansForKey(key);
+            applyReviewPeekPenalty(existing);
+        }
+
+        async function applyReviewPeekPenalty(wordObj) {
+            if (!wordObj || !wordObj.id) return;
+            const key = String(wordObj.word || '').toLowerCase();
+            if (!key || readerReviewPeeked.has(key)) return;
+            readerReviewPeeked.add(key);
+            const cur = clampSrsLevel(wordObj.srsLevel);
+            // Never invent a −1 when the word has no Brainstorm progress yet
+            if (cur <= 0) return;
+            const newLevel = Math.max(0, cur - 1);
+            const patch = {
+                srsLevel: newLevel,
+                nextReviewTime: Date.now(),
+                bsHistory: normalizeBsHistory([...(wordObj.bsHistory || []), {
+                    at: Date.now(),
+                    level: newLevel,
+                    ok: false,
+                    mode: 'review-peek'
+                }])
+            };
+            patchLocalWord(wordObj.id, patch);
+            if (!activeUid || !db) return;
+            try {
+                await updateDoc(docRef('words', wordObj.id), patch);
+            } catch (e) {
+                console.error('applyReviewPeekPenalty', e);
+            }
         }
 
         window.changeReaderPage = (direction) => {
@@ -13071,6 +13699,322 @@
                 return `<div data-reader-ui="1" class="mt-10 text-center p-4 bg-slate-100 rounded-xl border border-slate-200 text-slate-500 font-bold flex items-center justify-center gap-2 shadow-sm font-sans text-base"><span>✅</span> ${t('lib.readDone')}</div>`;
             }
             return `<button data-reader-ui="1" onclick="markCurrentAsRead()" class="mt-10 w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold font-sans shadow-md text-base sm:text-lg transition flex justify-center items-center gap-2 active:scale-95"><span>✅ ${t('lib.markRead')}</span></button>`;
+        }
+
+        function getReaderTtsLang(preferred) {
+            return preferred || LANG_META[learningLanguage]?.bcp47 || 'en-US';
+        }
+
+        function listReaderTtsVoices() {
+            try {
+                return window.speechSynthesis?.getVoices?.() || [];
+            } catch (_) {
+                return [];
+            }
+        }
+
+        function pickReaderTtsVoice(lang, voiceHint) {
+            const voices = listReaderTtsVoices();
+            if (!voices.length) return null;
+            const wantLang = String(lang || getReaderTtsLang()).toLowerCase();
+            const hint = String(voiceHint || '').toLowerCase();
+            if (readerTtsVoiceURI) {
+                const saved = voices.find((v) => v.voiceURI === readerTtsVoiceURI);
+                if (saved) return saved;
+            }
+            const langMatched = voices.filter((v) => {
+                const vl = String(v.lang || '').toLowerCase();
+                return vl === wantLang || vl.startsWith(wantLang.split('-')[0]);
+            });
+            const pool = langMatched.length ? langMatched : voices;
+            if (hint) {
+                const byHint = pool.find((v) => String(v.name || '').toLowerCase().includes(hint));
+                if (byHint) return byHint;
+            }
+            return pool[0] || null;
+        }
+
+        window.setReaderTtsVoice = (uri) => {
+            readerTtsVoiceURI = String(uri || '');
+            try { localStorage.setItem(READER_TTS_VOICE_KEY, readerTtsVoiceURI); } catch (_) {}
+            document.querySelectorAll('.reader-audio-voice').forEach((sel) => {
+                if (sel.value !== readerTtsVoiceURI) sel.value = readerTtsVoiceURI || '';
+            });
+        };
+
+        window.setReaderTtsRate = (rate) => {
+            const n = parseFloat(rate);
+            readerTtsRate = READER_TTS_RATES.includes(n) ? n : 1;
+            try { localStorage.setItem(READER_TTS_RATE_KEY, String(readerTtsRate)); } catch (_) {}
+            document.querySelectorAll('.reader-audio-rate').forEach(syncReaderAudioRateUi);
+        };
+
+        function syncReaderAudioRateUi(wrap) {
+            if (!wrap) return;
+            wrap.querySelectorAll('button[data-rate]').forEach((btn) => {
+                const on = parseFloat(btn.getAttribute('data-rate')) === readerTtsRate;
+                btn.classList.toggle('is-on', on);
+                btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+        }
+
+        function fillReaderVoiceSelect(sel, preferLang) {
+            if (!sel) return;
+            const voices = listReaderTtsVoices();
+            const learn = String(preferLang || getReaderTtsLang()).toLowerCase();
+            const learnRoot = learn.split('-')[0];
+            const preferred = voices.filter((v) => {
+                const vl = String(v.lang || '').toLowerCase();
+                return vl === learn || vl.startsWith(learnRoot);
+            });
+            const rest = voices.filter((v) => !preferred.includes(v));
+            const ordered = preferred.concat(rest);
+            const opts = [`<option value="">${escapeHtmlText(t('reader.voiceDefault'))}</option>`];
+            ordered.forEach((v) => {
+                const label = `${v.name}`;
+                const selected = readerTtsVoiceURI && v.voiceURI === readerTtsVoiceURI ? ' selected' : '';
+                opts.push(`<option value="${escapeHtmlText(v.voiceURI)}"${selected}>${escapeHtmlText(label)}</option>`);
+            });
+            sel.innerHTML = opts.join('');
+            if (readerTtsVoiceURI && ![...sel.options].some((o) => o.value === readerTtsVoiceURI)) {
+                sel.value = '';
+            } else {
+                sel.value = readerTtsVoiceURI || '';
+            }
+        }
+
+        function stopReaderAudioPlayback() {
+            readerAudioGen += 1;
+            readerAudioPaused = false;
+            if (readerAudioKeepAlive) {
+                clearInterval(readerAudioKeepAlive);
+                readerAudioKeepAlive = null;
+            }
+            try { window.speechSynthesis?.cancel(); } catch (_) {}
+            readerAudioUtterance = null;
+            document.querySelectorAll('.reader-audio-block').forEach((block) => {
+                const playBtn = block.querySelector('.reader-audio-play');
+                const pauseBtn = block.querySelector('.reader-audio-pause');
+                if (playBtn) {
+                    playBtn.classList.remove('is-playing');
+                    playBtn.textContent = `▶ ${t('reader.audioPlay')}`;
+                }
+                if (pauseBtn) {
+                    pauseBtn.disabled = true;
+                    pauseBtn.classList.remove('is-playing');
+                    pauseBtn.textContent = `⏸ ${t('reader.audioPause')}`;
+                }
+            });
+            readerAudioActiveId = null;
+        }
+
+        function syncReaderAudioPauseUi(id, paused) {
+            const block = document.querySelector(`.reader-audio-block[data-audio-id="${id}"]`);
+            if (!block) return;
+            const pauseBtn = block.querySelector('.reader-audio-pause');
+            if (!pauseBtn) return;
+            pauseBtn.disabled = false;
+            if (paused) {
+                pauseBtn.classList.add('is-playing');
+                pauseBtn.textContent = `▶ ${t('reader.audioResume')}`;
+            } else {
+                pauseBtn.classList.remove('is-playing');
+                pauseBtn.textContent = `⏸ ${t('reader.audioPause')}`;
+            }
+        }
+
+        function markReaderAudioPlaying(id, playBtn, on) {
+            const block = playBtn?.closest?.('.reader-audio-block')
+                || document.querySelector(`.reader-audio-block[data-audio-id="${id}"]`);
+            const pauseBtn = block?.querySelector('.reader-audio-pause');
+            if (playBtn) {
+                if (on) {
+                    playBtn.classList.add('is-playing');
+                    playBtn.textContent = `■ ${t('reader.audioStop')}`;
+                } else {
+                    playBtn.classList.remove('is-playing');
+                    playBtn.textContent = `▶ ${t('reader.audioPlay')}`;
+                }
+            }
+            if (pauseBtn) {
+                pauseBtn.disabled = !on;
+                if (!on) {
+                    pauseBtn.classList.remove('is-playing');
+                    pauseBtn.textContent = `⏸ ${t('reader.audioPause')}`;
+                } else {
+                    syncReaderAudioPauseUi(id, readerAudioPaused);
+                }
+            }
+        }
+
+        function toggleReaderAudioPause(id) {
+            if (readerAudioActiveId !== id) return;
+            try {
+                if (readerAudioPaused || window.speechSynthesis?.paused) {
+                    window.speechSynthesis.resume();
+                    readerAudioPaused = false;
+                } else {
+                    window.speechSynthesis.pause();
+                    readerAudioPaused = true;
+                }
+            } catch (_) {}
+            syncReaderAudioPauseUi(id, readerAudioPaused);
+        }
+
+        function startReaderAudioPlayback(id, data, playBtn) {
+            stopReaderAudioPlayback();
+            const chunks = splitTextForTts(data.plain);
+            if (!chunks.length) return;
+            const gen = readerAudioGen;
+            readerAudioActiveId = id;
+            readerAudioPaused = false;
+            markReaderAudioPlaying(id, playBtn, true);
+
+            // Chrome often stalls long TTS; nudge resume while this clip is active
+            readerAudioKeepAlive = setInterval(() => {
+                if (gen !== readerAudioGen || readerAudioPaused) return;
+                try {
+                    if (window.speechSynthesis?.speaking && !window.speechSynthesis.paused) {
+                        window.speechSynthesis.resume();
+                    }
+                } catch (_) {}
+            }, 5000);
+
+            let idx = 0;
+            const speakNext = () => {
+                if (gen !== readerAudioGen) return;
+                if (idx >= chunks.length) {
+                    if (readerAudioKeepAlive) {
+                        clearInterval(readerAudioKeepAlive);
+                        readerAudioKeepAlive = null;
+                    }
+                    markReaderAudioPlaying(id, playBtn, false);
+                    readerAudioActiveId = null;
+                    readerAudioUtterance = null;
+                    readerAudioPaused = false;
+                    return;
+                }
+                const u = new SpeechSynthesisUtterance(chunks[idx++]);
+                u.lang = getReaderTtsLang(data.lang);
+                u.rate = readerTtsRate;
+                const voice = pickReaderTtsVoice(u.lang, data.voiceHint);
+                if (voice) u.voice = voice;
+                readerAudioUtterance = u;
+                u.onend = () => speakNext();
+                u.onerror = () => {
+                    if (gen !== readerAudioGen) return;
+                    speakNext();
+                };
+                try {
+                    window.speechSynthesis.speak(u);
+                } catch (_) {
+                    speakNext();
+                }
+            };
+            speakNext();
+        }
+
+        function renderAudioTranscriptHtml(data) {
+            const lex = buildReaderSavedLexicon(vocabulary);
+            if (data.bodyHtml && /<[a-z]/i.test(data.bodyHtml)) {
+                return wrapHtmlWords(data.bodyHtml, lex);
+            }
+            const paras = String(data.plain || '').split(/(?:\r?\n){2,}|(?<=[.!?…])\s+(?=[A-ZА-ЯЁІЇЄҐ])/).map((p) => p.trim()).filter(Boolean);
+            if (paras.length > 1) {
+                return paras.map((p) => `<p>${wrapWords(p, lex)}</p>`).join('');
+            }
+            return `<p>${wrapWords(data.plain || '', lex)}</p>`;
+        }
+
+        function hydrateReaderAudioBlocks(container) {
+            if (!container) return;
+            container.querySelectorAll('.reader-audio-mount[data-audio-id]').forEach((mount) => {
+                const id = mount.getAttribute('data-audio-id');
+                const data = readerAudioStore[id];
+                if (!data || !data.plain) {
+                    mount.remove();
+                    return;
+                }
+                const block = document.createElement('div');
+                block.className = 'reader-audio-block';
+                block.setAttribute('data-reader-ui', '1');
+                block.setAttribute('data-audio-id', id);
+                block.innerHTML = `
+                    <div class="reader-audio-controls">
+                        <button type="button" class="reader-audio-btn reader-audio-play">▶ ${escapeHtmlText(t('reader.audioPlay'))}</button>
+                        <button type="button" class="reader-audio-btn reader-audio-pause" disabled>⏸ ${escapeHtmlText(t('reader.audioPause'))}</button>
+                        <button type="button" class="reader-audio-btn reader-audio-toggle">${escapeHtmlText(t('reader.audioShow'))}</button>
+                        <select class="reader-audio-voice" aria-label="${escapeHtmlText(t('reader.voiceDefault'))}"></select>
+                        <div class="reader-audio-rate" role="group">
+                            ${READER_TTS_RATES.map((r) => `<button type="button" data-rate="${r}">${r === 1 ? '1×' : r + '×'}</button>`).join('')}
+                        </div>
+                    </div>
+                    <div class="reader-audio-transcript is-hidden-transcript"></div>
+                `;
+                const playBtn = block.querySelector('.reader-audio-play');
+                const pauseBtn = block.querySelector('.reader-audio-pause');
+                const toggleBtn = block.querySelector('.reader-audio-toggle');
+                const voiceSel = block.querySelector('.reader-audio-voice');
+                const rateWrap = block.querySelector('.reader-audio-rate');
+                const transcript = block.querySelector('.reader-audio-transcript');
+                fillReaderVoiceSelect(voiceSel, data.lang || getReaderTtsLang());
+                syncReaderAudioRateUi(rateWrap);
+
+                voiceSel.onchange = () => setReaderTtsVoice(voiceSel.value);
+                rateWrap.querySelectorAll('button[data-rate]').forEach((btn) => {
+                    btn.onclick = (ev) => {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        setReaderTtsRate(btn.getAttribute('data-rate'));
+                    };
+                });
+
+                playBtn.onclick = (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (readerAudioActiveId === id) {
+                        stopReaderAudioPlayback();
+                        return;
+                    }
+                    startReaderAudioPlayback(id, data, playBtn);
+                };
+
+                pauseBtn.onclick = (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    toggleReaderAudioPause(id);
+                };
+
+                toggleBtn.onclick = (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    const hidden = transcript.classList.contains('is-hidden-transcript');
+                    if (hidden) {
+                        if (!transcript.dataset.ready) {
+                            transcript.innerHTML = renderAudioTranscriptHtml(data);
+                            transcript.dataset.ready = '1';
+                        }
+                        transcript.classList.remove('is-hidden-transcript');
+                        toggleBtn.textContent = t('reader.audioHide');
+                    } else {
+                        transcript.classList.add('is-hidden-transcript');
+                        toggleBtn.textContent = t('reader.audioShow');
+                    }
+                };
+
+                mount.replaceWith(block);
+            });
+        }
+
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.addEventListener?.('voiceschanged', () => {
+                document.querySelectorAll('.reader-audio-voice').forEach((sel) => {
+                    const block = sel.closest('.reader-audio-block');
+                    const id = block?.getAttribute('data-audio-id');
+                    const lang = id && readerAudioStore[id]?.lang;
+                    fillReaderVoiceSelect(sel, lang || getReaderTtsLang());
+                });
+            });
         }
 
         function isLyricsLikeSubtitles(subs) {
@@ -13223,6 +14167,7 @@
                 currentSubtitlesLyricMode = false;
                 const pageHtml = currentPageData || '';
                 container.innerHTML = wrapHtmlWords(pageHtml, savedLexicon, wordOccMap);
+                hydrateReaderAudioBlocks(container);
             }
 
             if (readerCurrentPage === readerTotalPages) {
@@ -13359,10 +14304,26 @@
         }
 
         document.getElementById('reader-content').addEventListener('click', (e) => {
+            if (e.target.closest('.reader-audio-btn')) return;
+            if (e.target.closest('.reader-audio-block') && !e.target.closest('.word-clickable')) {
+                e.stopPropagation();
+                return;
+            }
             if (readerHighlightMode) {
-                if (e.target.closest('mark.reader-hl')) {
-                    e.stopPropagation();
-                }
+                e.preventDefault();
+                e.stopPropagation();
+                closeInlinePopup();
+                const selText = String(window.getSelection?.()?.toString?.() || '').trim();
+                if (selText) return;
+                const mark = e.target.closest('mark.reader-hl');
+                const wordEl = e.target.closest('.word-clickable');
+                const target = mark || wordEl;
+                if (!target) return;
+                try {
+                    const range = document.createRange();
+                    range.selectNodeContents(target);
+                    handleReaderHighlightSelection(range);
+                } catch (_) {}
                 return;
             }
             if (e.target.classList.contains('word-clickable') && window.getSelection().toString().trim().length === 0) {
@@ -13372,6 +14333,7 @@
                 const rect = e.target.getBoundingClientRect();
                 positionInlinePopup(rect);
                 const lineContext = getLineContextFromNode(e.target, word);
+                if (readerReviewMode) handleReviewWordReveal(e.target, word);
                 processInlineTranslationRequest(word, currentMaterial.content, { occurrenceIndex, lineContext });
             }
         });
@@ -13440,6 +14402,7 @@
                 scheduleInlinePopupReposition(latest.rect);
                 const textOffset = getPlainTextOffsetInReader(latest.range);
                 const lineContext = getLineContextFromNode(latest.range?.commonAncestorContainer, stableText);
+                if (readerReviewMode) handleReviewWordReveal(null, stableText);
                 processInlineTranslationRequest(stableText, currentMaterial ? currentMaterial.content : '', { textOffset, lineContext });
             }, 450);
         });
@@ -17544,8 +18507,9 @@
             'sprint': [8],
             'picture': [9]
         };
-        // Brainstorm SRS level → exercise sequence (user stages 1–6)
-        // 0→1 intro; 1→2 TW; 2→3 WT; 3→4 hard TW; 4→5 hard WT; 5→6 blind ctor + sprint
+        // Brainstorm SRS level → exercise sequence (user етапи 1–6)
+        // MCQ: етап 3 = 4 opts + hard distractors; етапи 4–5 = 6 opts + hard
+        // Ctor: етап 1 = 1 free mistake; 2–3 = fail on wrong full word; 4–6 = strict letters
         const BRAINSTORM_STAGES_BY_LEVEL = {
             0: [0, 1, 2, 5],
             1: [4, 2, 3, 5],
@@ -17572,8 +18536,10 @@
 
         let bsSessionStages = null;
         let bsSessionLevel = 0;
-        let bsHardMcq = false;
+        let bsHardMcq = false;       // 6-option MCQ (етапи 4–5)
+        let bsMcqHardDistractors = false; // hard distractors even with 4 options (етап 3+)
         let bsStrictConstructor = false;
+        let bsCtorOneFreeMistake = false; // етап 1 only
         let bsBlindConstructor = false;
         let bsSprintGraduation = false;
         let sprintQuestionQueue = [];
@@ -17741,8 +18707,12 @@
         function configureBrainstormSessionFlags(level) {
             bsSessionLevel = level || 0;
             bsSessionStages = getBrainstormStagesForLevel(bsSessionLevel);
+            // Етап 3 (level 2): 4 options + hard distractors
+            // Етапи 4–5 (level 3+): 6 options + hard distractors
+            bsMcqHardDistractors = bsSessionLevel >= 2;
             bsHardMcq = bsSessionLevel >= 3;
             bsStrictConstructor = bsSessionLevel >= 3;
+            bsCtorOneFreeMistake = bsSessionLevel === 0;
             bsBlindConstructor = bsSessionLevel >= 5;
             bsSprintGraduation = bsSessionStages.includes(8);
             window._bsCtorStrictTipShown = false;
@@ -17861,7 +18831,9 @@
 
             bsSessionStages = null;
             bsHardMcq = false;
+            bsMcqHardDistractors = false;
             bsStrictConstructor = false;
+            bsCtorOneFreeMistake = false;
             bsBlindConstructor = false;
             bsSprintGraduation = false;
             sprintQuestionQueue = [];
@@ -17893,14 +18865,7 @@
                 if (mode === 'sprint') {
                     window._sprintCountdownActive = true;
                     window._sprintRulesPending = false;
-                    sprintTimeLeft = 60;
-                    sprintScore = 0;
-                    sprintStreak = 0;
-                    sprintWordsStats = {};
-                    if (sprintTimer) {
-                        clearInterval(sprintTimer);
-                        sprintTimer = null;
-                    }
+                    resetSprintRuntimeState(dueWords.length);
                     bsWords = dueWords.map((w) => ({ ...w, failed: false }));
                 } else if (mode === 'all') {
                     const picked = pickBrainstormWords(dueWords, reqCount, now);
@@ -17938,7 +18903,7 @@
             bsTotalSteps = bsWords.length * stagesForMode.length; bsCompletedSteps = 0;
             
             if (mode === 'sprint') {
-                bsTotalSteps = 60; 
+                bsTotalSteps = getSprintDurationSec(bsWords.length); 
             }
             if (mode === 'all' && bsSprintGraduation) {
                 // Sprint is one section for the whole set, not per word
@@ -18099,12 +19064,7 @@
                     if (bsCurrentStage === 8 && activeSessionMode === 'all') {
                         window._sprintRulesPending = true;
                         window._sprintCountdownActive = false;
-                        sprintTimeLeft = 60;
-                        sprintScore = 0;
-                        sprintStreak = 0;
-                        sprintWordsStats = {};
-                        sprintAnsweredCount = 0;
-                        if (sprintTimer) { clearInterval(sprintTimer); sprintTimer = null; }
+                        resetSprintRuntimeState(bsWords.length);
                         prepareBrainstormSprintQueue();
                     }
                 } else {
@@ -18474,17 +19434,21 @@
         }
 
         function renderStageTestWT(word, area, btnNext, feedback) {
-            const hard = activeSessionMode === 'all' && bsHardMcq;
-            const opts = getOptions(word, { count: hard ? 6 : 4, hard, field: 'translation' });
-            const grid = hard ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-4';
+            const inBs = activeSessionMode === 'all';
+            const hard = inBs && bsMcqHardDistractors;
+            const count = inBs && bsHardMcq ? 6 : 4;
+            const opts = getOptions(word, { count, hard, field: 'translation' });
+            const grid = count >= 6 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-4';
             area.innerHTML = `<h3 class="text-3xl font-bold text-slate-800 mb-6 tracking-tight">${word.word}</h3><div class="${grid}" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-base sm:text-lg shadow-sm flex justify-between items-center"><span>${o.translation}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
             bindTestButtons(word, feedback);
         }
 
         function renderStageTestTW(word, area, btnNext, feedback) {
-            const hard = activeSessionMode === 'all' && bsHardMcq;
-            const opts = getOptions(word, { count: hard ? 6 : 4, hard, field: 'word' });
-            const grid = hard ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-4';
+            const inBs = activeSessionMode === 'all';
+            const hard = inBs && bsMcqHardDistractors;
+            const count = inBs && bsHardMcq ? 6 : 4;
+            const opts = getOptions(word, { count, hard, field: 'word' });
+            const grid = count >= 6 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-4';
             area.innerHTML = `<h3 class="text-2xl font-bold text-indigo-700 uppercase mb-6 tracking-wider">${word.translation}</h3><div class="${grid}" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-xl shadow-sm flex justify-between items-center"><span>${o.word}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
             bindTestButtons(word, feedback);
         }
@@ -18526,6 +19490,7 @@
         }
 
         function tryPlaceConstructorLetter(char) {
+            if (window._bsCtorBusy) return false;
             const needle = String(char || '').toLowerCase();
             if (!needle) return false;
             const idx = bsLetterPool.findIndex(item => item.char.toLowerCase() === needle);
@@ -18556,6 +19521,7 @@
 
         window.handleConstructorKeyboard = (e) => {
             if (bsCurrentStage !== 2) return;
+            if (window._bsCtorBusy) return;
             // Don't steal keys from real text fields (typing / context / etc.)
             if (isEsAccentTypingTarget(e.target)) return;
             if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -18624,21 +19590,32 @@
                 articleGender
             })).sort(() => 0.5 - Math.random());
             bsSelectedLetters = [];
-            const strict = activeSessionMode === 'all' && bsStrictConstructor;
-            const blind = activeSessionMode === 'all' && bsBlindConstructor;
+            const inBs = activeSessionMode === 'all';
+            const strict = inBs && bsStrictConstructor;
+            const oneFree = inBs && bsCtorOneFreeMistake;
+            const blind = inBs && bsBlindConstructor;
             let ctorLastLen = 0;
+            let ctorFreeUsed = false;
+            let ctorBusy = false;
+            window._bsCtorBusy = false;
             const promptHtml = blind
                 ? `<p class="text-sm text-slate-400 font-bold mb-6 uppercase tracking-wider">${t('stage.2')}</p>`
                 : `<p class="text-xl text-indigo-600 font-bold mb-6 uppercase tracking-wider">${escapeHtmlText(word.translation)}</p>`;
             area.innerHTML = `${promptHtml}<div id="bs-c-slots" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 min-h-[3.5rem]"></div><div id="bs-c-pool" class="flex flex-wrap justify-center gap-2 sm:gap-2.5 min-h-[3.5rem]"></div>`;
             document.addEventListener('keydown', handleConstructorKeyboard);
 
-            const flashWrongSlots = (slots) => {
+            const markMismatchSlots = (slots) => {
                 slots.classList.add('animate-shake');
-                slots.querySelectorAll('.letter-slot.filled').forEach(el => {
+                [...slots.querySelectorAll('.letter-slot')].forEach((el, i) => {
+                    if (!bsSelectedLetters[i]) return;
+                    if (bsSelectedLetters[i].char === expectedWordStr[i]) return;
                     el.classList.remove('bg-indigo-600');
                     el.classList.add('constructor-wrong');
                 });
+            };
+
+            const flashWrongSlots = (slots) => {
+                markMismatchSlots(slots);
                 if (bsCtorWrongFlashTimer) clearTimeout(bsCtorWrongFlashTimer);
                 bsCtorWrongFlashTimer = setTimeout(() => {
                     bsCtorWrongFlashTimer = null;
@@ -18648,6 +19625,15 @@
                         if (!el.classList.contains('bg-emerald-500')) el.classList.add('bg-indigo-600');
                     });
                 }, 480);
+            };
+
+            const resetConstructorBoard = () => {
+                while (bsSelectedLetters.length) bsLetterPool.push(bsSelectedLetters.pop());
+                bsLetterPool.sort(() => 0.5 - Math.random());
+                ctorLastLen = 0;
+                ctorBusy = false;
+                window._bsCtorBusy = false;
+                if (typeof window._renderBsC === 'function') window._renderBsC();
             };
 
             const noteStrictFail = () => {
@@ -18660,6 +19646,7 @@
             };
 
             window._renderBsC = () => {
+                if (ctorBusy) return;
                 if (bsCtorWrongFlashTimer) { clearTimeout(bsCtorWrongFlashTimer); bsCtorWrongFlashTimer = null; }
                 const slots = document.getElementById('bs-c-slots'), pool = document.getElementById('bs-c-pool');
                 if (!slots || !pool) return;
@@ -18673,7 +19660,7 @@
                     el.className = 'letter-slot flex items-center justify-center text-2xl font-bold uppercase cursor-pointer '
                         + (filled ? 'filled bg-indigo-600 text-white shadow-md border-b-0' : 'bg-slate-100 text-slate-300')
                         + (g === 'm' ? ' is-article-m' : g === 'f' ? ' is-article-f' : g === 'n' ? ' is-article-n' : '');
-                    if(filled) { el.textContent = bsSelectedLetters[i].char; el.onclick = () => { bsLetterPool.push(bsSelectedLetters.splice(i, 1)[0]); _renderBsC(); }; }
+                    if(filled) { el.textContent = bsSelectedLetters[i].char; el.onclick = () => { if (ctorBusy) return; bsLetterPool.push(bsSelectedLetters.splice(i, 1)[0]); _renderBsC(); }; }
                     slots.appendChild(el);
                 }
                 bsLetterPool.forEach((item, idx) => {
@@ -18683,11 +19670,11 @@
                     btn.className = 'bg-white border-2 border-slate-200 shadow-sm text-2xl font-bold uppercase text-slate-700 hover:border-indigo-400 hover:text-indigo-600 letter-tile'
                         + (g === 'm' ? ' is-article-m' : g === 'f' ? ' is-article-f' : g === 'n' ? ' is-article-n' : '');
                     btn.textContent = item.char;
-                    btn.onclick = () => { bsSelectedLetters.push(bsLetterPool.splice(idx, 1)[0]); _renderBsC(); };
+                    btn.onclick = () => { if (ctorBusy) return; bsSelectedLetters.push(bsLetterPool.splice(idx, 1)[0]); _renderBsC(); };
                     pool.appendChild(btn);
                 });
 
-                // Strict (stages 4+): flag fail when a newly placed letter is wrong
+                // Strict (етапи 4–6): flag fail when a newly placed letter is wrong
                 if (strict && bsSelectedLetters.length > ctorLastLen) {
                     const i = bsSelectedLetters.length - 1;
                     if (bsSelectedLetters[i].char !== expectedWordStr[i]) {
@@ -18706,6 +19693,17 @@
                         clearBsCtorAccentHold();
                         document.removeEventListener('keydown', handleConstructorKeyboard);
                         triggerSuccessReveal(word);
+                    } else if (oneFree && !ctorFreeUsed) {
+                        // Етап 1: one free mistake — show wrong letters in red, then clear
+                        ctorFreeUsed = true;
+                        ctorBusy = true;
+                        window._bsCtorBusy = true;
+                        markMismatchSlots(slots);
+                        if (bsCtorWrongFlashTimer) clearTimeout(bsCtorWrongFlashTimer);
+                        bsCtorWrongFlashTimer = setTimeout(() => {
+                            bsCtorWrongFlashTimer = null;
+                            resetConstructorBoard();
+                        }, 900);
                     } else {
                         noteStrictFail();
                         word.failed = true;
@@ -20143,18 +21141,48 @@
 
         function prepareBrainstormSprintQueue() {
             const n = Math.max(1, bsWords.length);
-            sprintRepsPerWord = Math.ceil(30 / n);
+            sprintRepsPerWord = SPRINT_REPS_PER_WORD;
             sprintTargetTotal = sprintRepsPerWord * n;
+            sprintDurationTotal = getSprintDurationSec(n);
+            sprintTimeLeft = sprintDurationTotal;
             sprintAnsweredCount = 0;
             sprintQueueIndex = 0;
+            // 5 rounds for the whole set, alternating direction:
+            // 1 W→T, 2 T→W, 3 W→T, 4 T→W, 5 W→T (each round = all N words, shuffled)
             const queue = [];
-            bsWords.forEach((w) => {
-                for (let i = 0; i < sprintRepsPerWord; i++) queue.push(w);
-            });
-            sprintQuestionQueue = shuffleWords(queue);
+            for (let round = 0; round < sprintRepsPerWord; round++) {
+                const reverse = round % 2 === 1;
+                shuffleWords(bsWords).forEach((w) => {
+                    queue.push({ word: w, reverse });
+                });
+            }
+            sprintQuestionQueue = queue;
             bsWords.forEach((w) => {
                 if (!sprintWordsStats[w.id]) sprintWordsStats[w.id] = { correct: 0, wrong: 0 };
             });
+        }
+
+        function pickSprintHardFoil(target, field) {
+            const sessionIds = new Set((bsWords || []).map((w) => w.id));
+            const pool = vocabulary.filter((v) => {
+                if (!v || v.id === target.id) return false;
+                const text = String(field === 'word' ? v.word : v.translation || '').trim();
+                return !!text;
+            });
+            if (!pool.length) return null;
+            pool.sort((a, b) => {
+                const scoreOf = (c) => {
+                    let s = scoreMcqDistractor(c, target, field);
+                    if (sessionIds.has(c.id)) s += 50;
+                    if (c.materialId && target.materialId && c.materialId === target.materialId) s += 35;
+                    else if (c.source && target.source && c.source === target.source) s += 20;
+                    return s;
+                };
+                const diff = scoreOf(b) - scoreOf(a);
+                return diff !== 0 ? diff : (Math.random() - 0.5);
+            });
+            const top = pool.slice(0, Math.min(5, pool.length));
+            return top[Math.floor(Math.random() * top.length)] || pool[0];
         }
 
         function renderStageSprint(area, btnNext, feedback) {
@@ -20171,8 +21199,8 @@
                         <h3 class="text-2xl font-black text-slate-800 mb-3">${t('train.sprintRulesTitle')}</h3>
                         <p class="text-sm text-slate-600 leading-relaxed mb-6">${t('train.sprintRulesBody', {
                             n: bsWords.length,
-                            reps: sprintRepsPerWord,
-                            total: sprintTargetTotal
+                            total: sprintTargetTotal,
+                            sec: sprintDurationTotal
                         })}</p>
                         <button type="button" id="btn-sprint-rules-start" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-2xl font-bold text-lg shadow-md active:scale-95 transition">${t('train.sprintStart')}</button>
                     </div>
@@ -20262,7 +21290,7 @@
             if (!sprintTimer) {
                 sprintTimer = setInterval(() => {
                     sprintTimeLeft--;
-                    if (!graduation) bsCompletedSteps = 60 - sprintTimeLeft;
+                    if (!graduation) bsCompletedSteps = Math.max(0, sprintDurationTotal - sprintTimeLeft);
                     
                     const timerEl = document.getElementById('sprint-timer-val');
                     if (timerEl) {
@@ -20284,35 +21312,49 @@
         window.generateNextSprintQ = () => {
             const graduation = activeSessionMode === 'all' && bsSprintGraduation;
             let word;
+            let reverse = false;
             if (graduation) {
                 if (sprintQueueIndex >= sprintQuestionQueue.length) {
                     finishSprintSession();
                     return;
                 }
-                word = sprintQuestionQueue[sprintQueueIndex];
+                const item = sprintQuestionQueue[sprintQueueIndex];
+                word = item?.word || item;
+                reverse = !!(item && item.reverse);
             } else {
                 word = bsWords[Math.floor(Math.random() * bsWords.length)];
+                reverse = false;
             }
             const isCorrect = Math.random() < 0.5;
-            let shownTranslation = word.translation;
+            // Same visual roles always: top = "prompt" style (bold word look),
+            // bottom = "answer" style (italic translation look) — languages swap in reverse rounds.
+            const WORD_TOP = 'text-3xl font-bold text-slate-800 tracking-tight mb-4 select-none';
+            const TRANS_BOTTOM = 'text-2xl font-medium text-slate-500 italic select-none';
 
-            if (!isCorrect) {
-                const sessionPool = bsWords.filter(v => v.id !== word.id);
-                const pool = sessionPool.length ? sessionPool : vocabulary.filter(v => v.id !== word.id);
-                if (pool.length > 0) {
-                    shownTranslation = pool[Math.floor(Math.random() * pool.length)].translation;
-                } else {
-                    shownTranslation = word.translation + " ✗";
+            let topText = word.word;
+            let bottomText = word.translation;
+
+            if (reverse) {
+                topText = word.translation;
+                bottomText = word.word;
+                if (!isCorrect) {
+                    const foil = pickSprintHardFoil(word, 'word');
+                    bottomText = foil ? foil.word : (word.word + ' ✗');
                 }
+            } else if (!isCorrect) {
+                const foil = pickSprintHardFoil(word, 'translation');
+                bottomText = foil ? foil.translation : (word.translation + ' ✗');
             }
 
-            currentSprintQ = { word, shownTranslation, isCorrect };
+            currentSprintQ = { word, isCorrect, reverse };
 
             const qWordEl = document.getElementById('sprint-q-word');
             const qTransEl = document.getElementById('sprint-q-translation');
             if (qWordEl && qTransEl) {
-                qWordEl.textContent = word.word;
-                qTransEl.textContent = shownTranslation;
+                qWordEl.className = WORD_TOP;
+                qTransEl.className = TRANS_BOTTOM;
+                qWordEl.textContent = topText;
+                qTransEl.textContent = bottomText;
             }
         };
 
