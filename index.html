@@ -610,10 +610,13 @@
             -webkit-box-decoration-break: clone;
         }
         #library-read-view .text-reader .word-saved {
-            background-color: rgba(209, 250, 229, 0.55);
+            background-color: #d1fae5;
         }
         #library-read-view .text-reader .word-saved-phrase {
-            background-color: rgba(209, 250, 229, 0.42);
+            background-color: rgba(209, 250, 229, 0.52);
+        }
+        #library-read-view.reader-tools-floated #reader-pagination {
+            margin-bottom: 5.25rem;
         }
         #library-read-view.reader-hl-mode #reader-content {
             cursor: text;
@@ -1922,19 +1925,194 @@
         /* Ring lives in header next to profile; keep profile-modal duplicate off */
         .year-ring-profile-row { display: none !important; }
         .year-activity-disk {
-            width: min(100%, 280px);
-            margin: 0 auto;
+            width: 280px;
+            max-width: 100%;
+            margin: 0;
+        }
+        #year-activity-modal.is-expanded .year-activity-disk {
+            width: min(72vh, 72vw, 720px);
+            max-width: 100%;
         }
         .year-activity-disk svg { width: 100%; height: auto; display: block; }
+        #year-activity-modal {
+            --year-gap: 1.75rem;
+            --year-cal-w: 15rem;
+            --year-stats-w: 13.75rem;
+            --year-disk-w: 280px;
+        }
+        #year-activity-modal.is-expanded {
+            --year-gap: 3rem;
+            --year-cal-w: 18rem;
+            --year-stats-w: 16rem;
+            padding: 0.5rem;
+        }
+        #year-activity-modal .year-activity-card {
+            width: min(96vw, calc(var(--year-disk-w) + var(--year-cal-w) + var(--year-stats-w) + var(--year-gap) * 2 + 3rem));
+            max-width: min(96vw, calc(var(--year-disk-w) + var(--year-cal-w) + var(--year-stats-w) + var(--year-gap) * 2 + 3rem));
+            min-height: 26rem;
+            max-height: none;
+            overflow: hidden;
+            position: relative;
+        }
+        #year-activity-modal.is-expanded .year-activity-card {
+            width: fit-content;
+            max-width: min(98vw, calc(720px + var(--year-cal-w) + var(--year-stats-w) + var(--year-gap) * 2 + 3rem));
+            min-height: min(78vh, 760px);
+            max-height: 96vh;
+            overflow-y: auto;
+        }
+        @media (max-width: 639px) {
+            #year-activity-modal .year-activity-card {
+                width: min(94vw, 21rem);
+                max-width: min(94vw, 21rem);
+                min-height: 0;
+            }
+            #year-activity-modal.is-expanded .year-activity-card {
+                width: min(98vw, 100%);
+                max-width: 98vw;
+            }
+            .year-activity-disk {
+                width: min(100%, 260px);
+            }
+        }
+        .year-modal-toolbar {
+            position: absolute;
+            top: 0.65rem;
+            right: 0.65rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .year-modal-icon-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 1rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        .year-modal-icon-btn:hover {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+            color: #4338ca;
+        }
+        .year-modal-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+        @media (min-width: 640px) {
+            .year-modal-layout {
+                grid-template-columns: var(--year-disk-w) var(--year-cal-w) var(--year-stats-w);
+                column-gap: var(--year-gap);
+                row-gap: 0;
+                align-items: start;
+                min-height: 22rem;
+            }
+            #year-activity-modal.is-expanded .year-modal-layout {
+                grid-template-columns: auto var(--year-cal-w) var(--year-stats-w);
+                column-gap: var(--year-gap);
+                align-items: center;
+                min-height: min(72vh, 720px);
+            }
+        }
+        .year-modal-disk-col {
+            position: relative;
+            min-width: 0;
+            width: var(--year-disk-w);
+            max-width: 100%;
+            justify-self: start;
+        }
+        #year-activity-modal.is-expanded .year-modal-disk-col {
+            width: auto;
+            max-width: none;
+        }
+        .year-modal-right-col {
+            min-width: 0;
+            width: var(--year-cal-w);
+            max-width: 100%;
+            justify-self: start;
+        }
+        #year-day-side-panel {
+            display: none;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            max-height: 22rem;
+            overflow-y: auto;
+            box-sizing: border-box;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(160deg, #fafafe 0%, #f8fafc 100%);
+            padding: 0.85rem;
+        }
+        @media (min-width: 640px) {
+            #year-day-side-panel {
+                display: block;
+                visibility: hidden;
+                opacity: 0;
+                pointer-events: none;
+            }
+            #year-activity-modal.has-day-panel #year-day-side-panel {
+                visibility: visible;
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+        #year-activity-modal.has-day-panel #year-day-side-panel {
+            display: block;
+        }
+        #year-day-side-panel.is-preview {
+            border-style: dashed;
+            border-color: #c7d2fe;
+            background: linear-gradient(160deg, #fafafe 0%, #fff 100%);
+        }
+        #year-day-side-panel.is-preview .year-side-close { display: none; }
+        @media (min-width: 640px) {
+            #year-day-side-panel {
+                transition: opacity 0.15s ease, visibility 0.15s ease;
+            }
+        }
+        #year-rules-tip {
+            position: absolute;
+            left: 1.1rem;
+            right: 4.75rem;
+            top: 3.35rem;
+            z-index: 30;
+            margin: 0;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+        }
+        #year-rules-tip.hidden { display: none !important; }
+        .year-cal-wrap {
+            margin-top: 0;
+            width: 100%;
+        }
+        #year-activity-modal.is-expanded .year-cal-cell {
+            font-size: 0.78rem;
+            border-radius: 0.5rem;
+        }
+        #year-activity-modal.is-expanded .year-cal-dow {
+            font-size: 0.75rem;
+        }
+        #year-activity-modal.is-expanded .year-cal-grid {
+            gap: 0.28rem;
+        }
         .year-cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 0.28rem;
+            gap: 0.22rem;
         }
         .year-cal-cell {
             aspect-ratio: 1;
             border-radius: 0.45rem;
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -1945,20 +2123,110 @@
         }
         .year-cal-cell.is-muted { opacity: 0.35; }
         .year-cal-cell.is-today { border-color: #a5b4fc; color: #4338ca; }
-        .year-cal-cell.is-done {
-            background: #d1fae5;
-            color: #047857;
+        .year-cal-cell.is-done { background: #d1fae5; color: #047857; }
+        .year-cal-cell.is-partial { background: #f1f5f9; color: #64748b; }
+        .year-side-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.65rem;
         }
-        .year-cal-cell.is-partial {
-            background: #f1f5f9;
-            color: #64748b;
+        .year-side-close {
+            width: 1.65rem;
+            height: 1.65rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 1.35rem;
+            line-height: 1;
+            flex-shrink: 0;
         }
+        .year-side-close:hover { color: #475569; background: #f1f5f9; }
         .year-cal-dow {
             text-align: center;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             font-weight: 800;
             color: #94a3b8;
             text-transform: uppercase;
+        }
+        .year-cal-cell.is-clickable {
+            cursor: pointer;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+        }
+        .year-cal-cell.is-clickable:hover {
+            transform: scale(1.06);
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+            border-color: #c7d2fe;
+        }
+        .year-cal-cell.is-selected {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+        }
+        .year-disk-wedge {
+            cursor: pointer;
+            transition: opacity 0.15s ease, filter 0.15s ease;
+        }
+        .year-disk-wedge:hover { filter: brightness(0.92); }
+        .year-disk-wedge.is-hover { filter: brightness(0.9); stroke-width: 0.9 !important; }
+        .year-disk-wedge.is-selected { filter: brightness(0.86); stroke-width: 1.15 !important; }
+        #year-activity-main-view { transition: opacity 0.2s ease; }
+        #year-day-side-panel .year-day-stat-grid {
+            grid-template-columns: 1fr;
+            gap: 0.45rem;
+        }
+        #year-day-side-panel .year-day-stat {
+            padding: 0.6rem 0.7rem;
+        }
+        #year-day-side-panel .year-day-stat-val {
+            font-size: 1.2rem;
+        }
+        .year-day-stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.55rem;
+        }
+        .year-day-stat {
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(145deg, #fff 0%, #f8fafc 100%);
+            padding: 0.75rem 0.85rem;
+            text-align: left;
+        }
+        .year-day-stat.is-wide { grid-column: 1 / -1; }
+        .year-day-stat-emoji { font-size: 1.25rem; line-height: 1; margin-bottom: 0.35rem; }
+        .year-day-stat-val {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #0f172a;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.1;
+        }
+        .year-day-stat-words {
+            font-size: 0.68em;
+            font-weight: 800;
+            color: #64748b;
+        }
+        .year-day-stat-sub {
+            display: block;
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: #64748b;
+            margin-top: 0.2rem;
+        }
+        .year-day-stat-lbl {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #64748b;
+            margin-top: 0.2rem;
+            line-height: 1.3;
+        }
+        #year-day-hover-hint,
+        #year-day-hover-float { display: none !important; }
+        .year-cal-cell.is-preview {
+            border-color: #a5b4fc !important;
+            box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.18);
         }
         .dict-icon-btn {
             width: 2.25rem;
@@ -3369,22 +3637,41 @@
 
     <!-- Modal: Year activity (365-day circle) -->
     <div id="year-activity-modal" class="hidden fixed inset-0 z-[170] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeYearActivityModal()">
-        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-2xl max-w-md w-full relative max-h-[92vh] overflow-y-auto custom-scroll" role="dialog" aria-modal="true" aria-labelledby="year-activity-title">
-            <button type="button" onclick="closeYearActivityModal()" class="absolute top-3 right-4 text-slate-400 hover:text-slate-700 font-bold text-3xl leading-none" aria-label="Close">&times;</button>
-            <button type="button" id="btn-year-rules-info" onclick="toggleYearRulesTip(event)" onmouseenter="showYearRulesTip()" onmouseleave="hideYearRulesTip()" class="absolute top-3.5 right-12 w-8 h-8 rounded-full border border-slate-200 bg-slate-50 hover:bg-indigo-50 text-base leading-none flex items-center justify-center transition" data-i18n-title="year.ruleHint" title="Green day rules" aria-label="Info">ℹ️</button>
-            <h3 id="year-activity-title" class="text-lg font-bold text-slate-800 mb-1 pr-20" data-i18n="year.modalTitle">Рік навчання</h3>
-            <p id="year-activity-sub" class="text-xs text-slate-500 mb-4"></p>
-            <div id="year-rules-tip" class="hidden mb-4 text-[12px] leading-relaxed text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5" data-i18n-html="year.ruleHintHtml"></div>
-            <div id="year-activity-disk" class="year-activity-disk mb-3"></div>
-            <p id="year-activity-pct" class="text-center text-2xl font-black text-emerald-600 tabular-nums mb-1"></p>
-            <p id="year-activity-detail" class="text-center text-xs font-semibold text-slate-500 mb-5"></p>
-            <div class="flex items-center justify-between gap-2 mb-2">
-                <button type="button" id="btn-year-cal-prev" onclick="shiftYearCalendar(-1)" class="w-9 h-9 rounded-xl border border-slate-200 bg-slate-50 hover:bg-indigo-50 text-slate-600 font-bold transition">‹</button>
-                <p id="year-cal-month-label" class="text-sm font-bold text-slate-700"></p>
-                <button type="button" id="btn-year-cal-next" onclick="shiftYearCalendar(1)" class="w-9 h-9 rounded-xl border border-slate-200 bg-slate-50 hover:bg-indigo-50 text-slate-600 font-bold transition">›</button>
+        <div id="year-activity-card" class="year-activity-card bg-white p-5 sm:p-6 rounded-2xl shadow-2xl w-full relative" role="dialog" aria-modal="true" aria-labelledby="year-activity-title" onclick="event.stopPropagation()">
+            <div class="year-modal-toolbar">
+                <button type="button" id="btn-year-expand" onclick="toggleYearActivityExpand()" class="year-modal-icon-btn" data-i18n-title="year.expand" title="Expand" aria-pressed="false">⤢</button>
+                <button type="button" id="btn-year-rules-info" onclick="toggleYearRulesTip(event)" class="year-modal-icon-btn" data-i18n-title="year.ruleHint" title="Green day rules" aria-label="Info" aria-expanded="false">ℹ️</button>
+                <button type="button" onclick="closeYearActivityModal()" class="year-modal-icon-btn text-xl font-bold" aria-label="Close">&times;</button>
             </div>
-            <div id="year-cal-dow" class="year-cal-grid mb-1"></div>
-            <div id="year-cal-grid" class="year-cal-grid mb-1"></div>
+            <h3 id="year-activity-title" class="text-lg font-bold text-slate-800 mb-0.5 pr-28" data-i18n="year.modalTitle">Рік навчання</h3>
+            <p id="year-activity-sub" class="text-xs text-slate-500 mb-3"></p>
+            <div id="year-rules-tip" class="hidden text-[12px] leading-relaxed text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5" data-i18n-html="year.ruleHintHtml"></div>
+            <div class="year-modal-layout">
+                <div class="year-modal-disk-col">
+                    <div id="year-activity-disk" class="year-activity-disk"></div>
+                </div>
+                <div class="year-modal-right-col">
+                    <div class="year-cal-wrap">
+                        <div class="flex items-center justify-between gap-1 mb-1">
+                            <button type="button" id="btn-year-cal-prev" onclick="shiftYearCalendar(-1)" class="w-7 h-7 rounded-lg border border-slate-200 bg-slate-50 hover:bg-indigo-50 text-slate-600 font-bold text-xs transition">‹</button>
+                            <p id="year-cal-month-label" class="text-xs font-bold text-slate-700 text-center leading-tight"></p>
+                            <button type="button" id="btn-year-cal-next" onclick="shiftYearCalendar(1)" class="w-7 h-7 rounded-lg border border-slate-200 bg-slate-50 hover:bg-indigo-50 text-slate-600 font-bold text-xs transition">›</button>
+                        </div>
+                        <div id="year-cal-dow" class="year-cal-grid mb-0.5"></div>
+                        <div id="year-cal-grid" class="year-cal-grid"></div>
+                    </div>
+                </div>
+                <aside id="year-day-side-panel" aria-live="polite" onmouseenter="cancelYearDayPreviewClear()" onmouseleave="clearYearDayPreview()">
+                    <div class="year-side-head">
+                        <div class="min-w-0">
+                            <p id="year-day-detail-date" class="text-sm font-black text-slate-800 leading-snug"></p>
+                            <p id="year-day-detail-sub" class="text-[10px] text-slate-500 mt-0.5 leading-snug"></p>
+                        </div>
+                        <button type="button" class="year-side-close" onclick="closeYearDayDetail()" aria-label="Close">&times;</button>
+                    </div>
+                    <div id="year-day-stat-grid" class="year-day-stat-grid"></div>
+                </aside>
+            </div>
         </div>
     </div>
 
@@ -3736,18 +4023,25 @@
                         <div class="flex flex-col w-full pt-1 border-t border-slate-100">
                             <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wide mb-2" data-i18n="train.bsOrder">Порядок Brainstorm:</label>
                             <div class="flex flex-col sm:flex-row gap-2" id="bs-order-options">
-                                <button type="button" id="bs-order-new" onclick="setBrainstormOrder('new')" class="bs-order-btn is-on">
-                                    <span class="bs-order-emoji" aria-hidden="true">🆕</span>
+                                <button type="button" id="bs-order-new" onclick="setBrainstormOrder('new')" class="bs-order-btn">
+                                    <span class="bs-order-emoji" aria-hidden="true">🌱</span>
                                     <span class="min-w-0">
                                         <span class="bs-order-title" data-i18n="train.bsOrderNew">Нові</span>
                                         <span class="bs-order-hint" data-i18n="train.bsOrderNewHint">Спочатку свіжі слова</span>
+                                    </span>
+                                </button>
+                                <button type="button" id="bs-order-mixed" onclick="setBrainstormOrder('mixed')" class="bs-order-btn is-on">
+                                    <span class="bs-order-emoji" aria-hidden="true">⚖️</span>
+                                    <span class="min-w-0">
+                                        <span class="bs-order-title" data-i18n="train.bsOrderMixed">Змішано</span>
+                                        <span class="bs-order-hint" data-i18n="train.bsOrderMixedHint">Нові, потім старіші — по черзі</span>
                                     </span>
                                 </button>
                                 <button type="button" id="bs-order-reviews" onclick="setBrainstormOrder('reviews')" class="bs-order-btn">
                                     <span class="bs-order-emoji" aria-hidden="true">🔁</span>
                                     <span class="min-w-0">
                                         <span class="bs-order-title" data-i18n="train.bsOrderReviews">Повторення</span>
-                                        <span class="bs-order-hint" data-i18n="train.bsOrderReviewsHint">Спочатку пізніші етапи</span>
+                                        <span class="bs-order-hint" data-i18n="train.bsOrderReviewsHint">Спочатку вищі рівні</span>
                                     </span>
                                 </button>
                             </div>
@@ -4283,8 +4577,10 @@
                 'train.bsOrder': 'Порядок Brainstorm:',
                 'train.bsOrderNew': 'Нові',
                 'train.bsOrderNewHint': 'Спочатку свіжі слова',
+                'train.bsOrderMixed': 'Змішано',
+                'train.bsOrderMixedHint': 'Нові, потім старіші — по черзі',
                 'train.bsOrderReviews': 'Повторення',
-                'train.bsOrderReviewsHint': 'Спочатку пізніші етапи',
+                'train.bsOrderReviewsHint': 'Спочатку вищі рівні',
                 'train.bsStage': 'Етап {n}',
                 'train.ctorStrictTip': 'З 4-го етапу помилка в літері означає, що слово не перейде далі — навіть якщо ви потім виправите.',
                 'train.sprintRulesTitle': 'Фінальний спринт',
@@ -4603,6 +4899,19 @@
                 'year.ruleHint': 'Що потрібно для зеленого дня',
                 'year.ruleHintHtml': 'День стає зеленим, якщо виконано <b>будь-яку одну</b> з умов:<br>• пройти 1 сесію Brainstorm <i>або</i> 1 повторення вивчених слів;<br>• завершити 2 інші тренування (не Brainstorm / не повторення);<br>• додати до словника щонайменше 3 нові слова;<br>• позначити як опрацьований матеріал із текстом приблизно від 400 символів.',
                 'year.partial': 'Було тренування, але ще не «зелений» день',
+                'year.dayBack': 'До кола',
+                'year.daySub': 'Статистика · {track}',
+                'year.dayWordsAdded': 'Слів додано',
+                'year.dayBrainstorm': 'Сесії Brainstorm',
+                'year.dayReview': 'Сесії повторення',
+                'year.dayOtherTrain': 'Інші тренування',
+                'year.dayMaterials': 'Матеріали прочитано',
+                'year.dayEmpty': 'На цей день ще нічого не записано',
+                'year.dayPreviewSub': 'Наведіть · клік — закріпити',
+                'year.dayGreen': 'Зелений день ✓',
+                'year.expand': 'На весь екран',
+                'year.shrink': 'Звичний розмір',
+                'year.dayWordsStudied': '{n} слів',
                 'searching': 'Шукаємо...', 'notFound': 'Не знайдено'
             },
             en: {
@@ -4684,8 +4993,10 @@
                 'train.bsOrder': 'Brainstorm order:',
                 'train.bsOrderNew': 'New',
                 'train.bsOrderNewHint': 'Fresh words first',
+                'train.bsOrderMixed': 'Mixed',
+                'train.bsOrderMixedHint': 'New batch, then older — alternating',
                 'train.bsOrderReviews': 'Reviews',
-                'train.bsOrderReviewsHint': 'Later stages first',
+                'train.bsOrderReviewsHint': 'Higher levels first',
                 'train.bsStage': 'Stage {n}',
                 'train.ctorStrictTip': 'From stage 4 onward, a wrong letter means this word will not advance — even if you fix it afterward.',
                 'train.sprintRulesTitle': 'Final sprint',
@@ -4999,6 +5310,19 @@
                 'year.ruleHint': 'What counts as a green day',
                 'year.ruleHintHtml': 'A day turns green when you meet <b>any one</b> of these:<br>• complete 1 Brainstorm session <i>or</i> 1 review of learned words;<br>• finish 2 other trainings (not Brainstorm / not review);<br>• add at least 3 new words to the dictionary;<br>• mark as read a material with roughly 400+ characters of text.',
                 'year.partial': 'Some training, but not a green day yet',
+                'year.dayBack': 'Back to circle',
+                'year.daySub': 'Stats · {track}',
+                'year.dayWordsAdded': 'Words added',
+                'year.dayBrainstorm': 'Brainstorm sessions',
+                'year.dayReview': 'Review sessions',
+                'year.dayOtherTrain': 'Other trainings',
+                'year.dayMaterials': 'Materials read',
+                'year.dayEmpty': 'Nothing recorded for this day',
+                'year.dayPreviewSub': 'Hover · click to pin',
+                'year.dayGreen': 'Green day ✓',
+                'year.expand': 'Full screen',
+                'year.shrink': 'Normal size',
+                'year.dayWordsStudied': '{n} words',
                 'searching': 'Searching...', 'notFound': 'Not found'
             },
             es: {
@@ -5080,8 +5404,10 @@
                 'train.bsOrder': 'Orden del Brainstorm:',
                 'train.bsOrderNew': 'Nuevas',
                 'train.bsOrderNewHint': 'Primero las recién añadidas',
+                'train.bsOrderMixed': 'Mixto',
+                'train.bsOrderMixedHint': 'Nuevas y luego anteriores — alternando',
                 'train.bsOrderReviews': 'Repasos',
-                'train.bsOrderReviewsHint': 'Primero las etapas posteriores',
+                'train.bsOrderReviewsHint': 'Primero niveles más altos',
                 'train.bsStage': 'Etapa {n}',
                 'train.ctorStrictTip': 'Desde la etapa 4, una letra incorrecta hace que la palabra no avance, aunque la corrijas después.',
                 'train.sprintRulesTitle': 'Sprint final',
@@ -5395,6 +5721,19 @@
                 'year.ruleHint': 'Qué cuenta como día verde',
                 'year.ruleHintHtml': 'Un día se pone verde si cumples <b>cualquiera</b> de estas condiciones:<br>• completar 1 sesión de Brainstorm <i>o</i> 1 repaso de palabras aprendidas;<br>• terminar 2 entrenamientos distintos (no Brainstorm / no repaso);<br>• añadir al menos 3 palabras nuevas al diccionario;<br>• marcar como leído un material con unos 400+ caracteres de texto.',
                 'year.partial': 'Hubo entrenamiento, pero aún no es un día verde',
+                'year.dayBack': 'Volver al círculo',
+                'year.daySub': 'Estadísticas · {track}',
+                'year.dayWordsAdded': 'Palabras añadidas',
+                'year.dayBrainstorm': 'Sesiones Brainstorm',
+                'year.dayReview': 'Sesiones de repaso',
+                'year.dayOtherTrain': 'Otros entrenamientos',
+                'year.dayMaterials': 'Materiales leídos',
+                'year.dayEmpty': 'Nada registrado este día',
+                'year.dayPreviewSub': 'Pasa el cursor · clic para fijar',
+                'year.dayGreen': 'Día verde ✓',
+                'year.expand': 'Pantalla completa',
+                'year.shrink': 'Tamaño normal',
+                'year.dayWordsStudied': '{n} palabras',
                 'searching': 'Buscando...', 'notFound': 'No encontrado'
             }
         };
@@ -5854,7 +6193,9 @@
                 try { endSession(); } catch (_) {}
             }
 
-            if (typeof bindYearActivityToTrack === 'function') {
+            if (typeof refreshYearActivityForCurrentTrack === 'function') {
+                refreshYearActivityForCurrentTrack();
+            } else if (typeof bindYearActivityToTrack === 'function') {
                 bindYearActivityToTrack();
                 if (typeof refreshYearRingUI === 'function') refreshYearRingUI();
             }
@@ -5926,11 +6267,7 @@
                             const local = yearActivityStore[tid];
                             // Prefer per-track v2 data; older polluted blobs get rebuilt on seed
                             for (const [k, v] of Object.entries(cloudDays)) {
-                                const cur = local.days[k] || { heavy: 0, other: 0 };
-                                local.days[k] = {
-                                    heavy: Math.max(cur.heavy || 0, v.heavy || 0),
-                                    other: Math.max(cur.other || 0, v.other || 0)
-                                };
+                                local.days[k] = mergeYearDayRecord(local.days[k], v);
                             }
                             if (ya.cycleStart) {
                                 if (!local.cycleStart || ya.cycleStart < local.cycleStart) {
@@ -6119,6 +6456,10 @@
         let yearActivityStore = {}; // trackId → { days, cycleStart, seeded, v }
         let yearActivity = { days: {}, cycleStart: null, seeded: false, v: 0 };
         let yearCalCursor = null; // Date for calendar month
+        let yearSelectedDayKey = null;
+        let yearPreviewDayKey = null;
+        let yearHoverDayKey = null;
+        let yearActivityExpanded = false;
 
         function activityTrackId() {
             return activeTrackId || `${learningLanguage}-${translationLanguage}` || 'en-uk';
@@ -6131,9 +6472,22 @@
         function bindYearActivityToTrack() {
             const tid = activityTrackId();
             if (!yearActivityStore[tid]) yearActivityStore[tid] = emptyYearActivity();
-            // Keep a live reference so mutations write into the store
             yearActivity = yearActivityStore[tid];
             if (!yearActivity.days || typeof yearActivity.days !== 'object') yearActivity.days = {};
+            yearActivity._trackId = tid;
+        }
+
+        function refreshYearActivityForCurrentTrack() {
+            bindYearActivityToTrack();
+            yearSelectedDayKey = null;
+            yearPreviewDayKey = null;
+            yearHoverDayKey = null;
+            refreshYearRingUI();
+            const modal = document.getElementById('year-activity-modal');
+            if (modal && !modal.classList.contains('hidden')) {
+                syncYearActivityModalChrome();
+                renderYearActivityModal();
+            }
         }
 
         /** Old single-circle data belonged to the original EN–UK dictionary — never dump it onto es-en etc. */
@@ -6249,13 +6603,55 @@
                 || (rec.reading || 0) >= 1;
         }
         function dayHasAnyActivity(rec) {
-            return !!rec && ((rec.heavy || 0) + (rec.other || 0) + (rec.wordsAdded || 0) + (rec.reading || 0) > 0);
+            return !!rec && (
+                (rec.heavy || 0) + (rec.other || 0) + (rec.wordsAdded || 0) + (rec.reading || 0)
+                + (rec.brainstorm || 0) + (rec.review || 0) > 0
+                || (Array.isArray(rec.sessionLog) && rec.sessionLog.length > 0)
+            );
+        }
+        function mergeSessionLogs(localLogs, cloudLogs) {
+            const combined = [...(Array.isArray(localLogs) ? localLogs : []), ...(Array.isArray(cloudLogs) ? cloudLogs : [])];
+            if (!combined.length) return [];
+            const seen = new Set();
+            const out = [];
+            combined.sort((a, b) => (a.at || 0) - (b.at || 0));
+            for (const log of combined) {
+                if (!log || typeof log !== 'object') continue;
+                const key = `${log.at || 0}|${log.bucket || ''}|${(log.words || []).join(',')}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                out.push({
+                    at: log.at || 0,
+                    bucket: log.bucket || 'brainstorm',
+                    words: Array.isArray(log.words) ? log.words.map(String) : []
+                });
+            }
+            return out.slice(-40);
+        }
+
+        function mergeYearDayRecord(localRec, cloudRec) {
+            const cur = localRec || {};
+            const v = cloudRec || {};
+            return {
+                heavy: Math.max(cur.heavy || 0, v.heavy || 0),
+                other: Math.max(cur.other || 0, v.other || 0),
+                brainstorm: Math.max(cur.brainstorm || 0, v.brainstorm || 0),
+                review: Math.max(cur.review || 0, v.review || 0),
+                wordsAdded: Math.max(cur.wordsAdded || 0, v.wordsAdded || 0),
+                reading: Math.max(cur.reading || 0, v.reading || 0),
+                sessionLog: mergeSessionLogs(cur.sessionLog, v.sessionLog)
+            };
         }
         function ensureYearDayRec(key) {
-            if (!yearActivity.days[key]) yearActivity.days[key] = { heavy: 0, other: 0, wordsAdded: 0, reading: 0 };
+            if (!yearActivity.days[key]) {
+                yearActivity.days[key] = { heavy: 0, other: 0, wordsAdded: 0, reading: 0, brainstorm: 0, review: 0, sessionLog: [] };
+            }
             const rec = yearActivity.days[key];
             if (rec.wordsAdded == null) rec.wordsAdded = 0;
             if (rec.reading == null) rec.reading = 0;
+            if (rec.brainstorm == null) rec.brainstorm = 0;
+            if (rec.review == null) rec.review = 0;
+            if (!Array.isArray(rec.sessionLog)) rec.sessionLog = [];
             return rec;
         }
         function persistYearDayBump() {
@@ -6271,6 +6667,7 @@
             return key;
         }
         function recordWordsAdded(n = 1) {
+            bindYearActivityToTrack();
             const count = Math.max(0, Math.floor(+n || 0));
             if (!count) return;
             const key = dayKeyFromDate(new Date());
@@ -6293,6 +6690,7 @@
             }
         }
         function recordSubstantialReading(m) {
+            bindYearActivityToTrack();
             if (materialTextCharCount(m) < YEAR_READING_MIN_CHARS) return;
             const key = dayKeyFromDate(new Date());
             if (!key) return;
@@ -6306,13 +6704,16 @@
                 event.preventDefault();
             }
             const tip = document.getElementById('year-rules-tip');
+            const btn = document.getElementById('btn-year-rules-info');
             if (!tip) return;
-            // Touch / click: toggle. Pointer hover uses show/hide separately.
-            if (event && event.pointerType === 'mouse') return;
-            tip.classList.toggle('hidden');
-            if (!tip.classList.contains('hidden')) {
+            const opening = tip.classList.contains('hidden');
+            if (opening) {
                 tip.innerHTML = t('year.ruleHintHtml');
+                tip.classList.remove('hidden');
+            } else {
+                tip.classList.add('hidden');
             }
+            if (btn) btn.setAttribute('aria-expanded', opening ? 'true' : 'false');
         };
         window.showYearRulesTip = () => {
             const tip = document.getElementById('year-rules-tip');
@@ -6342,6 +6743,7 @@
             };
         }
         function countYearQualified() {
+            bindYearActivityToTrack();
             const win = getYearCycleWindow();
             if (!win) return { done: 0, total: YEAR_CYCLE_DAYS, pct: 0 };
             let done = 0;
@@ -6351,14 +6753,349 @@
             return { done, total: YEAR_CYCLE_DAYS, pct: Math.round((done / YEAR_CYCLE_DAYS) * 100) };
         }
 
-        function recordTrainingSession(mode) {
+        function recordTrainingSession(mode, wordIds = []) {
+            bindYearActivityToTrack();
             const key = dayKeyFromDate(new Date());
             if (!key) return;
             const rec = ensureYearDayRec(key);
-            if (isHeavyTrainingMode(mode)) rec.heavy = (rec.heavy || 0) + 1;
-            else rec.other = (rec.other || 0) + 1;
+            const bucket = activityModeBucket(mode);
+            if (mode === 'all' || mode === 'sprint') {
+                rec.brainstorm = (rec.brainstorm || 0) + 1;
+                rec.heavy = (rec.heavy || 0) + 1;
+            } else if (mode === 'review') {
+                rec.review = (rec.review || 0) + 1;
+                rec.heavy = (rec.heavy || 0) + 1;
+            } else if (isHeavyTrainingMode(mode)) {
+                rec.brainstorm = (rec.brainstorm || 0) + 1;
+                rec.heavy = (rec.heavy || 0) + 1;
+            } else {
+                rec.other = (rec.other || 0) + 1;
+            }
+            const ids = [...new Set((wordIds || []).filter(Boolean).map((id) => String(id)))];
+            rec.sessionLog.push({ at: Date.now(), bucket, words: ids, mode: mode || bucket });
+            if (rec.sessionLog.length > 40) rec.sessionLog = rec.sessionLog.slice(-40);
             persistYearDayBump();
         }
+
+        function aggregateSessionLogs(dayKey) {
+            const empty = () => ({ sessions: 0, words: 0 });
+            const out = { brainstorm: empty(), review: empty(), other: empty() };
+            const rec = dayKey ? (yearActivity.days[dayKey] || {}) : {};
+            const logs = Array.isArray(rec.sessionLog) ? rec.sessionLog : [];
+            for (const log of logs) {
+                const bucket = log.bucket || 'brainstorm';
+                if (!out[bucket]) continue;
+                out[bucket].sessions++;
+                out[bucket].words += (log.words || []).length;
+            }
+            return out;
+        }
+
+        function activityModeBucket(mode) {
+            const m = mode || '';
+            if (m === 'review' || m === 'review-peek') return 'review';
+            if (m === 'brainstorm' || m === 'all' || m === 'sprint') return 'brainstorm';
+            return 'other';
+        }
+
+        function inferDaySessionDetails(dayKey) {
+            return aggregateSessionLogs(dayKey);
+        }
+
+        function inferDaySessionsForKey(dayKey) {
+            const d = inferDaySessionDetails(dayKey);
+            return {
+                brainstorm: d.brainstorm.sessions,
+                review: d.review.sessions,
+                other: d.other.sessions
+            };
+        }
+
+        function inferWordsAddedForDay(dayKey) {
+            let n = 0;
+            for (const w of vocabulary || []) {
+                const addedMs = historyTimestamp(getWordAddedAt(w));
+                if (addedMs && dayKeyFromDate(new Date(addedMs)) === dayKey) n++;
+            }
+            return n;
+        }
+
+        function inferReadingForDay(dayKey) {
+            let n = 0;
+            for (const m of materials || []) {
+                if (!m?.readAt) continue;
+                const at = historyTimestamp(m.readAt);
+                if (!at || dayKeyFromDate(new Date(at)) !== dayKey) continue;
+                if (materialTextCharCount(m) >= YEAR_READING_MIN_CHARS) n++;
+            }
+            return n;
+        }
+
+        function reconcileYearActivityFromSources() {
+            bindYearActivityToTrack();
+            let dirty = false;
+            const wordDays = {};
+            for (const w of vocabulary || []) {
+                const addedMs = historyTimestamp(getWordAddedAt(w));
+                if (!addedMs) continue;
+                const key = dayKeyFromDate(new Date(addedMs));
+                if (!key) continue;
+                wordDays[key] = (wordDays[key] || 0) + 1;
+            }
+            for (const [key, n] of Object.entries(wordDays)) {
+                const rec = ensureYearDayRec(key);
+                if (n > (rec.wordsAdded || 0)) {
+                    rec.wordsAdded = n;
+                    dirty = true;
+                }
+            }
+            const readDays = {};
+            for (const m of materials || []) {
+                if (!m?.readAt) continue;
+                const at = historyTimestamp(m.readAt);
+                if (!at) continue;
+                if (materialTextCharCount(m) < YEAR_READING_MIN_CHARS) continue;
+                const key = dayKeyFromDate(new Date(at));
+                if (!key) continue;
+                readDays[key] = (readDays[key] || 0) + 1;
+            }
+            for (const [key, n] of Object.entries(readDays)) {
+                const rec = ensureYearDayRec(key);
+                if (n > (rec.reading || 0)) {
+                    rec.reading = n;
+                    dirty = true;
+                }
+            }
+            if (dirty) {
+                persistYearActivityLocal();
+                persistYearActivityCloud();
+                refreshYearRingUI();
+                const modal = document.getElementById('year-activity-modal');
+                if (modal && !modal.classList.contains('hidden')) renderYearActivityModal();
+            }
+        }
+
+        function getDayDetailStats(dayKey) {
+            bindYearActivityToTrack();
+            const stored = dayKey ? (yearActivity.days[dayKey] || {}) : {};
+            const logged = aggregateSessionLogs(dayKey);
+            const wordsAdded = Math.max(stored.wordsAdded || 0, inferWordsAddedForDay(dayKey));
+            const reading = Math.max(stored.reading || 0, inferReadingForDay(dayKey));
+            return {
+                wordsAdded,
+                brainstorm: {
+                    sessions: logged.brainstorm.sessions || stored.brainstorm || 0,
+                    words: logged.brainstorm.words
+                },
+                review: {
+                    sessions: logged.review.sessions || stored.review || 0,
+                    words: logged.review.words
+                },
+                other: {
+                    sessions: logged.other.sessions || stored.other || 0,
+                    words: logged.other.words
+                },
+                reading
+            };
+        }
+
+        function formatYearDayLabel(dayKey) {
+            const d = parseDayKey(dayKey);
+            if (!d) return dayKey || '';
+            return d.toLocaleDateString(uiLocale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        function formatYearDayShort(dayKey) {
+            const d = parseDayKey(dayKey);
+            if (!d) return dayKey || '';
+            return d.toLocaleDateString(uiLocale(), { day: 'numeric', month: 'short' });
+        }
+
+        function activityTrackLabel() {
+            const parsed = parseTrackId(activityTrackId());
+            if (!parsed) return activityTrackId();
+            return `${parsed.learn.toUpperCase()} → ${parsed.trans.toUpperCase()}`;
+        }
+
+        function dayHasDetailStats(stats) {
+            if (!stats) return false;
+            return (stats.wordsAdded + stats.brainstorm.sessions + stats.review.sessions
+                + stats.other.sessions + stats.reading) > 0;
+        }
+
+        function formatYearDayHoverHtml(dayKey, stats) {
+            const date = formatYearDayShort(dayKey);
+            if (!dayHasDetailStats(stats)) {
+                return `<strong>${escapeHtmlText(date)}</strong><br>${escapeHtmlText(t('year.dayEmpty'))}`;
+            }
+            const lines = [`<strong>${escapeHtmlText(date)}</strong>`];
+            if (stats.wordsAdded) lines.push(`🌱 +${stats.wordsAdded}`);
+            if (stats.brainstorm.sessions) {
+                lines.push(`🧠 ${stats.brainstorm.sessions}${stats.brainstorm.words ? ` · ${t('year.dayWordsStudied', { n: stats.brainstorm.words })}` : ''}`);
+            }
+            if (stats.review.sessions) {
+                lines.push(`🔁 ${stats.review.sessions}${stats.review.words ? ` · ${t('year.dayWordsStudied', { n: stats.review.words })}` : ''}`);
+            }
+            if (stats.other.sessions) {
+                lines.push(`🎯 ${stats.other.sessions}${stats.other.words ? ` · ${t('year.dayWordsStudied', { n: stats.other.words })}` : ''}`);
+            }
+            if (stats.reading) lines.push(`📖 ${stats.reading}`);
+            return lines.join('<br>');
+        }
+
+        function yearDayHoverText(dayKey) {
+            return formatYearDayShort(dayKey);
+        }
+
+        function syncYearActivityModalChrome() {
+            const modal = document.getElementById('year-activity-modal');
+            const card = document.getElementById('year-activity-card');
+            const expandBtn = document.getElementById('btn-year-expand');
+            const panel = document.getElementById('year-day-side-panel');
+            const showPanel = !!(yearSelectedDayKey || yearPreviewDayKey);
+            if (modal) {
+                modal.classList.toggle('is-expanded', yearActivityExpanded);
+                modal.classList.toggle('has-day-panel', showPanel);
+            }
+            if (card) card.classList.toggle('is-expanded', yearActivityExpanded);
+            if (panel) panel.classList.toggle('is-preview', !!yearPreviewDayKey && !yearSelectedDayKey);
+            if (expandBtn) {
+                expandBtn.title = yearActivityExpanded ? t('year.shrink') : t('year.expand');
+                expandBtn.setAttribute('aria-pressed', yearActivityExpanded ? 'true' : 'false');
+                expandBtn.textContent = yearActivityExpanded ? '⤡' : '⤢';
+            }
+        }
+
+        function renderYearDayStatCard(emoji, sessions, words, label, showWordsSlash = true) {
+            let valHtml = String(sessions);
+            if (showWordsSlash && words > 0) {
+                valHtml += `<span class="year-day-stat-words"> / ${words}</span>`;
+            }
+            return `<div class="year-day-stat">
+                <div class="year-day-stat-emoji" aria-hidden="true">${emoji}</div>
+                <div class="year-day-stat-val">${valHtml}</div>
+                <div class="year-day-stat-lbl">${escapeHtmlText(label)}</div>
+            </div>`;
+        }
+
+        function populateYearDayPanel(dayKey, { isPreview = false } = {}) {
+            const panel = document.getElementById('year-day-side-panel');
+            if (!panel || !dayKey) return;
+            const stats = getDayDetailStats(dayKey);
+            const rec = yearActivity.days[dayKey];
+            const dateEl = document.getElementById('year-day-detail-date');
+            const subEl = document.getElementById('year-day-detail-sub');
+            const grid = document.getElementById('year-day-stat-grid');
+            if (dateEl) dateEl.textContent = formatYearDayLabel(dayKey);
+            if (subEl) {
+                if (isPreview) {
+                    subEl.textContent = t('year.dayPreviewSub');
+                } else {
+                    const bits = [activityTrackLabel()];
+                    if (dayMeetsYearGoal(rec)) bits.push(t('year.dayGreen'));
+                    subEl.textContent = bits.join(' · ');
+                }
+            }
+            if (grid) {
+                const cards = [];
+                if (stats.wordsAdded > 0) {
+                    cards.push(renderYearDayStatCard('🌱', stats.wordsAdded, 0, t('year.dayWordsAdded'), false));
+                }
+                if (stats.brainstorm.sessions > 0) {
+                    cards.push(renderYearDayStatCard('🧠', stats.brainstorm.sessions, stats.brainstorm.words, t('year.dayBrainstorm')));
+                }
+                if (stats.review.sessions > 0) {
+                    cards.push(renderYearDayStatCard('🔁', stats.review.sessions, stats.review.words, t('year.dayReview')));
+                }
+                if (stats.other.sessions > 0) {
+                    cards.push(renderYearDayStatCard('🎯', stats.other.sessions, stats.other.words, t('year.dayOtherTrain')));
+                }
+                if (stats.reading > 0) {
+                    cards.push(renderYearDayStatCard('📖', stats.reading, 0, t('year.dayMaterials'), false));
+                }
+                if (!cards.length) {
+                    grid.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">${escapeHtmlText(t('year.dayEmpty'))}</p>`;
+                } else {
+                    grid.innerHTML = cards.join('');
+                }
+            }
+            panel.classList.toggle('is-preview', isPreview);
+        }
+
+        function renderYearDayDetail(dayKey) {
+            if (!dayKey) return;
+            yearSelectedDayKey = dayKey;
+            yearPreviewDayKey = null;
+            yearHoverDayKey = dayKey;
+            populateYearDayPanel(dayKey, { isPreview: false });
+            syncYearActivityModalChrome();
+            renderYearDisk();
+            renderYearCalendar();
+        }
+
+        window.toggleYearActivityExpand = () => {
+            yearActivityExpanded = !yearActivityExpanded;
+            syncYearActivityModalChrome();
+            renderYearDisk();
+            if (yearSelectedDayKey) populateYearDayPanel(yearSelectedDayKey, { isPreview: false });
+            else if (yearPreviewDayKey) populateYearDayPanel(yearPreviewDayKey, { isPreview: true });
+        };
+
+        window.selectYearDay = (dayKey) => {
+            if (!dayKey) return;
+            cancelYearDayPreviewClear();
+            renderYearDayDetail(dayKey);
+        };
+
+        window.closeYearDayDetail = () => {
+            cancelYearDayPreviewClear();
+            yearSelectedDayKey = null;
+            yearPreviewDayKey = null;
+            yearHoverDayKey = null;
+            syncYearActivityModalChrome();
+            renderYearDisk();
+            renderYearCalendar();
+        };
+
+        let yearPreviewClearTimer = null;
+
+        function cancelYearDayPreviewClear() {
+            if (yearPreviewClearTimer) {
+                clearTimeout(yearPreviewClearTimer);
+                yearPreviewClearTimer = null;
+            }
+        }
+
+        function scheduleYearDayPreviewClear() {
+            if (yearSelectedDayKey) return;
+            cancelYearDayPreviewClear();
+            yearPreviewClearTimer = setTimeout(() => {
+                yearPreviewClearTimer = null;
+                yearPreviewDayKey = null;
+                yearHoverDayKey = null;
+                syncYearActivityModalChrome();
+                renderYearDisk();
+                renderYearCalendar();
+            }, 160);
+        }
+
+        window.previewYearDay = (dayKey) => {
+            if (yearSelectedDayKey || !dayKey) return;
+            cancelYearDayPreviewClear();
+            yearPreviewDayKey = dayKey;
+            yearHoverDayKey = dayKey;
+            populateYearDayPanel(dayKey, { isPreview: true });
+            syncYearActivityModalChrome();
+            renderYearDisk();
+            renderYearCalendar();
+        };
+
+        window.clearYearDayPreview = () => {
+            if (yearSelectedDayKey) return;
+            scheduleYearDayPreviewClear();
+        };
+
+        window.cancelYearDayPreviewClear = cancelYearDayPreviewClear;
 
         function inferSessionsFromVocabulary() {
             const events = [];
@@ -6387,6 +7124,7 @@
         }
 
         function seedYearActivityFromVocabulary() {
+            bindYearActivityToTrack();
             const sessions = inferSessionsFromVocabulary();
             const before = JSON.stringify(yearActivity);
 
@@ -6405,6 +7143,7 @@
                     persistYearActivityCloud();
                 }
                 refreshYearRingUI();
+                reconcileYearActivityFromSources();
                 return;
             }
 
@@ -6412,19 +7151,28 @@
             for (const s of sessions) {
                 const key = dayKeyFromDate(s.at);
                 if (!key) continue;
-                if (!fromHist[key]) fromHist[key] = { heavy: 0, other: 0 };
-                if (isHeavyTrainingMode(s.mode)) fromHist[key].heavy++;
-                else fromHist[key].other++;
+                if (!fromHist[key]) fromHist[key] = { heavy: 0, other: 0, brainstorm: 0, review: 0 };
+                const bucket = activityModeBucket(s.mode);
+                if (bucket === 'brainstorm') {
+                    fromHist[key].brainstorm++;
+                    fromHist[key].heavy++;
+                } else if (bucket === 'review') {
+                    fromHist[key].review++;
+                    fromHist[key].heavy++;
+                } else {
+                    fromHist[key].other++;
+                }
             }
 
             // After rebuild, days start empty then fill from THIS track's vocabulary only.
             // Later calls (v already 2) still merge max() so live sessions aren't lost.
             for (const [k, v] of Object.entries(fromHist)) {
-                const cur = yearActivity.days[k] || { heavy: 0, other: 0 };
-                yearActivity.days[k] = {
-                    heavy: Math.max(cur.heavy || 0, v.heavy || 0),
-                    other: Math.max(cur.other || 0, v.other || 0)
-                };
+                yearActivity.days[k] = mergeYearDayRecord(yearActivity.days[k], {
+                    heavy: v.heavy || 0,
+                    other: v.other || 0,
+                    brainstorm: v.brainstorm || 0,
+                    review: v.review || 0
+                });
             }
 
             // Cycle start = earliest day that actually has activity on this track
@@ -6442,17 +7190,19 @@
                 persistYearActivityCloud();
             }
             refreshYearRingUI();
+            reconcileYearActivityFromSources();
         }
 
         function yearRingSvgMarkup(pct, size = 36) {
             const r = 15.2;
             const c = 2 * Math.PI * r;
             const p = Math.max(0, Math.min(100, pct || 0)) / 100;
-            const dash = `${(p * c).toFixed(2)} ${c.toFixed(2)}`;
+            const filled = (p * c).toFixed(2);
+            const gap = (c - p * c).toFixed(2);
             return `<svg viewBox="0 0 ${size} ${size}" aria-hidden="true">`
                 + `<circle cx="18" cy="18" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="3.2"/>`
-                + `<circle cx="18" cy="18" r="${r}" fill="none" stroke="#10b981" stroke-width="3.2" stroke-linecap="round" `
-                + `stroke-dasharray="${dash}" transform="rotate(-90 18 18)"/>`
+                + `<circle cx="18" cy="18" r="${r}" fill="none" stroke="#10b981" stroke-width="3.2" stroke-linecap="butt" `
+                + `stroke-dasharray="${filled} ${gap}" transform="rotate(-90 18 18)"/>`
                 + `</svg>`;
         }
 
@@ -6483,6 +7233,7 @@
         }
 
         function renderYearDisk() {
+            bindYearActivityToTrack();
             const host = document.getElementById('year-activity-disk');
             if (!host) return;
             const win = getYearCycleWindow();
@@ -6510,18 +7261,29 @@
                     fill = '#f8fafc';
                     stroke = '#f1f5f9';
                 }
-                parts.push(`<path d="${wedgePath(cx, cy, r0, r1, a0, a1)}" fill="${fill}" stroke="${stroke}" stroke-width="0.35"/>`);
+                const selected = yearSelectedDayKey === key ? ' is-selected' : '';
+                const hovered = yearHoverDayKey === key ? ' is-hover' : '';
+                parts.push(
+                    `<path class="year-disk-wedge${selected}${hovered}" data-year-day="${key}" role="button" tabindex="0"`
+                    + ` d="${wedgePath(cx, cy, r0, r1, a0, a1)}" fill="${fill}" stroke="${stroke}" stroke-width="0.35"`
+                    + ` onclick="selectYearDay('${key}')"`
+                    + ` onmouseenter="previewYearDay('${key}')"`
+                    + ` onmouseleave="clearYearDayPreview()"/>`
+                );
             }
             const stats = countYearQualified();
+            const centerTip = escapeHtmlText(t('year.daysDone', { done: stats.done, total: stats.total }));
             host.innerHTML = `<svg viewBox="0 0 240 240" role="img" aria-label="${escapeHtmlText(t('year.pct', { n: stats.pct }))}">`
+                + `<title>${centerTip}</title>`
                 + parts.join('')
-                + `<circle cx="${cx}" cy="${cy}" r="${r0 - 2}" fill="#fff"/>`
-                + `<text x="${cx}" y="${cy - 4}" text-anchor="middle" font-size="28" font-weight="800" fill="#059669">${stats.pct}%</text>`
-                + `<text x="${cx}" y="${cy + 18}" text-anchor="middle" font-size="11" font-weight="700" fill="#94a3b8">${stats.done}/${stats.total}</text>`
+                + `<circle cx="${cx}" cy="${cy}" r="${r0 - 2}" fill="#fff" class="year-disk-center"/>`
+                + `<text x="${cx}" y="${cy - 4}" text-anchor="middle" font-size="28" font-weight="800" fill="#059669" pointer-events="none">${stats.pct}%</text>`
+                + `<text x="${cx}" y="${cy + 18}" text-anchor="middle" font-size="11" font-weight="700" fill="#94a3b8" pointer-events="none">${stats.done}/${stats.total}</text>`
                 + `</svg>`;
         }
 
         function renderYearCalendar() {
+            bindYearActivityToTrack();
             const grid = document.getElementById('year-cal-grid');
             const dow = document.getElementById('year-cal-dow');
             const label = document.getElementById('year-cal-month-label');
@@ -6552,8 +7314,15 @@
                 if (key === today) cls += ' is-today';
                 if (dayMeetsYearGoal(rec)) cls += ' is-done';
                 else if (dayHasAnyActivity(rec)) cls += ' is-partial';
-                const tip = dayMeetsYearGoal(rec) ? '' : (dayHasAnyActivity(rec) ? t('year.partial') : '');
-                cells.push(`<div class="${cls}" title="${escapeHtmlText(tip)}">${day}</div>`);
+                if (yearSelectedDayKey === key) cls += ' is-selected';
+                else if (yearPreviewDayKey === key) cls += ' is-preview';
+                cls += ' is-clickable';
+                const hover = yearDayHoverText(key);
+                const tip = hover || (dayMeetsYearGoal(rec) ? '' : (dayHasAnyActivity(rec) ? t('year.partial') : ''));
+                cells.push(
+                    `<div class="${cls}" data-year-day="${key}" title="${escapeHtmlText(tip)}"`
+                    + ` onclick="selectYearDay('${key}')" onmouseenter="previewYearDay('${key}')" onmouseleave="clearYearDayPreview()">${day}</div>`
+                );
             }
             grid.innerHTML = cells.join('');
         }
@@ -6561,31 +7330,44 @@
         function renderYearActivityModal() {
             const stats = countYearQualified();
             const sub = document.getElementById('year-activity-sub');
-            const pct = document.getElementById('year-activity-pct');
-            const detail = document.getElementById('year-activity-detail');
             if (yearActivity.cycleStart) {
                 const d = parseDayKey(yearActivity.cycleStart);
                 const dateStr = d ? d.toLocaleDateString(uiLocale(), { day: 'numeric', month: 'short', year: 'numeric' }) : yearActivity.cycleStart;
                 if (sub) sub.textContent = t('year.cycleFrom', { date: dateStr });
-                if (pct) pct.textContent = t('year.pct', { n: stats.pct });
-                if (detail) detail.textContent = t('year.daysDone', { done: stats.done, total: stats.total });
             } else {
-                if (sub) sub.textContent = '';
-                if (pct) pct.textContent = '0%';
-                if (detail) detail.textContent = t('year.empty');
+                if (sub) sub.textContent = t('year.empty');
+            }
+            syncYearActivityModalChrome();
+            if (yearSelectedDayKey) {
+                renderYearDayDetail(yearSelectedDayKey);
+                return;
             }
             renderYearDisk();
             renderYearCalendar();
         }
 
         window.openYearActivityModal = () => {
+            bindYearActivityToTrack();
             if (!yearCalCursor) yearCalCursor = new Date();
+            yearSelectedDayKey = null;
+            yearPreviewDayKey = null;
+            yearHoverDayKey = null;
+            yearActivityExpanded = false;
             document.getElementById('year-rules-tip')?.classList.add('hidden');
+            document.getElementById('btn-year-rules-info')?.setAttribute('aria-expanded', 'false');
+            reconcileYearActivityFromSources();
+            syncYearActivityModalChrome();
             renderYearActivityModal();
             document.getElementById('year-activity-modal')?.classList.remove('hidden');
         };
         window.closeYearActivityModal = () => {
+            yearSelectedDayKey = null;
+            yearPreviewDayKey = null;
+            yearHoverDayKey = null;
+            yearActivityExpanded = false;
             document.getElementById('year-rules-tip')?.classList.add('hidden');
+            document.getElementById('btn-year-rules-info')?.setAttribute('aria-expanded', 'false');
+            syncYearActivityModalChrome();
             document.getElementById('year-activity-modal')?.classList.add('hidden');
         };
         window.shiftYearCalendar = (delta) => {
@@ -6983,6 +7765,54 @@
             return [...arr].sort(() => 0.5 - Math.random());
         }
 
+        /** Riffle / card-shuffle: A B C D E F → D A E B F C (max spacing from session order). */
+        function riffleInterleavePermutation(indices) {
+            const n = indices.length;
+            if (n <= 1) return indices;
+            const half = Math.ceil(n / 2);
+            const first = indices.slice(0, half);
+            const second = indices.slice(half);
+            const out = [];
+            let i = 0;
+            let j = 0;
+            let pickSecond = true;
+            while (i < first.length || j < second.length) {
+                if (pickSecond && j < second.length) {
+                    out.push(second[j++]);
+                } else if (i < first.length) {
+                    out.push(first[i++]);
+                } else if (j < second.length) {
+                    out.push(second[j++]);
+                }
+                pickSecond = !pickSecond;
+            }
+            return out;
+        }
+
+        /** Deterministic stage permutations — varied, purposeful; riffle for listening. */
+        function brainstormStagePermutation(n, stageId, stagePosIndex) {
+            const base = [...Array(n).keys()];
+            if (n <= 1) return base;
+            if (stageId === 8) return base;
+            if (stageId === 5) return riffleInterleavePermutation(base);
+            if (stagePosIndex <= 0) return base;
+            if (stagePosIndex === 1) return base.slice().reverse();
+            if (stagePosIndex === 2) {
+                const evens = base.filter((i) => i % 2 === 1);
+                const odds = base.filter((i) => i % 2 === 0);
+                return [...evens, ...odds];
+            }
+            return riffleInterleavePermutation(base);
+        }
+
+        function applyBrainstormStageWordOrder(words, stageId, stagePosIndex, orderIds) {
+            if (!words?.length || !orderIds?.length) return words;
+            const byId = new Map(words.map((w) => [w.id, w]));
+            const ids = orderIds.filter((id) => byId.has(id));
+            const perm = brainstormStagePermutation(ids.length, stageId, stagePosIndex);
+            return perm.map((i) => byId.get(ids[i])).filter(Boolean);
+        }
+
         function getHistoryForMode(word, modeId) {
             return (word.bsHistory || [])
                 .map(h => {
@@ -7015,12 +7845,50 @@
             return d.toLocaleDateString(uiLocale(), { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString(uiLocale(), { hour: '2-digit', minute: '2-digit' });
         }
 
+        function buildHistoryDisplayLevels(history) {
+            const chrono = [...history].sort((a, b) => historyTimestamp(a.at) - historyTimestamp(b.at));
+            const levelByAt = new Map();
+            let lastSuccessLevel = 0;
+            chrono.forEach((h) => {
+                const isPeek = h.mode === 'review-peek';
+                const ok = h.ok !== false;
+                let lvl = typeof h.level === 'number' ? h.level : 0;
+                if (ok && !isPeek && lvl > 0) {
+                    lastSuccessLevel = Math.max(lastSuccessLevel, lvl);
+                } else if (!ok && !isPeek && lvl === 0 && lastSuccessLevel > 0) {
+                    lvl = lastSuccessLevel;
+                }
+                levelByAt.set(historyTimestamp(h.at), lvl);
+            });
+            return levelByAt;
+        }
+
+        function repairBsHistoryLevels(hist) {
+            const normalized = normalizeBsHistory(hist);
+            const chrono = [...normalized].sort((a, b) => a.at - b.at);
+            let lastSuccessLevel = 0;
+            let changed = false;
+            const fixed = chrono.map((h) => {
+                if (h.ok !== false && h.mode !== 'review-peek') {
+                    if (h.level > 0) lastSuccessLevel = Math.max(lastSuccessLevel, h.level);
+                    return h;
+                }
+                if (h.ok === false && h.mode !== 'review-peek' && h.level === 0 && lastSuccessLevel > 0) {
+                    changed = true;
+                    return { ...h, level: lastSuccessLevel };
+                }
+                return h;
+            });
+            return changed ? fixed : null;
+        }
+
         function renderHistoryEntries(history, emptyText) {
             if (!history.length) return `<p class="text-xs text-slate-400 text-center py-2 italic">${emptyText}</p>`;
+            const displayLevels = buildHistoryDisplayLevels(history);
             return history.map(h => {
                 const isPeek = h.mode === 'review-peek';
                 const ok = h.ok !== false;
-                const lvl = h.level != null ? h.level : '—';
+                const lvl = displayLevels.get(historyTimestamp(h.at)) ?? (h.level != null ? h.level : '—');
                 const icon = isPeek ? '🔁' : (ok ? '✓' : '↺');
                 const iconCls = isPeek ? 'text-amber-500' : (ok ? 'text-emerald-500' : 'text-rose-400');
                 const label = isPeek ? `−1 · ${lvl}` : `Рів. ${lvl}`;
@@ -7210,6 +8078,8 @@
         let readerQuickMatchPanelOpen = false;
         let readerQuickMatchBatch = null;
         let readerQuickMatchSelection = null;
+        let readerQuickMatchLeftOrder = [];
+        let readerQuickMatchRightOrder = [];
         let materialTrackState = null;
         let bulkImportTargetSource = null;
         let pendingFolderCallback = null;
@@ -7635,22 +8505,25 @@
                 return buildMaintTrainingPatch(w);
             }
             if (activeSessionMode === 'all' || activeSessionMode === 'sprint') {
-                const newLevel = w.failed ? 0 : Math.min((w.srsLevel || 0) + 1, MAX_SRS_LEVEL);
+                const currentLevel = w.srsLevel || 0;
+                const newLevel = w.failed ? currentLevel : Math.min(currentLevel + 1, MAX_SRS_LEVEL);
                 const patch = {
                     srsLevel: newLevel,
                     nextReviewTime: getNextReviewTime(newLevel),
-                    bsHistory: appendTrainingHistory(w, activeSessionMode, newLevel, w.failed)
+                    bsHistory: appendTrainingHistory(w, activeSessionMode, w.failed ? currentLevel : newLevel, w.failed)
                 };
                 if (!w.failed && newLevel >= MAX_SRS_LEVEL) {
                     Object.assign(patch, graduationMaintFields(w));
                 }
                 return patch;
             }
-            const newLevel = w.failed ? 0 : Math.min((w[`srs_${activeSessionMode}_Level`] || 0) + 1, MAX_SRS_LEVEL);
+            const modeKey = activeSessionMode;
+            const currentLevel = w[`srs_${modeKey}_Level`] || 0;
+            const newLevel = w.failed ? currentLevel : Math.min(currentLevel + 1, MAX_SRS_LEVEL);
             const patch = {
-                [`srs_${activeSessionMode}_Level`]: newLevel,
-                [`srs_${activeSessionMode}_NextTime`]: getNextReviewTime(newLevel),
-                bsHistory: appendTrainingHistory(w, activeSessionMode, newLevel, w.failed)
+                [`srs_${modeKey}_Level`]: newLevel,
+                [`srs_${modeKey}_NextTime`]: getNextReviewTime(newLevel),
+                bsHistory: appendTrainingHistory(w, activeSessionMode, w.failed ? currentLevel : newLevel, w.failed)
             };
             return patch;
         }
@@ -7932,6 +8805,7 @@
 
         function loadData() {
             if (!activeUid) return;
+            bindYearActivityToTrack();
             srsInitialRepairDone = false;
             legacyMigrationChecked = false;
             materialsSnapshotReady = false;
@@ -7955,12 +8829,17 @@
                 updateTrainSources();
                 rememberActiveTrackIfHasWords();
                 seedYearActivityFromVocabulary();
+                reconcileYearActivityFromSources();
                 if (!legacyMigrationChecked && vocabulary.length > 0) {
                     legacyMigrationChecked = true;
                     migrateLegacyDictionarySources();
                 }
                 if (currentMaterial && !document.getElementById('library-read-view').classList.contains('hidden')) {
                     renderReaderContent();
+                }
+                if (!srsInitialRepairDone && vocabulary.length > 0) {
+                    srsInitialRepairDone = true;
+                    repairSrsState().catch(() => {});
                 }
             }, (error) => { setSystemStatus(t('status.dbError'), "error"); });
 
@@ -7969,6 +8848,7 @@
                 snap.forEach(d => materials.push({ id: d.id, ...d.data() }));
                 materials.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
                 materialsSnapshotReady = true;
+                reconcileYearActivityFromSources();
                 renderMaterials();
                 renderDictContextDropdown();
                 renderBulkFolderDropdown();
@@ -10199,42 +11079,78 @@
         function inferSrsLevelFromHistory(w) {
             const hist = normalizeBsHistory(w.bsHistory).slice().sort((a, b) => b.at - a.at);
             if (hist.length === 0) return null;
-            const latest = hist[0];
-            if (latest.ok === false && (latest.level ?? 0) === 0) return null;
-            const successes = hist.filter(h => h.ok !== false);
+            const current = w.srsLevel || 0;
+            const successes = hist.filter(h => h.ok !== false && h.mode !== 'review-peek');
             const successLevels = successes.map(h => (typeof h.level === 'number' ? h.level : 0));
-            let max = successLevels.length ? Math.max(...successLevels) : 0;
-            if (max === 0 && successes.length > 0) max = successes.length;
-            return max > 0 ? max : null;
+            let inferred = successLevels.length ? Math.max(...successLevels) : 0;
+            if (inferred === 0 && successes.length > 0) inferred = successes.length;
+
+            if (current === 0) {
+                const lastBrainFail = hist.find(h =>
+                    h.ok === false &&
+                    h.mode !== 'review-peek' &&
+                    typeof h.level === 'number' &&
+                    h.level > 0
+                );
+                if (lastBrainFail) inferred = Math.max(inferred, lastBrainFail.level);
+
+                const zeroFail = hist.find(h =>
+                    h.ok === false &&
+                    h.mode !== 'review-peek' &&
+                    (h.level === 0 || h.level == null)
+                );
+                if (zeroFail) {
+                    const priorHigh = hist
+                        .filter(h => h.at <= zeroFail.at && h.mode !== 'review-peek')
+                        .reduce((m, h) => Math.max(m, typeof h.level === 'number' ? h.level : 0), 0);
+                    inferred = Math.max(inferred, priorHigh);
+                }
+            }
+
+            if (inferred > current) return Math.min(inferred, MAX_SRS_LEVEL);
+            return null;
         }
 
         async function repairSrsState() {
             if (suppressAutoRepair || !activeUid || srsMigrationRunning || vocabulary.length === 0) return;
             const updates = [];
             vocabulary.forEach(w => {
-                const inferred = inferSrsLevelFromHistory(w);
+                const patch = {};
+                const histFixed = repairBsHistoryLevels(w.bsHistory);
+                if (histFixed) patch.bsHistory = histFixed;
+
+                const wordForInfer = histFixed ? { ...w, bsHistory: histFixed } : w;
+                const inferred = inferSrsLevelFromHistory(wordForInfer);
                 const currentLevel = w.srsLevel || 0;
                 let newLevel = currentLevel;
                 if (inferred != null && inferred > currentLevel) {
                     newLevel = Math.min(inferred, MAX_SRS_LEVEL);
                 }
-                const wordAtLevel = { ...w, srsLevel: newLevel };
+                const wordAtLevel = { ...wordForInfer, srsLevel: newLevel };
                 const computedReview = computeNextReviewTimeFromWord(wordAtLevel);
                 const levelChanged = newLevel !== currentLevel;
                 const reviewWrong = needsSrsTimerRepair(wordAtLevel, newLevel, computedReview);
-                if (levelChanged || reviewWrong) {
-                    updates.push({ id: w.id, srsLevel: newLevel, nextReviewTime: computedReview });
+                if (levelChanged) {
+                    patch.srsLevel = newLevel;
+                    patch.nextReviewTime = computedReview;
+                } else if (reviewWrong) {
+                    patch.nextReviewTime = computedReview;
                 }
+                if (Object.keys(patch).length) updates.push({ id: w.id, ...patch });
             });
             if (updates.length === 0) return;
             srsMigrationRunning = true;
             try {
                 const batch = writeBatch(db);
-                updates.forEach(u => batch.update(docRef('words', u.id), {
-                    srsLevel: u.srsLevel,
-                    nextReviewTime: u.nextReviewTime
-                }));
+                updates.forEach(u => {
+                    const { id, ...fields } = u;
+                    batch.update(docRef('words', id), fields);
+                });
                 await batch.commit();
+                updates.forEach((u) => {
+                    const { id, ...fields } = u;
+                    patchLocalWord(id, fields);
+                });
             } catch (e) { console.error('repairSrsState', e); } finally { srsMigrationRunning = false; }
         }
 
@@ -11026,6 +11942,8 @@
             return `${base}.json`;
         }
 
+        const SRS_LEVEL_INDIGO = ['#c7d2fe', '#a5b4fc', '#818cf8', '#6366f1', '#4f46e5', '#4338ca'];
+
         function getSrsSvg(level, isSmall = false, showLabel = false, maxLevel = MAX_SRS_LEVEL, opts = {}) {
             const compact = !!(opts && opts.compact);
             const size = opts.sizeClass
@@ -11035,16 +11953,18 @@
             const circ = 2 * Math.PI * r;
             const slots = Math.max(1, maxLevel);
             const slot = circ / slots;
-            // Subtle notches — visible as 6 parts, not a broken ring
             const gap = isSmall ? 1.1 : (compact ? 1.3 : 1.5);
             const seg = Math.max(0.8, slot - gap);
             const isDone = isSrsMastered(level);
-            const active = isDone ? '#10b981' : '#4f46e5';
             const idle = '#e2e8f0';
             const sw = isSmall ? '4' : (compact ? '2.75' : '3');
             let segments = '';
             for (let i = 0; i < slots; i++) {
-                const color = i < lvl ? active : idle;
+                let color = idle;
+                if (i < lvl) {
+                    if (isDone) color = '#10b981';
+                    else color = SRS_LEVEL_INDIGO[Math.min(i, SRS_LEVEL_INDIGO.length - 1)];
+                }
                 const offset = -i * slot;
                 segments += `<circle cx="12" cy="12" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="butt" stroke-dasharray="${seg.toFixed(3)} ${(circ - seg).toFixed(3)}" stroke-dashoffset="${offset.toFixed(3)}" />`;
             }
@@ -13235,6 +14155,35 @@
             readerQuickMatchPanelOpen = false;
             readerQuickMatchBatch = null;
             readerQuickMatchSelection = null;
+            readerQuickMatchLeftOrder = [];
+            readerQuickMatchRightOrder = [];
+        }
+
+        function shuffleQuickMatchIds(batch) {
+            return [...batch].map((b) => b.id).sort(() => Math.random() - 0.5);
+        }
+
+        function syncReaderQuickMatchItemUi() {
+            document.querySelectorAll('.reader-qm-item').forEach((btn) => {
+                btn.classList.remove('is-selected', 'is-wrong');
+                const id = btn.dataset.id;
+                const side = btn.dataset.side;
+                const item = readerQuickMatchBatch?.find((b) => b.id === id);
+                if (item?._matched) {
+                    btn.classList.add('is-matched');
+                    btn.disabled = true;
+                } else if (readerQuickMatchSelection?.id === id && readerQuickMatchSelection?.side === side) {
+                    btn.classList.add('is-selected');
+                }
+            });
+        }
+
+        function markReaderQuickMatchPairMatched(id) {
+            document.querySelectorAll(`.reader-qm-item[data-id="${id}"]`).forEach((btn) => {
+                btn.classList.add('is-matched');
+                btn.classList.remove('is-selected', 'is-wrong');
+                btn.disabled = true;
+            });
         }
 
         function showReaderQuickMatchPanel(batch) {
@@ -13244,6 +14193,8 @@
             readerQuickMatchPanelOpen = true;
             readerQuickMatchBatch = batch.map((b) => ({ ...b }));
             readerQuickMatchSelection = null;
+            readerQuickMatchLeftOrder = shuffleQuickMatchIds(readerQuickMatchBatch);
+            readerQuickMatchRightOrder = shuffleQuickMatchIds(readerQuickMatchBatch);
             panel.classList.remove('hidden');
             requestAnimationFrame(() => panel.classList.add('is-open'));
             renderReaderQuickMatchBody();
@@ -13257,8 +14208,12 @@
                 return;
             }
             const batch = readerQuickMatchBatch || [];
-            const left = [...batch].sort(() => Math.random() - 0.5);
-            const right = [...batch].sort(() => Math.random() - 0.5);
+            const left = readerQuickMatchLeftOrder
+                .map((id) => batch.find((b) => b.id === id))
+                .filter(Boolean);
+            const right = readerQuickMatchRightOrder
+                .map((id) => batch.find((b) => b.id === id))
+                .filter(Boolean);
             body.innerHTML = `
                 <div class="reader-qm-grid">
                     <div>
@@ -13273,13 +14228,13 @@
             body.querySelectorAll('.reader-qm-item').forEach((btn) => {
                 btn.addEventListener('click', () => handleReaderQuickMatchTap(btn));
             });
+            syncReaderQuickMatchItemUi();
         }
 
         function readerQuickMatchBtnHtml(side, item) {
             const label = side === 'word' ? item.word : item.translation;
             const matched = item._matched ? ' is-matched' : '';
-            const selected = readerQuickMatchSelection?.id === item.id && readerQuickMatchSelection?.side === side ? ' is-selected' : '';
-            return `<button type="button" class="reader-qm-item${matched}${selected}" data-side="${side}" data-id="${escapeHtmlText(item.id)}"${item._matched ? ' disabled' : ''}>${escapeHtmlText(label)}</button>`;
+            return `<button type="button" class="reader-qm-item${matched}" data-side="${side}" data-id="${escapeHtmlText(item.id)}"${item._matched ? ' disabled' : ''}>${escapeHtmlText(label)}</button>`;
         }
 
         function handleReaderQuickMatchTap(btn) {
@@ -13291,21 +14246,20 @@
             const sel = readerQuickMatchSelection;
             if (!sel) {
                 readerQuickMatchSelection = { id, side };
-                renderReaderQuickMatchBody();
+                syncReaderQuickMatchItemUi();
                 return;
             }
             if (sel.side === side) {
                 readerQuickMatchSelection = { id, side };
-                renderReaderQuickMatchBody();
+                syncReaderQuickMatchItemUi();
                 return;
             }
             if (sel.id === id) {
                 item._matched = true;
                 readerQuickMatchSelection = null;
+                markReaderQuickMatchPairMatched(id);
                 if (readerQuickMatchBatch.every((b) => b._matched)) {
                     finishReaderQuickMatch(true);
-                } else {
-                    renderReaderQuickMatchBody();
                 }
                 return;
             }
@@ -13313,7 +14267,7 @@
             const otherBtn = document.querySelector(`.reader-qm-item[data-id="${sel.id}"][data-side="${sel.side}"]`);
             otherBtn?.classList.add('is-wrong');
             readerQuickMatchSelection = null;
-            setTimeout(() => renderReaderQuickMatchBody(), 360);
+            setTimeout(() => syncReaderQuickMatchItemUi(), 360);
         }
 
         function finishReaderQuickMatch(completed) {
@@ -13393,7 +14347,9 @@
             const level = Math.min(...words.map((w) => w.srsLevel || 0));
             configureBrainstormSessionFlags(level);
             try { markBsLevelTrainedToday(level); } catch (_) {}
+            try { markBsMixLastBatch(level); } catch (_) {}
             bsWords = words.map((w) => ({ ...w, failed: false }));
+            bsWordsOrderIds = bsWords.map((w) => w.id);
             sprintQuestionQueue = [];
             sprintQueueIndex = 0;
             sprintAnsweredCount = 0;
@@ -13515,7 +14471,9 @@
                 readerToolsDockObserver = null;
             }
             readerToolsDockObserver = new IntersectionObserver(([entry]) => {
-                float.classList.toggle('is-docked', !entry.isIntersecting);
+                const floated = !entry.isIntersecting;
+                float.classList.toggle('is-docked', floated);
+                document.getElementById('library-read-view')?.classList.toggle('reader-tools-floated', floated);
             }, { threshold: 0, root: null, rootMargin: '-8px 0px 0px 0px' });
             readerToolsDockObserver.observe(bar);
         }
@@ -13526,6 +14484,7 @@
                 readerToolsDockObserver = null;
             }
             document.getElementById('reader-float-tools')?.classList.remove('is-docked');
+            document.getElementById('library-read-view')?.classList.remove('reader-tools-floated');
         }
 
         window.toggleReaderHighlightMode = (e) => {
@@ -19386,6 +20345,7 @@
             5: [2, 3, 5, 8]
         };
         const BS_ORDER_KEY = 'linguaspace_bs_order_v1';
+        const BS_MIX_LAST_KEY = 'linguaspace_bs_mix_last_v1';
         const BS_DAY_LEVELS_KEY = 'linguaspace_bs_day_levels_v1';
         const STAGE_NAMES = { 
             0: "Ознайомлення", 
@@ -19403,6 +20363,7 @@
 
         let bsSessionStages = null;
         let bsSessionLevel = 0;
+        let bsWordsOrderIds = null;
         let bsHardMcq = false;       // 6-option MCQ (етапи 4–5)
         let bsMcqHardDistractors = false; // hard distractors even with 4 options (етап 3+)
         let bsStrictConstructor = false;
@@ -19418,29 +20379,43 @@
         function loadBrainstormOrder() {
             try {
                 const v = localStorage.getItem(BS_ORDER_KEY);
-                if (v === 'reviews' || v === 'new') return v;
+                if (v === 'reviews' || v === 'new' || v === 'mixed') return v;
             } catch (_) {}
-            return 'new';
+            return 'mixed';
         }
         let brainstormOrderPref = loadBrainstormOrder();
 
         function getBrainstormOrder() {
-            return brainstormOrderPref === 'reviews' ? 'reviews' : 'new';
+            const p = brainstormOrderPref;
+            if (p === 'reviews' || p === 'new' || p === 'mixed') return p;
+            return 'mixed';
         }
 
         window.setBrainstormOrder = (pref) => {
-            brainstormOrderPref = pref === 'reviews' ? 'reviews' : 'new';
+            brainstormOrderPref = (pref === 'reviews' || pref === 'new' || pref === 'mixed') ? pref : 'mixed';
             try { localStorage.setItem(BS_ORDER_KEY, brainstormOrderPref); } catch (_) {}
             syncBrainstormOrderUI();
         };
 
+        function getBsMixLastBatch() {
+            try {
+                const v = localStorage.getItem(BS_MIX_LAST_KEY);
+                if (v === 'new' || v === 'older') return v;
+            } catch (_) {}
+            return null;
+        }
+
+        function markBsMixLastBatch(level) {
+            if (getBrainstormOrder() !== 'mixed') return;
+            const side = (level || 0) === 0 ? 'new' : 'older';
+            try { localStorage.setItem(BS_MIX_LAST_KEY, side); } catch (_) {}
+        }
+
         function syncBrainstormOrderUI() {
             const pref = getBrainstormOrder();
-            const btnNew = document.getElementById('bs-order-new');
-            const btnRev = document.getElementById('bs-order-reviews');
-            if (!btnNew || !btnRev) return;
-            btnNew.classList.toggle('is-on', pref === 'new');
-            btnRev.classList.toggle('is-on', pref === 'reviews');
+            document.getElementById('bs-order-new')?.classList.toggle('is-on', pref === 'new');
+            document.getElementById('bs-order-mixed')?.classList.toggle('is-on', pref === 'mixed');
+            document.getElementById('bs-order-reviews')?.classList.toggle('is-on', pref === 'reviews');
         }
         try { syncBrainstormOrderUI(); } catch (_) {}
 
@@ -19527,40 +20502,78 @@
 
             const need = Math.max(1, reqCount || 6);
             const count = (L) => (byLevel.get(L) || []).length;
-            const preferNew = getBrainstormOrder() !== 'reviews';
+            const order = getBrainstormOrder();
+            const fillableLevels = levels.filter((L) => count(L) >= need);
+            const emergency = levels.filter((L) => byLevel.get(L).some((w) => isWordHeavilyOverdue(w, now)));
 
-            // Prefer a level that can fill the session; otherwise the fullest cohort.
-            // Tie-break: prefer-new → lowest level (with same-day level-0 fairness); prefer-reviews → highest.
-            function chooseAmong(cands) {
+            function pickLowestFrom(cands) {
                 if (!cands.length) return null;
                 const fillable = cands.filter((L) => count(L) >= need);
                 const pool = fillable.length ? fillable : cands;
                 if (!fillable.length) {
                     const bestCount = Math.max(...pool.map(count));
                     const fullest = pool.filter((L) => count(L) === bestCount);
-                    return preferNew ? Math.min(...fullest) : Math.max(...fullest);
+                    return Math.min(...fullest);
                 }
-                if (preferNew) {
-                    const day = getBsDayState();
-                    const hasHigher = pool.some((L) => L > 0);
-                    const trained0Today = day.levels.includes(0);
-                    if (pool.includes(0) && !(trained0Today && hasHigher)) return 0;
-                    const rest = pool.filter((L) => L !== 0);
-                    return rest.length ? Math.min(...rest) : pool[0];
-                }
-                return Math.max(...pool);
+                if (pool.includes(0)) return 0;
+                return Math.min(...pool);
             }
 
-            const emergency = levels.filter((L) => byLevel.get(L).some((w) => isWordHeavilyOverdue(w, now)));
-            // Overdue safety: prefer an overdue level only when it can still fill the session
-            // (or when no level can). Never shrink a 6-word session down to 1–2 overdue leftovers.
-            const fillableLevels = levels.filter((L) => count(L) >= need);
-            if (fillableLevels.length) {
-                const overdueFillable = emergency.filter((L) => fillableLevels.includes(L));
-                return chooseAmong(overdueFillable.length ? overdueFillable : fillableLevels);
+            function pickHighestFrom(cands) {
+                if (!cands.length) return null;
+                const fillable = cands.filter((L) => count(L) >= need);
+                const pool = fillable.length ? fillable : cands;
+                if (!fillable.length) {
+                    const bestCount = Math.max(...pool.map(count));
+                    const fullest = pool.filter((L) => count(L) === bestCount);
+                    const advanced = fullest.filter((L) => L >= 2);
+                    if (advanced.length) return Math.max(...advanced);
+                    const mid = fullest.filter((L) => L >= 1);
+                    return mid.length ? Math.max(...mid) : Math.max(...fullest);
+                }
+                const advanced = pool.filter((L) => L >= 2);
+                const reviewPool = advanced.length ? advanced : pool.filter((L) => L >= 1);
+                return Math.max(...(reviewPool.length ? reviewPool : pool));
             }
-            if (emergency.length) return chooseAmong(emergency);
-            return chooseAmong(levels);
+
+            function pickWithEmergency(cands, picker) {
+                if (!cands.length) return null;
+                const fillable = cands.filter((L) => count(L) >= need);
+                if (fillable.length) {
+                    const overdueFillable = emergency.filter((L) => fillable.includes(L));
+                    return picker(overdueFillable.length ? overdueFillable : fillable);
+                }
+                const overdue = emergency.filter((L) => cands.includes(L));
+                if (overdue.length) return picker(overdue);
+                return picker(cands);
+            }
+
+            if (order === 'new') {
+                if (count(0) >= need) return 0;
+                return pickWithEmergency(levels, pickLowestFrom);
+            }
+
+            if (order === 'reviews') {
+                return pickWithEmergency(levels, pickHighestFrom);
+            }
+
+            // Mixed: alternate new batch ↔ older batch (default)
+            const lastBatch = getBsMixLastBatch();
+            const wantNew = lastBatch !== 'new';
+            const canNew = count(0) >= need;
+            const olderPick = () => pickWithEmergency(
+                levels.filter((L) => L >= 1),
+                pickHighestFrom
+            ) ?? pickWithEmergency(levels, pickHighestFrom);
+
+            if (wantNew) {
+                if (canNew) return 0;
+                return olderPick() ?? pickLowestFrom(levels);
+            }
+            const older = olderPick();
+            if (older != null && count(older) >= need) return older;
+            if (canNew) return 0;
+            return older ?? pickWithEmergency(levels, pickHighestFrom) ?? pickLowestFrom(levels);
         }
 
         function pickBrainstormWords(dueWords, reqCount, now = Date.now()) {
@@ -19739,7 +20752,9 @@
                     if (!picked.words.length) return window.showModal(t('msg.noDueWords'));
                     configureBrainstormSessionFlags(picked.level);
                     markBsLevelTrainedToday(picked.level);
+                    markBsMixLastBatch(picked.level);
                     bsWords = picked.words;
+                    bsWordsOrderIds = bsWords.map((w) => w.id);
                 } else if (mode === 'definition') {
                     markDefinitionSessionStarted();
                     window._defAnswered = 0;
@@ -19839,6 +20854,7 @@
         window.endSession = () => { 
             try { refundDefinitionSessionIfUnused(); } catch (_) {}
             materialTrackState = null;
+            bsWordsOrderIds = null;
             document.getElementById('bs-material-track-actions')?.classList.add('hidden');
             document.getElementById('bs-workspace').classList.add('hidden'); 
             document.getElementById('bs-results').classList.add('hidden'); 
@@ -19930,6 +20946,14 @@
                 if(currentStageIndex + 1 < stages.length) {
                     bsCurrentStage = stages[currentStageIndex + 1];
                     bsCurrentWordIdx = 0;
+                    if (activeSessionMode === 'all' && bsCurrentStage !== 8 && bsWordsOrderIds?.length) {
+                        bsWords = applyBrainstormStageWordOrder(
+                            bsWords,
+                            bsCurrentStage,
+                            currentStageIndex + 1,
+                            bsWordsOrderIds
+                        );
+                    }
                     if (bsCurrentStage === 8 && activeSessionMode === 'all') {
                         window._sprintRulesPending = true;
                         window._sprintCountdownActive = false;
@@ -19966,7 +20990,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             const saveResult = await persistTrainingToFirebase();
-            try { recordTrainingSession(activeSessionMode); } catch (_) {}
+            try {
+                const trainedIds = bsWords
+                    .filter((w) => w && w.id && !w._defSkipped && (activeSessionMode !== 'definition' || w._defAttempted))
+                    .map((w) => w.id);
+                recordTrainingSession(activeSessionMode, trainedIds);
+            } catch (_) {}
 
             document.getElementById('bs-saving').classList.add('hidden');
             document.getElementById('bs-results').classList.remove('hidden');
