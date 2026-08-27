@@ -166,31 +166,33 @@
         }
         #reader-float-tools.is-docked {
             display: flex;
-            padding: 0.35rem;
+            padding: 0.3rem;
             border-radius: 9999px;
-            border: 1px solid rgba(226, 232, 240, 0.35);
-            background: rgba(255, 255, 255, 0.38);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+            border: 1px solid rgba(226, 232, 240, 0.2);
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            box-shadow: none;
             transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
         }
         #reader-float-tools.is-docked .reader-tool-btn {
             width: 2.65rem;
             height: 2.65rem;
             border-radius: 9999px;
-            border: 1px solid rgba(226, 232, 240, 0.45);
-            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(226, 232, 240, 0.28);
+            background: rgba(255, 255, 255, 0.28);
             box-shadow: none;
-            opacity: 0.82;
+            opacity: 0.62;
             transition: background 0.22s ease, border-color 0.22s ease, opacity 0.22s ease, box-shadow 0.22s ease;
         }
-        #reader-float-tools.is-docked:hover {
-            border-color: rgba(226, 232, 240, 0.85);
-            background: rgba(255, 255, 255, 0.82);
-            box-shadow: 0 8px 28px rgba(15, 23, 42, 0.12);
+        #reader-float-tools.is-docked:hover,
+        #reader-float-tools.is-docked:focus-within {
+            border-color: rgba(226, 232, 240, 0.75);
+            background: rgba(255, 255, 255, 0.78);
+            box-shadow: 0 8px 28px rgba(15, 23, 42, 0.1);
         }
-        #reader-float-tools.is-docked:hover .reader-tool-btn {
+        #reader-float-tools.is-docked:hover .reader-tool-btn,
+        #reader-float-tools.is-docked:focus-within .reader-tool-btn {
             border-color: rgba(226, 232, 240, 0.9);
             background: rgba(255, 255, 255, 0.92);
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
@@ -199,6 +201,16 @@
         #reader-float-tools.is-docked .reader-tool-btn.is-active {
             opacity: 1;
             box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.35);
+        }
+        @media (max-width: 640px) {
+            #reader-float-tools.is-docked {
+                background: rgba(255, 255, 255, 0.12);
+                border-color: rgba(226, 232, 240, 0.14);
+            }
+            #reader-float-tools.is-docked .reader-tool-btn {
+                opacity: 0.5;
+                background: rgba(255, 255, 255, 0.2);
+            }
         }
         #library-read-view.reader-hl-mode .yt-sub-line {
             cursor: text;
@@ -219,15 +231,50 @@
             box-decoration-break: clone;
             -webkit-box-decoration-break: clone;
         }
-        #library-read-view[data-hl-color="mint"] .text-reader mark.reader-hl {
+        .text-reader mark.reader-hl-book {
+            background: transparent;
+            box-shadow: none;
+        }
+        .text-reader mark.reader-hl-book::before,
+        .text-reader mark.reader-hl-book::after {
+            content: '🔖';
+            font-size: 0.85em;
+            margin: 0 0.1em;
+            opacity: 0.9;
+        }
+        #library-read-view[data-hl-color="mint"] .text-reader mark.reader-hl:not(.reader-hl-book) {
             background: rgba(94, 234, 212, 0.52);
         }
-        #library-read-view[data-hl-color="lavender"] .text-reader mark.reader-hl {
+        #library-read-view[data-hl-color="lavender"] .text-reader mark.reader-hl:not(.reader-hl-book) {
             background: rgba(196, 181, 253, 0.58);
         }
         ::highlight(reader-hl) {
             background-color: rgba(253, 224, 71, 0.62);
             color: inherit;
+        }
+        /* Reader words: no box padding — keeps sentence highlights continuous (marker on or off) */
+        #library-read-view .text-reader .word-clickable {
+            padding: 0;
+            margin: 0;
+            border-radius: 0;
+            border-bottom: 1px dotted transparent;
+            transition: color 0.15s ease, border-bottom-color 0.15s ease, background-color 0.15s ease;
+        }
+        #library-read-view .text-reader .word-saved,
+        #library-read-view .text-reader .word-saved-phrase {
+            padding: 0;
+            margin: 0;
+            border: none;
+            border-radius: 0;
+            font-weight: inherit;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+        #library-read-view .text-reader .word-saved {
+            background-color: rgba(209, 250, 229, 0.55);
+        }
+        #library-read-view .text-reader .word-saved-phrase {
+            background-color: rgba(209, 250, 229, 0.42);
         }
         #library-read-view.reader-hl-mode #reader-content {
             cursor: text;
@@ -236,36 +283,6 @@
         }
         #library-read-view.reader-hl-mode .word-clickable {
             cursor: text;
-            padding: 0;
-            margin: 0;
-            border: none;
-            border-radius: 0;
-            background: transparent !important;
-        }
-        #library-read-view.reader-hl-mode .word-saved {
-            padding: 0;
-            margin: 0;
-            border: none;
-            border-radius: 0;
-            background: transparent !important;
-            font-weight: inherit;
-        }
-        #library-read-view.reader-hl-mode .word-saved-phrase {
-            padding: 0;
-            margin: 0;
-            border: none;
-            border-radius: 0;
-            background: transparent !important;
-            font-weight: inherit;
-        }
-        #library-read-view.reader-hl-mode mark.reader-hl .word-clickable,
-        #library-read-view.reader-hl-mode mark.reader-hl .word-saved,
-        #library-read-view.reader-hl-mode mark.reader-hl .word-saved-phrase {
-            padding: 0;
-            margin: 0;
-            border: none;
-            border-radius: 0;
-            background: transparent !important;
         }
 
         .fade-in { animation: fadeIn 0.2s ease-out; }
@@ -496,14 +513,16 @@
             height: 3.25rem;
         }
         #edit-word-img-url-row,
-        #edit-mat-cover-url-row {
+        #edit-mat-cover-url-row,
+        .edit-img-combo-row {
             display: flex;
             align-items: stretch;
             gap: 0.4rem;
             margin-bottom: 0.35rem;
         }
         #edit-word-img-url-row .edit-img-link-ico,
-        #edit-mat-cover-url-row .edit-img-link-ico {
+        #edit-mat-cover-url-row .edit-img-link-ico,
+        .edit-img-combo-row .edit-img-link-ico {
             flex-shrink: 0;
             width: 2.35rem;
             display: flex;
@@ -517,7 +536,8 @@
             user-select: none;
         }
         #edit-word-new-imgUrl,
-        #edit-mat-cover-url {
+        #edit-mat-cover-url,
+        .edit-img-combo-row input[type="text"] {
             flex: 1;
             min-width: 0;
             font-size: 0.75rem;
@@ -530,7 +550,8 @@
             background: #fff;
         }
         #edit-word-new-imgUrl:focus,
-        #edit-mat-cover-url:focus {
+        #edit-mat-cover-url:focus,
+        .edit-img-combo-row input[type="text"]:focus {
             border-color: #6366f1;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
         }
@@ -1197,12 +1218,14 @@
         #bulk-add-dialog.bulk-photo-results .bulk-photo-idle-copy { display: none; }
         #bulk-photo-drop-copy { display: none; }
 
-        /* YouTube search: link icon dim until a URL is pasted/typed */
-        .yt-search-link-icon {
+        /* YouTube / image search: link icon dim until a URL is pasted/typed */
+        .yt-search-link-icon,
+        .edit-img-link-ico {
             opacity: 0.22;
             transition: opacity 0.2s ease;
         }
-        .yt-search-link-icon.is-active {
+        .yt-search-link-icon.is-active,
+        .edit-img-link-ico.is-active {
             opacity: 1;
         }
 
@@ -2609,28 +2632,18 @@
             </div>
             
             <div class="mb-4 border-t border-slate-100 pt-3">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase" data-i18n="edit.image">Зображення</label>
-                    <div class="flex gap-1.5 w-full sm:w-auto">
-                        <input type="text" id="edit-img-query" placeholder="Інше слово для пошуку..." class="text-xs p-1.5 border border-slate-300 rounded-lg outline-none focus:border-indigo-500 w-full sm:w-44 font-medium" data-i18n-placeholder="edit.imgQuery" onkeydown="if(event.key==='Enter') { event.preventDefault(); searchEditImages(); }">
-                        <button type="button" onclick="searchEditImages()" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg font-bold transition shadow-sm border border-indigo-100 shrink-0 relative z-10" data-i18n="edit.search">Шукати</button>
-                    </div>
+                <label class="text-xs font-bold text-slate-500 uppercase block mb-2" data-i18n="edit.image">Зображення</label>
+                <div class="edit-img-combo-row">
+                    <span id="edit-img-link-ico" class="edit-img-link-ico" title="URL" aria-hidden="true">🔗</span>
+                    <input type="text" id="edit-img-query" placeholder="Пошук або посилання…" class="font-medium" data-i18n-placeholder="edit.imgQuery" oninput="onEditImgQueryInput()" onkeydown="if(event.key==='Enter'){event.preventDefault();searchEditImages();}">
+                    <button type="button" onclick="searchEditImages()" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg font-bold transition shadow-sm border border-indigo-100 shrink-0" data-i18n="edit.search">Шукати</button>
+                    <button type="button" onclick="clearEditWordImage()" class="text-xs text-slate-500 hover:text-rose-600 px-2 py-1.5 rounded-lg font-bold border border-slate-200 shrink-0" data-i18n="edit.imgClear" title="Clear">✕</button>
                 </div>
                 <div id="edit-img-query-hints" class="hidden flex flex-wrap gap-1.5 mb-2"></div>
-                <div id="edit-word-img-url-row">
-                    <span class="edit-img-link-ico" title="URL" aria-hidden="true">🔗</span>
-                    <input type="url" id="edit-word-new-imgUrl" inputmode="url" autocomplete="off" spellcheck="false"
-                        placeholder="https://…"
-                        data-i18n-placeholder="edit.imgUrlPh"
-                        oninput="onEditImageUrlInput()"
-                        onchange="onEditImageUrlInput(true)">
-                </div>
-                <p id="edit-img-url-hint" data-i18n="edit.imgUrlHint">JPG, PNG, WebP, GIF, AVIF… — вставте своє посилання (Unsplash окремо зверху)</p>
                 <p id="edit-img-url-status" class="hidden" role="status"></p>
                 <img id="edit-word-img-preview" class="w-full h-28 rounded-xl object-cover mb-1 hidden bg-slate-100 shadow-inner" alt=""
                      onload="onEditImagePreviewLoad(this)"
                      onerror="onEditImagePreviewError(this)">
-                <p id="edit-img-source-note" class="hidden mb-2" data-i18n="edit.imgUnsplashNote">Зараз — зображення з Unsplash. Вставте посилання нижче, щоб замінити.</p>
                 <div id="edit-img-options" class="grid grid-cols-4 gap-1.5 hidden mb-2"></div>
                 <p id="edit-img-status" class="text-xs text-slate-500 hidden font-bold"></p>
             </div>
@@ -2651,27 +2664,17 @@
                 <input type="text" id="edit-mat-title" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-bold text-slate-800">
             </div>
             <div class="mb-3 border-t border-slate-100 pt-3 shrink-0">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase" data-i18n="edit.matCover">Обкладинка</label>
-                    <div class="flex gap-1.5 w-full sm:w-auto">
-                        <input type="text" id="edit-mat-img-query" placeholder="" class="text-xs p-1.5 border border-slate-300 rounded-lg outline-none focus:border-indigo-500 w-full sm:w-44 font-medium" data-i18n-placeholder="edit.matCoverQueryPh" onkeydown="if(event.key==='Enter'){event.preventDefault();searchEditMatCover();}">
-                        <button type="button" onclick="searchEditMatCover()" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg font-bold transition shadow-sm border border-indigo-100 shrink-0" data-i18n="edit.search">Шукати</button>
-                    </div>
+                <label class="text-xs font-bold text-slate-500 uppercase block mb-2" data-i18n="edit.matCover">Обкладинка</label>
+                <div class="edit-img-combo-row">
+                    <span id="edit-mat-link-ico" class="edit-img-link-ico" title="URL" aria-hidden="true">🔗</span>
+                    <input type="text" id="edit-mat-img-query" placeholder="Пошук або посилання…" class="font-medium" data-i18n-placeholder="edit.matCoverQueryPh" oninput="onEditMatCoverQueryInput()" onkeydown="if(event.key==='Enter'){event.preventDefault();searchEditMatCover();}">
+                    <button type="button" onclick="searchEditMatCover()" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg font-bold transition shadow-sm border border-indigo-100 shrink-0" data-i18n="edit.search">Шукати</button>
+                    <button type="button" onclick="clearEditMatCover()" class="text-xs text-slate-500 hover:text-rose-600 px-2 py-1.5 rounded-lg font-bold border border-slate-200 shrink-0" data-i18n="edit.matCoverClear" title="Clear">✕</button>
                 </div>
-                <p class="text-[11px] text-slate-400 mb-2 leading-snug" data-i18n="edit.matCoverHint">Необов'язково. Без обкладинки залишається іконка 📺 або 📜 у списку.</p>
-                <div id="edit-mat-cover-url-row">
-                    <span class="edit-img-link-ico" title="URL" aria-hidden="true">🔗</span>
-                    <input type="url" id="edit-mat-cover-url" inputmode="url" autocomplete="off" spellcheck="false"
-                        placeholder="https://…"
-                        data-i18n-placeholder="edit.imgUrlPh"
-                        oninput="onEditMatCoverUrlInput()"
-                        onchange="onEditMatCoverUrlInput(true)">
-                </div>
-                <img id="edit-mat-cover-preview" class="w-full max-w-xs h-24 rounded-xl object-cover mb-2 hidden bg-slate-100 shadow-inner" alt=""
+                <img id="edit-mat-cover-preview" class="w-full max-w-xs h-24 rounded-xl object-cover mb-2 mt-2 hidden bg-slate-100 shadow-inner" alt=""
                      onerror="this.classList.add('hidden')">
                 <div id="edit-mat-img-options" class="grid grid-cols-4 gap-1.5 hidden mb-2"></div>
                 <p id="edit-mat-img-status" class="text-xs text-slate-500 hidden font-bold"></p>
-                <button type="button" onclick="clearEditMatCover()" class="text-xs text-slate-500 hover:text-rose-600 font-bold" data-i18n="edit.matCoverClear">Прибрати обкладинку</button>
             </div>
             <div class="mb-4 flex-1 flex flex-col min-h-0">
                 <label class="text-xs font-bold text-slate-500 uppercase block mb-1" data-i18n="edit.matContent">Текст / Субтитри</label>
@@ -3187,9 +3190,9 @@
                 <button type="button" id="reader-yt-jump" onclick="jumpToActiveSubtitle()" aria-label="Current line" data-i18n-title="lib.jumpToLine" title="До поточного рядка">↓</button>
 
                 <div id="reader-pagination-top" class="hidden flex justify-between items-center bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
-                    <button type="button" onclick="changeReaderPage(-1)" id="btn-reader-prev-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs sm:text-sm transition">← <span data-i18n="common.back">Назад</span></button>
+                    <button type="button" onclick="changeReaderPage(-1)" id="btn-reader-prev-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.prevPage" title="Попередня сторінка">‹</button>
                     <span id="reader-page-info-top" class="text-xs sm:text-sm font-bold text-slate-500">Сторінка 1 з 1</span>
-                    <button type="button" onclick="changeReaderPage(1)" id="btn-reader-next-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs sm:text-sm transition"><span data-i18n="common.next">Вперед</span> →</button>
+                    <button type="button" onclick="changeReaderPage(1)" id="btn-reader-next-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.nextPage" title="Наступна сторінка">›</button>
                 </div>
                 
                 <div id="reader-content-wrapper" class="bg-white px-3 py-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 relative mb-4 overflow-hidden">
@@ -3197,9 +3200,9 @@
                 </div>
 
                 <div id="reader-pagination" class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
-                    <button onclick="changeReaderPage(-1)" id="btn-reader-prev" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs sm:text-sm transition">← <span data-i18n="common.back">Назад</span></button>
+                    <button onclick="changeReaderPage(-1)" id="btn-reader-prev" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.prevPage" title="Попередня сторінка">‹</button>
                     <span id="reader-page-info" class="text-xs sm:text-sm font-bold text-slate-500">Сторінка 1 з 1</span>
-                    <button onclick="changeReaderPage(1)" id="btn-reader-next" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs sm:text-sm transition"><span data-i18n="common.next">Вперед</span> →</button>
+                    <button onclick="changeReaderPage(1)" id="btn-reader-next" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.nextPage" title="Наступна сторінка">›</button>
                 </div>
             </div>
         </section>
@@ -3762,15 +3765,12 @@
                 'profile.sync': 'Синхронізація словника',
                 'edit.title': 'Редагувати слово', 'edit.word': 'Слово', 'edit.trans': 'Переклад',
                 'edit.context': 'Контекст (речення)', 'edit.image': 'Зображення',
-                'edit.imgQuery': 'Інше слово для пошуку...', 'edit.search': 'Шукати', 'edit.save': 'Зберегти зміни',
-                'edit.imgUrlPh': 'Вставте своє посилання…',
-                'edit.imgUrlHint': 'JPG, PNG, WebP, GIF, AVIF, SVG… — своє посилання. Unsplash — пошук зверху.',
+                'edit.imgQuery': 'Пошук або посилання…', 'edit.search': 'Шукати', 'edit.save': 'Зберегти зміни',
+                'edit.imgClear': 'Прибрати',
                 'edit.imgUrlBad': 'Не вдалося завантажити це посилання як зображення.',
-                'edit.imgUrlEmpty': 'Немає зображення — вставте посилання або знайдіть у Unsplash.',
-                'edit.imgUnsplashNote': 'Зараз — зображення з Unsplash. Вставте посилання вище, щоб замінити.',
                 'edit.matTitle': 'Редагувати матеріал', 'edit.matName': 'Назва', 'edit.matContent': 'Текст / Субтитри',
-                'edit.matCover': 'Обкладинка', 'edit.matCoverHint': 'Необов\'язково. Без обкладинки залишається іконка 📺 або 📜 у списку.',
-                'edit.matCoverQueryPh': 'Тема для пошуку…', 'edit.matCoverClear': 'Прибрати обкладинку',
+                'edit.matCover': 'Обкладинка',
+                'edit.matCoverQueryPh': 'Пошук або посилання…', 'edit.matCoverClear': 'Прибрати',
                 'edit.matSave': 'Зберегти зміни',
                 'bulk.title': 'Розумний імпорт слів', 'bulk.expand': 'Розгорнути',
                 'bulk.hint': 'Вставте текст (слово - переклад - контекст) або перетягніть сюди <b>.CSV / .TXT</b> файл.',
@@ -3798,6 +3798,7 @@
                 'reader.fontSize': 'Розмір тексту', 'reader.width': 'Ширина вікна', 'reader.font': 'Шрифт',
                 'reader.settings': 'Налаштування читання', 'reader.highlight': 'Маркер',
                 'reader.highlightOn': 'Маркер увімкнено — виділіть текст', 'reader.highlightOff': 'Маркер вимкнено',
+                'reader.prevPage': 'Попередня сторінка', 'reader.nextPage': 'Наступна сторінка',
                 'reader.narrow': 'Вужче', 'reader.wide': 'Ширше',
                 'reader.georgia': 'Georgia (із засічками)', 'reader.inter': 'Inter (без засічок)',
                 'train.stop': 'Стоп', 'train.dontKnow': 'Не знаю слово', 'train.next': 'Далі',
@@ -4099,15 +4100,12 @@
                 'profile.sync': 'Dictionary sync',
                 'edit.title': 'Edit word', 'edit.word': 'Word', 'edit.trans': 'Translation',
                 'edit.context': 'Context (sentence)', 'edit.image': 'Image',
-                'edit.imgQuery': 'Another word to search...', 'edit.search': 'Search', 'edit.save': 'Save changes',
-                'edit.imgUrlPh': 'Paste your own link…',
-                'edit.imgUrlHint': 'JPG, PNG, WebP, GIF, AVIF, SVG… — your link. Use search above for Unsplash.',
+                'edit.imgQuery': 'Search or paste a link…', 'edit.search': 'Search', 'edit.save': 'Save changes',
+                'edit.imgClear': 'Clear',
                 'edit.imgUrlBad': 'Could not load this link as an image.',
-                'edit.imgUrlEmpty': 'No image — paste a link or search Unsplash.',
-                'edit.imgUnsplashNote': 'Current image is from Unsplash. Paste a link above to replace it.',
                 'edit.matTitle': 'Edit material', 'edit.matName': 'Title', 'edit.matContent': 'Text / Subtitles',
-                'edit.matCover': 'Cover', 'edit.matCoverHint': 'Optional. Without a cover, the 📺 or 📜 icon stays in the list.',
-                'edit.matCoverQueryPh': 'Search topic…', 'edit.matCoverClear': 'Remove cover',
+                'edit.matCover': 'Cover',
+                'edit.matCoverQueryPh': 'Search or paste a link…', 'edit.matCoverClear': 'Clear',
                 'edit.matSave': 'Save changes',
                 'bulk.title': 'Smart word import', 'bulk.expand': 'Expand',
                 'bulk.hint': 'Paste text (word - translation - context) or drop a <b>.CSV / .TXT</b> file here.',
@@ -4135,6 +4133,7 @@
                 'reader.fontSize': 'Text size', 'reader.width': 'Window width', 'reader.font': 'Font',
                 'reader.settings': 'Reading settings', 'reader.highlight': 'Highlighter',
                 'reader.highlightOn': 'Highlighter on — select text', 'reader.highlightOff': 'Highlighter off',
+                'reader.prevPage': 'Previous page', 'reader.nextPage': 'Next page',
                 'reader.narrow': 'Narrower', 'reader.wide': 'Wider',
                 'reader.georgia': 'Georgia (serif)', 'reader.inter': 'Inter (sans-serif)',
                 'train.stop': 'Stop', 'train.dontKnow': "I don't<br>know", 'train.next': 'Next',
@@ -4431,15 +4430,12 @@
                 'profile.sync': 'Sincronización del diccionario',
                 'edit.title': 'Editar palabra', 'edit.word': 'Palabra', 'edit.trans': 'Traducción',
                 'edit.context': 'Contexto (frase)', 'edit.image': 'Imagen',
-                'edit.imgQuery': 'Otra palabra para buscar...', 'edit.search': 'Buscar', 'edit.save': 'Guardar cambios',
-                'edit.imgUrlPh': 'Pega tu enlace…',
-                'edit.imgUrlHint': 'JPG, PNG, WebP, GIF, AVIF, SVG… — tu enlace. Unsplash arriba.',
+                'edit.imgQuery': 'Buscar o pegar enlace…', 'edit.search': 'Buscar', 'edit.save': 'Guardar cambios',
+                'edit.imgClear': 'Quitar',
                 'edit.imgUrlBad': 'No se pudo cargar este enlace como imagen.',
-                'edit.imgUrlEmpty': 'Sin imagen — pega un enlace o busca en Unsplash.',
-                'edit.imgUnsplashNote': 'Imagen actual de Unsplash. Pega un enlace arriba para cambiarla.',
                 'edit.matTitle': 'Editar material', 'edit.matName': 'Título', 'edit.matContent': 'Texto / Subtítulos',
-                'edit.matCover': 'Portada', 'edit.matCoverHint': 'Opcional. Sin portada, el icono 📺 o 📜 permanece en la lista.',
-                'edit.matCoverQueryPh': 'Tema de búsqueda…', 'edit.matCoverClear': 'Quitar portada',
+                'edit.matCover': 'Portada',
+                'edit.matCoverQueryPh': 'Buscar o pegar enlace…', 'edit.matCoverClear': 'Quitar',
                 'edit.matSave': 'Guardar cambios',
                 'bulk.title': 'Importación inteligente', 'bulk.expand': 'Ampliar',
                 'bulk.hint': 'Pega texto (palabra - traducción - contexto) o suelta un archivo <b>.CSV / .TXT</b>.',
@@ -4467,6 +4463,7 @@
                 'reader.fontSize': 'Tamaño del texto', 'reader.width': 'Ancho de la ventana', 'reader.font': 'Fuente',
                 'reader.settings': 'Ajustes de lectura', 'reader.highlight': 'Subrayador',
                 'reader.highlightOn': 'Subrayador activo — selecciona texto', 'reader.highlightOff': 'Subrayador desactivado',
+                'reader.prevPage': 'Página anterior', 'reader.nextPage': 'Página siguiente',
                 'reader.narrow': 'Más estrecho', 'reader.wide': 'Más ancho',
                 'reader.georgia': 'Georgia (con serifa)', 'reader.inter': 'Inter (sin serifa)',
                 'train.stop': 'Parar', 'train.dontKnow': 'No lo<br>sé', 'train.next': 'Siguiente',
@@ -6361,6 +6358,8 @@
             if (w.createdAt != null) payload.createdAt = w.createdAt;
             if (w.materialId) payload.materialId = w.materialId;
             if (w.publishedAt != null) payload.publishedAt = w.publishedAt;
+            if (w.ipa) payload.ipa = w.ipa;
+            if (w.ipaSource) payload.ipaSource = w.ipaSource;
             for (const mode of CORE_TRAIN_MODES) {
                 const lvl = w[`srs_${mode.id}_Level`];
                 const next = w[`srs_${mode.id}_NextTime`];
@@ -7266,8 +7265,8 @@
         }
 
         function ipaSourceLabel(source) {
+            if (source === 'mw' || source === 'shared') return 'MW';
             if (source === 'fd') return 'FD';
-            if (source === 'mw') return 'MW';
             if (source === 'parts') return 'PARTS';
             return '';
         }
@@ -7285,9 +7284,9 @@
                 const hit = pronunciationCache.get(key);
                 if (hit && hit.ipa) return hit;
             }
-            const vocab = vocabulary.find((v) => v.word.toLowerCase() === key);
+            const vocab = vocabulary.find((v) => String(v.word || '').toLowerCase() === key);
             if (vocab?.ipa) {
-                const hit = { ipa: vocab.ipa, source: vocab.ipaSource || 'fd' };
+                const hit = { ipa: vocab.ipa, source: vocab.ipaSource || 'mw' };
                 pronunciationCache.set(key, hit);
                 return hit;
             }
@@ -7316,19 +7315,59 @@
             }
         }
 
+        function sharedIpaDocRef(key) {
+            // Shared pool under the common account — reusable across personal IDs when rules allow
+            return doc(db, 'users', DEFAULT_SHARED_UID, 'ipaPool', key);
+        }
+
+        async function lookupSharedIpa(key) {
+            if (!db || !key) return null;
+            try {
+                const snap = await Promise.race([
+                    getDoc(sharedIpaDocRef(key)),
+                    new Promise((resolve) => setTimeout(() => resolve(null), 900))
+                ]);
+                if (!snap || !snap.exists?.()) return null;
+                const data = snap.data() || {};
+                const ipa = formatIpaDisplay(data.ipa || '');
+                if (!ipa) return null;
+                return { ipa, source: data.source === 'parts' ? 'parts' : 'shared' };
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function contributeSharedIpa(key, ipa, source) {
+            if (!db || !key || !ipa) return;
+            // Best-effort — ignore permission errors on personal accounts
+            setDoc(sharedIpaDocRef(key), {
+                word: key,
+                ipa,
+                source: source || 'mw',
+                updatedAt: serverTimestamp()
+            }, { merge: true }).catch(() => {});
+        }
+
         function persistIpaCacheEntry(key, ipa, source, wordId) {
             if (!key || !ipa) return;
             const entry = { ipa, source: source || '', at: Date.now() };
             pronunciationCache.set(key, { ipa, source: source || '' });
             ipaCacheStore[key] = entry;
-            localStorage.setItem(IPA_CACHE_LS_KEY, JSON.stringify(ipaCacheStore));
+            try { localStorage.setItem(IPA_CACHE_LS_KEY, JSON.stringify(ipaCacheStore)); } catch (_) {}
             ipaCacheDirty = true;
             scheduleIpaCacheFirestoreSync();
+            contributeSharedIpa(key, ipa, source);
             if (wordId && activeUid && db) {
                 updateDoc(docRef('words', wordId), { ipa, ipaSource: source || '' }).catch(() => {});
+                const local = vocabulary.find((v) => v.id === wordId);
+                if (local) {
+                    local.ipa = ipa;
+                    local.ipaSource = source || '';
+                }
             }
         }
 
+        // Free Dictionary is kept only for image-search synonym hints — not for IPA (unreliable / slow).
         async function fetchFreeDictJson(lang, word) {
             const q = String(word || '').trim().toLowerCase();
             if (!q) return null;
@@ -7346,35 +7385,10 @@
                     return null;
                 }
             };
-            let data = await tryFetch(url, 3200);
-            if (!data) {
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-                data = await tryFetch(proxyUrl, 3200);
-            }
-            return data;
+            return await tryFetch(url, 2500);
         }
 
-        function extractFreeDictPhonetic(data) {
-            if (!Array.isArray(data)) return null;
-            const texts = [];
-            for (const entry of data) {
-                if (entry?.phonetic) texts.push(String(entry.phonetic).trim());
-                (entry?.phonetics || []).forEach((p) => {
-                    if (p?.text) texts.push(String(p.text).trim());
-                });
-            }
-            const uniq = [...new Set(texts.filter(Boolean))];
-            if (!uniq.length) return null;
-            const us = uniq.find((t) => /oʊ|ɑ|ɚ|-us/i.test(t)) || uniq.find((t) => /\/.*\//.test(t)) || uniq[0];
-            return formatIpaDisplay(us);
-        }
-
-        async function fetchFreeDictPhonetic(word, lang = 'en') {
-            const data = await fetchFreeDictJson(lang, word);
-            return extractFreeDictPhonetic(data);
-        }
-
-        async function fetchMwPhoneticFallback(word) {
+        async function fetchMwPhonetic(word) {
             const path = getMerriamDictPath(word);
             if (!path) return null;
             try {
@@ -7403,14 +7417,17 @@
             if (!key || /\s/.test(key)) return null;
             const cached = getIpaFromCache(key);
             if (cached?.ipa) return cached;
-            let ipa = await fetchFreeDictPhonetic(key, 'en');
-            let source = ipa ? 'fd' : null;
-            if (!ipa) {
-                ipa = await fetchMwPhoneticFallback(key);
-                source = ipa ? 'mw' : null;
+            const shared = await lookupSharedIpa(key);
+            if (shared?.ipa) {
+                persistIpaCacheEntry(key, shared.ipa, shared.source || 'shared', null);
+                return shared;
             }
-            if (ipa) persistIpaCacheEntry(key, ipa, source, null);
-            return ipa ? { ipa, source } : null;
+            const ipa = await fetchMwPhonetic(key);
+            if (ipa) {
+                persistIpaCacheEntry(key, ipa, 'mw', null);
+                return { ipa, source: 'mw' };
+            }
+            return null;
         }
 
         async function fetchPhrasalPartsIpa(phrase) {
@@ -7431,14 +7448,22 @@
             if (!key) return { ipa: null, source: null };
 
             const cached = getIpaFromCache(key);
-            if (cached?.ipa) return cached;
-
-            let ipa = await fetchFreeDictPhonetic(key, 'en');
-            let source = ipa ? 'fd' : null;
-            if (!ipa) {
-                ipa = await fetchMwPhoneticFallback(key);
-                source = ipa ? 'mw' : null;
+            if (cached?.ipa) {
+                // Ensure the word doc also keeps a copy for export / shared reuse
+                if (wordId && !vocabulary.find((v) => v.id === wordId)?.ipa) {
+                    persistIpaCacheEntry(key, cached.ipa, cached.source || 'mw', wordId);
+                }
+                return cached;
             }
+
+            const shared = await lookupSharedIpa(key);
+            if (shared?.ipa) {
+                persistIpaCacheEntry(key, shared.ipa, shared.source || 'shared', wordId);
+                return shared;
+            }
+
+            let ipa = await fetchMwPhonetic(key);
+            let source = ipa ? 'mw' : null;
             if (!ipa && /\s/.test(key)) {
                 const parts = await fetchPhrasalPartsIpa(key);
                 if (parts?.ipa) {
@@ -7469,7 +7494,9 @@
             if (!el || !showTrainingPronunciation || learningLanguage !== 'en') return;
             const token = String(word || '').trim().toLowerCase();
             el.dataset.pronToken = token;
-            el.textContent = '';
+            const quick = getIpaFromCache(token);
+            if (quick?.ipa) applyIpaToElement(el, quick.ipa, quick.source);
+            else el.textContent = '';
             const result = await fetchWordPronunciation(word, wordId);
             if (!el.isConnected || el.dataset.pronToken !== token) return;
             applyIpaToElement(el, result.ipa, result.source);
@@ -9720,11 +9747,10 @@
             editImageUrlPreviewToken++;
             const imgUrl = String(word.imageUrl || '').trim();
             editWordPendingImageUrl = imgUrl;
-            editWordFallbackImageUrl = isUnsplashImageUrl(imgUrl) ? imgUrl : '';
+            editWordFallbackImageUrl = imgUrl;
             setEditImageUrlStatus('');
-            refreshEditImageUrlFieldFromPending();
             applyEditImagePreview(imgUrl, { silent: true });
-            refreshEditImageSourceNote();
+            syncEditImgLinkIcon();
             document.getElementById('edit-img-options').classList.add('hidden');
             document.getElementById('edit-img-status').classList.add('hidden');
             clearEditImageQueryHints();
@@ -9743,28 +9769,6 @@
         let editMatCoverSearchToken = 0;
         let pendingMaterialCoverUrl = '';
 
-        function refreshEditImageUrlFieldFromPending() {
-            const field = document.getElementById('edit-word-new-imgUrl');
-            if (!field) return;
-            const show = editWordPendingImageUrl && !isUnsplashImageUrl(editWordPendingImageUrl)
-                ? editWordPendingImageUrl
-                : '';
-            field.value = show;
-        }
-
-        function refreshEditImageSourceNote() {
-            const note = document.getElementById('edit-img-source-note');
-            if (!note) return;
-            const field = document.getElementById('edit-word-new-imgUrl');
-            const fieldEmpty = !String(field?.value || '').trim();
-            if (fieldEmpty && editWordPendingImageUrl && isUnsplashImageUrl(editWordPendingImageUrl)) {
-                note.textContent = t('edit.imgUnsplashNote');
-                note.classList.remove('hidden');
-            } else {
-                note.classList.add('hidden');
-            }
-        }
-
         function setEditImageUrlStatus(msg, kind = '') {
             const el = document.getElementById('edit-img-url-status');
             if (!el) return;
@@ -9782,20 +9786,58 @@
         function normalizeEditImageUrl(raw) {
             let u = String(raw || '').trim();
             if (!u) return '';
-            // Allow paste without scheme
             if (/^\/\//.test(u)) u = `https:${u}`;
             else if (!/^[a-z][a-z0-9+.-]*:/i.test(u) && /\./.test(u)) u = `https://${u}`;
             return u;
         }
 
+        function looksLikeImageLink(input) {
+            const raw = String(input || '').trim();
+            if (!raw || /\s/.test(raw)) return false;
+            if (/^(https?:)?\/\//i.test(raw)) return true;
+            if (/^www\./i.test(raw)) return true;
+            if (/^[a-z0-9]([a-z0-9-]*\.)+[a-z]{2,}([/:?#].*)?$/i.test(raw)) return true;
+            return false;
+        }
+
         function looksLikeImageUrl(url) {
             const u = String(url || '').trim();
-            if (!/^https?:\/\//i.test(u)) return false;
-            const path = u.split(/[?#]/)[0];
-            if (/\.(jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(path)) return true;
-            // CDNs often omit extensions (Unsplash, Cloudinary, Firebase Storage, ImgBB…)
-            return true;
+            return /^https?:\/\//i.test(u);
         }
+
+        function syncEditImgLinkIcon() {
+            const input = document.getElementById('edit-img-query');
+            const icon = document.getElementById('edit-img-link-ico');
+            if (!icon) return;
+            icon.classList.toggle('is-active', looksLikeImageLink(input?.value || ''));
+        }
+
+        function syncEditMatLinkIcon() {
+            const input = document.getElementById('edit-mat-img-query');
+            const icon = document.getElementById('edit-mat-link-ico');
+            if (!icon) return;
+            icon.classList.toggle('is-active', looksLikeImageLink(input?.value || ''));
+        }
+
+        window.onEditImgQueryInput = () => {
+            syncEditImgLinkIcon();
+            const raw = document.getElementById('edit-img-query')?.value || '';
+            if (looksLikeImageLink(raw)) {
+                const u = normalizeEditImageUrl(raw);
+                editWordPendingImageUrl = u;
+                applyEditImagePreview(u, { silent: true });
+            }
+        };
+
+        window.onEditMatCoverQueryInput = () => {
+            syncEditMatLinkIcon();
+            const raw = document.getElementById('edit-mat-img-query')?.value || '';
+            if (looksLikeImageLink(raw)) {
+                const u = normalizeEditImageUrl(raw);
+                editMatPendingCoverUrl = u;
+                applyEditMatCoverPreview(u);
+            }
+        };
 
         function applyEditImagePreview(rawUrl, opts = {}) {
             const silent = !!opts.silent;
@@ -9809,7 +9851,7 @@
             if (!url) {
                 imgPreview.removeAttribute('src');
                 imgPreview.classList.add('hidden');
-                if (!silent) setEditImageUrlStatus(t('edit.imgUrlEmpty'), '');
+                if (!silent) setEditImageUrlStatus('');
                 return;
             }
             if (!looksLikeImageUrl(url)) {
@@ -9818,34 +9860,8 @@
                 return;
             }
             imgPreview.classList.remove('hidden');
-            // Bust cache when re-testing the same URL after a failed load
             imgPreview.src = url;
         }
-
-        window.onEditImageUrlInput = (immediate = false) => {
-            const field = document.getElementById('edit-word-new-imgUrl');
-            if (!field) return;
-            const run = () => {
-                if (immediate) {
-                    const normalized = normalizeEditImageUrl(field.value);
-                    if (normalized && normalized !== field.value.trim()) field.value = normalized;
-                }
-                const val = String(field.value || '').trim();
-                if (val) {
-                    editWordPendingImageUrl = normalizeEditImageUrl(val);
-                    setEditImageUrlStatus('');
-                    applyEditImagePreview(editWordPendingImageUrl, { silent: false });
-                } else {
-                    editWordPendingImageUrl = editWordFallbackImageUrl || '';
-                    setEditImageUrlStatus('');
-                    applyEditImagePreview(editWordPendingImageUrl, { silent: true });
-                }
-                refreshEditImageSourceNote();
-            };
-            clearTimeout(editImageUrlPreviewTimer);
-            if (immediate) run();
-            else editImageUrlPreviewTimer = setTimeout(run, 320);
-        };
 
         window.onEditImagePreviewLoad = (img) => {
             if (!img) return;
@@ -9857,15 +9873,27 @@
 
         window.onEditImagePreviewError = (img) => {
             if (!img) return;
-            // Do NOT swap to Unsplash fallback — keep the pasted URL so the user can fix it
             img.classList.add('is-broken');
-            const field = document.getElementById('edit-word-new-imgUrl');
-            if (field && field.value.trim()) setEditImageUrlStatus(t('edit.imgUrlBad'), 'is-bad');
+            if (editWordPendingImageUrl) setEditImageUrlStatus(t('edit.imgUrlBad'), 'is-bad');
             else {
                 img.classList.add('hidden');
                 setEditImageUrlStatus('');
             }
         };
+
+        window.clearEditWordImage = () => {
+            editWordPendingImageUrl = '';
+            editWordFallbackImageUrl = '';
+            const q = document.getElementById('edit-img-query');
+            if (q) q.value = '';
+            syncEditImgLinkIcon();
+            applyEditImagePreview('');
+            setEditImageUrlStatus('');
+            const opts = document.getElementById('edit-img-options');
+            if (opts) { opts.innerHTML = ''; opts.classList.add('hidden'); }
+            clearEditImageQueryHints();
+        };
+
         window.searchEditImages = async (opts = {}) => {
             const learnedWord = document.getElementById('edit-word-en').value.trim();
             const translation = document.getElementById('edit-word-uk').value.trim();
@@ -9875,21 +9903,29 @@
             const optionsContainer = document.getElementById('edit-img-options');
             if (!learnedWord && !translation && !customQuery) return;
 
+            // Paste link into the same field → use as image URL
+            if (looksLikeImageLink(customQuery)) {
+                const u = normalizeEditImageUrl(customQuery);
+                selectEditImage(u);
+                status.classList.add('hidden');
+                optionsContainer.innerHTML = '';
+                optionsContainer.classList.add('hidden');
+                clearEditImageQueryHints();
+                return;
+            }
+
             const token = ++editImageSearchToken;
             status.textContent = t('img.searching'); status.classList.remove('hidden');
             optionsContainer.innerHTML = ''; optionsContainer.classList.add('hidden');
-            // Drop previous word's chips immediately so they never linger across searches
             clearEditImageQueryHints();
 
             try {
-                // Default to EN gloss for es-en (etc.); user can override in the query box.
                 let searchQuery = customQuery || imageSearchWord || learnedWord;
                 if (!opts.fromHint) {
                     const input = document.getElementById('edit-img-query');
                     if (input && !customQuery) input.value = '';
                 }
 
-                // Local hints immediately; Free Dictionary chips load in the background (non-blocking).
                 if (learnedWord || translation) {
                     const quickOpts = await getVisualImageQueryOptions(learnedWord, { forEdit: true, translation, skipRemote: true });
                     if (token !== editImageSearchToken) return;
@@ -9927,27 +9963,31 @@
             const u = normalizeEditImageUrl(url) || '';
             editWordPendingImageUrl = u;
             editWordFallbackImageUrl = u;
-            refreshEditImageUrlFieldFromPending();
+            const q = document.getElementById('edit-img-query');
+            if (q && looksLikeImageLink(q.value)) {
+                /* keep pasted link visible */
+            } else if (q && !looksLikeImageLink(u)) {
+                /* Unsplash pick — leave query as search text */
+            }
             setEditImageUrlStatus('');
             applyEditImagePreview(u, { silent: true });
-            refreshEditImageSourceNote();
+            syncEditImgLinkIcon();
         };
 
         function initEditMaterialCover(m) {
             editMatPendingCoverUrl = m?.coverUrl || '';
             editMatFallbackCoverUrl = editMatPendingCoverUrl;
-            const field = document.getElementById('edit-mat-cover-url');
-            if (field) field.value = editMatPendingCoverUrl;
             const query = document.getElementById('edit-mat-img-query');
-            if (query) query.value = '';
+            if (query) query.value = editMatPendingCoverUrl || '';
             const opts = document.getElementById('edit-mat-img-options');
             if (opts) { opts.innerHTML = ''; opts.classList.add('hidden'); }
             const status = document.getElementById('edit-mat-img-status');
             if (status) { status.textContent = ''; status.classList.add('hidden'); }
-            applyEditMatCoverPreview(editMatPendingCoverUrl, { silent: true });
+            applyEditMatCoverPreview(editMatPendingCoverUrl);
+            syncEditMatLinkIcon();
         }
 
-        function applyEditMatCoverPreview(rawUrl, opts = {}) {
+        function applyEditMatCoverPreview(rawUrl) {
             const imgPreview = document.getElementById('edit-mat-cover-preview');
             if (!imgPreview) return;
             const url = normalizeEditImageUrl(rawUrl);
@@ -9960,25 +10000,22 @@
             imgPreview.src = url;
         }
 
-        window.onEditMatCoverUrlInput = (immediate = false) => {
-            const field = document.getElementById('edit-mat-cover-url');
-            if (!field) return;
-            if (immediate) {
-                const normalized = normalizeEditImageUrl(field.value);
-                if (normalized && normalized !== field.value.trim()) field.value = normalized;
-            }
-            const val = String(field.value || '').trim();
-            editMatPendingCoverUrl = val ? normalizeEditImageUrl(val) : (editMatFallbackCoverUrl || '');
-            applyEditMatCoverPreview(editMatPendingCoverUrl, { silent: !val });
-        };
-
         window.searchEditMatCover = async () => {
             const title = document.getElementById('edit-mat-title')?.value.trim() || '';
             const customQuery = document.getElementById('edit-mat-img-query')?.value.trim() || '';
-            const searchQuery = customQuery || title;
-            if (!searchQuery) return;
             const status = document.getElementById('edit-mat-img-status');
             const optionsContainer = document.getElementById('edit-mat-img-options');
+            if (!customQuery && !title) return;
+
+            if (looksLikeImageLink(customQuery)) {
+                const u = normalizeEditImageUrl(customQuery);
+                selectEditMatCover(u);
+                if (status) status.classList.add('hidden');
+                if (optionsContainer) { optionsContainer.innerHTML = ''; optionsContainer.classList.add('hidden'); }
+                return;
+            }
+
+            const searchQuery = customQuery || title;
             const token = ++editMatCoverSearchToken;
             if (status) { status.textContent = t('img.searching'); status.classList.remove('hidden'); }
             if (optionsContainer) { optionsContainer.innerHTML = ''; optionsContainer.classList.add('hidden'); }
@@ -10009,9 +10046,10 @@
             const u = normalizeEditImageUrl(url) || '';
             editMatPendingCoverUrl = u;
             editMatFallbackCoverUrl = u;
-            const field = document.getElementById('edit-mat-cover-url');
-            if (field) field.value = u;
-            applyEditMatCoverPreview(u, { silent: true });
+            const field = document.getElementById('edit-mat-img-query');
+            if (field && (!field.value.trim() || looksLikeImageLink(field.value))) field.value = u;
+            applyEditMatCoverPreview(u);
+            syncEditMatLinkIcon();
             const status = document.getElementById('edit-mat-img-status');
             if (status) { status.textContent = ''; status.classList.add('hidden'); }
         };
@@ -10019,9 +10057,10 @@
         window.clearEditMatCover = () => {
             editMatPendingCoverUrl = '';
             editMatFallbackCoverUrl = '';
-            const field = document.getElementById('edit-mat-cover-url');
+            const field = document.getElementById('edit-mat-img-query');
             if (field) field.value = '';
             applyEditMatCoverPreview('');
+            syncEditMatLinkIcon();
             const opts = document.getElementById('edit-mat-img-options');
             if (opts) { opts.innerHTML = ''; opts.classList.add('hidden'); }
         };
@@ -10034,21 +10073,30 @@
         async function fetchWikipediaPageImage(title, wikiLang) {
             const wiki = wikiLang || wikiLangCode();
             try {
-                const res = await fetch(`https://${wiki}.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=640&titles=${encodeURIComponent(title)}&format=json&origin=*`);
+                const res = await fetch(`https://${wiki}.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail|original&pithumbsize=800&titles=${encodeURIComponent(title)}&format=json&origin=*`);
                 if (!res.ok) return '';
                 const data = await res.json();
                 const pages = data.query?.pages;
                 if (!pages) return '';
                 const page = pages[Object.keys(pages)[0]];
-                return page?.thumbnail?.source || '';
+                const src = page?.original?.source || page?.thumbnail?.source || '';
+                return normalizeEditImageUrl(src);
             } catch (_) {
                 return '';
             }
         }
 
         function extractFirstImageFromJinaRaw(raw) {
-            const m = String(raw || '').match(/!\[[^\]]*]\((https?:[^)\s]+)\)/);
-            return m ? normalizeEditImageUrl(m[1]) : '';
+            const text = String(raw || '');
+            const matches = [...text.matchAll(/!\[[^\]]*]\((https?:[^)\s]+)\)/g)];
+            for (const m of matches) {
+                const u = normalizeEditImageUrl(m[1]);
+                if (!u) continue;
+                // Skip tiny icons / tracking pixels when size is in the URL
+                if (/\/\d{1,2}px-/i.test(u) || /favicon|sprite|logo\.svg|1x1|pixel/i.test(u)) continue;
+                return u;
+            }
+            return '';
         }
 
         window.saveEditedWord = async () => {
@@ -12185,7 +12233,9 @@
             const range = rawOffsetsToDomRange(root, start, end);
             if (!range) return;
             const mark = document.createElement('mark');
-            mark.className = 'reader-hl';
+            // On touch devices without CSS Highlight API, bookmarks avoid paint/layout thrash
+            const useBookmarks = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+            mark.className = useBookmarks ? 'reader-hl reader-hl-book' : 'reader-hl';
             mark.dataset.hlStart = String(start);
             mark.dataset.hlEnd = String(end);
             try {
@@ -12199,6 +12249,14 @@
             const container = document.getElementById('reader-content');
             if (!container) return;
             clearReaderHighlightPaint();
+            // Unwrap any previous DOM marks so offsets stay stable
+            container.querySelectorAll('mark.reader-hl').forEach((mark) => {
+                const parent = mark.parentNode;
+                if (!parent) return;
+                while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+                parent.removeChild(mark);
+                parent.normalize?.();
+            });
             const list = getReaderHighlightsForPage(readerCurrentPage)
                 .filter((h) => h && Number.isFinite(h.start) && Number.isFinite(h.end) && h.end > h.start)
                 .sort((a, b) => a.start - b.start);
@@ -12257,7 +12315,8 @@
             scheduleSaveReaderHighlights();
             pushAppUndo(() => restoreReaderHighlightsSnapshot(materialId, pageNum, beforeSnapshot));
             window.getSelection()?.removeAllRanges();
-            renderReaderContent();
+            // Avoid full page rebuild — that was the main phone glitch (font/layout jump)
+            applyStoredHighlightsToReader();
         }
 
         function bindReaderFloatToolsDismiss() {
