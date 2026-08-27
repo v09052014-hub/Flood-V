@@ -2501,23 +2501,31 @@
         .def-wrong-sense-btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 0.35rem;
-            margin-top: 0.65rem;
-            padding: 0.2rem 0;
-            border: none;
-            background: transparent;
-            color: #94a3b8;
-            font-size: 0.72rem;
+            width: 100%;
+            margin: 0;
+            padding: 0.55rem 0.9rem;
+            border: 1px solid #fecdd3;
+            border-radius: 0.75rem;
+            background: #fff1f2;
+            color: #e11d48;
+            font-size: 0.8rem;
             font-weight: 700;
             letter-spacing: 0.01em;
             cursor: pointer;
-            transition: color 0.15s ease;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
         }
-        .def-wrong-sense-btn:hover { color: #64748b; }
+        .def-wrong-sense-btn:hover {
+            background: #ffe4e6;
+            border-color: #fda4af;
+            color: #be123c;
+        }
         .def-wrong-sense-btn:disabled {
             opacity: 0.55;
             cursor: default;
         }
+        .def-wrong-sense-btn.hidden { display: none !important; }
         #bs-def-input {
             font-size: 1.5rem;
             line-height: 1.4;
@@ -3444,9 +3452,12 @@
                             </div>
                         </div>
 
-                        <div class="mt-3 flex gap-3 relative z-10 w-full">
-                            <button id="bs-btn-dont-know" onclick="markWordAsFailed()" class="flex-shrink-0 bg-slate-100 text-slate-500 hover:bg-slate-200 py-3 px-4 rounded-xl font-bold text-sm transition border border-slate-200 shadow-sm hidden" data-i18n-html="train.dontKnow">Не знаю<br>слово</button>
-                            <button id="bs-btn-next" onclick="nextBrainstormStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-lg hidden active:scale-95 shadow-md transition" data-i18n="train.next">Далі <span class="font-normal">↵</span></button>
+                        <div class="mt-3 flex flex-col gap-2 relative z-10 w-full">
+                            <button type="button" id="bs-btn-wrong-sense" onclick="discardWrongDefinitionSense()" class="def-wrong-sense-btn hidden" data-i18n="train.defWrongSense" data-i18n-title="train.defWrongSenseTitle" title="">Не те значення</button>
+                            <div class="flex gap-3 w-full">
+                                <button id="bs-btn-dont-know" onclick="markWordAsFailed()" class="flex-shrink-0 bg-slate-100 text-slate-500 hover:bg-slate-200 py-3 px-4 rounded-xl font-bold text-sm transition border border-slate-200 shadow-sm hidden" data-i18n-html="train.dontKnow">Не знаю<br>слово</button>
+                                <button id="bs-btn-next" onclick="nextBrainstormStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-lg hidden active:scale-95 shadow-md transition" data-i18n="train.next">Далі <span class="font-normal">↵</span></button>
+                            </div>
                         </div>
                     </div>
                     <div id="bs-external-clues" class="w-full lg:w-5/12 hidden transition-all"></div>
@@ -3779,7 +3790,7 @@
                 'train.defLess': 'Менше',
                 'train.defCredit': 'Merriam-Webster',
                 'train.defWrongSense': 'Не те значення',
-                'train.defWrongSenseTitle': 'Повідомити: це визначення не підходить. Воно більше не покажеться і не зарахується як помилка.',
+                'train.defWrongSenseTitle': 'Це визначення не підходить до вашого слова. Воно більше не покажеться і не зарахується.',
                 'msg.defEnOnly': 'Вправа «Визначення» доступна, коли вивчаєте англійську.',
                 'msg.defDailyLimit': 'Сьогодні вже {n} сесій визначень. Поверніться завтра.',
                 'msg.defNone': 'Не вдалося знайти чіткі визначення для слів, готових зараз.',
@@ -4114,7 +4125,7 @@
                 'train.defLess': 'Less',
                 'train.defCredit': 'Merriam-Webster',
                 'train.defWrongSense': 'Wrong sense',
-                'train.defWrongSenseTitle': 'Report this definition. It won’t be shown again and won’t count as a miss.',
+                'train.defWrongSenseTitle': 'This definition doesn’t match your word. It won’t be shown again and won’t count.',
                 'msg.defEnOnly': 'Definitions is available when you are learning English.',
                 'msg.defDailyLimit': 'You have used {n} definition sessions today. Come back tomorrow.',
                 'msg.defNone': 'Could not find clear definitions for words that are due right now.',
@@ -4443,7 +4454,7 @@
                 'train.defLess': 'Menos',
                 'train.defCredit': 'Merriam-Webster',
                 'train.defWrongSense': 'Sentido incorrecto',
-                'train.defWrongSenseTitle': 'Reportar: esta definición no encaja. No se volverá a mostrar y no cuenta como fallo.',
+                'train.defWrongSenseTitle': 'Esta definición no encaja con tu palabra. No se volverá a mostrar y no contará.',
                 'msg.defEnOnly': 'Definiciones está disponible cuando estudias inglés.',
                 'msg.defDailyLimit': 'Ya usaste {n} sesiones de definiciones hoy. Vuelve mañana.',
                 'msg.defNone': 'No se encontraron definiciones claras para las palabras listas ahora.',
@@ -18355,8 +18366,25 @@
                 btnNext.classList.remove('hidden');
             }
             document.getElementById('bs-btn-dont-know').classList.add('hidden');
+            const wrongSenseBtn = document.getElementById('bs-btn-wrong-sense');
+            if (wrongSenseBtn) {
+                const showWrong = activeSessionMode === 'definition' && !word._defSkipped;
+                wrongSenseBtn.classList.toggle('hidden', !showWrong);
+                wrongSenseBtn.disabled = !showWrong;
+                if (showWrong) {
+                    wrongSenseBtn.title = t('train.defWrongSenseTitle');
+                    wrongSenseBtn.textContent = t('train.defWrongSense');
+                }
+            }
             ensureSuccessRevealVisible();
             setTimeout(ensureSuccessRevealVisible, 120);
+        }
+
+        function hideDefWrongSenseButton() {
+            const wrongSenseBtn = document.getElementById('bs-btn-wrong-sense');
+            if (!wrongSenseBtn) return;
+            wrongSenseBtn.classList.add('hidden');
+            wrongSenseBtn.disabled = true;
         }
 
         function renderBsStage() {
@@ -18367,6 +18395,7 @@
             clearContextRoundTimer();
             const area = document.getElementById('bs-interactive-area'); const btnNext = document.getElementById('bs-btn-next'), feedback = document.getElementById('bs-feedback');
             feedback.innerHTML = ''; btnNext.classList.add('hidden'); document.getElementById('bs-btn-dont-know').classList.remove('hidden'); area.innerHTML = '';
+            hideDefWrongSenseButton();
             const reveal = document.getElementById('bs-success-reveal');
             reveal.classList.add('hidden');
             reveal.classList.remove('bs-reveal-success', 'bs-reveal-missed');
@@ -18751,16 +18780,12 @@
                             ${fl}
                         </div>
                         <p class="text-lg sm:text-xl font-bold text-slate-800 leading-snug">${escapeHtmlText(prompt.def)}</p>
-                        <button type="button" class="def-wrong-sense-btn" id="bs-def-wrong-sense" title="${escapeHtmlText(t('train.defWrongSenseTitle'))}">
-                            ${escapeHtmlText(t('train.defWrongSense'))}
-                        </button>
                         ${exampleBlock}
                         <div class="mt-5 flex flex-col items-center justify-center gap-3 w-full">
                             <input type="text" id="bs-def-input" class="w-full p-4 text-center font-bold border-2 border-slate-300 rounded-2xl focus:border-indigo-500 outline-none transition-colors" autocomplete="off" lang="en" placeholder="${t('train.typeIn', { lang: learnLangLabel() })}">
                         </div>
                     </div>`;
                 const inp = document.getElementById('bs-def-input');
-                const wrongBtn = document.getElementById('bs-def-wrong-sense');
                 setTimeout(() => inp?.focus(), 50);
                 const answers = (prompt.answers || englishDefinitionAnswers(word.word, prompt.lemma))
                     .map((a) => String(a).trim().toLowerCase())
@@ -18769,11 +18794,6 @@
                     word._defAttempted = true;
                     window._defAnswered = (window._defAnswered || 0) + 1;
                 };
-                wrongBtn?.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.discardWrongDefinitionSense();
-                });
                 inp?.addEventListener('keydown', (e) => {
                     if (e.key !== 'Enter') return;
                     e.preventDefault();
@@ -18786,14 +18806,12 @@
                         inp.classList.replace('border-slate-300', 'border-emerald-500');
                         inp.classList.add('bg-emerald-50', 'text-emerald-700');
                         inp.disabled = true;
-                        if (wrongBtn) wrongBtn.disabled = true;
                         triggerSuccessReveal(word);
                     } else {
                         word.failed = true;
                         inp.classList.replace('border-slate-300', 'border-rose-400');
                         inp.classList.add('text-rose-500', 'bg-rose-50');
                         inp.disabled = true;
-                        if (wrongBtn) wrongBtn.disabled = true;
                         triggerSuccessReveal(word);
                     }
                 });
@@ -18807,21 +18825,36 @@
         window.discardWrongDefinitionSense = async () => {
             if (activeSessionMode !== 'definition') return;
             const word = bsWords[bsCurrentWordIdx];
-            if (!word || word._defSkipped || word._defAttempted) return;
+            if (!word || word._defSkipped) return;
             const prompt = word._defPrompt;
             if (!prompt?.def) return;
 
-            const wrongBtn = document.getElementById('bs-def-wrong-sense');
+            const wrongBtn = document.getElementById('bs-btn-wrong-sense');
             const inp = document.getElementById('bs-def-input');
+            const btnNext = document.getElementById('bs-btn-next');
+            const feedback = document.getElementById('bs-feedback');
+            const reveal = document.getElementById('bs-success-reveal');
             if (wrongBtn) wrongBtn.disabled = true;
             if (inp) inp.disabled = true;
+            if (btnNext) btnNext.classList.add('hidden');
+
+            // Undo this attempt so a mismatched sense doesn't count
+            if (word._defAttempted) {
+                window._defAnswered = Math.max(0, (window._defAnswered || 0) - 1);
+            }
+            word.failed = false;
+            word._defAttempted = false;
 
             banAndReportDefSense(word, prompt);
             clearDefinitionPromptForWord(word);
+            hideDefWrongSenseButton();
+            if (reveal) {
+                reveal.classList.add('hidden');
+                reveal.classList.remove('bs-reveal-success', 'bs-reveal-missed');
+            }
+            if (feedback) feedback.innerHTML = '';
 
-            const area = document.getElementById('bs-stage-area');
-            const btnNext = document.getElementById('bs-btn-next');
-            const feedback = document.getElementById('bs-feedback');
+            const area = document.getElementById('bs-interactive-area');
             if (area) {
                 area.innerHTML = `<div class="w-full max-w-md mx-auto py-8 text-center text-slate-400 font-bold text-sm">${t('train.defLoading')}</div>`;
             }
@@ -18829,13 +18862,11 @@
             try {
                 const nextPrompt = await ensureDefinitionPrompt(word, { forceRebuild: true });
                 if (nextPrompt) {
-                    // Another usable sense — stay on this word, no SRS / no progress tick
                     renderStageDefinition(word, area, btnNext, feedback);
                     return;
                 }
             } catch (_) {}
 
-            // No other senses: soft-skip like a missing def — uses reserve, no ✕ / no ✓
             word.failed = false;
             word._defSkipped = true;
             word._defAttempted = false;
