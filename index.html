@@ -325,11 +325,240 @@
         .reader-audio-transcript p:last-child {
             margin-bottom: 0;
         }
+        #reader-quick-match-panel {
+            position: fixed;
+            left: 50%;
+            bottom: 1rem;
+            width: min(28rem, calc(100vw - 1.5rem));
+            z-index: 180;
+            transform: translateX(-50%) translateY(calc(100% + 1.5rem));
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.35s ease, opacity 0.28s ease;
+        }
+        #reader-quick-match-panel.hidden { display: none !important; }
+        #reader-quick-match-panel.is-open {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .reader-quick-match-card {
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+            padding: 0.85rem 1rem 1rem;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .reader-qm-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.65rem;
+        }
+        .reader-qm-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+        .reader-qm-skip {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #64748b;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .reader-qm-skip:hover { background: #f1f5f9; color: #475569; }
+        .reader-qm-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.45rem;
+        }
+        .reader-qm-col-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+        }
+        .reader-qm-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.55rem 0.65rem;
+            border-radius: 0.65rem;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: border-color 0.15s, background 0.15s, opacity 0.25s, transform 0.15s;
+        }
+        .reader-qm-item:hover:not(:disabled) { border-color: #c7d2fe; background: #eef2ff; }
+        .reader-qm-item.is-selected { border-color: #6366f1; background: #eef2ff; color: #3730a3; }
+        .reader-qm-item.is-matched {
+            opacity: 0.35;
+            pointer-events: none;
+            border-color: #e2e8f0;
+            background: #f1f5f9;
+        }
+        .reader-qm-item.is-wrong { animation: reader-qm-shake 0.35s ease; border-color: #fca5a5; }
+        .reader-qm-done {
+            text-align: center;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #059669;
+            padding: 0.75rem 0 0.25rem;
+        }
+        @keyframes reader-qm-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+        #reader-post-read-panel {
+            position: fixed;
+            inset: 0;
+            z-index: 175;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.42);
+            backdrop-filter: blur(3px);
+        }
+        #reader-post-read-panel.hidden { display: none !important; }
+        .reader-post-read-card {
+            width: min(24rem, 100%);
+            background: #fff;
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
+            border: 1px solid #e2e8f0;
+        }
+        .reader-post-read-train {
+            width: 100%;
+            margin-top: 0.75rem;
+            padding: 1rem 1.1rem;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1rem;
+            text-align: left;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+            transition: transform 0.15s, filter 0.15s;
+        }
+        .reader-post-read-train:hover { filter: brightness(1.05); }
+        .reader-post-read-train:active { transform: scale(0.98); }
+        .reader-post-read-skip {
+            width: 100%;
+            margin-top: 0.5rem;
+            padding: 0.65rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+        .reader-post-read-skip:hover { background: #f8fafc; color: #475569; }
+        .reader-settings-toggle {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f1f5f9;
+            cursor: pointer;
+        }
+        .reader-settings-toggle input { margin-top: 0.15rem; accent-color: #4f46e5; }
+        .reader-settings-toggle-title { font-size: 0.82rem; font-weight: 700; color: #334155; display: block; }
+        .reader-settings-toggle-head {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+        .reader-settings-qm-wrap {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #f1f5f9;
+        }
+        .reader-settings-toggle--qm {
+            margin: 0;
+            padding: 0;
+            border-top: none;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .reader-settings-toggle--qm input[type="checkbox"] {
+            width: 1.35rem;
+            height: 1.35rem;
+            min-width: 1.35rem;
+            min-height: 1.35rem;
+            margin: 0;
+            flex-shrink: 0;
+            accent-color: #4f46e5;
+            cursor: pointer;
+        }
+        .reader-settings-info-btn {
+            flex-shrink: 0;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+        }
+        .reader-settings-info-btn:hover,
+        .reader-settings-info-btn[aria-expanded="true"] {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #475569;
+            transform: scale(1.12);
+        }
+        .reader-settings-tip {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 0.35rem;
+            font-size: 0.75rem;
+            line-height: 1.45;
+            font-weight: 500;
+            font-family: 'Inter', system-ui, sans-serif;
+            color: #64748b;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.55rem;
+        }
+        .reader-settings-tip.hidden { display: none !important; }
+        .reader-settings-toggle-hint { font-size: 0.7rem; color: #94a3b8; display: block; margin-top: 0.15rem; line-height: 1.35; }
         #reader-settings-panel {
             position: fixed;
             z-index: 150;
             width: 16.5rem;
             max-width: calc(100vw - 1.5rem);
+            padding: 0.625rem 0.75rem;
+        }
+        #reader-settings-panel .reader-settings-label {
+            margin-bottom: 0.375rem;
+        }
+        #reader-settings-panel .reader-settings-row {
+            margin-bottom: 0.75rem;
+        }
+        #reader-settings-panel .reader-settings-font-btn {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
         }
         .text-reader mark.reader-hl {
             display: inline;
@@ -525,7 +754,6 @@
             border-color: #cbd5e1;
         }
         #reader-content-wrapper {
-            transition: max-width 0.25s ease;
             max-width: 100%;
             overflow-x: hidden;
             box-sizing: border-box;
@@ -537,6 +765,12 @@
         #view-library,
         #view-library.reader-wide-mode {
             background-color: var(--app-bg);
+        }
+        #view-library.reader-wide-mode {
+            transition: max-width 0.3s ease;
+        }
+        main.reader-width-active {
+            transition: max-width 0.3s ease;
         }
         @media (max-width: 640px) {
             #reader-content-wrapper { padding-left: 0.75rem; padding-right: 0.75rem; }
@@ -596,6 +830,55 @@
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
         }
         .bs-play-audio-btn--intro:hover { background: #e2e8f0; }
+        .bs-intro-morph {
+            margin: 0 auto 0.75rem;
+            max-width: 22rem;
+            animation: bs-morph-in 0.45s ease both;
+        }
+        .bs-intro-morph-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 0.35rem;
+        }
+        .bs-intro-morph-segments {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: baseline;
+            gap: 0.12rem 0.2rem;
+            font-size: 1.875rem;
+            line-height: 1.2;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        .bs-morph-part {
+            display: inline-block;
+            padding: 0.05rem 0.15rem;
+            border-radius: 0.35rem;
+            animation: bs-morph-part-in 0.55s ease both;
+        }
+        .bs-morph-prefix { color: #4338ca; background: rgba(199, 210, 254, 0.45); }
+        .bs-morph-root { color: #0f766e; background: rgba(153, 246, 228, 0.35); }
+        .bs-morph-suffix { color: #7c3aed; background: rgba(221, 214, 254, 0.45); }
+        .bs-morph-chunk { color: #334155; background: rgba(241, 245, 249, 0.9); }
+        .bs-intro-morph-hints {
+            margin-top: 0.45rem;
+            font-size: 0.72rem;
+            line-height: 1.45;
+            color: #64748b;
+            font-weight: 600;
+        }
+        @keyframes bs-morph-in {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bs-morph-part-in {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
         .bs-play-audio-btn--listen {
             background: #eef2ff;
             color: #4338ca;
@@ -2942,6 +3225,13 @@
                                     <span class="settings-toggle-hint block" data-i18n="settings.trainingSfxHint">Звуки відповідей, таймера та завершення сесії. Озвучення слів не змінюється.</span>
                                 </span>
                             </label>
+                            <label class="settings-toggle-row mt-4">
+                                <input type="checkbox" id="settings-intro-morph" onchange="setShowIntroMorphHints(this.checked)">
+                                <span>
+                                    <span class="settings-toggle-title" data-i18n="settings.introMorph">Підказки про будову слова</span>
+                                    <span class="settings-toggle-hint block" data-i18n="settings.introMorphHint">На етапі ознайомлення Brainstorm: префікси, суфікси або частини довгих слів.</span>
+                                </span>
+                            </label>
                             <p class="settings-segment-label" data-i18n="settings.trainModesVisible">Режими тренування</p>
                             <p class="settings-toggle-hint mb-1" data-i18n="settings.trainModesHint">Оберіть, які вправи показувати на сторінці тренувань.</p>
                             <div id="settings-train-modes-list" class="settings-mode-grid"></div>
@@ -3340,15 +3630,15 @@
                     <button type="button" id="btn-reader-settings-float" class="reader-tool-btn" onclick="toggleReaderSettings(event)" title="Settings" data-i18n-title="reader.settings" aria-label="Settings">⚙️</button>
                 </div>
 
-                <div id="reader-settings-panel" onclick="event.stopPropagation()" class="hidden bg-white rounded-xl shadow-xl border border-slate-200 p-3">
-                    <p class="text-xs font-bold text-slate-400 uppercase mb-2" data-i18n="reader.fontSize">Розмір тексту</p>
-                    <div class="flex justify-between items-center mb-4 bg-slate-50 rounded-lg p-1 border border-slate-100" onclick="event.stopPropagation()">
+                <div id="reader-settings-panel" onclick="event.stopPropagation()" class="hidden bg-white rounded-xl shadow-xl border border-slate-200">
+                    <p class="text-xs font-bold text-slate-400 uppercase reader-settings-label" data-i18n="reader.fontSize">Розмір тексту</p>
+                    <div class="flex justify-between items-center reader-settings-row bg-slate-50 rounded-lg p-1 border border-slate-100" onclick="event.stopPropagation()">
                         <button onclick="event.stopPropagation(); changeFontSize(-1)" class="px-4 py-1.5 font-bold text-slate-600 hover:text-indigo-600 hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200">A-</button>
                         <span id="font-size-display" class="text-sm font-bold text-slate-700">18px</span>
                         <button onclick="event.stopPropagation(); changeFontSize(1)" class="px-4 py-1.5 font-bold text-slate-600 hover:text-indigo-600 hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200">A+</button>
                     </div>
-                    <p class="text-xs font-bold text-slate-400 uppercase mb-2" data-i18n="reader.width">Ширина вікна</p>
-                    <div class="flex justify-between items-center mb-4 bg-slate-50 rounded-lg p-1 border border-slate-100" onclick="event.stopPropagation()">
+                    <p class="text-xs font-bold text-slate-400 uppercase reader-settings-label" data-i18n="reader.width">Ширина вікна</p>
+                    <div class="flex justify-between items-center reader-settings-row bg-slate-50 rounded-lg p-1 border border-slate-100" onclick="event.stopPropagation()">
                         <button onclick="event.stopPropagation(); changeReaderWidth(-1)" id="btn-reader-narrow" class="px-3 py-1.5 text-base leading-none hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed" data-i18n-title="reader.narrow" title="Вужче">➡️⬅️</button>
                         <div id="reader-width-indicator" class="flex items-center gap-1.5 px-1">
                             <span class="reader-width-dot w-2 h-2 rounded-full bg-indigo-500 transition-colors"></span>
@@ -3357,10 +3647,20 @@
                         </div>
                         <button onclick="event.stopPropagation(); changeReaderWidth(1)" id="btn-reader-widen" class="px-3 py-1.5 text-base leading-none hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed" data-i18n-title="reader.wide" title="Ширше">⬅️➡️</button>
                     </div>
-                    <p class="text-xs font-bold text-slate-400 uppercase mb-2" data-i18n="reader.font">Шрифт</p>
-                    <div class="flex flex-col gap-1">
-                        <button onclick="event.stopPropagation(); changeFontFamily('\'Georgia\', serif')" class="text-left text-sm px-3 py-2.5 rounded-lg hover:bg-indigo-50 font-serif font-bold text-slate-700 border border-transparent hover:border-indigo-100 transition" data-i18n="reader.georgia">Georgia (Із засічками)</button>
-                        <button onclick="event.stopPropagation(); changeFontFamily('\'Inter\', sans-serif')" class="text-left text-sm px-3 py-2.5 rounded-lg hover:bg-indigo-50 font-sans font-bold text-slate-700 border border-transparent hover:border-indigo-100 transition" data-i18n="reader.inter">Inter (Без засічок)</button>
+                    <p class="text-xs font-bold text-slate-400 uppercase reader-settings-label" data-i18n="reader.font">Шрифт</p>
+                    <div class="flex flex-col gap-1 reader-settings-row">
+                        <button onclick="event.stopPropagation(); changeFontFamily('\'Georgia\', serif')" class="reader-settings-font-btn text-left text-sm px-3 rounded-lg hover:bg-indigo-50 font-serif font-bold text-slate-700 border border-transparent hover:border-indigo-100 transition" data-i18n="reader.georgia">Georgia (Із засічками)</button>
+                        <button onclick="event.stopPropagation(); changeFontFamily('\'Inter\', sans-serif')" class="reader-settings-font-btn text-left text-sm px-3 rounded-lg hover:bg-indigo-50 font-sans font-bold text-slate-700 border border-transparent hover:border-indigo-100 transition" data-i18n="reader.inter">Inter (Без засічок)</button>
+                    </div>
+                    <div class="reader-settings-qm-wrap" onmouseleave="hideReaderQuickMatchTip()">
+                        <label class="reader-settings-toggle reader-settings-toggle--qm" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="reader-quick-match-toggle" onchange="setReaderQuickMatch(this.checked)">
+                            <span class="reader-settings-toggle-head flex-1 min-w-0">
+                                <span class="reader-settings-toggle-title" data-i18n="reader.quickMatch">Швидке співставлення</span>
+                                <button type="button" id="btn-reader-qm-info" class="reader-settings-info-btn" onclick="toggleReaderQuickMatchTip(event)" onmouseenter="showReaderQuickMatchTip()" aria-expanded="false" aria-controls="reader-quick-match-tip" aria-label="Info">ℹ</button>
+                            </span>
+                        </label>
+                        <div id="reader-quick-match-tip" class="reader-settings-tip hidden" role="tooltip"></div>
                     </div>
                 </div>
                 
@@ -3384,6 +3684,29 @@
                     <button onclick="changeReaderPage(-1)" id="btn-reader-prev" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.prevPage" title="Попередня сторінка">‹</button>
                     <span id="reader-page-info" class="text-xs sm:text-sm font-bold text-slate-500">Сторінка 1 з 1</span>
                     <button onclick="changeReaderPage(1)" id="btn-reader-next" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.nextPage" title="Наступна сторінка">›</button>
+                </div>
+
+                <div id="reader-quick-match-panel" class="hidden" data-reader-ui="1" aria-live="polite">
+                    <div class="reader-quick-match-card">
+                        <div class="reader-qm-head">
+                            <span class="reader-qm-title" data-i18n="reader.quickMatchTitle">Швидке співставлення</span>
+                            <button type="button" class="reader-qm-skip" onclick="skipReaderQuickMatch()" data-i18n="reader.quickMatchSkip">Пропустити</button>
+                        </div>
+                        <div id="reader-qm-body"></div>
+                    </div>
+                </div>
+
+                <div id="reader-post-read-panel" class="hidden" data-reader-ui="1">
+                    <div class="reader-post-read-card font-sans">
+                        <p class="text-sm font-bold text-emerald-600 flex items-center gap-2"><span>✅</span> <span data-i18n="msg.matRead">Матеріал опрацьовано</span></p>
+                        <p id="reader-post-read-hint" class="text-xs text-slate-500 mt-2 leading-relaxed"></p>
+                        <button type="button" class="reader-post-read-train" onclick="beginMaterialTrackFromReader()">
+                            <span class="text-xl">🧠</span>
+                            <span class="block text-lg font-bold mt-1" data-i18n="reader.trainFromMat">Тренувати слова з цього тексту</span>
+                            <span id="reader-post-read-train-sub" class="block text-indigo-100 text-xs font-semibold mt-1"></span>
+                        </button>
+                        <button type="button" class="reader-post-read-skip" onclick="dismissReaderPostRead()" data-i18n="reader.trainFromMatSkip">Пропустити</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -3612,6 +3935,10 @@
                 </div>
 
                 <div id="bs-results-list" class="text-left bg-slate-50 p-3 sm:p-4 rounded-xl mb-8 max-h-[min(55vh,28rem)] overflow-y-auto border border-slate-200 custom-scroll grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                <div id="bs-material-track-actions" class="hidden mb-4 space-y-2">
+                    <button type="button" id="bs-material-track-continue" onclick="continueMaterialTrackSession()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition"></button>
+                    <p id="bs-material-track-remain" class="text-xs text-slate-500 font-semibold"></p>
+                </div>
                 <button onclick="endSession()" class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg w-full shadow-lg active:scale-95 transition" data-i18n="train.backHub">До вибору тренувань</button>
             </div>
         </section>
@@ -3899,6 +4226,44 @@
                 'settings.showIpaSourceHint': 'При наведенні показує, звідки взята вимова.',
                 'settings.trainingSfx': 'Звукові ефекти в тренуваннях',
                 'settings.trainingSfxHint': 'Звуки відповідей, таймера та завершення сесії. Озвучення слів не змінюється.',
+                'settings.introMorph': 'Підказки про будову слова',
+                'settings.introMorphHint': 'На етапі ознайомлення Brainstorm: префікси, суфікси або частини довгих слів.',
+                'train.introMorphLabel': 'Будова слова',
+                'morph.longWord': 'Довге слово — читай по частинах',
+                'morph.likeWord': 'Схоже на: {word}',
+                'morph.un': 'не-, протилежність',
+                'morph.re': 'знову, назад',
+                'morph.pre': 'перед-, заздалегідь',
+                'morph.dis': 'не-, роз-',
+                'morph.mis': 'помилково',
+                'morph.over': 'надмірно, зверх',
+                'morph.under': 'недостатньо, під-',
+                'morph.inter': 'між-, взаємо-',
+                'morph.trans': 'через-, наскрізь',
+                'morph.anti': 'проти-',
+                'morph.sub': 'під-, нижче',
+                'morph.in': 'не-, всередину',
+                'morph.tion': 'дія / результат (іменник)',
+                'morph.sion': 'дія / результат (іменник)',
+                'morph.ment': 'результат, процес',
+                'morph.ness': 'стан, якість',
+                'morph.able': 'можна, здатний',
+                'morph.less': 'без, -less',
+                'morph.ly': 'способом (наречія)',
+                'morph.er': 'той, хто / більше',
+                'morph.ist': 'фахівець',
+                'morph.es': 'множина / дія',
+                'morph.cion': '-ción (дія, результат)',
+                'morph.miento': '-miento (процес)',
+                'morph.dad': '-dad / -tad (якість)',
+                'morph.ukNe': 'не-',
+                'morph.ukPere': 'пере- (знову, через)',
+                'morph.ukPid': 'під-',
+                'morph.ukVid': 'від-',
+                'morph.ukBez': 'без-',
+                'morph.ukNist': '-ність (якість)',
+                'morph.ukEnnya': '-ення (дія, процес)',
+                'morph.ukNyk': '-ник (той, хто / що)',
                 'settings.trainModesVisible': 'Режими тренування',
                 'settings.trainModesHint': 'Оберіть, які вправи показувати на сторінці тренувань.',
                 'settings.dictGrid': 'Сітка словника',
@@ -4035,6 +4400,20 @@
                 'reader.audioResume': 'Далі',
                 'reader.audioShow': 'Текст',
                 'reader.audioHide': 'Сховати',
+                'reader.quickMatch': 'Швидке співставлення',
+                'reader.quickMatchTitle': 'Швидке співставлення',
+                'reader.quickMatchSkip': 'Пропустити',
+                'reader.quickMatchWords': 'Слова',
+                'reader.quickMatchTrans': 'Переклади',
+                'reader.quickMatchNice': 'Чудово!',
+                'reader.quickMatchInfoTitle': 'Що це?',
+                'reader.quickMatchInfo': 'Легка підготовка під час читання: кілька разів з’єднай слово з перекладом, щоб вони не змішалися — перед тренуванням.',
+                'reader.trainFromMat': 'Тренувати слова з цього тексту',
+                'reader.trainFromMatSkip': 'Пропустити',
+                'reader.trainFromMatHint': '{total} слів · у цій сесії до {batch}',
+                'reader.trainFromMatSub': 'Brainstorm · до {batch} слів',
+                'train.materialContinue': '🧠 Ще {batch} слів з цього тексту',
+                'train.materialRemain': 'Залишилось {n} слів з матеріалу',
                 'train.stop': 'Стоп', 'train.dontKnow': 'Не знаю слово', 'train.next': 'Далі',
                 'train.saving': 'Зберігаємо результати...', 'train.wait': 'Зачекайте кілька секунд',
                 'train.done': 'Завершено!', 'train.records': 'Рекорди:', 'train.backHub': 'До вибору тренувань',
@@ -4248,6 +4627,44 @@
                 'settings.showIpaSourceHint': 'Shows where the pronunciation was looked up when you hover.',
                 'settings.trainingSfx': 'Training sound effects',
                 'settings.trainingSfxHint': 'Sounds for answers, timers, and session completion. Word audio is unchanged.',
+                'settings.introMorph': 'Word structure hints',
+                'settings.introMorphHint': 'During Brainstorm introduction: prefixes, suffixes, or chunks of long words.',
+                'train.introMorphLabel': 'Word structure',
+                'morph.longWord': 'Long word — read it in parts',
+                'morph.likeWord': 'Like: {word}',
+                'morph.un': 'not / opposite',
+                'morph.re': 'again / back',
+                'morph.pre': 'before',
+                'morph.dis': 'not / apart',
+                'morph.mis': 'wrongly',
+                'morph.over': 'too much / over-',
+                'morph.under': 'too little / under-',
+                'morph.inter': 'between / mutual',
+                'morph.trans': 'across / through',
+                'morph.anti': 'against',
+                'morph.sub': 'under / below',
+                'morph.in': 'not / into',
+                'morph.tion': 'action / result (noun)',
+                'morph.sion': 'action / result (noun)',
+                'morph.ment': 'result / process',
+                'morph.ness': 'state / quality',
+                'morph.able': 'can / -able',
+                'morph.less': 'without',
+                'morph.ly': '-ly (manner)',
+                'morph.er': 'one who / more',
+                'morph.ist': 'specialist',
+                'morph.es': 'plural / action',
+                'morph.cion': '-ción (action, result)',
+                'morph.miento': '-miento (process)',
+                'morph.dad': '-dad / -tad (quality)',
+                'morph.ukNe': 'not (не-)',
+                'morph.ukPere': 're- / over- (пере-)',
+                'morph.ukPid': 'under- (під-)',
+                'morph.ukVid': 'from- (від-)',
+                'morph.ukBez': 'without (без-)',
+                'morph.ukNist': '-ність (quality)',
+                'morph.ukEnnya': '-ення (action)',
+                'morph.ukNyk': '-ник (person / thing)',
                 'settings.trainModesVisible': 'Training modes',
                 'settings.trainModesHint': 'Choose which exercises appear on the training page.',
                 'settings.dictGrid': 'Dictionary layout',
@@ -4384,6 +4801,20 @@
                 'reader.audioResume': 'Resume',
                 'reader.audioShow': 'Text',
                 'reader.audioHide': 'Hide',
+                'reader.quickMatch': 'Quick match',
+                'reader.quickMatchTitle': 'Quick match',
+                'reader.quickMatchSkip': 'Skip',
+                'reader.quickMatchWords': 'Words',
+                'reader.quickMatchTrans': 'Translations',
+                'reader.quickMatchNice': 'Nice!',
+                'reader.quickMatchInfoTitle': 'What is this?',
+                'reader.quickMatchInfo': 'A light prep while you read: match a few words to their translations so they stay separate in your head — before training.',
+                'reader.trainFromMat': 'Train words from this text',
+                'reader.trainFromMatSkip': 'Skip',
+                'reader.trainFromMatHint': '{total} words · up to {batch} in this session',
+                'reader.trainFromMatSub': 'Brainstorm · up to {batch} words',
+                'train.materialContinue': '🧠 Train {batch} more from this text',
+                'train.materialRemain': '{n} words left from this material',
                 'train.stop': 'Stop', 'train.dontKnow': "I don't<br>know", 'train.next': 'Next',
                 'train.saving': 'Saving results...', 'train.wait': 'Please wait a few seconds',
                 'train.done': 'Done!', 'train.records': 'Records:', 'train.backHub': 'Back to training',
@@ -4592,6 +5023,44 @@
                 'settings.showIpaSourceHint': 'Al pasar el cursor, muestra de dónde proviene la pronunciación.',
                 'settings.trainingSfx': 'Efectos de sonido en entrenamientos',
                 'settings.trainingSfxHint': 'Sonidos de respuestas, temporizador y fin de sesión. El audio de palabras no cambia.',
+                'settings.introMorph': 'Pistas de estructura de palabras',
+                'settings.introMorphHint': 'En la introducción de Brainstorm: prefijos, sufijos o partes de palabras largas.',
+                'train.introMorphLabel': 'Estructura',
+                'morph.longWord': 'Palabra larga — léela por partes',
+                'morph.likeWord': 'Como: {word}',
+                'morph.un': 'no / opuesto',
+                'morph.re': 'otra vez / de nuevo',
+                'morph.pre': 'antes / pre-',
+                'morph.dis': 'no / aparte',
+                'morph.mis': 'mal / error',
+                'morph.over': 'demasiado / sobre-',
+                'morph.under': 'poco / bajo-',
+                'morph.inter': 'entre / mutuo',
+                'morph.trans': 'a través / trans-',
+                'morph.anti': 'contra',
+                'morph.sub': 'bajo / sub-',
+                'morph.in': 'no / en',
+                'morph.tion': 'acción / resultado',
+                'morph.sion': 'acción / resultado',
+                'morph.ment': 'resultado / proceso',
+                'morph.ness': 'estado / cualidad',
+                'morph.able': 'puede / -able',
+                'morph.less': 'sin',
+                'morph.ly': '-mente (modo)',
+                'morph.er': 'quien / más',
+                'morph.ist': 'especialista',
+                'morph.es': 'plural / acción',
+                'morph.cion': '-ción (acción, resultado)',
+                'morph.miento': '-miento (proceso)',
+                'morph.dad': '-dad / -tad (cualidad)',
+                'morph.ukNe': 'no (не-)',
+                'morph.ukPere': 're- (пере-)',
+                'morph.ukPid': 'sub- (під-)',
+                'morph.ukVid': 'de- (від-)',
+                'morph.ukBez': 'sin (без-)',
+                'morph.ukNist': '-ність (cualidad)',
+                'morph.ukEnnya': '-ення (acción)',
+                'morph.ukNyk': '-ник (persona / cosa)',
                 'settings.trainModesVisible': 'Modos de entrenamiento',
                 'settings.trainModesHint': 'Elige qué ejercicios aparecen en la página de entrenamiento.',
                 'settings.dictGrid': 'Diseño del diccionario',
@@ -4728,6 +5197,20 @@
                 'reader.audioResume': 'Seguir',
                 'reader.audioShow': 'Texto',
                 'reader.audioHide': 'Ocultar',
+                'reader.quickMatch': 'Match rápido',
+                'reader.quickMatchTitle': 'Match rápido',
+                'reader.quickMatchSkip': 'Omitir',
+                'reader.quickMatchWords': 'Palabras',
+                'reader.quickMatchTrans': 'Traducciones',
+                'reader.quickMatchNice': '¡Genial!',
+                'reader.quickMatchInfoTitle': '¿Qué es?',
+                'reader.quickMatchInfo': 'Una preparación ligera mientras lees: empareja unas palabras con su traducción para que no se mezclen — antes del entrenamiento.',
+                'reader.trainFromMat': 'Entrenar palabras de este texto',
+                'reader.trainFromMatSkip': 'Omitir',
+                'reader.trainFromMatHint': '{total} palabras · hasta {batch} en esta sesión',
+                'reader.trainFromMatSub': 'Brainstorm · hasta {batch} palabras',
+                'train.materialContinue': '🧠 {batch} palabras más de este texto',
+                'train.materialRemain': 'Quedan {n} palabras del material',
                 'train.stop': 'Parar', 'train.dontKnow': 'No lo<br>sé', 'train.next': 'Siguiente',
                 'train.saving': 'Guardando resultados...', 'train.wait': 'Espera unos segundos',
                 'train.done': '¡Listo!', 'train.records': 'Récords:', 'train.backHub': 'Volver a los entrenamientos',
@@ -4930,13 +5413,18 @@
         const SHOW_IPA_KEY = 'linguaspace_show_ipa_v1';
         const SHOW_IPA_SOURCE_KEY = 'linguaspace_show_ipa_source_v1';
         const TRAINING_SFX_KEY = 'linguaspace_training_sfx_v1';
+        const SHOW_INTRO_MORPH_KEY = 'linguaspace_intro_morph_v1';
         const HIDDEN_TRAIN_MODES_KEY = 'linguaspace_hidden_train_modes_v1';
         const DICT_GRID_COLS_KEY = 'linguaspace_dict_grid_cols_v1';
         const READER_HL_COLOR_KEY = 'linguaspace_reader_hl_color_v1';
+        const READER_QUICK_MATCH_KEY = 'linguaspace_reader_quick_match_v1';
+        const READER_QUICK_MATCH_LOG_KEY = 'linguaspace_reader_quick_match_log_v1';
+        const READER_QUICK_MATCH_BATCH = 4;
         let settingsActiveTab = 'languages';
         let showTrainingPronunciation = localStorage.getItem(SHOW_IPA_KEY) === '1';
         let showIpaSourceOnHover = localStorage.getItem(SHOW_IPA_SOURCE_KEY) !== '0';
         let trainingSoundEffects = localStorage.getItem(TRAINING_SFX_KEY) !== '0';
+        let showIntroMorphHints = localStorage.getItem(SHOW_INTRO_MORPH_KEY) === '1';
         let hiddenTrainModes = [];
         try {
             hiddenTrainModes = JSON.parse(localStorage.getItem(HIDDEN_TRAIN_MODES_KEY) || '[]');
@@ -5241,6 +5729,7 @@
             localStorage.setItem(SHOW_IPA_KEY, showTrainingPronunciation ? '1' : '0');
             localStorage.setItem(SHOW_IPA_SOURCE_KEY, showIpaSourceOnHover ? '1' : '0');
             localStorage.setItem(TRAINING_SFX_KEY, trainingSoundEffects ? '1' : '0');
+            localStorage.setItem(SHOW_INTRO_MORPH_KEY, showIntroMorphHints ? '1' : '0');
             localStorage.setItem(HIDDEN_TRAIN_MODES_KEY, JSON.stringify(hiddenTrainModes));
             localStorage.setItem(DICT_GRID_COLS_KEY, String(dictGridCols));
             localStorage.setItem(READER_HL_COLOR_KEY, readerHighlightColor);
@@ -5249,7 +5738,7 @@
             try {
                 await setDoc(doc(db, 'users', activeUid), {
                     interfaceLanguage, learningLanguage, translationLanguage, activeTrackId, knownTracks,
-                    showTrainingPronunciation, showIpaSourceOnHover, trainingSoundEffects,
+                    showTrainingPronunciation, showIpaSourceOnHover, trainingSoundEffects, showIntroMorphHints,
                     hiddenTrainModes, dictGridCols, readerHighlightColor
                 }, { merge: true });
             } catch (e) { console.error(e); }
@@ -5408,6 +5897,10 @@
                         trainingSoundEffects = d.trainingSoundEffects;
                         localStorage.setItem(TRAINING_SFX_KEY, trainingSoundEffects ? '1' : '0');
                     }
+                    if (typeof d.showIntroMorphHints === 'boolean') {
+                        showIntroMorphHints = d.showIntroMorphHints;
+                        localStorage.setItem(SHOW_INTRO_MORPH_KEY, showIntroMorphHints ? '1' : '0');
+                    }
                     if (Array.isArray(d.hiddenTrainModes)) {
                         hiddenTrainModes = d.hiddenTrainModes.filter((m) => typeof m === 'string');
                         localStorage.setItem(HIDDEN_TRAIN_MODES_KEY, JSON.stringify(hiddenTrainModes));
@@ -5485,6 +5978,8 @@
             if (ipaSrcToggle) ipaSrcToggle.checked = !!showIpaSourceOnHover;
             const sfxToggle = document.getElementById('settings-training-sfx');
             if (sfxToggle) sfxToggle.checked = !!trainingSoundEffects;
+            const morphToggle = document.getElementById('settings-intro-morph');
+            if (morphToggle) morphToggle.checked = !!showIntroMorphHints;
             const gridSel = document.getElementById('settings-dict-grid-cols');
             if (gridSel) gridSel.value = String(dictGridCols);
             const enOnly = document.getElementById('settings-show-ipa-en-only');
@@ -5494,6 +5989,7 @@
             syncTrainModeVisibility();
             applyDictGridCols();
             applyReaderHighlightColor();
+            syncReaderQuickMatchUi();
         }
 
         function renderReaderHlSwatches() {
@@ -5602,6 +6098,13 @@
         window.setShowTrainingPronunciation = async (on) => {
             showTrainingPronunciation = !!on;
             localStorage.setItem(SHOW_IPA_KEY, showTrainingPronunciation ? '1' : '0');
+            await saveUserPrefs();
+            syncSettingsPanelUi();
+        };
+
+        window.setShowIntroMorphHints = async (on) => {
+            showIntroMorphHints = !!on;
+            localStorage.setItem(SHOW_INTRO_MORPH_KEY, showIntroMorphHints ? '1' : '0');
             await saveUserPrefs();
             syncSettingsPanelUi();
         };
@@ -6701,6 +7204,13 @@
         let selectedWordIds = new Set();
         let selectedFolderNames = new Set();
         let readerSaveSource = null;
+        let readerQuickMatchEnabled = localStorage.getItem(READER_QUICK_MATCH_KEY) === '1';
+        let readerSessionNewWords = [];
+        let readerQuickMatchPending = [];
+        let readerQuickMatchPanelOpen = false;
+        let readerQuickMatchBatch = null;
+        let readerQuickMatchSelection = null;
+        let materialTrackState = null;
         let bulkImportTargetSource = null;
         let pendingFolderCallback = null;
         let folderModalMode = 'create';
@@ -6738,7 +7248,7 @@
         let currentReaderFontFamily = "'Georgia', serif";
         // 3 кроки: стандарт · трохи ширше · ширше (main теж розширюється)
         const READER_LAYOUT_WIDTHS = [
-            { main: null, lib: '48rem' },
+            { main: '56rem', lib: '48rem' },
             { main: '56rem', lib: '56rem' },
             { main: '64rem', lib: '64rem' }
         ];
@@ -12616,6 +13126,7 @@
             if (!panel) return;
             const willOpen = panel.classList.contains('hidden');
             panel.classList.toggle('hidden');
+            if (!willOpen) hideReaderQuickMatchTip();
             if (willOpen && e?.currentTarget) positionReaderSettingsPanel(e.currentTarget);
         };
 
@@ -12630,6 +13141,341 @@
         let readerToolsDockObserver = null;
         let readerSettingsAnchor = null;
         const READER_HL_MODE_KEY = 'linguaspace_reader_hl_mode';
+
+        function getBsWordCountSetting() {
+            const n = parseInt(document.getElementById('bs-word-count')?.value || '6', 10);
+            return Number.isFinite(n) && n > 0 ? n : 6;
+        }
+
+        window.setReaderQuickMatch = (on) => {
+            readerQuickMatchEnabled = !!on;
+            try { localStorage.setItem(READER_QUICK_MATCH_KEY, readerQuickMatchEnabled ? '1' : '0'); } catch (_) {}
+            syncReaderQuickMatchUi();
+        };
+
+        window.toggleReaderQuickMatchTip = (event) => {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            const tip = document.getElementById('reader-quick-match-tip');
+            const btn = document.getElementById('btn-reader-qm-info');
+            if (!tip) return;
+            if (event && event.pointerType === 'mouse') return;
+            const willShow = tip.classList.contains('hidden');
+            tip.classList.toggle('hidden');
+            if (willShow) tip.textContent = t('reader.quickMatchInfo');
+            if (btn) btn.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+        };
+
+        window.showReaderQuickMatchTip = () => {
+            const tip = document.getElementById('reader-quick-match-tip');
+            const btn = document.getElementById('btn-reader-qm-info');
+            if (!tip) return;
+            tip.textContent = t('reader.quickMatchInfo');
+            tip.classList.remove('hidden');
+            if (btn) btn.setAttribute('aria-expanded', 'true');
+        };
+
+        window.hideReaderQuickMatchTip = () => {
+            const tip = document.getElementById('reader-quick-match-tip');
+            const btn = document.getElementById('btn-reader-qm-info');
+            tip?.classList.add('hidden');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        };
+
+        function syncReaderQuickMatchUi() {
+            const cb = document.getElementById('reader-quick-match-toggle');
+            if (cb) cb.checked = readerQuickMatchEnabled;
+        }
+
+        function resetReaderSessionWords() {
+            readerSessionNewWords = [];
+            readerQuickMatchPending = [];
+            hideReaderQuickMatchPanel(true);
+        }
+
+        function onReaderNewWordSaved(wordId, data) {
+            if (!currentMaterial || !wordId) return;
+            const entry = {
+                id: wordId,
+                word: String(data.word || '').trim(),
+                translation: String(data.translation || '').trim()
+            };
+            if (!entry.word || !entry.translation) return;
+            readerSessionNewWords.push(entry);
+            if (!readerQuickMatchEnabled || readerQuickMatchPanelOpen) return;
+            readerQuickMatchPending.push(entry);
+            if (readerQuickMatchPending.length >= READER_QUICK_MATCH_BATCH) {
+                const batch = readerQuickMatchPending.splice(0, READER_QUICK_MATCH_BATCH);
+                showReaderQuickMatchPanel(batch);
+            }
+        }
+
+        function logReaderQuickMatch(batch, outcome) {
+            try {
+                const log = JSON.parse(localStorage.getItem(READER_QUICK_MATCH_LOG_KEY) || '[]');
+                log.push({
+                    ts: Date.now(),
+                    materialId: currentMaterial?.id || null,
+                    wordIds: (batch || []).map((b) => b.id),
+                    outcome
+                });
+                if (log.length > 200) log.splice(0, log.length - 200);
+                localStorage.setItem(READER_QUICK_MATCH_LOG_KEY, JSON.stringify(log));
+            } catch (_) {}
+        }
+
+        function hideReaderQuickMatchPanel(instant) {
+            const panel = document.getElementById('reader-quick-match-panel');
+            if (!panel) return;
+            panel.classList.remove('is-open');
+            if (instant) panel.classList.add('hidden');
+            else setTimeout(() => panel.classList.add('hidden'), 320);
+            readerQuickMatchPanelOpen = false;
+            readerQuickMatchBatch = null;
+            readerQuickMatchSelection = null;
+        }
+
+        function showReaderQuickMatchPanel(batch) {
+            const panel = document.getElementById('reader-quick-match-panel');
+            const body = document.getElementById('reader-qm-body');
+            if (!panel || !body || !batch?.length) return;
+            readerQuickMatchPanelOpen = true;
+            readerQuickMatchBatch = batch.map((b) => ({ ...b }));
+            readerQuickMatchSelection = null;
+            panel.classList.remove('hidden');
+            requestAnimationFrame(() => panel.classList.add('is-open'));
+            renderReaderQuickMatchBody();
+        }
+
+        function renderReaderQuickMatchBody(doneText) {
+            const body = document.getElementById('reader-qm-body');
+            if (!body) return;
+            if (doneText) {
+                body.innerHTML = `<div class="reader-qm-done">${escapeHtmlText(doneText)}</div>`;
+                return;
+            }
+            const batch = readerQuickMatchBatch || [];
+            const left = [...batch].sort(() => Math.random() - 0.5);
+            const right = [...batch].sort(() => Math.random() - 0.5);
+            body.innerHTML = `
+                <div class="reader-qm-grid">
+                    <div>
+                        <div class="reader-qm-col-label">${escapeHtmlText(t('reader.quickMatchWords'))}</div>
+                        <div class="space-y-1.5" id="reader-qm-left">${left.map((item) => readerQuickMatchBtnHtml('word', item)).join('')}</div>
+                    </div>
+                    <div>
+                        <div class="reader-qm-col-label">${escapeHtmlText(t('reader.quickMatchTrans'))}</div>
+                        <div class="space-y-1.5" id="reader-qm-right">${right.map((item) => readerQuickMatchBtnHtml('trans', item)).join('')}</div>
+                    </div>
+                </div>`;
+            body.querySelectorAll('.reader-qm-item').forEach((btn) => {
+                btn.addEventListener('click', () => handleReaderQuickMatchTap(btn));
+            });
+        }
+
+        function readerQuickMatchBtnHtml(side, item) {
+            const label = side === 'word' ? item.word : item.translation;
+            const matched = item._matched ? ' is-matched' : '';
+            const selected = readerQuickMatchSelection?.id === item.id && readerQuickMatchSelection?.side === side ? ' is-selected' : '';
+            return `<button type="button" class="reader-qm-item${matched}${selected}" data-side="${side}" data-id="${escapeHtmlText(item.id)}"${item._matched ? ' disabled' : ''}>${escapeHtmlText(label)}</button>`;
+        }
+
+        function handleReaderQuickMatchTap(btn) {
+            if (!readerQuickMatchBatch || btn.disabled || btn.classList.contains('is-matched')) return;
+            const side = btn.dataset.side;
+            const id = btn.dataset.id;
+            const item = readerQuickMatchBatch.find((b) => b.id === id);
+            if (!item || item._matched) return;
+            const sel = readerQuickMatchSelection;
+            if (!sel) {
+                readerQuickMatchSelection = { id, side };
+                renderReaderQuickMatchBody();
+                return;
+            }
+            if (sel.side === side) {
+                readerQuickMatchSelection = { id, side };
+                renderReaderQuickMatchBody();
+                return;
+            }
+            if (sel.id === id) {
+                item._matched = true;
+                readerQuickMatchSelection = null;
+                if (readerQuickMatchBatch.every((b) => b._matched)) {
+                    finishReaderQuickMatch(true);
+                } else {
+                    renderReaderQuickMatchBody();
+                }
+                return;
+            }
+            btn.classList.add('is-wrong');
+            const otherBtn = document.querySelector(`.reader-qm-item[data-id="${sel.id}"][data-side="${sel.side}"]`);
+            otherBtn?.classList.add('is-wrong');
+            readerQuickMatchSelection = null;
+            setTimeout(() => renderReaderQuickMatchBody(), 360);
+        }
+
+        function finishReaderQuickMatch(completed) {
+            const batch = readerQuickMatchBatch ? [...readerQuickMatchBatch] : [];
+            logReaderQuickMatch(batch, completed ? 'completed' : 'skipped');
+            renderReaderQuickMatchBody(t('reader.quickMatchNice'));
+            setTimeout(() => hideReaderQuickMatchPanel(false), 1200);
+        }
+
+        window.skipReaderQuickMatch = () => {
+            if (!readerQuickMatchPanelOpen) return;
+            finishReaderQuickMatch(false);
+        };
+
+        function hideReaderPostReadPanel() {
+            document.getElementById('reader-post-read-panel')?.classList.add('hidden');
+        }
+
+        function showReaderPostReadPanel() {
+            const panel = document.getElementById('reader-post-read-panel');
+            if (!panel) return;
+            const total = readerSessionNewWords.length;
+            const batch = Math.min(total, getBsWordCountSetting());
+            const hint = document.getElementById('reader-post-read-hint');
+            const sub = document.getElementById('reader-post-read-train-sub');
+            if (hint) hint.textContent = t('reader.trainFromMatHint', { total, batch });
+            if (sub) sub.textContent = t('reader.trainFromMatSub', { batch });
+            panel.classList.remove('hidden');
+        }
+
+        window.dismissReaderPostRead = () => {
+            hideReaderPostReadPanel();
+            window.showModal(t('msg.matRead'));
+            closeReader();
+            renderMaterials();
+        };
+
+        function initMaterialTrackFromReader() {
+            if (!currentMaterial || !readerSessionNewWords.length) return null;
+            const entries = {};
+            readerSessionNewWords.forEach((w) => { entries[w.id] = { ...w }; });
+            return {
+                materialId: currentMaterial.id,
+                wordIds: readerSessionNewWords.map((w) => w.id),
+                entries,
+                trainedIds: new Set()
+            };
+        }
+
+        function resolveMaterialTrackWord(id) {
+            const v = vocabulary.find((w) => w.id === id);
+            if (v) return v;
+            const e = materialTrackState?.entries?.[id];
+            if (!e) return null;
+            return {
+                id: e.id,
+                word: e.word,
+                translation: e.translation,
+                srsLevel: 0,
+                nextReviewTime: 0,
+                bsHistory: [],
+                imageUrl: '',
+                context: '',
+                source: ''
+            };
+        }
+
+        function getMaterialTrackRemainingIds() {
+            if (!materialTrackState) return [];
+            return materialTrackState.wordIds.filter((id) => !materialTrackState.trainedIds.has(id));
+        }
+
+        function startBrainstormWithFixedWords(words) {
+            if (!words?.length) return false;
+            try { closeTrainSettings(); } catch (_) {}
+            activeSessionMode = 'all';
+            const level = Math.min(...words.map((w) => w.srsLevel || 0));
+            configureBrainstormSessionFlags(level);
+            try { markBsLevelTrainedToday(level); } catch (_) {}
+            bsWords = words.map((w) => ({ ...w, failed: false }));
+            sprintQuestionQueue = [];
+            sprintQueueIndex = 0;
+            sprintAnsweredCount = 0;
+            window._sprintCountdownActive = false;
+            window._sprintRulesPending = false;
+
+            const mainEl = document.querySelector('main');
+            const mainCard = document.getElementById('bs-main-card');
+            const extClues = document.getElementById('bs-external-clues');
+            mainEl.classList.remove('cw-expanded-main', 'max-w-5xl', 'max-w-6xl', 'max-w-7xl');
+            mainEl.classList.add('max-w-4xl');
+            mainEl.style.maxWidth = '';
+            mainCard.className = 'bg-white p-4 sm:p-5 rounded-2xl shadow-xl border border-slate-100 text-center relative overflow-hidden flex flex-col min-h-[300px] w-full';
+            extClues.classList.add('hidden');
+            document.getElementById('bs-workspace')?.classList.remove('cw-session');
+
+            bsCurrentWordIdx = 0;
+            bsCurrentStage = bsSessionStages[0];
+            bsTotalSteps = bsWords.length * bsSessionStages.length;
+            bsCompletedSteps = 0;
+            if (bsSprintGraduation) {
+                bsTotalSteps = bsWords.length * (bsSessionStages.length - 1) + 1;
+            }
+
+            document.getElementById('train-hub-screen').classList.add('hidden');
+            document.getElementById('bs-results').classList.add('hidden');
+            document.getElementById('bs-workspace').classList.remove('hidden');
+            document.getElementById('bs-material-track-actions')?.classList.add('hidden');
+            beginTrainingSession();
+            syncCrosswordExpandButton();
+            updateBsProgress();
+            renderBsStage();
+            return true;
+        }
+
+        window.beginMaterialTrackFromReader = () => {
+            materialTrackState = initMaterialTrackFromReader();
+            if (!materialTrackState) {
+                dismissReaderPostRead();
+                return;
+            }
+            hideReaderPostReadPanel();
+            closeReader();
+            switchTab('training');
+            continueMaterialTrackSession();
+        };
+
+        window.continueMaterialTrackSession = () => {
+            if (!materialTrackState) return;
+            const reqCount = getBsWordCountSetting();
+            const remainingIds = getMaterialTrackRemainingIds();
+            const batchIds = remainingIds.slice(0, reqCount);
+            const batch = batchIds.map((id) => resolveMaterialTrackWord(id)).filter(Boolean);
+            if (!batch.length) {
+                materialTrackState = null;
+                endSession();
+                return;
+            }
+            document.getElementById('bs-material-track-actions')?.classList.add('hidden');
+            document.getElementById('bs-results')?.classList.add('hidden');
+            startBrainstormWithFixedWords(batch);
+        };
+
+        function updateMaterialTrackResultsActions() {
+            const wrap = document.getElementById('bs-material-track-actions');
+            const btn = document.getElementById('bs-material-track-continue');
+            const hint = document.getElementById('bs-material-track-remain');
+            if (!wrap || !btn || !materialTrackState) {
+                wrap?.classList.add('hidden');
+                return;
+            }
+            const remaining = getMaterialTrackRemainingIds();
+            if (!remaining.length) {
+                materialTrackState = null;
+                wrap.classList.add('hidden');
+                return;
+            }
+            const batch = Math.min(remaining.length, getBsWordCountSetting());
+            btn.textContent = t('train.materialContinue', { batch });
+            if (hint) hint.textContent = t('train.materialRemain', { n: remaining.length });
+            wrap.classList.remove('hidden');
+        }
 
         function positionReaderSettingsPanel(anchorEl) {
             const panel = document.getElementById('reader-settings-panel');
@@ -12926,6 +13772,7 @@
                 if (!panel || panel.classList.contains('hidden')) return;
                 if (e.target.closest('#reader-top-tools, #reader-float-tools, #reader-settings-panel')) return;
                 panel.classList.add('hidden');
+                hideReaderQuickMatchTip();
             });
             window.addEventListener('resize', () => {
                 const panel = document.getElementById('reader-settings-panel');
@@ -12964,12 +13811,18 @@
             if (window.innerWidth < 640) {
                 lib.classList.add('reader-wide-mode');
                 lib.style.maxWidth = '100%';
-                if (main) main.style.maxWidth = '100%';
+                if (main) {
+                    main.classList.add('reader-width-active');
+                    main.style.maxWidth = '100%';
+                }
             } else {
                 const layout = READER_LAYOUT_WIDTHS[currentReaderWidthStep];
                 lib.classList.add('reader-wide-mode');
                 lib.style.maxWidth = layout.lib;
-                if (main) main.style.maxWidth = layout.main || '';
+                if (main) {
+                    main.classList.add('reader-width-active');
+                    main.style.maxWidth = layout.main;
+                }
             }
 
             document.querySelectorAll('.reader-width-dot').forEach((dot, i) => {
@@ -12991,7 +13844,10 @@
                 lib.classList.remove('reader-wide-mode');
                 lib.classList.add('max-w-3xl');
             }
-            if (main) main.style.maxWidth = '';
+            if (main) {
+                main.style.maxWidth = '';
+                main.classList.remove('reader-width-active');
+            }
         }
 
         window.changeReaderWidth = (delta) => {
@@ -13019,6 +13875,8 @@
             readerReviewMode = materialHasReviewMode(m);
             readerReviewRevealed = new Set();
             readerReviewPeeked = new Set();
+            resetReaderSessionWords();
+            syncReaderQuickMatchUi();
             readerAudioStore = {};
             readerAudioSeq = 0;
             stopReaderAudioPlayback();
@@ -13092,6 +13950,8 @@
             readerReviewMode = false;
             readerReviewRevealed = new Set();
             readerReviewPeeked = new Set();
+            resetReaderSessionWords();
+            hideReaderPostReadPanel();
             stopReaderAudioPlayback();
             document.getElementById('library-read-view')?.classList.remove('reader-review-mode');
 
@@ -13686,9 +14546,13 @@
                 currentMaterial.readAt = Date.now();
                 try { recordSubstantialReading(matSnap); } catch (_) {}
                 renderReaderContent();
+                renderMaterials();
+                if (readerSessionNewWords.length > 0) {
+                    showReaderPostReadPanel();
+                    return;
+                }
                 window.showModal(t('msg.matRead'));
                 closeReader();
-                renderMaterials();
             } catch(e) {
                 console.error(e);
             }
@@ -14469,7 +15333,10 @@
                         await setDoc(docRef('words', replaced.id), firestoreWordFields(replaced));
                     }
                 });
-                if (!existing) { try { recordWordsAdded(1); } catch (_) {} }
+                if (!existing) {
+                    try { recordWordsAdded(1); } catch (_) {}
+                    onReaderNewWordSaved(ref.id, saveData);
+                }
                 closeInlinePopup();
             } catch(e) {} finally { btn.disabled = false; btn.innerHTML = orig; }
         };
@@ -18971,6 +19838,8 @@
 
         window.endSession = () => { 
             try { refundDefinitionSessionIfUnused(); } catch (_) {}
+            materialTrackState = null;
+            document.getElementById('bs-material-track-actions')?.classList.add('hidden');
             document.getElementById('bs-workspace').classList.add('hidden'); 
             document.getElementById('bs-results').classList.add('hidden'); 
             document.getElementById('bs-saving')?.classList.add('hidden');
@@ -19189,6 +20058,12 @@
             preserveTrainingFocusState();
             if (saveResult.ok) renderDictionary();
             updateReviewDueBadge();
+            if (materialTrackState && activeSessionMode === 'all') {
+                bsWords.forEach((w) => { if (w?.id) materialTrackState.trainedIds.add(w.id); });
+                updateMaterialTrackResultsActions();
+            } else {
+                document.getElementById('bs-material-track-actions')?.classList.add('hidden');
+            }
         }
 
         window.markWordAsFailed = () => {
@@ -19393,8 +20268,162 @@
         }
 
         function renderStageIntro(word, area, btnNext) {
-            area.innerHTML = `<div class="mx-auto w-40 h-40 rounded-xl overflow-hidden shadow-sm mb-4"><img src="${word.imageUrl}" class="w-full h-full object-cover" onerror="imgError(this)"></div><h3 class="text-3xl font-bold text-indigo-700 mb-1 tracking-tight">${word.word}</h3><p class="text-xl text-slate-900 font-semibold mb-2">${word.translation}</p><button type="button" id="btn-intro-audio" class="bs-play-audio-btn bs-play-audio-btn--intro mx-auto" title="${t('inline.listen')}" aria-label="${t('inline.listen')}">${trainingPlayAudioIconSvg('w-7 h-7')}</button>`;
+            const morph = showIntroMorphHints ? buildIntroMorphHint(word) : null;
+            const morphHtml = morph ? renderIntroMorphHtml(morph) : '';
+            const wordHeadline = morphHtml
+                ? morphHtml
+                : `<h3 class="text-3xl font-bold text-indigo-700 mb-1 tracking-tight">${escapeHtmlText(word.word)}</h3>`;
+            area.innerHTML = `<div class="mx-auto w-40 h-40 rounded-xl overflow-hidden shadow-sm mb-4"><img src="${word.imageUrl}" class="w-full h-full object-cover" onerror="imgError(this)"></div>${wordHeadline}<p class="text-xl text-slate-900 font-semibold mb-2">${escapeHtmlText(word.translation)}</p><button type="button" id="btn-intro-audio" class="bs-play-audio-btn bs-play-audio-btn--intro mx-auto" title="${t('inline.listen')}" aria-label="${t('inline.listen')}">${trainingPlayAudioIconSvg('w-7 h-7')}</button>`;
             document.getElementById('btn-intro-audio').onclick = () => playAudioWord(word.word); btnNext.innerHTML = withEnterHint(t('train.gotIt')); btnNext.classList.remove('hidden');
+        }
+
+        const MORPH_PREFIXES = {
+            en: [
+                { text: 'inter', hintKey: 'morph.inter' }, { text: 'trans', hintKey: 'morph.trans' },
+                { text: 'over', hintKey: 'morph.over' }, { text: 'under', hintKey: 'morph.under' },
+                { text: 'anti', hintKey: 'morph.anti' }, { text: 'dis', hintKey: 'morph.dis' },
+                { text: 'mis', hintKey: 'morph.mis' }, { text: 'pre', hintKey: 'morph.pre' },
+                { text: 'sub', hintKey: 'morph.sub' }, { text: 're', hintKey: 'morph.re' },
+                { text: 'un', hintKey: 'morph.un' }, { text: 'in', hintKey: 'morph.in' },
+                { text: 'im', hintKey: 'morph.in' }, { text: 'il', hintKey: 'morph.in' }, { text: 'ir', hintKey: 'morph.in' }
+            ],
+            es: [
+                { text: 'contra', hintKey: 'morph.anti' }, { text: 'super', hintKey: 'morph.over' },
+                { text: 'inter', hintKey: 'morph.inter' }, { text: 'trans', hintKey: 'morph.trans' },
+                { text: 'des', hintKey: 'morph.dis' }, { text: 'pre', hintKey: 'morph.pre' },
+                { text: 'sub', hintKey: 'morph.sub' }, { text: 're', hintKey: 'morph.re' },
+                { text: 'in', hintKey: 'morph.in' }, { text: 'im', hintKey: 'morph.in' }
+            ],
+            uk: [
+                { text: 'пере', hintKey: 'morph.ukPere' }, { text: 'під', hintKey: 'morph.ukPid' },
+                { text: 'від', hintKey: 'morph.ukVid' }, { text: 'без', hintKey: 'morph.ukBez' },
+                { text: 'не', hintKey: 'morph.ukNe' }
+            ]
+        };
+
+        const MORPH_SUFFIXES = {
+            en: [
+                { text: 'tion', hintKey: 'morph.tion' }, { text: 'sion', hintKey: 'morph.sion' },
+                { text: 'ment', hintKey: 'morph.ment' }, { text: 'ness', hintKey: 'morph.ness' },
+                { text: 'able', hintKey: 'morph.able' }, { text: 'ible', hintKey: 'morph.able' },
+                { text: 'less', hintKey: 'morph.less' }, { text: 'ful', hintKey: 'morph.ness' },
+                { text: 'ist', hintKey: 'morph.ist' }, { text: 'ism', hintKey: 'morph.ness' },
+                { text: 'ly', hintKey: 'morph.ly' }, { text: 'er', hintKey: 'morph.er' },
+                { text: 'or', hintKey: 'morph.er' }
+            ],
+            es: [
+                { text: 'ción', hintKey: 'morph.cion' }, { text: 'sión', hintKey: 'morph.cion' },
+                { text: 'miento', hintKey: 'morph.miento' }, { text: 'dad', hintKey: 'morph.dad' },
+                { text: 'tad', hintKey: 'morph.dad' }, { text: 'mente', hintKey: 'morph.ly' },
+                { text: 'ista', hintKey: 'morph.ist' }, { text: 'oso', hintKey: 'morph.ness' },
+                { text: 'osa', hintKey: 'morph.ness' }
+            ],
+            uk: [
+                { text: 'ність', hintKey: 'morph.ukNist' }, { text: 'ення', hintKey: 'morph.ukEnnya' },
+                { text: 'ник', hintKey: 'morph.ukNyk' }, { text: 'ство', hintKey: 'morph.ukNist' }
+            ]
+        };
+
+        function morphListsForLang(lang) {
+            const key = ['en', 'es', 'uk'].includes(lang) ? lang : 'en';
+            return {
+                prefixes: MORPH_PREFIXES[key] || MORPH_PREFIXES.en,
+                suffixes: MORPH_SUFFIXES[key] || MORPH_SUFFIXES.en
+            };
+        }
+
+        function matchMorphAffix(rawWord, list, fromEnd) {
+            const w = String(rawWord || '');
+            if (!w) return null;
+            const lower = w.toLowerCase();
+            const sorted = [...list].sort((a, b) => b.text.length - a.text.length);
+            for (const item of sorted) {
+                const aff = item.text;
+                const affLower = aff.toLowerCase();
+                if (fromEnd) {
+                    if (lower.endsWith(affLower) && w.length - aff.length >= 3) {
+                        return {
+                            affix: w.slice(w.length - aff.length),
+                            rest: w.slice(0, w.length - aff.length),
+                            hintKey: item.hintKey
+                        };
+                    }
+                } else if (lower.startsWith(affLower) && w.length - aff.length >= 3) {
+                    return {
+                        affix: w.slice(0, aff.length),
+                        rest: w.slice(aff.length),
+                        hintKey: item.hintKey
+                    };
+                }
+            }
+            return null;
+        }
+
+        function chunkLongWordParts(rawWord) {
+            const w = String(rawWord || '').replace(/\s+/g, '');
+            if (w.length < 12) return null;
+            const parts = [];
+            let i = 0;
+            while (i < w.length) {
+                const remain = w.length - i;
+                const take = remain > 5 ? Math.min(4, remain) : remain;
+                parts.push({ text: w.slice(i, i + take), type: 'chunk', hintKey: 'morph.longWord' });
+                i += take;
+            }
+            return parts.length >= 3 ? parts : null;
+        }
+
+        function findMorphRelatedWord(root, wordId) {
+            const r = String(root || '').trim().toLowerCase();
+            if (r.length < 3) return null;
+            return vocabulary.find((v) => {
+                if (!v || v.id === wordId) return false;
+                const vw = String(v.word || '').trim().toLowerCase();
+                if (!vw || vw.includes(' ')) return false;
+                return vw === r || (vw.endsWith(r) && vw.length <= r.length + 2);
+            }) || null;
+        }
+
+        function buildIntroMorphHint(word) {
+            const raw = String(word?.word || '').trim();
+            if (!raw || /\s/.test(raw) || raw.length < 5) return null;
+            const { prefixes, suffixes } = morphListsForLang(learningLanguage);
+            const parts = [];
+            const hints = [];
+            let rest = raw;
+            const pre = matchMorphAffix(rest, prefixes, false);
+            if (pre) {
+                parts.push({ text: pre.affix, type: 'prefix', hintKey: pre.hintKey });
+                hints.push(t(pre.hintKey));
+                rest = pre.rest;
+            }
+            const suf = matchMorphAffix(rest, suffixes, true);
+            if (suf && suf.rest.length >= 3) {
+                parts.push({ text: suf.rest, type: 'root' });
+                parts.push({ text: suf.affix, type: 'suffix', hintKey: suf.hintKey });
+                hints.push(t(suf.hintKey));
+            } else if (pre && rest.length >= 3) {
+                parts.push({ text: rest, type: 'root' });
+            }
+            if (parts.length >= 2 && parts.some((p) => p.type === 'prefix' || p.type === 'suffix')) {
+                const rootPart = parts.find((p) => p.type === 'root');
+                const related = rootPart ? findMorphRelatedWord(rootPart.text, word.id) : null;
+                if (related) hints.push(t('morph.likeWord', { word: related.word }));
+                return { parts, hints };
+            }
+            const chunks = chunkLongWordParts(raw);
+            if (chunks) {
+                return { parts: chunks, hints: [t('morph.longWord')] };
+            }
+            return null;
+        }
+
+        function renderIntroMorphHtml(morph) {
+            const segs = (morph.parts || []).map((p, i) =>
+                `<span class="bs-morph-part bs-morph-${p.type}" style="animation-delay:${(i * 0.12).toFixed(2)}s">${escapeHtmlText(p.text)}</span>`
+            ).join('');
+            const hintLine = (morph.hints || []).filter(Boolean).join(' · ');
+            return `<div class="bs-intro-morph"><p class="bs-intro-morph-label">${escapeHtmlText(t('train.introMorphLabel'))}</p><div class="bs-intro-morph-segments">${segs}</div>${hintLine ? `<p class="bs-intro-morph-hints">${escapeHtmlText(hintLine)}</p>` : ''}</div>`;
         }
 
         function scoreMcqDistractor(candidate, target, field) {
