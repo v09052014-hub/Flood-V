@@ -185,14 +185,25 @@
             opacity: 0.34;
             transition: background 0.22s ease, border-color 0.22s ease, opacity 0.22s ease, box-shadow 0.22s ease;
         }
-        #reader-float-tools.is-docked:hover,
-        #reader-float-tools.is-docked:focus-within {
+        @media (hover: hover) and (pointer: fine) {
+            #reader-float-tools.is-docked:hover {
+                border-color: rgba(226, 232, 240, 0.75);
+                background: rgba(255, 255, 255, 0.78);
+                box-shadow: 0 8px 28px rgba(15, 23, 42, 0.1);
+            }
+            #reader-float-tools.is-docked:hover .reader-tool-btn {
+                border-color: rgba(226, 232, 240, 0.9);
+                background: rgba(255, 255, 255, 0.92);
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+                opacity: 1;
+            }
+        }
+        #reader-float-tools.is-docked:focus-within:has(.reader-tool-btn:focus-visible) {
             border-color: rgba(226, 232, 240, 0.75);
             background: rgba(255, 255, 255, 0.78);
             box-shadow: 0 8px 28px rgba(15, 23, 42, 0.1);
         }
-        #reader-float-tools.is-docked:hover .reader-tool-btn,
-        #reader-float-tools.is-docked:focus-within .reader-tool-btn {
+        #reader-float-tools.is-docked:focus-within:has(.reader-tool-btn:focus-visible) .reader-tool-btn {
             border-color: rgba(226, 232, 240, 0.9);
             background: rgba(255, 255, 255, 0.92);
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
@@ -204,14 +215,26 @@
             background: rgba(254, 249, 195, 0.75);
             border-color: rgba(253, 224, 71, 0.55);
         }
+        #reader-float-tools.is-docked.is-resting {
+            background: rgba(255, 255, 255, 0.38) !important;
+            border-color: rgba(226, 232, 240, 0.28) !important;
+            box-shadow: none !important;
+        }
+        #reader-float-tools.is-docked.is-resting .reader-tool-btn {
+            border-color: transparent !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            opacity: 0.28 !important;
+        }
         @media (max-width: 640px) {
-            #reader-float-tools.is-docked {
-                background: rgba(255, 255, 255, 0.38);
-                border-color: rgba(226, 232, 240, 0.28);
+            #reader-float-tools.is-docked.is-resting {
+                background: rgba(255, 255, 255, 0.32) !important;
             }
-            #reader-float-tools.is-docked .reader-tool-btn {
-                opacity: 0.28;
-                background: transparent;
+            #reader-float-tools.is-docked.is-resting .reader-tool-btn {
+                opacity: 0.26 !important;
+            }
+            #reader-float-tools.is-docked .reader-tool-btn.is-active {
+                opacity: 0.88;
             }
         }
         #library-read-view.reader-hl-mode .yt-sub-line {
@@ -502,6 +525,39 @@
             accent-color: #4f46e5;
             cursor: pointer;
         }
+        .reader-settings-icon-row {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .reader-settings-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2.5rem;
+            height: 2.25rem;
+            padding: 0 0.65rem;
+            border-radius: 0.55rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #64748b;
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .reader-settings-icon-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #475569;
+        }
+        .reader-settings-icon-btn.is-active {
+            background: #eef2ff;
+            border-color: #a5b4fc;
+            color: #4f46e5;
+            box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.12);
+        }
         .reader-settings-info-btn {
             flex-shrink: 0;
             width: 1.25rem;
@@ -562,8 +618,8 @@
         }
         .text-reader mark.reader-hl {
             display: inline;
-            background: rgba(253, 224, 71, 0.62);
-            color: inherit;
+            background: transparent;
+            color: #ca8a04;
             padding: 0;
             margin: 0;
             border-radius: 0;
@@ -582,14 +638,14 @@
             opacity: 0.9;
         }
         #library-read-view[data-hl-color="mint"] .text-reader mark.reader-hl:not(.reader-hl-book) {
-            background: rgba(94, 234, 212, 0.52);
+            color: #0d9488;
         }
         #library-read-view[data-hl-color="lavender"] .text-reader mark.reader-hl:not(.reader-hl-book) {
-            background: rgba(196, 181, 253, 0.58);
+            color: #7c3aed;
         }
         ::highlight(reader-hl) {
-            background-color: rgba(253, 224, 71, 0.62);
-            color: inherit;
+            background-color: transparent;
+            color: #ca8a04;
         }
         /* Reader words: no box padding — keeps sentence highlights continuous (marker on or off) */
         #library-read-view .text-reader .word-clickable {
@@ -668,6 +724,123 @@
         }
         .text-reader p,
         .text-reader > div { margin: 0 0 1rem; text-align: justify; overflow-wrap: anywhere; max-width: 100%; }
+        #library-read-view.reader-para-indent .text-reader p + p {
+            text-indent: 1.5em;
+            margin-top: 0;
+        }
+        #library-read-view.reader-para-indent .text-reader h1 + p,
+        #library-read-view.reader-para-indent .text-reader h2 + p,
+        #library-read-view.reader-para-indent .text-reader h3 + p {
+            text-indent: 0;
+        }
+        html, body, #view-library {
+            transition: background-color 0.35s ease;
+        }
+        html.reader-theme-warm,
+        html.reader-theme-warm body,
+        #view-library.reader-theme-warm {
+            background-color: #f0e8db;
+        }
+        html.reader-theme-dark,
+        html.reader-theme-dark body,
+        #view-library.reader-theme-dark {
+            background-color: #12100e;
+        }
+        #library-read-view #reader-content-wrapper,
+        #library-read-view #reader-pagination,
+        #library-read-view #reader-pagination-top,
+        #library-read-view .text-reader,
+        #library-read-view .text-reader h1,
+        #library-read-view .text-reader h2,
+        #library-read-view .text-reader h3,
+        #library-read-view .text-reader strong,
+        #library-read-view .text-reader b {
+            transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+        }
+        #library-read-view.reader-theme-warm #reader-content-wrapper,
+        #library-read-view.reader-theme-warm #reader-pagination,
+        #library-read-view.reader-theme-warm #reader-pagination-top {
+            background: #f7f0e3;
+            border-color: #e6d9c4;
+        }
+        #library-read-view.reader-theme-warm .text-reader { color: #3d3428; }
+        #library-read-view.reader-theme-warm .text-reader h1,
+        #library-read-view.reader-theme-warm .text-reader h2,
+        #library-read-view.reader-theme-warm .text-reader h3 { color: #2c2418; }
+        #library-read-view.reader-theme-warm .text-reader strong,
+        #library-read-view.reader-theme-warm .text-reader b { color: #2c2418; }
+        #library-read-view.reader-theme-warm .text-reader .word-saved {
+            background-color: rgba(120, 168, 140, 0.35);
+        }
+        #library-read-view.reader-theme-warm .text-reader .word-saved-phrase {
+            background-color: rgba(120, 168, 140, 0.22);
+        }
+        #library-read-view.reader-theme-warm #reader-title { color: #2c2418; }
+        #library-read-view.reader-theme-dark #reader-title { color: #f5f5f4; }
+        #library-read-view.reader-theme-dark #reader-content-wrapper,
+        #library-read-view.reader-theme-dark #reader-pagination,
+        #library-read-view.reader-theme-dark #reader-pagination-top {
+            background: #1c1917;
+            border-color: #44403c;
+        }
+        #library-read-view.reader-theme-dark .text-reader { color: #d6d3d1; }
+        #library-read-view.reader-theme-dark .text-reader h1,
+        #library-read-view.reader-theme-dark .text-reader h2,
+        #library-read-view.reader-theme-dark .text-reader h3 { color: #fafaf9; }
+        #library-read-view.reader-theme-dark .text-reader strong,
+        #library-read-view.reader-theme-dark .text-reader b { color: #f5f5f4; }
+        #library-read-view.reader-theme-dark #reader-page-info,
+        #library-read-view.reader-theme-dark #reader-page-info-top { color: #a8a29e; }
+        #library-read-view.reader-theme-dark #reader-pagination button,
+        #library-read-view.reader-theme-dark #reader-pagination-top button {
+            background: #292524;
+            color: #e7e5e4;
+        }
+        #library-read-view.reader-theme-dark #reader-pagination button:hover,
+        #library-read-view.reader-theme-dark #reader-pagination-top button:hover {
+            background: #44403c;
+        }
+        #library-read-view.reader-theme-dark .text-reader .word-saved,
+        #library-read-view.reader-theme-dark .text-reader .word-saved-phrase {
+            background-color: transparent;
+            color: #73d4a5;
+            box-shadow: inset 0 -2px 0 rgba(115, 212, 165, 0.42);
+            border-radius: 0;
+        }
+        #library-read-view.reader-theme-dark .text-reader .word-saved:hover,
+        #library-read-view.reader-theme-dark .text-reader .word-saved-phrase:hover {
+            background-color: rgba(115, 212, 165, 0.12);
+            color: #8ecdb0;
+        }
+        #library-read-view.reader-theme-dark .text-reader mark.reader-hl:not(.reader-hl-book) {
+            color: #fbbf24;
+        }
+        #library-read-view.reader-theme-dark[data-hl-color="mint"] .text-reader mark.reader-hl:not(.reader-hl-book) {
+            color: #5eead4;
+        }
+        #library-read-view.reader-theme-dark[data-hl-color="lavender"] .text-reader mark.reader-hl:not(.reader-hl-book) {
+            color: #c4b5fd;
+        }
+        #library-read-view.reader-theme-warm .text-reader mark.reader-hl:not(.reader-hl-book) {
+            color: #b45309;
+        }
+        #library-read-view.reader-theme-warm[data-hl-color="mint"] .text-reader mark.reader-hl:not(.reader-hl-book) {
+            color: #0f766e;
+        }
+        #library-read-view.reader-theme-warm[data-hl-color="lavender"] .text-reader mark.reader-hl:not(.reader-hl-book) {
+            color: #6d28d9;
+        }
+        #library-read-view.reader-theme-dark .text-reader mark:not(.reader-hl):not(.reader-hl-book) {
+            background: rgba(186, 152, 48, 0.3);
+        }
+        #library-read-view.reader-theme-warm .text-reader mark:not(.reader-hl):not(.reader-hl-book) {
+            background: rgba(218, 178, 52, 0.34);
+        }
+        #library-read-view.reader-theme-dark .text-reader .word-clickable:hover {
+            background-color: rgba(148, 163, 184, 0.14);
+            color: #e7e5e4;
+            border-bottom-color: #94a3b8;
+        }
         .text-reader h1, .text-reader h2, .text-reader h3 {
             font-weight: 800;
             color: #1e293b;
@@ -705,6 +878,122 @@
             gap: 0.35rem;
             margin-bottom: 0.45rem;
         }
+        .fmt-toolbar-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.45rem;
+        }
+        .fmt-toolbar-row > .fmt-toolbar {
+            margin-bottom: 0;
+            flex: 1;
+            min-width: 0;
+        }
+        .mat-gpt-photo-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+        .mat-gpt-photo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            height: 2rem;
+            padding: 0 0.55rem 0 0.45rem;
+            border-radius: 0.55rem;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            background: rgba(255, 255, 255, 0.42);
+            color: #64748b;
+            font-size: 0.85rem;
+            line-height: 1;
+            opacity: 0.58;
+            transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+            cursor: pointer;
+        }
+        .mat-gpt-photo-btn:hover {
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.78);
+            border-color: #cbd5e1;
+        }
+        .mat-gpt-photo-emoji {
+            font-size: 0.95rem;
+            line-height: 1;
+        }
+        .mat-gpt-photo-logo {
+            height: 1.05rem;
+            width: auto;
+            max-width: 1.75rem;
+            object-fit: contain;
+            opacity: 0.9;
+        }
+        .mat-gpt-photo-tip {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.4rem);
+            z-index: 40;
+            width: min(18.5rem, 78vw);
+            padding: 0.7rem 0.8rem;
+            border-radius: 0.8rem;
+            border: 1px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.98);
+            color: #475569;
+            font-size: 0.72rem;
+            font-weight: 600;
+            line-height: 1.45;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.15s ease, visibility 0.15s ease;
+        }
+        .mat-gpt-photo-tip-head {
+            margin: 0 0 0.15rem;
+            color: #334155;
+            font-size: 0.74rem;
+            line-height: 1.35;
+        }
+        .mat-gpt-photo-tip-meta {
+            display: block;
+            margin-top: 0.2rem;
+            color: #94a3b8;
+            font-size: 0.66rem;
+            font-weight: 600;
+            line-height: 1.35;
+        }
+        .mat-gpt-photo-wrap:hover .mat-gpt-photo-tip,
+        .mat-gpt-photo-wrap:focus-within .mat-gpt-photo-tip {
+            opacity: 1;
+            visibility: visible;
+        }
+        .mat-gpt-photo-tip ol {
+            list-style: none;
+            counter-reset: gpt-tip-step;
+            margin: 0.45rem 0 0;
+            padding: 0;
+        }
+        .mat-gpt-photo-tip ol li {
+            counter-increment: gpt-tip-step;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.45rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .mat-gpt-photo-tip ol li::before {
+            content: counter(gpt-tip-step);
+            flex-shrink: 0;
+            width: 1.1rem;
+            height: 1.1rem;
+            margin-top: 0.05rem;
+            border-radius: 9999px;
+            background: #eef2ff;
+            color: #4f46e5;
+            font-size: 0.62rem;
+            font-weight: 800;
+            line-height: 1.1rem;
+            text-align: center;
+        }
+        .mat-gpt-photo-tip li + li { margin-top: 0.35rem; }
         .fmt-btn {
             min-width: 2rem;
             height: 2rem;
@@ -768,6 +1057,14 @@
         #view-library,
         #view-library.reader-wide-mode {
             background-color: var(--app-bg);
+        }
+        #view-library.reader-theme-warm,
+        #view-library.reader-theme-warm.reader-wide-mode {
+            background-color: #f0e8db;
+        }
+        #view-library.reader-theme-dark,
+        #view-library.reader-theme-dark.reader-wide-mode {
+            background-color: #12100e;
         }
         #view-library.reader-wide-mode {
             transition: max-width 0.3s ease;
@@ -851,22 +1148,22 @@
             flex-wrap: wrap;
             justify-content: center;
             align-items: baseline;
-            gap: 0.12rem 0.2rem;
+            gap: 0;
             font-size: 1.875rem;
             line-height: 1.2;
-            font-weight: 800;
-            letter-spacing: -0.02em;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: #4338ca;
         }
         .bs-morph-part {
             display: inline-block;
-            padding: 0.05rem 0.15rem;
-            border-radius: 0.35rem;
-            animation: bs-morph-part-in 0.55s ease both;
+            color: inherit;
+            background: none;
+            padding: 0;
+            border-radius: 0;
+            transform-origin: center bottom;
+            animation: bs-morph-part-focus 1.05s ease both;
         }
-        .bs-morph-prefix { color: #4338ca; background: rgba(199, 210, 254, 0.45); }
-        .bs-morph-root { color: #0f766e; background: rgba(153, 246, 228, 0.35); }
-        .bs-morph-suffix { color: #7c3aed; background: rgba(221, 214, 254, 0.45); }
-        .bs-morph-chunk { color: #334155; background: rgba(241, 245, 249, 0.9); }
         .bs-intro-morph-hints {
             margin-top: 0.45rem;
             font-size: 0.72rem;
@@ -878,9 +1175,18 @@
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes bs-morph-part-in {
-            from { opacity: 0; transform: scale(0.92); }
-            to { opacity: 1; transform: scale(1); }
+        @keyframes bs-morph-part-focus {
+            0%, 100% {
+                transform: scale(1);
+                color: #4338ca;
+            }
+            22%, 48% {
+                transform: scale(1.1);
+                color: #6366f1;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .bs-morph-part { animation: none !important; }
         }
         .bs-play-audio-btn--listen {
             background: #eef2ff;
@@ -1087,6 +1393,128 @@
                 left: 0.5rem !important;
                 right: 0.5rem;
             }
+        }
+        #inline-popup {
+            transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+        }
+        #inline-popup.reader-theme-warm {
+            background: #faf6ee;
+            border-color: #e6d9c4;
+            box-shadow: 0 12px 32px rgba(61, 52, 40, 0.14);
+            color: #3d3428;
+        }
+        #inline-popup.reader-theme-warm #inline-popup-word { color: #4338ca; }
+        #inline-popup.reader-theme-warm #inline-context-panel {
+            background: #f0e8db;
+            border-color: #e0d4c0;
+        }
+        #inline-popup.reader-theme-warm #inline-context-phrase-hint {
+            color: #4338ca;
+            background: #ebe4f8;
+            border-color: #c7bfe8;
+        }
+        #inline-popup.reader-theme-warm #inline-context-source { color: #5c5045; }
+        #inline-popup.reader-theme-warm #inline-context-full { color: #2c2418; }
+        #inline-popup.reader-theme-warm #inline-context-panel .inline-ctx-label { color: #7a6b5c; }
+        #inline-popup.reader-theme-warm #inline-popup-trans-input {
+            background: #f0e8db;
+            border-color: #ddd0bc;
+            color: #2c2418;
+        }
+        #inline-popup.reader-theme-warm #inline-trans-dropdown {
+            background: #f7f0e3;
+            border-color: #e0d4c0;
+        }
+        #inline-popup.reader-theme-warm #inline-dict-section { border-color: #e6d9c4; }
+        #inline-popup.reader-theme-dark {
+            background: #292524;
+            border-color: #44403c;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.42);
+            color: #e7e5e4;
+        }
+        #inline-popup.reader-theme-dark #inline-popup-word { color: #c7d2fe; }
+        #inline-popup.reader-theme-dark #inline-popup-loader { color: #a5b4fc; }
+        #inline-popup.reader-theme-dark #inline-popup-trans-input {
+            background: #1c1917;
+            border-color: #57534e;
+            color: #f5f5f4;
+        }
+        #inline-popup.reader-theme-dark #inline-context-panel {
+            background: #1c1917;
+            border-color: #44403c;
+        }
+        #inline-popup.reader-theme-dark #inline-context-phrase-hint {
+            color: #c7d2fe;
+            background: rgba(99, 102, 241, 0.16);
+            border-color: rgba(129, 140, 248, 0.35);
+        }
+        #inline-popup.reader-theme-dark #inline-context-phrase-kind { color: #78716c; }
+        #inline-popup.reader-theme-dark #inline-context-panel .inline-ctx-label { color: #a8a29e; }
+        #inline-popup.reader-theme-dark #inline-context-source { color: #a8a29e; }
+        #inline-popup.reader-theme-dark #inline-context-full { color: #e7e5e4; }
+        #inline-popup.reader-theme-dark #inline-trans-dropdown {
+            background: #1c1917;
+            border-color: #44403c;
+        }
+        #inline-popup.reader-theme-dark #inline-dict-section { border-color: #44403c; }
+        #inline-popup.reader-theme-dark #inline-dict-section > button { color: #a8a29e; }
+        #inline-popup.reader-theme-dark #inline-dict-section > button:hover { color: #c7d2fe; }
+        #inline-popup.reader-theme-dark #inline-popup-back,
+        #inline-popup.reader-theme-dark #inline-popup-tts,
+        #inline-popup.reader-theme-dark #inline-context-trans-btn {
+            background: #1c1917;
+            border-color: #57534e;
+            color: #d6d3d1;
+        }
+        #inline-popup.reader-theme-dark #inline-popup-back:hover,
+        #inline-popup.reader-theme-dark #inline-popup-tts:hover,
+        #inline-popup.reader-theme-dark #inline-context-trans-btn:hover {
+            background: #292524;
+            border-color: #78716c;
+            color: #e7e5e4;
+        }
+        #inline-popup.reader-theme-dark button[onclick="closeInlinePopup()"] {
+            color: #a8a29e;
+        }
+        #inline-popup.reader-theme-dark button[onclick="closeInlinePopup()"]:hover {
+            background: #1c1917;
+            color: #e7e5e4;
+        }
+        #inline-popup.reader-theme-dark .text-slate-800 { color: #e7e5e4 !important; }
+        #inline-popup.reader-theme-dark .text-slate-700 { color: #d6d3d1 !important; }
+        #inline-popup.reader-theme-dark .text-slate-600 { color: #a8a29e !important; }
+        #inline-popup.reader-theme-dark .text-slate-500 { color: #78716c !important; }
+        #inline-popup.reader-theme-dark .text-slate-400 { color: #78716c !important; }
+        #inline-popup.reader-theme-dark .text-indigo-500,
+        #inline-popup.reader-theme-dark .text-indigo-700 { color: #a5b4fc !important; }
+        #inline-popup.reader-theme-dark .text-amber-700 { color: #fbbf24 !important; }
+        #inline-popup.reader-theme-dark .text-rose-500 { color: #fca5a5 !important; }
+        #inline-popup.reader-theme-dark .border-slate-100,
+        #inline-popup.reader-theme-dark .border-l-2 { border-color: #44403c !important; }
+        #inline-popup.reader-theme-dark .bg-indigo-50,
+        #inline-popup.reader-theme-dark .mw-dict-tab {
+            background: rgba(99, 102, 241, 0.14) !important;
+            border-color: rgba(129, 140, 248, 0.35) !important;
+            color: #c7d2fe !important;
+        }
+        #inline-popup.reader-theme-dark .bg-indigo-50:hover,
+        #inline-popup.reader-theme-dark .mw-dict-tab:hover {
+            background: rgba(99, 102, 241, 0.24) !important;
+        }
+        #inline-popup.reader-theme-warm .text-slate-800 { color: #2c2418 !important; }
+        #inline-popup.reader-theme-warm .text-slate-700 { color: #3d3428 !important; }
+        #inline-popup.reader-theme-warm .text-slate-600 { color: #5c5045 !important; }
+        #inline-popup.reader-theme-warm .text-slate-500,
+        #inline-popup.reader-theme-warm .text-slate-400 { color: #7a6b5c !important; }
+        #inline-popup.reader-theme-warm #inline-trans-options-list li:hover {
+            background: #ebe4d4;
+        }
+        #inline-popup.reader-theme-dark #inline-trans-options-list li {
+            border-color: #44403c;
+            color: #e7e5e4;
+        }
+        #inline-popup.reader-theme-dark #inline-trans-options-list li:hover {
+            background: rgba(99, 102, 241, 0.14);
         }
 
         /* Crossword — normal size (original compact look) */
@@ -1875,17 +2303,38 @@
             transition: opacity 0.15s ease, background 0.15s ease;
             line-height: 0;
         }
-        .dict-word-delete svg {
+        .dict-word-speak {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.75rem;
+            height: 1.75rem;
+            padding: 0;
+            margin: 0;
+            border-radius: 9999px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+            color: #4f46e5;
+            opacity: 0;
+            transition: opacity 0.15s ease, background 0.15s ease;
+            line-height: 0;
+        }
+        .dict-word-delete svg,
+        .dict-word-speak svg {
             width: 0.72rem;
             height: 0.72rem;
             display: block;
             flex-shrink: 0;
         }
-        .dict-word-card:hover .dict-word-delete,
-        .dict-word-card:focus-within .dict-word-delete {
-            opacity: 1;
+        @media (hover: hover) and (pointer: fine) {
+            .dict-word-card:hover .dict-word-delete,
+            .dict-word-card:hover .dict-word-speak {
+                opacity: 1;
+            }
         }
         .dict-word-delete:hover { background: #fff1f2; }
+        .dict-word-speak:hover { background: #eef2ff; }
 
         .header-right-tools {
             display: inline-flex;
@@ -3122,6 +3571,240 @@
             margin-top: 0.15rem;
             line-height: 1.35;
         }
+        .bs-setting-toggle {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            padding: 0.65rem 0.75rem;
+            border-radius: 0.85rem;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            cursor: pointer;
+        }
+        .bs-setting-toggle input {
+            width: 1.35rem;
+            height: 1.35rem;
+            min-width: 1.35rem;
+            min-height: 1.35rem;
+            margin-top: 0.1rem;
+            accent-color: #6366f1;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .bs-setting-toggle-title {
+            display: block;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            color: #334155;
+            line-height: 1.3;
+        }
+        .bs-setting-toggle-hint {
+            display: block;
+            font-size: 0.6875rem;
+            color: #64748b;
+            margin-top: 0.2rem;
+            line-height: 1.4;
+        }
+        .bs-count-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .bs-count-linked {
+            margin-top: 0.15rem;
+            border: 1px solid #e2e8f0;
+            border-left: 3px solid #a5b4fc;
+            border-radius: 0 0.85rem 0.85rem 0;
+            background: #f8fafc;
+        }
+        .bs-count-link-icon {
+            color: #6366f1;
+            font-size: 1.1rem;
+            font-weight: 800;
+            line-height: 1;
+            flex-shrink: 0;
+            margin-top: 0.12rem;
+            user-select: none;
+        }
+        .bs-setting-toggle-head {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.35rem;
+        }
+        .bs-setting-toggle-head .bs-setting-toggle-title {
+            flex: 1;
+            min-width: 0;
+        }
+        .bs-full-sets-wrap {
+            display: flex;
+            flex-direction: column;
+        }
+        .bs-full-sets-wrap .reader-settings-tip {
+            margin-left: 1.65rem;
+        }
+        .train-word-pick-open-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 0.45rem;
+            padding: 0.55rem 0.7rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #475569;
+            transition: border-color 0.15s, background 0.15s, color 0.15s;
+        }
+        .train-word-pick-open-btn:hover {
+            border-color: #c7d2fe;
+            background: #fafafe;
+            color: #4338ca;
+        }
+        .train-word-pick-summary {
+            font-size: 0.6875rem;
+            font-weight: 800;
+            color: #6366f1;
+            white-space: nowrap;
+        }
+        .train-word-pick-dialog {
+            max-width: 52rem;
+            width: min(96vw, 52rem);
+            max-height: min(92vh, 48rem);
+            min-height: min(72vh, 26rem);
+            display: flex;
+            flex-direction: column;
+        }
+        .train-word-pick-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            min-height: 0;
+            flex: 1;
+        }
+        @media (min-width: 520px) {
+            .train-word-pick-body {
+                flex-direction: row;
+                align-items: stretch;
+                min-height: 22rem;
+            }
+        }
+        .train-word-pick-folders {
+            display: flex;
+            flex-direction: row;
+            gap: 0.35rem;
+            overflow-x: auto;
+            flex-shrink: 0;
+            padding-bottom: 0.15rem;
+        }
+        @media (min-width: 520px) {
+            .train-word-pick-folders {
+                flex-direction: column;
+                width: 11rem;
+                flex: 0 0 11rem;
+                overflow-x: hidden;
+                overflow-y: auto;
+                max-height: none;
+                align-self: stretch;
+                padding-bottom: 0;
+            }
+        }
+        .train-word-pick-folder-btn {
+            flex-shrink: 0;
+            text-align: left;
+            padding: 0.45rem 0.55rem;
+            border-radius: 0.65rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            color: #475569;
+            transition: border-color 0.15s, background 0.15s, color 0.15s;
+            line-height: 1.3;
+        }
+        .train-word-pick-folder-btn.is-on {
+            border-color: #6366f1;
+            background: #eef2ff;
+            color: #4338ca;
+        }
+        .train-word-pick-words {
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.85rem;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+        .train-word-pick-words-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.35rem 0.5rem;
+            padding: 0.5rem 0.65rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: #fff;
+        }
+        .train-word-pick-words-title {
+            flex: 1;
+            min-width: 0;
+            font-size: 0.6875rem;
+            font-weight: 800;
+            color: #334155;
+            line-height: 1.3;
+        }
+        .train-word-pick-mini-btn {
+            font-size: 0.625rem;
+            font-weight: 800;
+            color: #6366f1;
+            background: transparent;
+            border: none;
+            padding: 0.15rem 0.25rem;
+            cursor: pointer;
+        }
+        .train-word-pick-mini-btn:hover { color: #4338ca; }
+        .train-word-pick-list {
+            flex: 1;
+            min-height: 14rem;
+            overflow-y: auto;
+            padding: 0.35rem;
+        }
+        @media (min-width: 520px) {
+            .train-word-pick-list { min-height: 20rem; }
+        }
+        .train-word-pick-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.4rem 0.45rem;
+            border-radius: 0.55rem;
+            cursor: pointer;
+        }
+        .train-word-pick-item:hover { background: #fff; }
+        .train-word-pick-item input {
+            margin-top: 0.15rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: #6366f1;
+            flex-shrink: 0;
+        }
+        .train-word-pick-item-word {
+            display: block;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1.25;
+        }
+        .train-word-pick-item-trans {
+            display: block;
+            font-size: 0.6875rem;
+            color: #64748b;
+            line-height: 1.3;
+        }
         .def-blank {
             display: inline-block;
             min-width: 3.25rem;
@@ -3173,30 +3856,29 @@
         }
         .def-more-btn.is-open .def-more-chevron { transform: rotate(180deg); }
         .def-wrong-sense-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.35rem;
-            width: 100%;
-            margin: 0;
-            padding: 0.55rem 0.9rem;
-            border: 1px solid #fecdd3;
-            border-radius: 0.75rem;
-            background: #fff1f2;
-            color: #e11d48;
-            font-size: 0.8rem;
-            font-weight: 700;
+            display: inline;
+            width: auto;
+            margin: 0.35rem 0 0;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            font-weight: 600;
             letter-spacing: 0.01em;
+            text-decoration: underline;
+            text-underline-offset: 0.18em;
             cursor: pointer;
-            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+            transition: color 0.15s ease, opacity 0.15s ease;
         }
         .def-wrong-sense-btn:hover {
-            background: #ffe4e6;
-            border-color: #fda4af;
-            color: #be123c;
+            background: transparent;
+            border-color: transparent;
+            color: #64748b;
         }
         .def-wrong-sense-btn:disabled {
-            opacity: 0.55;
+            opacity: 0.45;
             cursor: default;
         }
         .def-wrong-sense-btn.hidden { display: none !important; }
@@ -3328,6 +4010,30 @@
             <div class="flex gap-3">
                 <button type="button" onclick="closeReviewSetup()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold border border-slate-200" data-i18n="common.cancel">Скасувати</button>
                 <button type="button" id="btn-confirm-review" onclick="confirmReviewSession()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold shadow-sm" data-i18n="train.reviewStart">Почати</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Choose words for training -->
+    <div id="train-word-pick-modal" class="hidden fixed inset-0 z-[200] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeTrainWordPickModal()">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-2xl train-word-pick-dialog relative text-left" role="dialog" aria-modal="true" aria-labelledby="train-word-pick-title">
+            <button type="button" onclick="closeTrainWordPickModal()" class="absolute top-3 right-4 text-slate-400 hover:text-slate-700 font-bold text-3xl leading-none" aria-label="Close">&times;</button>
+            <h3 id="train-word-pick-title" class="text-lg font-bold text-slate-800 mb-1 pr-8" data-i18n="train.pickWordsTitle">Слова для тренування</h3>
+            <p id="train-word-pick-modal-hint" class="text-xs text-slate-500 mb-3"></p>
+            <div class="train-word-pick-body">
+                <div id="train-word-pick-folders" class="train-word-pick-folders custom-scroll"></div>
+                <div class="train-word-pick-words">
+                    <div class="train-word-pick-words-toolbar">
+                        <span id="train-word-pick-folder-title" class="train-word-pick-words-title"></span>
+                        <button type="button" class="train-word-pick-mini-btn" onclick="trainWordPickSelectAllFolder(true)" data-i18n="train.pickWordsSelectAll">Вибрати всі</button>
+                        <button type="button" class="train-word-pick-mini-btn" onclick="trainWordPickSelectAllFolder(false)" data-i18n="train.pickWordsClearAll">Зняти всі</button>
+                    </div>
+                    <div id="train-word-pick-list" class="train-word-pick-list custom-scroll"></div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-100">
+                <span id="train-word-pick-total" class="text-xs font-bold text-slate-500"></span>
+                <button type="button" onclick="closeTrainWordPickModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-sm" data-i18n="train.pickWordsDone">Готово</button>
             </div>
         </div>
     </div>
@@ -3610,7 +4316,7 @@
                     </div>
                 </div>
                 <div class="flex-1 overflow-y-auto custom-scroll min-h-0">
-                <div id="bulk-loader" class="text-center py-4 text-indigo-600 font-bold text-sm hidden flex flex-col items-center gap-2"><div class="loader"></div> <span data-i18n="bulk.processing">Обробка та переклад...</span></div>
+                <div id="bulk-loader" class="text-center py-4 text-indigo-600 font-bold text-sm hidden flex flex-col items-center gap-2"><div class="loader"></div> <span id="bulk-loader-label" data-i18n="bulk.processing">Обробка та переклад...</span></div>
                 <ul id="bulk-preview-list" class="space-y-3"></ul>
                 </div>
             </div>
@@ -3817,12 +4523,21 @@
                 
                 <!-- Tab: Text -->
                 <div id="mode-text-area" class="add-mode-pane is-visible mb-4">
-                    <div class="fmt-toolbar" data-fmt-for="material-content">
-                        <button type="button" class="fmt-btn" data-fmt="bold" title="Bold"><b>B</b></button>
-                        <button type="button" class="fmt-btn" data-fmt="italic" title="Italic"><i>I</i></button>
-                        <button type="button" class="fmt-btn" data-fmt="underline" title="Underline"><u>U</u></button>
-                        <button type="button" class="fmt-btn is-mark" data-fmt="highlight" title="Highlight">▮</button>
-                        <button type="button" class="fmt-btn" data-fmt="h2" title="Heading">H</button>
+                    <div class="fmt-toolbar-row">
+                        <div class="fmt-toolbar" data-fmt-for="material-content">
+                            <button type="button" class="fmt-btn" data-fmt="bold" title="Bold"><b>B</b></button>
+                            <button type="button" class="fmt-btn" data-fmt="italic" title="Italic"><i>I</i></button>
+                            <button type="button" class="fmt-btn" data-fmt="underline" title="Underline"><u>U</u></button>
+                            <button type="button" class="fmt-btn is-mark" data-fmt="highlight" title="Highlight">▮</button>
+                            <button type="button" class="fmt-btn" data-fmt="h2" title="Heading">H</button>
+                        </div>
+                        <div class="mat-gpt-photo-wrap">
+                            <button type="button" class="mat-gpt-photo-btn" onclick="openChatGptPhotoExtract(event)" data-i18n-title="lib.chatGptPhotoBtn" title="Витягнути текст із фото" aria-label="ChatGPT">
+                                <span class="mat-gpt-photo-emoji" aria-hidden="true">🖼️</span>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/ChatGPT-Logo.png/120px-ChatGPT-Logo.png" alt="" class="mat-gpt-photo-logo" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+                            </button>
+                            <div class="mat-gpt-photo-tip" role="tooltip" data-i18n-html="lib.chatGptPhotoTip"></div>
+                        </div>
                     </div>
                     <div id="material-content" class="material-editor custom-scroll" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Оригінальний текст (або скрипт відео)..." data-i18n-placeholder="lib.textPh"></div>
                 </div>
@@ -3939,6 +4654,11 @@
                         <button onclick="event.stopPropagation(); changeFontFamily('\'Georgia\', serif')" class="reader-settings-font-btn text-left text-sm px-3 rounded-lg hover:bg-indigo-50 font-serif font-bold text-slate-700 border border-transparent hover:border-indigo-100 transition" data-i18n="reader.georgia">Georgia (Із засічками)</button>
                         <button onclick="event.stopPropagation(); changeFontFamily('\'Inter\', sans-serif')" class="reader-settings-font-btn text-left text-sm px-3 rounded-lg hover:bg-indigo-50 font-sans font-bold text-slate-700 border border-transparent hover:border-indigo-100 transition" data-i18n="reader.inter">Inter (Без засічок)</button>
                     </div>
+                    <p class="text-xs font-bold text-slate-400 uppercase reader-settings-label" data-i18n="reader.display">Вигляд тексту</p>
+                    <div class="reader-settings-icon-row reader-settings-row" onclick="event.stopPropagation()">
+                        <button type="button" id="reader-para-indent-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderParaIndent()" data-i18n-title="reader.paraIndent" title="Відступ першого рядка" aria-pressed="false" aria-label="Paragraph indent">¶</button>
+                        <button type="button" id="reader-comfort-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); cycleReaderTheme()" data-i18n-title="reader.themeNormal" title="Звичайний вигляд" aria-pressed="false" aria-label="Reading comfort">📖</button>
+                    </div>
                     <div class="reader-settings-qm-wrap" onmouseleave="hideReaderQuickMatchTip()">
                         <label class="reader-settings-toggle reader-settings-toggle--qm" onclick="event.stopPropagation()">
                             <input type="checkbox" id="reader-quick-match-toggle" onchange="setReaderQuickMatch(this.checked)">
@@ -4005,19 +4725,35 @@
                     <div id="train-settings" aria-hidden="true">
                         <div class="train-settings-inner">
                         <div class="flex flex-col sm:flex-row gap-3 justify-between items-stretch w-full">
-                            <div class="flex flex-col flex-1 w-full min-w-0">
-                                <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wide mb-1.5" data-i18n="train.bsCount">Слів у Brainstorm:</label>
-                                <select id="bs-word-count" class="train-hub-select">
+                            <div class="flex flex-col flex-1 w-full min-w-0 bs-count-group">
+                                <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wide mb-0" for="bs-word-count" data-i18n="train.bsCount">Слів за сесію Brainstorm:</label>
+                                <select id="bs-word-count" class="train-hub-select" onchange="syncBsCountLinkedUI()">
                                     <option value="1">1 слово</option>
                                     <option value="4">4 слова</option>
                                     <option value="6" selected>6 слів</option>
                                     <option value="10">10 слів</option>
                                 </select>
+                                <div class="bs-full-sets-wrap" onmouseleave="hideBsFullSetsTip()">
+                                    <label class="bs-setting-toggle bs-count-linked w-full">
+                                        <span class="bs-count-link-icon" aria-hidden="true">↳</span>
+                                        <input type="checkbox" id="bs-prioritize-full-sets" onchange="setBsPrioritizeFullSets(this.checked)">
+                                        <span class="min-w-0 flex-1">
+                                            <span class="bs-setting-toggle-head">
+                                                <span class="bs-setting-toggle-title" id="bs-prioritize-full-label">Віддавати перевагу наборам із 6 слів</span>
+                                                <button type="button" id="btn-bs-full-sets-info" class="reader-settings-info-btn" onclick="toggleBsFullSetsTip(event)" onmouseenter="showBsFullSetsTip()" aria-expanded="false" aria-controls="bs-full-sets-tip" aria-label="Info">ℹ</button>
+                                            </span>
+                                        </span>
+                                    </label>
+                                    <div id="bs-full-sets-tip" class="reader-settings-tip hidden" role="tooltip"></div>
+                                </div>
                             </div>
                             <div class="flex flex-col flex-1 w-full min-w-0">
                                 <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wide mb-1.5" data-i18n="train.source">Джерело слів:</label>
-                                <select id="train-source-select" class="train-hub-select">
-                                </select>
+                                <select id="train-source-select" class="train-hub-select" onchange="onTrainSourceScopeChange()"></select>
+                                <button type="button" id="btn-train-word-pick" class="train-word-pick-open-btn" onclick="event.stopPropagation(); openTrainWordPickModal()">
+                                    <span data-i18n="train.pickWords">Обрати слова…</span>
+                                    <span id="train-word-pick-summary" class="train-word-pick-summary"></span>
+                                </button>
                             </div>
                         </div>
                         <div class="flex flex-col w-full pt-1 border-t border-slate-100">
@@ -4034,7 +4770,7 @@
                                     <span class="bs-order-emoji" aria-hidden="true">⚖️</span>
                                     <span class="min-w-0">
                                         <span class="bs-order-title" data-i18n="train.bsOrderMixed">Змішано</span>
-                                        <span class="bs-order-hint" data-i18n="train.bsOrderMixedHint">Нові, потім старіші — по черзі</span>
+                                        <span class="bs-order-hint" data-i18n="train.bsOrderMixedHint">Нові, потім старіші (чергування)</span>
                                     </span>
                                 </button>
                                 <button type="button" id="bs-order-reviews" onclick="setBrainstormOrder('reviews')" class="bs-order-btn">
@@ -4078,7 +4814,7 @@
                                 <div id="train-flag-wt" class="train-mode-emoji">🇬🇧➡️🇺🇦</div>
                                 <h4 class="train-mode-title" data-i18n="mode.word-trans">Слово → Переклад</h4>
                             </div>
-                            <p class="train-mode-desc" data-i18n="mode.word-trans.desc">Обери переклад слова з чотирьох варіантів</p>
+                            <p class="train-mode-desc" data-i18n="mode.word-trans.desc">Оберіть переклад слова з чотирьох варіантів</p>
                         </div>
                     </button>
                     <button type="button" data-train-mode="trans-word" onclick="startSession('trans-word')" class="train-mode-card border-hover-violet">
@@ -4087,7 +4823,7 @@
                                 <div id="train-flag-tw" class="train-mode-emoji">🇬🇧⬅️🇺🇦</div>
                                 <h4 class="train-mode-title" data-i18n="mode.trans-word">Переклад → Слово</h4>
                             </div>
-                            <p class="train-mode-desc" data-i18n="mode.trans-word.desc">Побач переклад — обери правильне слово з чотирьох</p>
+                            <p class="train-mode-desc" data-i18n="mode.trans-word.desc">Побачите переклад — оберіть правильне слово з чотирьох</p>
                         </div>
                     </button>
                     <button type="button" data-train-mode="constructor" onclick="startSession('constructor')" class="train-mode-card border-hover-fuchsia">
@@ -4096,7 +4832,7 @@
                                 <div class="train-mode-emoji">🔠🔄</div>
                                 <h4 class="train-mode-title" data-i18n="mode.constructor">Конструктор</h4>
                             </div>
-                            <p class="train-mode-desc" data-i18n="mode.constructor.desc">Збери слово з перемішаних літер</p>
+                            <p class="train-mode-desc" data-i18n="mode.constructor.desc">Зберіть слово з перемішаних літер</p>
                         </div>
                     </button>
                     <button type="button" data-train-mode="typing" onclick="startSession('typing')" class="train-mode-card border-hover-emerald">
@@ -4105,7 +4841,7 @@
                                 <div class="train-mode-emoji">⌨️✍️</div>
                                 <h4 class="train-mode-title" data-i18n="mode.typing">Написання</h4>
                             </div>
-                            <p class="train-mode-desc" data-i18n="mode.typing.desc">Побач переклад і набери слово сам</p>
+                            <p class="train-mode-desc" data-i18n="mode.typing.desc">Побачите переклад і введіть слово самостійно</p>
                         </div>
                     </button>
                     <button type="button" data-train-mode="listening" onclick="startSession('listening')" class="train-mode-card border-hover-sky">
@@ -4114,7 +4850,7 @@
                                 <div class="train-mode-emoji">🎧👂</div>
                                 <h4 class="train-mode-title" data-i18n="mode.listening">Аудіювання</h4>
                             </div>
-                            <p class="train-mode-desc" data-i18n="mode.listening.desc">Слухай і набери слово</p>
+                            <p class="train-mode-desc" data-i18n="mode.listening.desc">Слухайте і введіть слово</p>
                         </div>
                     </button>
                     <button type="button" data-train-mode="context" onclick="startSession('context')" class="train-mode-card border-hover-amber">
@@ -4123,7 +4859,7 @@
                                 <div class="train-mode-emoji">🧩📄</div>
                                 <h4 class="train-mode-title" data-i18n="mode.context">Контекст</h4>
                             </div>
-                            <p class="train-mode-desc" data-i18n="mode.context.desc">Встав слово в короткий уривок тексту на час</p>
+                            <p class="train-mode-desc" data-i18n="mode.context.desc">Вставте слово в короткий уривок тексту на час</p>
                         </div>
                     </button>
                     <button type="button" id="train-card-definition" data-train-mode="definition" onclick="startSession('definition')" class="train-mode-card border-hover-violet">
@@ -4132,7 +4868,7 @@
                                 <div class="train-mode-emoji">📘🎯</div>
                                 <h4 class="train-mode-title" data-i18n="mode.definition">Визначення</h4>
                             </div>
-                            <p class="train-mode-desc" data-i18n="mode.definition.desc">Прочитай визначення і набери слово</p>
+                            <p class="train-mode-desc" data-i18n="mode.definition.desc">Прочитайте визначення Merriam-Webster і введіть слово</p>
                         </div>
                     </button>
                     <button type="button" data-train-mode="crossword" onclick="startSession('crossword')" class="train-mode-card border-hover-indigo">
@@ -4141,7 +4877,7 @@
                                 <div class="train-mode-emoji">🧩✍️</div>
                                 <h4 class="train-mode-title" data-i18n="mode.crossword">Кросворд</h4>
                             </div>
-                            <p class="train-mode-desc" data-i18n="mode.crossword.desc">Заповни клітинки словами зі словника</p>
+                            <p class="train-mode-desc" data-i18n="mode.crossword.desc">Заповніть клітинки словами зі словника</p>
                         </div>
                     </button>
                     <button type="button" data-train-mode="sprint" onclick="startSession('sprint')" class="train-mode-card border-hover-amber">
@@ -4150,7 +4886,7 @@
                                 <div class="train-mode-emoji">⚡🏃‍♂️</div>
                                 <h4 class="train-mode-title" data-i18n="mode.sprint">Спринт</h4>
                             </div>
-                            <p class="train-mode-desc" data-i18n="mode.sprint.desc">Швидко вирішуй, чи підходить переклад до слова</p>
+                            <p class="train-mode-desc" data-i18n="mode.sprint.desc">Швидко вирішуйте, чи підходить переклад до слова</p>
                         </div>
                     </button>
                     <button type="button" data-train-mode="picture" onclick="startSession('picture')" class="train-mode-card border-hover-cyan">
@@ -4159,7 +4895,7 @@
                                 <div class="train-mode-emoji">🖼️🤔</div>
                                 <h4 class="train-mode-title" data-i18n="mode.picture">По фото</h4>
                             </div>
-                            <p class="train-mode-desc" data-i18n="mode.picture.desc">Вгадай слово за зображенням</p>
+                            <p class="train-mode-desc" data-i18n="mode.picture.desc">Вгадайте слово за зображенням</p>
                         </div>
                     </button>
                 </div>
@@ -4573,14 +5309,25 @@
                 'dict.select': 'Вибрати слова', 'dict.selectDone': 'Вийти з режиму вибору (Esc)',
                 'dict.allWords': 'Усі слова', 'folder.import': 'Імпорт', 'filter.all': 'Усі слова',
                 'filter.import': 'Імпорт', 'filter.materials': 'Матеріали',
-                'train.title': 'Тренування', 'train.settings': 'Налаштування Brainstorm', 'train.bsCount': 'Слів у Brainstorm:', 'train.source': 'Джерело слів:',
+                'train.title': 'Тренування', 'train.settings': 'Налаштування Brainstorm', 'train.bsCount': 'Слів за сесію Brainstorm:', 'train.source': 'Джерело слів:',
                 'train.bsOrder': 'Порядок Brainstorm:',
                 'train.bsOrderNew': 'Нові',
                 'train.bsOrderNewHint': 'Спочатку свіжі слова',
                 'train.bsOrderMixed': 'Змішано',
-                'train.bsOrderMixedHint': 'Нові, потім старіші — по черзі',
+                'train.bsOrderMixedHint': 'Нові, потім старіші (чергування)',
                 'train.bsOrderReviews': 'Повторення',
                 'train.bsOrderReviewsHint': 'Спочатку вищі рівні',
+                'train.bsPrioritizeFull': 'Віддавати перевагу наборам із {n} слів',
+                'train.bsPrioritizeFullInfo': 'Увімкнено: обирає набір, де вже є {n} слів, якщо такий готовий. Вимкнено: може почати з меншою кількістю.',
+                'train.pickWords': 'Обрати слова…',
+                'train.pickWordsTitle': 'Слова для тренування',
+                'train.pickWordsHint': 'Оберіть, які слова потрапляють у Brainstorm та інші тренування. За замовчуванням усі позначені.',
+                'train.pickWordsSummary': '{selected} / {total}',
+                'train.pickWordsSelectAll': 'Вибрати всі',
+                'train.pickWordsClearAll': 'Зняти всі',
+                'train.pickWordsDone': 'Готово',
+                'train.pickWordsTotal': 'Усього обрано: {selected} з {total}',
+                'train.pickWordsEmpty': 'У цій папці немає слів',
                 'train.bsStage': 'Етап {n}',
                 'train.ctorStrictTip': 'З 4-го етапу помилка в літері означає, що слово не перейде далі — навіть якщо ви потім виправите.',
                 'train.sprintRulesTitle': 'Фінальний спринт',
@@ -4602,16 +5349,16 @@
                 'mode.constructor': 'Конструктор', 'mode.typing': 'Написання', 'mode.listening': 'Аудіювання',
                 'mode.context': 'Контекст', 'mode.definition': 'Визначення', 'mode.crossword': 'Кросворд', 'mode.sprint': 'Спринт',
                 'mode.picture': 'По фото', 'mode.brainstorm': 'Brainstorm', 'mode.all': 'Brainstorm',
-                'mode.word-trans.desc': 'Обери переклад слова з чотирьох варіантів',
-                'mode.trans-word.desc': 'Побач переклад — обери правильне слово з чотирьох',
-                'mode.constructor.desc': 'Збери слово з перемішаних літер',
-                'mode.typing.desc': 'Побач переклад і набери слово сам',
-                'mode.listening.desc': 'Слухай і набери слово',
-                'mode.context.desc': 'Встав слово в короткий уривок тексту на час',
-                'mode.definition.desc': 'Прочитай визначення Merriam-Webster і набери слово',
-                'mode.crossword.desc': 'Заповни клітинки словами зі словника',
-                'mode.sprint.desc': 'Швидко вирішуй, чи підходить переклад до слова',
-                'mode.picture.desc': 'Вгадай слово за зображенням',
+                'mode.word-trans.desc': 'Оберіть переклад слова з чотирьох варіантів',
+                'mode.trans-word.desc': 'Побачите переклад — оберіть правильне слово з чотирьох',
+                'mode.constructor.desc': 'Зберіть слово з перемішаних літер',
+                'mode.typing.desc': 'Побачите переклад і введіть слово самостійно',
+                'mode.listening.desc': 'Слухайте і введіть слово',
+                'mode.context.desc': 'Вставте слово в короткий уривок тексту на час',
+                'mode.definition.desc': 'Прочитайте визначення Merriam-Webster і введіть слово',
+                'mode.crossword.desc': 'Заповніть клітинки словами зі словника',
+                'mode.sprint.desc': 'Швидко вирішуйте, чи підходить переклад до слова',
+                'mode.picture.desc': 'Вгадайте слово за зображенням',
                 'stage.0': 'Ознайомлення', 'stage.1': 'Слово → Переклад', 'stage.2': 'Конструктор',
                 'stage.3': 'Написання', 'stage.4': 'Переклад → Слово', 'stage.5': 'Аудіювання',
                 'stage.6': 'Контекст', 'stage.7': 'Кросворд', 'stage.8': 'Спринт', 'stage.9': 'По фото',
@@ -4667,12 +5414,18 @@
                 'bulk.translateAll': 'Перекласти всі',
                 'bulk.translating': 'Перекладаємо {n}…',
                 'bulk.translateDone': 'Переклад готовий ({n}).',
-                'bulk.processing': 'Обробка та переклад...', 'bulk.process': 'Обробити список', 'bulk.save': 'Зберегти вибрані',
+                'bulk.processing': 'Обробка та переклад...', 'bulk.processingProgress': 'Обробка {n} / {total}…', 'bulk.process': 'Обробити список', 'bulk.save': 'Зберегти вибрані',
                 'bulk.saving': 'Зберігаємо...',
+                'bulk.savingProgress': 'Зберігаємо {n} / {total}…',
                 'lib.add': 'Додати новий матеріал', 'lib.addLead': 'Додайте текст, статтю або відео — і читайте з підсвіткою слів зі словника.', 'common.back': 'Назад', 'common.next': 'Вперед',
                 'page': 'Сторінка {n} з {total}',
                 'lib.tabText': 'Текст', 'lib.tabUrl': 'Стаття (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Назва матеріалу', 'lib.textPh': 'Оригінальний текст (або скрипт відео)...',
+                'lib.chatGptPhotoBtn': 'Витягнути текст із фото',
+                'lib.chatGptPhotoToast': 'Інструкцію скопійовано. Вставте її в ChatGPT і додайте фото.',
+                'lib.chatGptPhotoToastNoClip': 'Відкриваємо ChatGPT. Скопіюйте інструкцію з підказки вручну.',
+                'lib.chatGptPhotoPrompt': 'Витягни з доданих зображень лише текст мовою навчання. Якщо зображень кілька — об’єднай їх у порядку читання в один суцільний текст. Прибери номери сторінок і все, що не є основним текстом. Якщо є чіткий заголовок — почни з: [LS_TITLE]Заголовок[/LS_TITLE]. Поверни лише готовий текст для копіювання — без коментарів.',
+                'lib.chatGptPhotoTip': '<p class="mat-gpt-photo-tip-head"><strong>Витягнути текст із фото</strong><span class="mat-gpt-photo-tip-meta">(зовнішній сервіс ChatGPT; може знадобитися обліковий запис)</span></p><ol><li>Натисніть кнопку — відкриється ChatGPT, інструкція скопіюється.</li><li>Вставте інструкцію в чат.</li><li>Додайте фото з текстом і надішліть повідомлення.</li><li>Скопіюйте результат і вставте сюди.</li></ol>',
                 'lib.searchArticles': 'Пошук статей', 'lib.find': 'Знайти',
                 'lib.importUrl': 'Посилання на статтю', 'lib.sourceUrl': '🌐 URL', 'lib.urlPh': 'https://example.com/article',
                 'lib.orExtract': 'Або витягнути текст із посилання', 'lib.extract': 'Витягнути текст',
@@ -4696,6 +5449,11 @@
                 'reader.audioResume': 'Далі',
                 'reader.audioShow': 'Текст',
                 'reader.audioHide': 'Сховати',
+                'reader.display': 'Вигляд тексту',
+                'reader.paraIndent': 'Відступ першого рядка',
+                'reader.themeNormal': 'Звичайний вигляд',
+                'reader.themeWarm': 'Теплий режим для очей',
+                'reader.themeDark': 'Нічний режим',
                 'reader.quickMatch': 'Швидке співставлення',
                 'reader.quickMatchTitle': 'Швидке співставлення',
                 'reader.quickMatchSkip': 'Пропустити',
@@ -4703,7 +5461,7 @@
                 'reader.quickMatchTrans': 'Переклади',
                 'reader.quickMatchNice': 'Чудово!',
                 'reader.quickMatchInfoTitle': 'Що це?',
-                'reader.quickMatchInfo': 'Легка підготовка під час читання: кілька разів з’єднай слово з перекладом, щоб вони не змішалися — перед тренуванням.',
+                'reader.quickMatchInfo': 'Під час читання з’єднайте слова з перекладами, щоб краще розрізняти їх перед тренуванням.',
                 'reader.trainFromMat': 'Тренувати слова з цього тексту',
                 'reader.trainFromMatSkip': 'Пропустити',
                 'reader.trainFromMatHint': '{total} слів · у цій сесії до {batch}',
@@ -4989,14 +5747,25 @@
                 'dict.select': 'Select words', 'dict.selectDone': 'Exit selection (Esc)',
                 'dict.allWords': 'All words', 'folder.import': 'Import', 'filter.all': 'All words',
                 'filter.import': 'Import', 'filter.materials': 'Materials',
-                'train.title': 'Training', 'train.settings': 'Brainstorm settings', 'train.bsCount': 'Words in Brainstorm:', 'train.source': 'Word source:',
+                'train.title': 'Training', 'train.settings': 'Brainstorm settings', 'train.bsCount': 'Words per Brainstorm session:', 'train.source': 'Word source:',
                 'train.bsOrder': 'Brainstorm order:',
                 'train.bsOrderNew': 'New',
                 'train.bsOrderNewHint': 'Fresh words first',
                 'train.bsOrderMixed': 'Mixed',
-                'train.bsOrderMixedHint': 'New batch, then older — alternating',
+                'train.bsOrderMixedHint': 'New, then older (alternating)',
                 'train.bsOrderReviews': 'Reviews',
                 'train.bsOrderReviewsHint': 'Higher levels first',
+                'train.bsPrioritizeFull': 'Prefer groups of {n} words',
+                'train.bsPrioritizeFullInfo': 'On: picks a group that already has {n} words, if one is ready. Off: may start with fewer.',
+                'train.pickWords': 'Choose words…',
+                'train.pickWordsTitle': 'Words for training',
+                'train.pickWordsHint': 'Pick which words go into Brainstorm and other trainings. All are selected by default.',
+                'train.pickWordsSummary': '{selected} / {total}',
+                'train.pickWordsSelectAll': 'Select all',
+                'train.pickWordsClearAll': 'Clear all',
+                'train.pickWordsDone': 'Done',
+                'train.pickWordsTotal': 'Selected: {selected} of {total}',
+                'train.pickWordsEmpty': 'No words in this folder',
                 'train.bsStage': 'Stage {n}',
                 'train.ctorStrictTip': 'From stage 4 onward, a wrong letter means this word will not advance — even if you fix it afterward.',
                 'train.sprintRulesTitle': 'Final sprint',
@@ -5083,12 +5852,18 @@
                 'bulk.translateAll': 'Translate all',
                 'bulk.translating': 'Translating {n}…',
                 'bulk.translateDone': 'Translations ready ({n}).',
-                'bulk.processing': 'Processing and translating...', 'bulk.process': 'Process list', 'bulk.save': 'Save selected',
+                'bulk.processing': 'Processing and translating...', 'bulk.processingProgress': 'Processing {n} / {total}…', 'bulk.process': 'Process list', 'bulk.save': 'Save selected',
                 'bulk.saving': 'Saving...',
+                'bulk.savingProgress': 'Saving {n} / {total}…',
                 'lib.add': 'Add new material', 'lib.addLead': 'Add text, an article, or a video — then read with your dictionary words highlighted.', 'common.back': 'Back', 'common.next': 'Next',
                 'page': 'Page {n} of {total}',
                 'lib.tabText': 'Text', 'lib.tabUrl': 'Article (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Material title', 'lib.textPh': 'Original text (or video script)...',
+                'lib.chatGptPhotoBtn': 'Extract text from photo',
+                'lib.chatGptPhotoToast': 'Instructions copied. Paste them in ChatGPT and attach your photo.',
+                'lib.chatGptPhotoToastNoClip': 'Opening ChatGPT. Copy the instructions from the tooltip manually.',
+                'lib.chatGptPhotoPrompt': 'Extract from the attached image(s) only the learning-target-language text. If there are multiple images, merge them in reading order into one continuous text. Remove page numbers and anything else that is not the main text. If there is a clear title, begin with: [LS_TITLE]Title[/LS_TITLE]. Return only the final copy-ready text — no comments from you.',
+                'lib.chatGptPhotoTip': '<p class="mat-gpt-photo-tip-head"><strong>Extract text from a photo</strong><span class="mat-gpt-photo-tip-meta">(external ChatGPT service; an account may be required)</span></p><ol><li>Click the button — ChatGPT opens and the instructions are copied.</li><li>Paste the instructions into the chat.</li><li>Attach the photo(s) and send the message.</li><li>Copy the result and paste it here.</li></ol>',
                 'lib.searchArticles': 'Search articles', 'lib.find': 'Find',
                 'lib.importUrl': 'Article link', 'lib.sourceUrl': '🌐 URL', 'lib.urlPh': 'https://example.com/article',
                 'lib.orExtract': 'Or extract text from a link', 'lib.extract': 'Extract text',
@@ -5112,14 +5887,19 @@
                 'reader.audioResume': 'Resume',
                 'reader.audioShow': 'Text',
                 'reader.audioHide': 'Hide',
+                'reader.display': 'Text layout',
                 'reader.quickMatch': 'Quick match',
+                'reader.paraIndent': 'First-line indent',
+                'reader.themeNormal': 'Default appearance',
+                'reader.themeWarm': 'Warm reading mode',
+                'reader.themeDark': 'Night mode',
                 'reader.quickMatchTitle': 'Quick match',
                 'reader.quickMatchSkip': 'Skip',
                 'reader.quickMatchWords': 'Words',
                 'reader.quickMatchTrans': 'Translations',
                 'reader.quickMatchNice': 'Nice!',
                 'reader.quickMatchInfoTitle': 'What is this?',
-                'reader.quickMatchInfo': 'A light prep while you read: match a few words to their translations so they stay separate in your head — before training.',
+                'reader.quickMatchInfo': 'While you read, match words to translations so you can tell them apart before training.',
                 'reader.trainFromMat': 'Train words from this text',
                 'reader.trainFromMatSkip': 'Skip',
                 'reader.trainFromMatHint': '{total} words · up to {batch} in this session',
@@ -5400,14 +6180,25 @@
                 'dict.select': 'Seleccionar palabras', 'dict.selectDone': 'Salir de la selección (Esc)',
                 'dict.allWords': 'Todas las palabras', 'folder.import': 'Importar', 'filter.all': 'Todas las palabras',
                 'filter.import': 'Importar', 'filter.materials': 'Materiales',
-                'train.title': 'Entrenamiento', 'train.settings': 'Ajustes de Brainstorm', 'train.bsCount': 'Palabras en Brainstorm:', 'train.source': 'Fuente:',
+                'train.title': 'Entrenamiento', 'train.settings': 'Ajustes de Brainstorm', 'train.bsCount': 'Palabras por sesión de Brainstorm:', 'train.source': 'Fuente:',
                 'train.bsOrder': 'Orden del Brainstorm:',
                 'train.bsOrderNew': 'Nuevas',
                 'train.bsOrderNewHint': 'Primero las recién añadidas',
                 'train.bsOrderMixed': 'Mixto',
-                'train.bsOrderMixedHint': 'Nuevas y luego anteriores — alternando',
+                'train.bsOrderMixedHint': 'Nuevas, luego anteriores (alternando)',
                 'train.bsOrderReviews': 'Repasos',
                 'train.bsOrderReviewsHint': 'Primero niveles más altos',
+                'train.bsPrioritizeFull': 'Preferir grupos de {n} palabras',
+                'train.bsPrioritizeFullInfo': 'Activado: elige un grupo que ya tenga {n} palabras, si hay. Desactivado: puede empezar con menos.',
+                'train.pickWords': 'Elegir palabras…',
+                'train.pickWordsTitle': 'Palabras para entrenar',
+                'train.pickWordsHint': 'Elige qué palabras entran en Brainstorm y otros entrenamientos. Por defecto, todas están marcadas.',
+                'train.pickWordsSummary': '{selected} / {total}',
+                'train.pickWordsSelectAll': 'Marcar todas',
+                'train.pickWordsClearAll': 'Quitar todas',
+                'train.pickWordsDone': 'Listo',
+                'train.pickWordsTotal': 'Seleccionadas: {selected} de {total}',
+                'train.pickWordsEmpty': 'No hay palabras en esta carpeta',
                 'train.bsStage': 'Etapa {n}',
                 'train.ctorStrictTip': 'Desde la etapa 4, una letra incorrecta hace que la palabra no avance, aunque la corrijas después.',
                 'train.sprintRulesTitle': 'Sprint final',
@@ -5494,12 +6285,18 @@
                 'bulk.translateAll': 'Traducir todas',
                 'bulk.translating': 'Traduciendo {n}…',
                 'bulk.translateDone': 'Traducciones listas ({n}).',
-                'bulk.processing': 'Procesando y traduciendo...', 'bulk.process': 'Procesar lista', 'bulk.save': 'Guardar seleccionadas',
+                'bulk.processing': 'Procesando y traduciendo...', 'bulk.processingProgress': 'Procesando {n} / {total}…', 'bulk.process': 'Procesar lista', 'bulk.save': 'Guardar seleccionadas',
                 'bulk.saving': 'Guardando...',
+                'bulk.savingProgress': 'Guardando {n} / {total}…',
                 'lib.add': 'Añadir material nuevo', 'lib.addLead': 'Añade texto, un artículo o un vídeo — y lee con las palabras del diccionario resaltadas.', 'common.back': 'Atrás', 'common.next': 'Siguiente',
                 'page': 'Página {n} de {total}',
                 'lib.tabText': 'Texto', 'lib.tabUrl': 'Artículo (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Título del material', 'lib.textPh': 'Texto original (o guion del vídeo)...',
+                'lib.chatGptPhotoBtn': 'Extraer texto de foto',
+                'lib.chatGptPhotoToast': 'Instrucciones copiadas. Pégalas en ChatGPT y adjunta la foto.',
+                'lib.chatGptPhotoToastNoClip': 'Abriendo ChatGPT. Copia las instrucciones del tooltip manualmente.',
+                'lib.chatGptPhotoPrompt': 'Extrae de las imágenes adjuntas solo el texto en la lengua que estás aprendiendo. Si hay varias imágenes, únelas en orden de lectura en un texto continuo. Elimina números de página y todo lo que no sea el texto principal. Si hay un título claro, empieza con: [LS_TITLE]Título[/LS_TITLE]. Devuelve solo el texto final listo para copiar — sin comentarios.',
+                'lib.chatGptPhotoTip': '<p class="mat-gpt-photo-tip-head"><strong>Extraer texto de una foto</strong><span class="mat-gpt-photo-tip-meta">(servicio externo ChatGPT; puede hacer falta una cuenta)</span></p><ol><li>Pulsa el botón: se abre ChatGPT y se copian las instrucciones.</li><li>Pega las instrucciones en el chat.</li><li>Adjunta la(s) foto(s) y envía el mensaje.</li><li>Copia el resultado y pégalo aquí.</li></ol>',
                 'lib.searchArticles': 'Buscar artículos', 'lib.find': 'Buscar',
                 'lib.importUrl': 'Enlace del artículo', 'lib.sourceUrl': '🌐 URL', 'lib.urlPh': 'https://example.com/articulo',
                 'lib.orExtract': 'O extraer el texto de un enlace', 'lib.extract': 'Extraer texto',
@@ -5523,14 +6320,19 @@
                 'reader.audioResume': 'Seguir',
                 'reader.audioShow': 'Texto',
                 'reader.audioHide': 'Ocultar',
+                'reader.display': 'Aspecto del texto',
                 'reader.quickMatch': 'Match rápido',
+                'reader.paraIndent': 'Sangría de primera línea',
+                'reader.themeNormal': 'Aspecto normal',
+                'reader.themeWarm': 'Modo cálido para leer',
+                'reader.themeDark': 'Modo nocturno',
                 'reader.quickMatchTitle': 'Match rápido',
                 'reader.quickMatchSkip': 'Omitir',
                 'reader.quickMatchWords': 'Palabras',
                 'reader.quickMatchTrans': 'Traducciones',
                 'reader.quickMatchNice': '¡Genial!',
                 'reader.quickMatchInfoTitle': '¿Qué es?',
-                'reader.quickMatchInfo': 'Una preparación ligera mientras lees: empareja unas palabras con su traducción para que no se mezclen — antes del entrenamiento.',
+                'reader.quickMatchInfo': 'Mientras lees, empareja palabras con traducciones para distinguirlas mejor antes de entrenar.',
                 'reader.trainFromMat': 'Entrenar palabras de este texto',
                 'reader.trainFromMatSkip': 'Omitir',
                 'reader.trainFromMatHint': '{total} palabras · hasta {batch} en esta sesión',
@@ -5757,6 +6559,8 @@
         const DICT_GRID_COLS_KEY = 'linguaspace_dict_grid_cols_v1';
         const READER_HL_COLOR_KEY = 'linguaspace_reader_hl_color_v1';
         const READER_QUICK_MATCH_KEY = 'linguaspace_reader_quick_match_v1';
+        const READER_PARA_INDENT_KEY = 'linguaspace_reader_para_indent_v1';
+        const READER_THEME_KEY = 'linguaspace_reader_theme_v1';
         const READER_QUICK_MATCH_LOG_KEY = 'linguaspace_reader_quick_match_log_v1';
         const READER_QUICK_MATCH_BATCH = 4;
         let settingsActiveTab = 'languages';
@@ -5774,10 +6578,20 @@
         let readerHighlightColor = localStorage.getItem(READER_HL_COLOR_KEY) || 'yellow';
         if (!['yellow', 'mint', 'lavender'].includes(readerHighlightColor)) readerHighlightColor = 'yellow';
 
-        const READER_HL_BG = {
-            yellow: 'rgba(253, 224, 71, 0.62)',
-            mint: 'rgba(94, 234, 212, 0.52)',
-            lavender: 'rgba(196, 181, 253, 0.58)'
+        const READER_HL_FG = {
+            yellow: '#ca8a04',
+            mint: '#0d9488',
+            lavender: '#7c3aed'
+        };
+        const READER_HL_FG_WARM = {
+            yellow: '#b45309',
+            mint: '#0f766e',
+            lavender: '#6d28d9'
+        };
+        const READER_HL_FG_DARK = {
+            yellow: '#fbbf24',
+            mint: '#5eead4',
+            lavender: '#c4b5fd'
         };
         const READER_HL_SWATCH_DOT = {
             yellow: '#fde047',
@@ -6175,6 +6989,7 @@
             const fromDeepLink = !!opts.fromDeepLink;
             activeTrackId = `${learningLanguage}-${translationLanguage}`;
             persistLangLocal();
+            if (typeof loadTrainWordPickForTrack === 'function') loadTrainWordPickForTrack();
             currentDictFilter = 'all';
             activeDictSource = null;
             activeMaterialId = null;
@@ -6327,6 +7142,8 @@
             applyDictGridCols();
             applyReaderHighlightColor();
             syncReaderQuickMatchUi();
+            syncReaderParaIndentUi();
+            syncReaderThemeUi();
         }
 
         function renderReaderHlSwatches() {
@@ -6360,8 +7177,13 @@
             ensureReaderHighlightCss();
         }
 
-        function getReaderHighlightBg() {
-            return READER_HL_BG[readerHighlightColor] || READER_HL_BG.yellow;
+        function getReaderHighlightFg() {
+            const key = readerHighlightColor in READER_HL_FG ? readerHighlightColor : 'yellow';
+            const view = document.getElementById('library-read-view');
+            const readOpen = !!(view && !view.classList.contains('hidden'));
+            if (readOpen && readerTheme === 'dark') return READER_HL_FG_DARK[key];
+            if (readOpen && readerTheme === 'warm') return READER_HL_FG_WARM[key];
+            return READER_HL_FG[key];
         }
 
         function renderTrainModeSettingsList() {
@@ -6450,7 +7272,7 @@
         const ACTIVITY_KEY = 'linguaspace_year_activity_v1'; // legacy flat blob
         const ACTIVITY_STORE_KEY = 'linguaspace_year_activity_by_track_v1';
         const ACTIVITY_LEGACY_MIGRATE_FLAG = 'linguaspace_year_legacy_migrated_enuk_v1';
-        const YEAR_ACTIVITY_TRACK_VERSION = 2; // rebuild polluted pre-split cycles from vocab
+        const YEAR_ACTIVITY_TRACK_VERSION = 3; // v3: activity only on/after track word createdAt
         const YEAR_CYCLE_DAYS = 365;
         const ACTIVITY_SESSION_GAP_MS = 45 * 60 * 1000;
         let yearActivityStore = {}; // trackId → { days, cycleStart, seeded, v }
@@ -6811,35 +7633,92 @@
             };
         }
 
+        function getWordCreatedAtMs(word) {
+            if (!word) return 0;
+            return historyTimestamp(word.createdAt);
+        }
+
+        function getTrackYearStartKey() {
+            let minKey = null;
+            for (const w of vocabulary || []) {
+                const at = getWordCreatedAtMs(w);
+                if (!at) continue;
+                const key = dayKeyFromDate(new Date(at));
+                if (!key) continue;
+                if (!minKey || key < minKey) minKey = key;
+            }
+            return minKey;
+        }
+
+        function isDayOnTrackTimeline(dayKey) {
+            if (!dayKey) return false;
+            const start = getTrackYearStartKey();
+            if (!start) return true;
+            return dayKey >= start;
+        }
+
+        function pruneYearActivityOutsideTrackTimeline() {
+            const start = getTrackYearStartKey();
+            if (!start) return false;
+            let dirty = false;
+            for (const key of Object.keys(yearActivity.days || {})) {
+                if (key < start) {
+                    delete yearActivity.days[key];
+                    dirty = true;
+                }
+            }
+            const activeKeys = Object.keys(yearActivity.days)
+                .filter((k) => dayHasAnyActivity(yearActivity.days[k]))
+                .filter((k) => k >= start)
+                .sort();
+            const newCycleStart = activeKeys.length ? activeKeys[0] : null;
+            if (yearActivity.cycleStart !== newCycleStart) {
+                yearActivity.cycleStart = newCycleStart;
+                dirty = true;
+            }
+            return dirty;
+        }
+
         function inferWordsAddedForDay(dayKey) {
+            if (!isDayOnTrackTimeline(dayKey)) return 0;
             let n = 0;
             for (const w of vocabulary || []) {
-                const addedMs = historyTimestamp(getWordAddedAt(w));
+                const addedMs = getWordCreatedAtMs(w);
                 if (addedMs && dayKeyFromDate(new Date(addedMs)) === dayKey) n++;
             }
             return n;
         }
 
         function inferReadingForDay(dayKey) {
+            if (!isDayOnTrackTimeline(dayKey)) return 0;
+            const trackStart = getTrackYearStartKey();
             let n = 0;
             for (const m of materials || []) {
                 if (!m?.readAt) continue;
                 const at = historyTimestamp(m.readAt);
                 if (!at || dayKeyFromDate(new Date(at)) !== dayKey) continue;
-                if (materialTextCharCount(m) >= YEAR_READING_MIN_CHARS) n++;
+                if (materialTextCharCount(m) < YEAR_READING_MIN_CHARS) continue;
+                const matCreated = historyTimestamp(m.createdAt);
+                if (trackStart && matCreated) {
+                    const matKey = dayKeyFromDate(new Date(matCreated));
+                    if (matKey && matKey < trackStart) continue;
+                }
+                n++;
             }
             return n;
         }
 
         function reconcileYearActivityFromSources() {
             bindYearActivityToTrack();
+            const trackStart = getTrackYearStartKey();
             let dirty = false;
             const wordDays = {};
             for (const w of vocabulary || []) {
-                const addedMs = historyTimestamp(getWordAddedAt(w));
+                const addedMs = getWordCreatedAtMs(w);
                 if (!addedMs) continue;
                 const key = dayKeyFromDate(new Date(addedMs));
                 if (!key) continue;
+                if (trackStart && key < trackStart) continue;
                 wordDays[key] = (wordDays[key] || 0) + 1;
             }
             for (const [key, n] of Object.entries(wordDays)) {
@@ -6857,6 +7736,7 @@
                 if (materialTextCharCount(m) < YEAR_READING_MIN_CHARS) continue;
                 const key = dayKeyFromDate(new Date(at));
                 if (!key) continue;
+                if (trackStart && key < trackStart) continue;
                 readDays[key] = (readDays[key] || 0) + 1;
             }
             for (const [key, n] of Object.entries(readDays)) {
@@ -6866,6 +7746,7 @@
                     dirty = true;
                 }
             }
+            if (pruneYearActivityOutsideTrackTimeline()) dirty = true;
             if (dirty) {
                 persistYearActivityLocal();
                 persistYearActivityCloud();
@@ -6877,6 +7758,15 @@
 
         function getDayDetailStats(dayKey) {
             bindYearActivityToTrack();
+            if (!isDayOnTrackTimeline(dayKey)) {
+                return {
+                    wordsAdded: 0,
+                    brainstorm: { sessions: 0, words: 0 },
+                    review: { sessions: 0, words: 0 },
+                    other: { sessions: 0, words: 0 },
+                    reading: 0
+                };
+            }
             const stored = dayKey ? (yearActivity.days[dayKey] || {}) : {};
             const logged = aggregateSessionLogs(dayKey);
             const wordsAdded = Math.max(stored.wordsAdded || 0, inferWordsAddedForDay(dayKey));
@@ -7100,10 +7990,12 @@
         function inferSessionsFromVocabulary() {
             const events = [];
             for (const w of vocabulary || []) {
+                const wordStart = getWordCreatedAtMs(w);
                 for (const h of (w.bsHistory || [])) {
                     let at = 0;
                     try { at = historyTimestamp(h.at); } catch (_) { at = +h.at || 0; }
                     if (!at) continue;
+                    if (wordStart && at < wordStart - 60000) continue;
                     events.push({ at, mode: h.mode || 'brainstorm' });
                 }
             }
@@ -7136,6 +8028,7 @@
                 yearActivity.v = YEAR_ACTIVITY_TRACK_VERSION;
             }
 
+            const trackStart = getTrackYearStartKey();
             if (!sessions.length) {
                 // Still persist version bump so we don't keep showing a foreign cycle
                 if (JSON.stringify(yearActivity) !== before) {
@@ -7151,6 +8044,7 @@
             for (const s of sessions) {
                 const key = dayKeyFromDate(s.at);
                 if (!key) continue;
+                if (trackStart && key < trackStart) continue;
                 if (!fromHist[key]) fromHist[key] = { heavy: 0, other: 0, brainstorm: 0, review: 0 };
                 const bucket = activityModeBucket(s.mode);
                 if (bucket === 'brainstorm') {
@@ -7178,10 +8072,14 @@
             // Cycle start = earliest day that actually has activity on this track
             const activeKeys = Object.keys(yearActivity.days)
                 .filter((k) => dayHasAnyActivity(yearActivity.days[k]))
+                .filter((k) => !trackStart || k >= trackStart)
                 .sort();
             if (activeKeys.length) {
                 yearActivity.cycleStart = activeKeys[0];
+            } else if (trackStart) {
+                yearActivity.cycleStart = trackStart;
             }
+            pruneYearActivityOutsideTrackTimeline();
             yearActivity.seeded = true;
             yearActivity.v = YEAR_ACTIVITY_TRACK_VERSION;
             ensureYearCycleCurrent();
@@ -7586,16 +8484,12 @@
             };
         }
 
-        function getReviewPool(srcFilter = 'ALL', now = Date.now()) {
-            let pool = vocabulary.filter((w) => isWordDueForMaintenance(w, now));
-            if (srcFilter && srcFilter !== 'ALL') pool = pool.filter((w) => w.source === srcFilter);
-            return pool;
+        function getReviewPool(now = Date.now()) {
+            return getTrainWordPool().filter((w) => isWordDueForMaintenance(w, now));
         }
 
-        function countLearnedWords(srcFilter = 'ALL') {
-            let pool = vocabulary.filter((w) => isSrsMastered(w.srsLevel));
-            if (srcFilter && srcFilter !== 'ALL') pool = pool.filter((w) => w.source === srcFilter);
-            return pool.length;
+        function countLearnedWords() {
+            return getTrainWordPool().filter((w) => isSrsMastered(w.srsLevel)).length;
         }
 
         function pickReviewStageForWord(modes) {
@@ -7636,10 +8530,8 @@
         // Maintenance urgency ramps over 30 days *after* a word becomes due (not instantly red)
         const REVIEW_URGENCY_RAMP_MS = 30 * DAY_MS;
 
-        function getLearnedMaintPool(srcFilter = 'ALL') {
-            let pool = vocabulary.filter((w) => isSrsMastered(w.srsLevel) && !isMaintMastered(w.maintLevel));
-            if (srcFilter && srcFilter !== 'ALL') pool = pool.filter((w) => w.source === srcFilter);
-            return pool;
+        function getLearnedMaintPool() {
+            return getTrainWordPool().filter((w) => isSrsMastered(w.srsLevel) && !isMaintMastered(w.maintLevel));
         }
 
         function getWordMaintUrgency(w, now = Date.now()) {
@@ -7657,8 +8549,8 @@
             return Math.min(1, overdueMs / REVIEW_URGENCY_RAMP_MS);
         }
 
-        function getReviewUrgencyStats(srcFilter = 'ALL', now = Date.now()) {
-            const learned = getLearnedMaintPool(srcFilter);
+        function getReviewUrgencyStats(now = Date.now()) {
+            const learned = getLearnedMaintPool();
             if (!learned.length) {
                 return { urgency: 0, learned: 0, due: 0, caughtUp: true };
             }
@@ -7690,21 +8582,18 @@
         }
 
         function updateReviewDueBadge() {
-            const src = document.getElementById('train-source-select')?.value || 'ALL';
-            applyReviewButtonUrgency(getReviewUrgencyStats(src));
+            applyReviewButtonUrgency(getReviewUrgencyStats());
         }
 
         function syncReviewSetupDueLine() {
             const el = document.getElementById('review-setup-due');
             if (!el) return;
-            const src = document.getElementById('train-source-select')?.value || 'ALL';
-            el.textContent = reviewStatusMessage(getReviewUrgencyStats(src));
+            el.textContent = reviewStatusMessage(getReviewUrgencyStats());
         }
 
         window.openReviewSetup = () => {
-            const srcFilter = document.getElementById('train-source-select')?.value || 'ALL';
-            if (countLearnedWords(srcFilter) === 0) return window.showModal(t('msg.noLearned'));
-            if (getReviewPool(srcFilter).length === 0) return window.showModal(t('msg.noMaintDue'));
+            if (countLearnedWords() === 0) return window.showModal(t('msg.noLearned'));
+            if (getReviewPool().length === 0) return window.showModal(t('msg.noMaintDue'));
             renderReviewModesChips();
             syncReviewSetupDueLine();
             document.getElementById('review-setup-modal')?.classList.remove('hidden');
@@ -8002,6 +8891,22 @@
             appToastTimer = setTimeout(() => { el.classList.remove('is-visible'); }, ms);
         }
 
+        window.openChatGptPhotoExtract = async (e) => {
+            e?.preventDefault?.();
+            e?.stopPropagation?.();
+            e?.currentTarget?.blur?.();
+            const prompt = t('lib.chatGptPhotoPrompt');
+            let copied = false;
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(prompt);
+                    copied = true;
+                }
+            } catch (_) {}
+            showAppToast(copied ? t('lib.chatGptPhotoToast') : t('lib.chatGptPhotoToastNoClip'), copied ? 2600 : 3200);
+            window.open('https://chatgpt.com', '_blank', 'noopener,noreferrer');
+        };
+
         function pushAppUndo(undoFn) {
             appUndoStack.push({ undo: undoFn, at: Date.now() });
             if (appUndoStack.length > APP_UNDO_MAX) appUndoStack.shift();
@@ -8073,6 +8978,11 @@
         let selectedFolderNames = new Set();
         let readerSaveSource = null;
         let readerQuickMatchEnabled = localStorage.getItem(READER_QUICK_MATCH_KEY) === '1';
+        let readerParaIndent = localStorage.getItem(READER_PARA_INDENT_KEY) === '1';
+        let readerTheme = (() => {
+            const v = localStorage.getItem(READER_THEME_KEY) || '';
+            return v === 'warm' || v === 'dark' ? v : '';
+        })();
         let readerSessionNewWords = [];
         let readerQuickMatchPending = [];
         let readerQuickMatchPanelOpen = false;
@@ -11485,6 +12395,7 @@
 
         window.deleteWord = (id, e) => {
             e.stopPropagation();
+            e?.currentTarget?.blur?.();
             window.showModal(t('msg.deleteWord'), true, async () => {
                 const prev = vocabulary.find((v) => v.id === id);
                 const snapshot = firestoreWordFields(prev);
@@ -11942,7 +12853,7 @@
             return `${base}.json`;
         }
 
-        const SRS_LEVEL_INDIGO = ['#c7d2fe', '#a5b4fc', '#818cf8', '#6366f1', '#4f46e5', '#4338ca'];
+        const SRS_LEVEL_INDIGO = ['#a5b4fc', '#9399f6', '#7c86f5', '#6366f1', '#5145e5', '#4338ca'];
 
         function getSrsSvg(level, isSmall = false, showLabel = false, maxLevel = MAX_SRS_LEVEL, opts = {}) {
             const compact = !!(opts && opts.compact);
@@ -12093,6 +13004,7 @@
                         : `<div class="absolute top-2 left-2 z-10 bg-white rounded-full shadow-md p-1 cursor-pointer" data-srs-id="${item.id}" onclick="event.stopPropagation(); showSrsStatus('${item.id}')">
                         ${getSrsSvg(item.srsLevel, true, false)}
                     </div>
+                    <button type="button" onclick="speakDictWord('${item.id}', event)" class="dict-word-speak absolute top-2 left-10 z-10" title="${escapeHtmlText(t('inline.listen'))}" aria-label="${escapeHtmlText(t('inline.listen'))}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06z"/><path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z"/></svg></button>
                     <button type="button" onclick="deleteWord('${item.id}', event)" class="dict-word-delete absolute top-2 right-2 z-10" aria-label="Delete"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l6 6M9 3L3 9"/></svg></button>`}
                 </div>`;
             }).join('');
@@ -12167,10 +13079,14 @@
             }
 
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const loaderLabel = document.getElementById('bulk-loader-label');
+            let lineNum = 0;
             
             for(let line of lines) {
+                lineNum += 1;
+                if (loaderLabel) loaderLabel.textContent = t('bulk.processingProgress', { n: lineNum, total: lines.length });
                 try {
-                    let w = "", t = "", c = "";
+                    let w = "", trans = "", c = "";
                     let sep = '-';
                     if(line.includes('\t')) sep = '\t';
                     else if(line.includes(';')) sep = ';';
@@ -12178,7 +13094,7 @@
                     const parts = line.split(sep).map(p => p.trim()).filter(p => p.length > 0);
 
                     if(parts.length >= 3) {
-                        w = parts[0]; t = parts[1]; c = parts.slice(2).join(sep).replace(/^"|"$/g, '');
+                        w = parts[0]; trans = parts[1]; c = parts.slice(2).join(sep).replace(/^"|"$/g, '');
                     } else if(parts.length === 2) {
                         w = parts[0];
                         let p1 = parts[1];
@@ -12195,18 +13111,18 @@
                         if(isContext) {
                             c = p1.replace(/^["'«]|["'»]$/g, '');
                             const opts = await fetchTranslationOptions(w);
-                            t = (opts && opts.length > 0) ? opts[0].text : "переклад";
+                            trans = (opts && opts.length > 0) ? opts[0].text : "переклад";
                         } else {
-                            t = p1;
+                            trans = p1;
                         }
                     } else {
                         w = parts[0];
                         const opts = await fetchTranslationOptions(w);
-                        t = (opts && opts.length > 0) ? opts[0].text : "переклад";
+                        trans = (opts && opts.length > 0) ? opts[0].text : "переклад";
                     }
 
                     if(w) {
-                        bulkParsedWords.push({word: w, trans: t, context: c, selected: true});
+                        bulkParsedWords.push({word: w, trans: trans, context: c, selected: true});
                         renderBulkPreview();
                         const previewArea = document.getElementById('bulk-preview-area'); previewArea.scrollTop = previewArea.scrollHeight;
                     }
@@ -12297,11 +13213,16 @@
             const toSave = bulkParsedWords.filter(w => w.selected);
             if(!activeUid || toSave.length === 0) return;
             const importSource = bulkImportTargetSource || (bulkImportMode === 'duocards' ? DUOCARDS_SOURCE : bulkImportMode === 'quizlet' ? QUIZLET_SOURCE : bulkImportMode === 'anki' ? ANKI_SOURCE : 'Імпорт');
-            const btn = document.getElementById('btn-bulk-save'); btn.textContent = t('bulk.saving'); btn.disabled = true;
+            const btn = document.getElementById('btn-bulk-save');
+            const prevLabel = btn?.textContent || t('bulk.save');
+            if (btn) { btn.textContent = t('bulk.saving'); btn.disabled = true; }
             try {
                 await ensureFolderExists(importSource);
                 const addedIds = [];
-                for(let item of toSave) {
+                let n = 0;
+                for (const item of toSave) {
+                    n += 1;
+                    if (btn) btn.textContent = t('bulk.savingProgress', { n, total: toSave.length });
                     const imgUrl = await getImageUrl(item.word, item.trans);
                     const payload = {
                         word: item.word, translation: item.trans, context: item.context || "", imageUrl: imgUrl, source: importSource, createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0, bsHistory: []
@@ -12317,7 +13238,7 @@
                 }
                 try { recordWordsAdded(toSave.length); } catch (_) {}
                 closeBulkModal(); window.showModal(t('msg.importDone', { folder: importSource }));
-            } catch(e) {} finally { btn.textContent = t('bulk.save'); btn.disabled = false; }
+            } catch(e) {} finally { if (btn) { btn.textContent = prevLabel; btn.disabled = false; } }
         };
 
         function escapeHtmlText(s) {
@@ -12367,6 +13288,25 @@
             return null;
         }
 
+        /** Spanish typing: accept with/without leading article when the noun matches. */
+        function typingWordAnswersMatch(userVal, expectedWord, lang) {
+            const user = String(userVal || '').trim().toLowerCase();
+            const expected = String(expectedWord || '').trim().toLowerCase();
+            if (!user || !expected || user === expected) return user === expected;
+            if (lang !== 'es') return false;
+
+            const userArt = parseLeadingArticle(user, lang);
+            const expArt = parseLeadingArticle(expected, lang);
+            const userCore = (userArt ? userArt.rest : user).trim().toLowerCase();
+            const expCore = (expArt ? expArt.rest : expected).trim().toLowerCase();
+            if (userCore !== expCore) return false;
+
+            if (expArt && userArt) {
+                return userArt.text.toLowerCase() === expArt.text.toLowerCase();
+            }
+            return true;
+        }
+
         function formatWordWithArticleHtml(wordStr, lang) {
             const info = parseLeadingArticle(wordStr, lang || learningLanguage);
             if (!info) return escapeHtmlText(wordStr);
@@ -12400,6 +13340,34 @@
         function looksLikeMaterialHtml(s) {
             return /<\/?(?:b|strong|i|em|u|mark|h[1-3]|p|div|br|span)\b/i.test(String(s || ''));
         }
+        function isWikiHeadingLine(line) {
+            return /^(=+)\s*.+\s*\1\s*$/.test(String(line || '').trim());
+        }
+        function materialTextHasMarkup(text) {
+            const s = String(text || '');
+            return /^#{1,6}\s/m.test(s) || /\*\*[^*]+\*\*/.test(s) || /__[^\n]+__/.test(s) || /^={1,6}\s*.+\s*={1,6}\s*$/m.test(s);
+        }
+        function maybeFillTitleFromLeadingLine(bodyText, titleEl) {
+            if (!titleEl || titleEl.value.trim()) return;
+            const lines = String(bodyText || '').replace(/\r\n/g, '\n').split('\n');
+            const first = (lines[0] || '').trim();
+            if (!first || first.length > 90 || first.length < 3) return;
+            if (/[.!?…]$/.test(first)) return;
+            if (/\[LS_TITLE\]/i.test(first)) return;
+            if (/^#{1,6}\s/.test(first) || isWikiHeadingLine(first)) return;
+            let i = 1;
+            while (i < lines.length && !lines[i].trim()) i += 1;
+            const next = (lines[i] || '').trim();
+            if (!next || next.length < 40) return;
+            let title = first;
+            if (isWikiHeadingLine(first)) {
+                const wm = /^(=+)\s*(.+?)\s*\1\s*$/.exec(first);
+                if (wm) title = wm[2].trim();
+            } else if (/^#{1,6}\s/.test(first)) {
+                title = first.replace(/^#{1,6}\s+/, '').trim();
+            }
+            if (title) titleEl.value = title;
+        }
         function formatInlineMarkdown(s) {
             let t = escapeHtmlText(s);
             t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
@@ -12418,6 +13386,12 @@
             for (const line of lines) {
                 const trimmed = line.replace(/\s+$/, '');
                 if (!trimmed.trim()) continue;
+                const wm = /^(=+)\s*(.+?)\s*\1\s*$/.exec(trimmed.trim());
+                if (wm) {
+                    const level = Math.min(wm[1].length, 3);
+                    out.push(`<h${level}>${formatInlineMarkdown(wm[2].trim())}</h${level}>`);
+                    continue;
+                }
                 const hm = /^(#{1,6})\s+(.+)$/.exec(trimmed.trim());
                 if (hm) {
                     const level = Math.min(hm[1].length, 3);
@@ -12506,6 +13480,22 @@
             return html;
         }
         const REVIEW_MODE_MARKER_RE = /\[\s*review(?:\s+mode)?\s*\]/gi;
+        const LS_TITLE_PASTE_RE = /^\s*\[LS_TITLE\]([\s\S]*?)\[\/LS_TITLE\]\s*/i;
+        function parseLinguaSpaceTitlePaste(raw) {
+            const text = String(raw || '').replace(/^\uFEFF/, '');
+            const ls = LS_TITLE_PASTE_RE.exec(text);
+            if (!ls) return { title: '', body: text };
+            const title = String(ls[1] || '').replace(/\s+/g, ' ').trim();
+            return { title, body: text.slice(ls[0].length).trimStart() };
+        }
+        function plainPasteToMaterialHtml(text) {
+            const trimmed = String(text || '').trim();
+            if (!trimmed) return '';
+            if (materialTextHasMarkup(trimmed)) return markdownToHtml(trimmed);
+            const paras = trimmed.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+            if (!paras.length) return `<p>${escapeHtmlText(trimmed)}</p>`;
+            return paras.map((p) => `<p>${escapeHtmlText(p).replace(/\n/g, '<br>')}</p>`).join('');
+        }
         function stripReviewModeMarkerText(s) {
             return String(s || '').replace(REVIEW_MODE_MARKER_RE, '').replace(/\s+/g, ' ').trim();
         }
@@ -12768,9 +13758,19 @@
             el.addEventListener('paste', (e) => {
                 const text = e.clipboardData?.getData('text/plain') || '';
                 if (!text) return;
-                if (!/^#{1,6}\s/m.test(text) && !/\*\*[^*]+\*\*/.test(text) && !/__[^\n]+__/.test(text)) return;
+                const parsed = parseLinguaSpaceTitlePaste(text);
+                const bodyText = parsed.title ? parsed.body : text;
+                const shouldSmartPaste = parsed.title || materialTextHasMarkup(bodyText) || /\n\s*\n/.test(bodyText);
+                if (!shouldSmartPaste) return;
                 e.preventDefault();
-                document.execCommand('insertHTML', false, markdownToHtml(text));
+                const titleEl = id === 'material-content'
+                    ? document.getElementById('material-title')
+                    : id === 'edit-mat-content'
+                    ? document.getElementById('edit-mat-title')
+                    : null;
+                if (parsed.title && titleEl) titleEl.value = parsed.title;
+                else maybeFillTitleFromLeadingLine(bodyText, titleEl);
+                document.execCommand('insertHTML', false, plainPasteToMaterialHtml(bodyText));
             });
         }
         bindMaterialEditorPaste('material-content');
@@ -14048,6 +15048,11 @@
             panel.classList.toggle('hidden');
             if (!willOpen) hideReaderQuickMatchTip();
             if (willOpen && e?.currentTarget) positionReaderSettingsPanel(e.currentTarget);
+            syncReaderFloatDockLook();
+            releaseReaderFloatToolsFocus();
+            if (e?.currentTarget && typeof e.currentTarget.blur === 'function') {
+                setTimeout(() => { try { e.currentTarget.blur(); } catch (_) {} }, 0);
+            }
         };
 
         let readerHighlightMode = false;
@@ -14071,7 +15076,84 @@
             readerQuickMatchEnabled = !!on;
             try { localStorage.setItem(READER_QUICK_MATCH_KEY, readerQuickMatchEnabled ? '1' : '0'); } catch (_) {}
             syncReaderQuickMatchUi();
+            syncReaderParaIndentUi();
         };
+
+        window.setReaderParaIndent = (on) => {
+            readerParaIndent = !!on;
+            try { localStorage.setItem(READER_PARA_INDENT_KEY, readerParaIndent ? '1' : '0'); } catch (_) {}
+            syncReaderParaIndentUi();
+        };
+
+        const READER_THEME_CYCLE = ['', 'warm', 'dark'];
+        const READER_THEME_ICON = { '': '📖', warm: '💡', dark: '🌙' };
+        const READER_THEME_I18N = { '': 'reader.themeNormal', warm: 'reader.themeWarm', dark: 'reader.themeDark' };
+
+        window.setReaderTheme = (theme) => {
+            readerTheme = theme === 'warm' || theme === 'dark' ? theme : '';
+            try { localStorage.setItem(READER_THEME_KEY, readerTheme); } catch (_) {}
+            syncReaderThemeUi();
+        };
+
+        window.cycleReaderTheme = () => {
+            const idx = READER_THEME_CYCLE.indexOf(readerTheme);
+            const next = READER_THEME_CYCLE[(idx + 1) % READER_THEME_CYCLE.length];
+            setReaderTheme(next);
+        };
+
+        function applyReaderThemeClasses(el, theme) {
+            if (!el) return;
+            el.classList.remove('reader-theme-warm', 'reader-theme-dark');
+            if (theme === 'warm') el.classList.add('reader-theme-warm');
+            else if (theme === 'dark') el.classList.add('reader-theme-dark');
+        }
+
+        function getActiveReaderTheme() {
+            const view = document.getElementById('library-read-view');
+            const readOpen = !!(view && !view.classList.contains('hidden'));
+            return readOpen ? readerTheme : '';
+        }
+
+        function syncInlinePopupTheme() {
+            applyReaderThemeClasses(document.getElementById('inline-popup'), getActiveReaderTheme());
+        }
+
+        function syncReaderThemeUi() {
+            const btn = document.getElementById('reader-comfort-btn');
+            const view = document.getElementById('library-read-view');
+            const lib = document.getElementById('view-library');
+            const readOpen = !!(view && !view.classList.contains('hidden'));
+            const activeTheme = readOpen ? readerTheme : '';
+
+            applyReaderThemeClasses(view, activeTheme);
+            applyReaderThemeClasses(lib, activeTheme);
+            applyReaderThemeClasses(document.documentElement, activeTheme);
+            syncInlinePopupTheme();
+
+            if (btn) {
+                btn.textContent = READER_THEME_ICON[readerTheme] || '📖';
+                const active = readerTheme !== '';
+                btn.classList.toggle('is-active', active);
+                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+                const label = t(READER_THEME_I18N[readerTheme] || 'reader.themeNormal');
+                btn.setAttribute('title', label);
+                btn.setAttribute('aria-label', label);
+            }
+            ensureReaderHighlightCss();
+        }
+
+        window.toggleReaderParaIndent = () => setReaderParaIndent(!readerParaIndent);
+
+        function syncReaderParaIndentUi() {
+            const btn = document.getElementById('reader-para-indent-btn');
+            if (btn) {
+                btn.classList.toggle('is-active', readerParaIndent);
+                btn.setAttribute('aria-pressed', readerParaIndent ? 'true' : 'false');
+                btn.setAttribute('title', t('reader.paraIndent'));
+                btn.setAttribute('aria-label', t('reader.paraIndent'));
+            }
+            document.getElementById('library-read-view')?.classList.toggle('reader-para-indent', readerParaIndent);
+        }
 
         window.toggleReaderQuickMatchTip = (event) => {
             if (event) {
@@ -14401,7 +15483,9 @@
             if (!materialTrackState) return;
             const reqCount = getBsWordCountSetting();
             const remainingIds = getMaterialTrackRemainingIds();
-            const batchIds = remainingIds.slice(0, reqCount);
+            const batchIds = remainingIds
+                .filter((id) => !trainWordPickIncluded || trainWordPickIncluded.has(id))
+                .slice(0, reqCount);
             const batch = batchIds.map((id) => resolveMaterialTrackWord(id)).filter(Boolean);
             if (!batch.length) {
                 materialTrackState = null;
@@ -14451,6 +15535,26 @@
             panel.style.top = `${Math.round(top)}px`;
         }
 
+        function releaseReaderFloatToolsFocus() {
+            const float = document.getElementById('reader-float-tools');
+            float?.querySelectorAll('.reader-tool-btn').forEach((btn) => {
+                try { btn.blur(); } catch (_) {}
+            });
+            const active = document.activeElement;
+            if (active && float?.contains(active) && typeof active.blur === 'function') {
+                try { active.blur(); } catch (_) {}
+            }
+        }
+
+        function syncReaderFloatDockLook() {
+            const float = document.getElementById('reader-float-tools');
+            if (!float) return;
+            const settingsOpen = !document.getElementById('reader-settings-panel')?.classList.contains('hidden');
+            const toolActive = !!float.querySelector('.reader-tool-btn.is-active');
+            const resting = !settingsOpen && !toolActive;
+            float.classList.toggle('is-resting', resting);
+        }
+
         function syncReaderHighlightUi() {
             ['btn-reader-highlight-top', 'btn-reader-highlight-float'].forEach((id) => {
                 const btn = document.getElementById(id);
@@ -14460,6 +15564,8 @@
                 btn.title = readerHighlightMode ? t('reader.highlightOn') : t('reader.highlight');
             });
             document.getElementById('library-read-view')?.classList.toggle('reader-hl-mode', readerHighlightMode);
+            syncReaderFloatDockLook();
+            if (!readerHighlightMode) releaseReaderFloatToolsFocus();
         }
 
         function bindReaderToolsDock() {
@@ -14474,6 +15580,7 @@
                 const floated = !entry.isIntersecting;
                 float.classList.toggle('is-docked', floated);
                 document.getElementById('library-read-view')?.classList.toggle('reader-tools-floated', floated);
+                syncReaderFloatDockLook();
             }, { threshold: 0, root: null, rootMargin: '-8px 0px 0px 0px' });
             readerToolsDockObserver.observe(bar);
         }
@@ -14493,6 +15600,10 @@
             try { localStorage.setItem(READER_HL_MODE_KEY, readerHighlightMode ? '1' : '0'); } catch (_) {}
             syncReaderHighlightUi();
             if (readerHighlightMode) closeInlinePopup();
+            else releaseReaderFloatToolsFocus();
+            if (e?.currentTarget && typeof e.currentTarget.blur === 'function') {
+                setTimeout(() => { try { e.currentTarget.blur(); } catch (_) {} }, 0);
+            }
         };
 
         function readerHighlightsPageKey(pageNum) {
@@ -14583,14 +15694,14 @@
         }
 
         function ensureReaderHighlightCss() {
-            const bg = getReaderHighlightBg();
+            const fg = getReaderHighlightFg();
             let style = document.getElementById('reader-hl-style');
             if (!style) {
                 style = document.createElement('style');
                 style.id = 'reader-hl-style';
                 document.head.appendChild(style);
             }
-            style.textContent = `::highlight(reader-hl){background-color:${bg};color:inherit}`;
+            style.textContent = `::highlight(reader-hl){background-color:transparent;color:${fg}}`;
         }
 
         function clearReaderHighlightPaint() {
@@ -14836,6 +15947,7 @@
             readerReviewPeeked = new Set();
             resetReaderSessionWords();
             syncReaderQuickMatchUi();
+            syncReaderParaIndentUi();
             readerAudioStore = {};
             readerAudioSeq = 0;
             stopReaderAudioPlayback();
@@ -14843,6 +15955,7 @@
             document.getElementById('library-add-view').classList.add('hidden');
             document.getElementById('library-read-view').classList.remove('hidden');
             document.getElementById('main-tabs-nav').classList.add('hidden');
+            syncReaderThemeUi();
             const titleEl = document.getElementById('reader-title');
             if (titleEl) {
                 const displayTitle = materialDisplayTitle(m);
@@ -14917,6 +16030,7 @@
             document.getElementById('library-read-view').classList.add('hidden');
             document.getElementById('library-list-view').classList.remove('hidden');
             document.getElementById('main-tabs-nav').classList.remove('hidden');
+            syncReaderThemeUi();
             document.getElementById('reader-settings-panel').classList.add('hidden');
             unbindReaderToolsDock();
             clearReaderHighlightPaint();
@@ -16039,6 +17153,7 @@
                 height: anchorRect.height
             };
             inlinePopup.classList.remove('hidden');
+            syncInlinePopupTheme();
             inlinePopup.style.position = 'fixed';
             inlinePopup.style.visibility = 'hidden';
 
@@ -16247,6 +17362,7 @@
             clearTimeout(selectionFetchTimeout);
             setInlinePopupSelectionAdjusting(false);
             inlinePopup.classList.add('hidden');
+            applyReaderThemeClasses(inlinePopup, '');
             pendingInlineSaveData = null;
             lastSelectedText = "";
             lastInlineAnchorRect = null;
@@ -19823,6 +20939,7 @@
         async function processInlineTranslationRequest(queryStr, fullText, opts = {}) {
             const query = queryStr.toLowerCase().trim();
             inlinePopup.classList.remove('hidden');
+            syncInlinePopupTheme();
             document.getElementById('inline-popup-word').textContent = queryStr;
             document.getElementById('inline-popup-trans-input').value = '';
             document.getElementById('inline-trans-dropdown').classList.add('hidden');
@@ -20346,6 +21463,8 @@
         };
         const BS_ORDER_KEY = 'linguaspace_bs_order_v1';
         const BS_MIX_LAST_KEY = 'linguaspace_bs_mix_last_v1';
+        const BS_PRIORITIZE_FULL_KEY = 'linguaspace_bs_prioritize_full_v1';
+        const BS_SHORT_NEW_KEY = 'linguaspace_bs_short_new_v1'; // legacy
         const BS_DAY_LEVELS_KEY = 'linguaspace_bs_day_levels_v1';
         const STAGE_NAMES = { 
             0: "Ознайомлення", 
@@ -20383,7 +21502,18 @@
             } catch (_) {}
             return 'mixed';
         }
+        function loadBsPrioritizeFullSets() {
+            try {
+                const v = localStorage.getItem(BS_PRIORITIZE_FULL_KEY);
+                if (v === '1' || v === '0') return v === '1';
+                const legacy = localStorage.getItem(BS_SHORT_NEW_KEY);
+                if (legacy === '1') return false;
+                if (legacy === '0') return true;
+            } catch (_) {}
+            return true;
+        }
         let brainstormOrderPref = loadBrainstormOrder();
+        let bsPrioritizeFullSets = loadBsPrioritizeFullSets();
 
         function getBrainstormOrder() {
             const p = brainstormOrderPref;
@@ -20394,6 +21524,12 @@
         window.setBrainstormOrder = (pref) => {
             brainstormOrderPref = (pref === 'reviews' || pref === 'new' || pref === 'mixed') ? pref : 'mixed';
             try { localStorage.setItem(BS_ORDER_KEY, brainstormOrderPref); } catch (_) {}
+            syncBrainstormOrderUI();
+        };
+
+        window.setBsPrioritizeFullSets = (on) => {
+            bsPrioritizeFullSets = !!on;
+            try { localStorage.setItem(BS_PRIORITIZE_FULL_KEY, bsPrioritizeFullSets ? '1' : '0'); } catch (_) {}
             syncBrainstormOrderUI();
         };
 
@@ -20416,10 +21552,62 @@
             document.getElementById('bs-order-new')?.classList.toggle('is-on', pref === 'new');
             document.getElementById('bs-order-mixed')?.classList.toggle('is-on', pref === 'mixed');
             document.getElementById('bs-order-reviews')?.classList.toggle('is-on', pref === 'reviews');
+            const shortNew = document.getElementById('bs-prioritize-full-sets');
+            if (shortNew) shortNew.checked = !!bsPrioritizeFullSets;
+            syncBsCountLinkedUI();
         }
+
+        window.syncBsCountLinkedUI = () => {
+            const n = parseInt(document.getElementById('bs-word-count')?.value || '6', 10) || 6;
+            const label = document.getElementById('bs-prioritize-full-label');
+            if (label) label.textContent = t('train.bsPrioritizeFull', { n });
+            const tip = document.getElementById('bs-full-sets-tip');
+            const btn = document.getElementById('btn-bs-full-sets-info');
+            if (tip && btn && btn.getAttribute('aria-expanded') === 'true') {
+                tip.textContent = t('train.bsPrioritizeFullInfo', { n });
+            }
+        };
+
+        window.toggleBsFullSetsTip = (event) => {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            const tip = document.getElementById('bs-full-sets-tip');
+            const btn = document.getElementById('btn-bs-full-sets-info');
+            if (!tip || !btn) return;
+            const willShow = tip.classList.contains('hidden');
+            tip.classList.toggle('hidden', !willShow);
+            btn.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+            if (willShow) {
+                const n = parseInt(document.getElementById('bs-word-count')?.value || '6', 10) || 6;
+                tip.textContent = t('train.bsPrioritizeFullInfo', { n });
+            }
+        };
+
+        window.showBsFullSetsTip = () => {
+            const tip = document.getElementById('bs-full-sets-tip');
+            const btn = document.getElementById('btn-bs-full-sets-info');
+            if (!tip || !btn) return;
+            const n = parseInt(document.getElementById('bs-word-count')?.value || '6', 10) || 6;
+            tip.textContent = t('train.bsPrioritizeFullInfo', { n });
+            tip.classList.remove('hidden');
+            btn.setAttribute('aria-expanded', 'true');
+        };
+
+        window.hideBsFullSetsTip = () => {
+            const tip = document.getElementById('bs-full-sets-tip');
+            const btn = document.getElementById('btn-bs-full-sets-info');
+            if (!tip || !btn) return;
+            tip.classList.add('hidden');
+            btn.setAttribute('aria-expanded', 'false');
+        };
         try { syncBrainstormOrderUI(); } catch (_) {}
 
         window.closeTrainSettings = () => {
+            const pickModal = document.getElementById('train-word-pick-modal');
+            if (pickModal && !pickModal.classList.contains('hidden')) return;
+            hideBsFullSetsTip();
             const panel = document.getElementById('train-settings');
             const btn = document.getElementById('btn-train-settings');
             if (panel) {
@@ -20448,12 +21636,21 @@
             }
         };
         document.addEventListener('click', (e) => {
+            const pickModal = document.getElementById('train-word-pick-modal');
+            if (pickModal && !pickModal.classList.contains('hidden')) return;
             const wrap = document.getElementById('bs-hero-wrap');
             if (!wrap || wrap.contains(e.target)) return;
             closeTrainSettings();
         });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeTrainSettings();
+            if (e.key === 'Escape') {
+                const pickModal = document.getElementById('train-word-pick-modal');
+                if (pickModal && !pickModal.classList.contains('hidden')) {
+                    closeTrainWordPickModal();
+                    return;
+                }
+                closeTrainSettings();
+            }
         });
 
         function bsTodayKey() {
@@ -20503,12 +21700,13 @@
             const need = Math.max(1, reqCount || 6);
             const count = (L) => (byLevel.get(L) || []).length;
             const order = getBrainstormOrder();
-            const fillableLevels = levels.filter((L) => count(L) >= need);
+            const minPick = bsPrioritizeFullSets ? need : 1;
+            const fillableLevels = levels.filter((L) => count(L) >= minPick);
             const emergency = levels.filter((L) => byLevel.get(L).some((w) => isWordHeavilyOverdue(w, now)));
 
             function pickLowestFrom(cands) {
                 if (!cands.length) return null;
-                const fillable = cands.filter((L) => count(L) >= need);
+                const fillable = cands.filter((L) => count(L) >= minPick);
                 const pool = fillable.length ? fillable : cands;
                 if (!fillable.length) {
                     const bestCount = Math.max(...pool.map(count));
@@ -20521,7 +21719,7 @@
 
             function pickHighestFrom(cands) {
                 if (!cands.length) return null;
-                const fillable = cands.filter((L) => count(L) >= need);
+                const fillable = cands.filter((L) => count(L) >= minPick);
                 const pool = fillable.length ? fillable : cands;
                 if (!fillable.length) {
                     const bestCount = Math.max(...pool.map(count));
@@ -20538,7 +21736,7 @@
 
             function pickWithEmergency(cands, picker) {
                 if (!cands.length) return null;
-                const fillable = cands.filter((L) => count(L) >= need);
+                const fillable = cands.filter((L) => count(L) >= minPick);
                 if (fillable.length) {
                     const overdueFillable = emergency.filter((L) => fillable.includes(L));
                     return picker(overdueFillable.length ? overdueFillable : fillable);
@@ -20549,7 +21747,7 @@
             }
 
             if (order === 'new') {
-                if (count(0) >= need) return 0;
+                if (count(0) >= minPick) return 0;
                 return pickWithEmergency(levels, pickLowestFrom);
             }
 
@@ -20560,7 +21758,7 @@
             // Mixed: alternate new batch ↔ older batch (default)
             const lastBatch = getBsMixLastBatch();
             const wantNew = lastBatch !== 'new';
-            const canNew = count(0) >= need;
+            const canNew = count(0) >= minPick;
             const olderPick = () => pickWithEmergency(
                 levels.filter((L) => L >= 1),
                 pickHighestFrom
@@ -20571,7 +21769,7 @@
                 return olderPick() ?? pickLowestFrom(levels);
             }
             const older = olderPick();
-            if (older != null && count(older) >= need) return older;
+            if (older != null && count(older) >= minPick) return older;
             if (canNew) return 0;
             return older ?? pickWithEmergency(levels, pickHighestFrom) ?? pickLowestFrom(levels);
         }
@@ -20653,17 +21851,235 @@
             switchTab('dictionary');
         });
 
+        const TRAIN_WORD_PICK_KEY = 'linguaspace_train_word_pick_v1';
+        let trainWordPickIncluded = null;
+        let trainWordPickModalFolder = 'ALL';
+
+        function trainWordPickStorageKey() {
+            return `${TRAIN_WORD_PICK_KEY}_${activeTrackId || 'default'}`;
+        }
+
+        function loadTrainWordPickForTrack() {
+            trainWordPickIncluded = null;
+            try {
+                const raw = localStorage.getItem(trainWordPickStorageKey());
+                if (!raw) return;
+                const arr = JSON.parse(raw);
+                if (Array.isArray(arr) && arr.length) trainWordPickIncluded = new Set(arr);
+            } catch (_) {}
+        }
+        try { loadTrainWordPickForTrack(); } catch (_) {}
+
+        function persistTrainWordPick() {
+            if (!trainWordPickIncluded) return;
+            try {
+                localStorage.setItem(trainWordPickStorageKey(), JSON.stringify([...trainWordPickIncluded]));
+            } catch (_) {}
+        }
+
+        function ensureTrainWordPickIncluded() {
+            if (!vocabulary.length) {
+                syncTrainWordPickSummary();
+                return;
+            }
+            if (!trainWordPickIncluded) {
+                trainWordPickIncluded = new Set(vocabulary.map((w) => w.id));
+            } else {
+                const valid = new Set(vocabulary.map((w) => w.id));
+                vocabulary.forEach((w) => trainWordPickIncluded.add(w.id));
+                [...trainWordPickIncluded].forEach((id) => {
+                    if (!valid.has(id)) trainWordPickIncluded.delete(id);
+                });
+            }
+            persistTrainWordPick();
+            syncTrainWordPickSummary();
+        }
+
+        function getTrainSourceScope() {
+            return document.getElementById('train-source-select')?.value || 'ALL';
+        }
+
+        function trainSourceOptionLabel(scope) {
+            if (scope === 'ALL') return `🌐 ${t('dict.allWords')}`;
+            if (isPresetImportSource(scope)) return `${presetImportLogo(scope)} ${scope}`;
+            if (scope === 'Імпорт') return `📥 ${t('folder.import')}`;
+            return `📂 ${scope}`;
+        }
+
+        function getTrainFolderWordList(folderKey) {
+            if (folderKey === 'ALL') return vocabulary.slice();
+            return getWordsForFolderName(folderKey);
+        }
+
+        function buildTrainFolderEntries() {
+            const entries = [{ key: 'ALL', label: `🌐 ${t('dict.allWords')}` }];
+            const seen = new Set(['ALL']);
+            const srcs = [...new Set(vocabulary.map((v) => v.source).filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, uiLocale()));
+            srcs.forEach((s) => {
+                if (s === ALL_WORDS_SOURCE || seen.has(s)) return;
+                entries.push({ key: s, label: trainSourceOptionLabel(s) });
+                seen.add(s);
+            });
+            getDictionaryFolderNames().forEach((name) => {
+                if (seen.has(name)) return;
+                entries.push({ key: name, label: trainSourceOptionLabel(name) });
+                seen.add(name);
+            });
+            return entries;
+        }
+
+        function getTrainWordPool() {
+            ensureTrainWordPickIncluded();
+            const scope = getTrainSourceScope();
+            let pool = scope === 'ALL' ? vocabulary.slice() : getWordsForFolderName(scope);
+            if (!trainWordPickIncluded) return pool;
+            return pool.filter((w) => trainWordPickIncluded.has(w.id));
+        }
+
+        function syncTrainWordPickSummary() {
+            const el = document.getElementById('train-word-pick-summary');
+            if (!el) return;
+            const scope = getTrainSourceScope();
+            const scopePool = scope === 'ALL' ? vocabulary : getWordsForFolderName(scope);
+            const total = scopePool.length;
+            if (!total) {
+                el.textContent = '';
+                return;
+            }
+            const selected = trainWordPickIncluded
+                ? scopePool.filter((w) => trainWordPickIncluded.has(w.id)).length
+                : total;
+            el.textContent = t('train.pickWordsSummary', { selected, total });
+        }
+
+        window.onTrainSourceScopeChange = () => {
+            updateReviewDueBadge();
+            syncTrainWordPickSummary();
+        };
+
+        function renderTrainWordPickFolders() {
+            const wrap = document.getElementById('train-word-pick-folders');
+            if (!wrap) return;
+            const entries = buildTrainFolderEntries();
+            wrap.innerHTML = entries.map((e) => {
+                const on = e.key === trainWordPickModalFolder ? ' is-on' : '';
+                const esc = e.key.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                const label = isPresetImportSource(e.key) ? trainSourceOptionLabel(e.key) : e.label;
+                const labelHtml = isPresetImportSource(e.key)
+                    ? `${presetImportLogo(e.key)} ${e.key}`
+                    : escapeHtmlText(e.label);
+                const count = getTrainFolderWordList(e.key).length;
+                return `<button type="button" class="train-word-pick-folder-btn${on}" onclick="selectTrainWordPickFolder('${esc}')">${labelHtml} <span class="text-slate-400 font-normal">(${count})</span></button>`;
+            }).join('');
+        }
+
+        function renderTrainWordPickList() {
+            const list = document.getElementById('train-word-pick-list');
+            const title = document.getElementById('train-word-pick-folder-title');
+            const totalEl = document.getElementById('train-word-pick-total');
+            if (!list) return;
+            ensureTrainWordPickIncluded();
+            const words = getTrainFolderWordList(trainWordPickModalFolder)
+                .slice()
+                .sort((a, b) => String(a.word || '').localeCompare(String(b.word || ''), uiLocale()));
+            if (title) {
+                const entry = buildTrainFolderEntries().find((e) => e.key === trainWordPickModalFolder);
+                title.textContent = entry?.label || trainWordPickModalFolder;
+            }
+            if (!words.length) {
+                list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6 italic">${t('train.pickWordsEmpty')}</p>`;
+            } else {
+                list.innerHTML = words.map((w) => {
+                    const checked = trainWordPickIncluded.has(w.id);
+                    const escId = String(w.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                    return `<label class="train-word-pick-item">
+                        <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleTrainWordPickId('${escId}', this.checked)">
+                        <span class="min-w-0">
+                            <span class="train-word-pick-item-word">${escapeHtmlText(w.word || '')}</span>
+                            <span class="train-word-pick-item-trans">${escapeHtmlText(w.translation || '')}</span>
+                        </span>
+                    </label>`;
+                }).join('');
+            }
+            if (totalEl) {
+                const all = vocabulary.length;
+                const selected = trainWordPickIncluded ? [...trainWordPickIncluded].filter((id) => vocabulary.some((w) => w.id === id)).length : all;
+                totalEl.textContent = t('train.pickWordsTotal', { selected, total: all });
+            }
+            renderTrainWordPickFolders();
+        }
+
+        window.selectTrainWordPickFolder = (key) => {
+            trainWordPickModalFolder = key || 'ALL';
+            renderTrainWordPickList();
+        };
+
+        window.toggleTrainWordPickId = (id, on) => {
+            ensureTrainWordPickIncluded();
+            if (!id) return;
+            if (on) trainWordPickIncluded.add(id);
+            else trainWordPickIncluded.delete(id);
+            persistTrainWordPick();
+            renderTrainWordPickList();
+            syncTrainWordPickSummary();
+            updateReviewDueBadge();
+        };
+
+        window.trainWordPickSelectAllFolder = (on) => {
+            ensureTrainWordPickIncluded();
+            getTrainFolderWordList(trainWordPickModalFolder).forEach((w) => {
+                if (on) trainWordPickIncluded.add(w.id);
+                else trainWordPickIncluded.delete(w.id);
+            });
+            persistTrainWordPick();
+            renderTrainWordPickList();
+            syncTrainWordPickSummary();
+            updateReviewDueBadge();
+        };
+
+        window.openTrainWordPickModal = () => {
+            ensureTrainWordPickIncluded();
+            const scope = getTrainSourceScope();
+            trainWordPickModalFolder = scope === 'ALL' ? 'ALL' : scope;
+            const hint = document.getElementById('train-word-pick-modal-hint');
+            if (hint) hint.textContent = t('train.pickWordsHint');
+            const panel = document.getElementById('train-settings');
+            const btn = document.getElementById('btn-train-settings');
+            if (panel && !panel.classList.contains('is-open')) {
+                panel.classList.add('is-open');
+                panel.setAttribute('aria-hidden', 'false');
+                if (btn) {
+                    btn.classList.add('is-open');
+                    btn.setAttribute('aria-expanded', 'true');
+                }
+            }
+            renderTrainWordPickList();
+            document.getElementById('train-word-pick-modal')?.classList.remove('hidden');
+        };
+
+        window.closeTrainWordPickModal = () => {
+            document.getElementById('train-word-pick-modal')?.classList.add('hidden');
+            syncTrainWordPickSummary();
+            updateReviewDueBadge();
+        };
+
         function updateTrainSources() {
             const select = document.getElementById('train-source-select');
             if (!select) return;
             const prev = select.value || 'ALL';
-            const sources = [...new Set(vocabulary.map(v => v.source))];
-            select.innerHTML = `<option value="ALL">${t('dict.allWords')}</option>` + sources.map(s => `<option value="${s.replace(/"/g, '&quot;')}">📁 ${s === 'Імпорт' ? t('folder.import') : s}</option>`).join('');
+            const sources = [...new Set(vocabulary.map((v) => v.source).filter((s) => s && s !== ALL_WORDS_SOURCE))];
+            select.innerHTML = `<option value="ALL">${trainSourceOptionLabel('ALL')}</option>`
+                + sources.map((s) => {
+                    const esc = s.replace(/"/g, '&quot;');
+                    return `<option value="${esc}">${trainSourceOptionLabel(s)}</option>`;
+                }).join('');
             if ([...select.options].some((o) => o.value === prev)) select.value = prev;
             if (!select.dataset.reviewDueBound) {
                 select.dataset.reviewDueBound = '1';
-                select.addEventListener('change', () => updateReviewDueBadge());
+                select.addEventListener('change', () => onTrainSourceScopeChange());
             }
+            ensureTrainWordPickIncluded();
             updateReviewDueBadge();
         }
 
@@ -20678,10 +22094,8 @@
             const reqCount = mode === 'all'
                 ? parseInt(document.getElementById('bs-word-count').value, 10)
                 : (mode === 'definition' ? DEF_WORDS_PER_SESSION : 10);
-            const srcFilter = document.getElementById('train-source-select').value;
-            
-            let pool = vocabulary;
-            if(srcFilter !== 'ALL') pool = vocabulary.filter(w => w.source === srcFilter);
+
+            let pool = getTrainWordPool();
             if (mode === 'context') pool = pool.filter(w => w.context && w.context.length > 5 && contextHasWholeWord(w.context, w.word));
             if (mode === 'definition') {
                 pool = pool.filter((w) => {
@@ -20802,14 +22216,13 @@
         };
 
         window.startReviewSession = () => {
-            const srcFilter = document.getElementById('train-source-select').value;
             const modes = selectedReviewModes.length ? selectedReviewModes : [...REVIEW_MODE_IDS];
             if (!modes.length) return window.showModal(t('msg.reviewModesNeed'));
 
-            const learned = countLearnedWords(srcFilter);
+            const learned = countLearnedWords();
             if (learned === 0) return window.showModal(t('msg.noLearned'));
 
-            let pool = getReviewPool(srcFilter);
+            let pool = getReviewPool();
             // Picture mode needs a real image (not the default Unsplash placeholder)
             if (modes.length === 1 && modes[0] === 'picture') {
                 pool = pool.filter((w) => wordHasRealImage(w.imageUrl));
@@ -21286,6 +22699,13 @@
         }
 
         function playAudioWord(text) { const u = new SpeechSynthesisUtterance(text); u.lang = LANG_META[learningLanguage]?.bcp47 || 'en-US'; u.rate = 0.9; window.speechSynthesis.speak(u); }
+        window.speakDictWord = (id, e) => {
+            e?.stopPropagation?.();
+            e?.currentTarget?.blur?.();
+            const item = vocabulary.find((v) => v.id === id);
+            if (!item?.word || isGlobalAudioMuted) return;
+            playAudioWord(item.word);
+        };
 
         /** Speaker cone + two sound waves (fixed path — old SVG was truncated so waves never drew). */
         function trainingPlayAudioIconSvg(sizeClass = 'w-7 h-7') {
@@ -21371,9 +22791,11 @@
                 const affLower = aff.toLowerCase();
                 if (fromEnd) {
                     if (lower.endsWith(affLower) && w.length - aff.length >= 3) {
+                        const rest = w.slice(0, w.length - aff.length);
+                        if (!isMorphSuffixAllowed(rest, affLower, item.hintKey, w)) continue;
                         return {
                             affix: w.slice(w.length - aff.length),
-                            rest: w.slice(0, w.length - aff.length),
+                            rest,
                             hintKey: item.hintKey
                         };
                     }
@@ -21384,6 +22806,45 @@
                         hintKey: item.hintKey
                     };
                 }
+            }
+            return null;
+        }
+
+        function isMorphAgentErSuffix(affixLower, hintKey) {
+            return hintKey === 'morph.er' && (affixLower === 'er' || affixLower === 'or');
+        }
+
+        function isMorphSuffixAllowed(root, affixLower, hintKey, fullWord) {
+            if (!isMorphAgentErSuffix(affixLower, hintKey)) return true;
+            const r = String(root || '').toLowerCase();
+            if (r.length < 4) return false;
+            const badEndings = ['aft', 'oft', 'ift', 'eft', 'ast', 'ost', 'ust', 'lon', 'ther', 'ear', 'our', 'air', 'ier', 'oth', 'eath', 'eat', 'reat'];
+            if (badEndings.some((be) => r.endsWith(be))) return false;
+            if (/^(broth|weath|rathe|anoth|neigh|feath|leath|heath|wheth)/.test(r)) return false;
+            const vocabLower = vocabulary.map((v) => String(v.word || '').trim().toLowerCase());
+            if (vocabLower.includes(r) || vocabLower.includes(r + 'e')) return true;
+            if (/(ify|ize|ise|ate|en|ed|ow|ack|eak|eek|ink|ing)$/i.test(r)) return true;
+            if (/y$/i.test(r) && r.length >= 3) return true;
+            if (r.endsWith('e') && r.length >= 4) return true;
+            if (r.length >= 5 && !r.endsWith('er') && !r.endsWith('or')) return true;
+            return false;
+        }
+
+        function tryEnglishCompoundMorph(raw) {
+            if (learningLanguage !== 'en') return null;
+            const lower = String(raw || '').toLowerCase();
+            const tails = ['after', 'before', 'under', 'over', 'with', 'out', 'some', 'where', 'self', 'less', 'like', 'wise'];
+            for (const tail of tails) {
+                if (!lower.endsWith(tail) || lower.length <= tail.length + 2) continue;
+                const head = raw.slice(0, raw.length - tail.length);
+                if (head.length < 3) continue;
+                return {
+                    parts: [
+                        { text: head, type: 'chunk' },
+                        { text: raw.slice(raw.length - tail.length), type: 'chunk' }
+                    ],
+                    hints: []
+                };
             }
             return null;
         }
@@ -21416,6 +22877,8 @@
         function buildIntroMorphHint(word) {
             const raw = String(word?.word || '').trim();
             if (!raw || /\s/.test(raw) || raw.length < 5) return null;
+            const compound = tryEnglishCompoundMorph(raw);
+            if (compound) return compound;
             const { prefixes, suffixes } = morphListsForLang(learningLanguage);
             const parts = [];
             const hints = [];
@@ -21449,7 +22912,7 @@
 
         function renderIntroMorphHtml(morph) {
             const segs = (morph.parts || []).map((p, i) =>
-                `<span class="bs-morph-part bs-morph-${p.type}" style="animation-delay:${(i * 0.12).toFixed(2)}s">${escapeHtmlText(p.text)}</span>`
+                `<span class="bs-morph-part" style="animation-delay:${(i * 0.55).toFixed(2)}s">${escapeHtmlText(p.text)}</span>`
             ).join('');
             const hintLine = (morph.hints || []).filter(Boolean).join(' · ');
             return `<div class="bs-intro-morph"><p class="bs-intro-morph-label">${escapeHtmlText(t('train.introMorphLabel'))}</p><div class="bs-intro-morph-segments">${segs}</div>${hintLine ? `<p class="bs-intro-morph-hints">${escapeHtmlText(hintLine)}</p>` : ''}</div>`;
@@ -21782,7 +23245,9 @@
                 if(e.key === 'Enter') {
                     e.preventDefault(); e.stopPropagation(); if(inp.disabled) return; 
                     const userVal = inp.value.trim().toLowerCase();
-                    if(userVal === word.word.toLowerCase()) {
+                    const typedOk = userVal === word.word.toLowerCase()
+                        || (!isAudioMode && typingWordAnswersMatch(userVal, word.word, learningLanguage));
+                    if(typedOk) {
                         inp.classList.replace('border-slate-300', 'border-emerald-500'); inp.classList.add('bg-emerald-50', 'text-emerald-700'); inp.disabled = true;
                         triggerSuccessReveal(word);
                     } else {
@@ -22719,7 +24184,9 @@
                 if(e.key === 'Enter') {
                     e.preventDefault(); e.stopPropagation(); if(inp.disabled) return; 
                     const userVal = inp.value.trim().toLowerCase();
-                    if(userVal === word.word.toLowerCase()) {
+                    const typedOk = userVal === word.word.toLowerCase()
+                        || typingWordAnswersMatch(userVal, word.word, learningLanguage);
+                    if(typedOk) {
                         inp.classList.replace('border-slate-300', 'border-emerald-500'); inp.classList.add('bg-emerald-50', 'text-emerald-700'); inp.disabled = true;
                         triggerSuccessReveal(word);
                     } else {
