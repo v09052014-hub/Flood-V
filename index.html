@@ -1200,14 +1200,41 @@
             padding: 1.1rem;
             margin-bottom: 1.25rem;
             border: 1px solid #e0e7ff;
+            position: relative;
         }
-        .bs-play-audio-btn--listen:hover { background: #e0e7ff; transform: scale(1.04); }
+        .bs-play-audio-btn--listen:hover:not(:disabled) { background: #e0e7ff; transform: scale(1.04); }
+        .bs-play-audio-btn--listen:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .bs-listen-badge {
+            position: absolute;
+            top: -0.2rem;
+            right: -0.2rem;
+            min-width: 1.15rem;
+            height: 1.15rem;
+            padding: 0 0.25rem;
+            border-radius: 9999px;
+            background: #4338ca;
+            color: #fff;
+            font-size: 0.62rem;
+            font-weight: 800;
+            line-height: 1.15rem;
+            text-align: center;
+            pointer-events: none;
+        }
         #bs-type-input,
         #bs-pic-input,
         #bs-def-input,
         .inline-context-input {
             font-size: 1.5rem;
             line-height: 1.25;
+        }
+        /* Mobile: type=password suppresses Gboard suggestions; show letters not dots */
+        .train-answer-input.train-answer--plain {
+            -webkit-text-security: none;
+            font-family: inherit;
         }
         #bs-type-input::placeholder,
         #bs-pic-input::placeholder,
@@ -22867,10 +22894,73 @@
 
             preserveTrainingFocusState();
 
-            if((bsCurrentStage === 0 || bsCurrentStage === 5) && !isGlobalAudioMuted) playAudioWord(word.word);
+            if (bsCurrentStage === 0 && !isGlobalAudioMuted) playAudioWord(word.word);
+            if (bsCurrentStage === 5) initListenStage(word);
         }
 
-        function playAudioWord(text) { const u = new SpeechSynthesisUtterance(text); u.lang = LANG_META[learningLanguage]?.bcp47 || 'en-US'; u.rate = 0.9; window.speechSynthesis.speak(u); }
+        let listenPlaysUsed = 0;
+        let listenManualClicks = 0;
+
+        function getListenPlaysMax() {
+            if (activeSessionMode !== 'all') return null;
+            if (bsSessionLevel === 3) return 3;
+            if (bsSessionLevel === 4) return 2;
+            if (bsSessionLevel === 5) return 1;
+            return null;
+        }
+
+        function syncListenButtonUi() {
+            const btn = document.getElementById('btn-listen-audio');
+            const badge = document.getElementById('btn-listen-audio-badge');
+            if (!btn) return;
+            const max = getListenPlaysMax();
+            const exhausted = max !== null && listenPlaysUsed >= max;
+            btn.disabled = exhausted;
+            if (badge) {
+                const remaining = max !== null ? Math.max(0, max - listenPlaysUsed) : 0;
+                const showBadge = listenManualClicks > 0 && max !== null && remaining > 0;
+                badge.textContent = showBadge ? String(remaining) : '';
+                badge.classList.toggle('hidden', !showBadge);
+            }
+        }
+
+        function initListenStage(word) {
+            listenPlaysUsed = 0;
+            listenManualClicks = 0;
+            if (!isGlobalAudioMuted && word?.word) {
+                playAudioWord(word.word);
+                listenPlaysUsed = 1;
+            }
+            syncListenButtonUi();
+        }
+
+        window.handleListenButtonClick = (wordText) => {
+            const max = getListenPlaysMax();
+            if (max !== null && listenPlaysUsed >= max) return;
+            playAudioWord(wordText);
+            listenPlaysUsed++;
+            listenManualClicks++;
+            syncListenButtonUi();
+        };
+
+        function playAudioWord(text) {
+            if (isGlobalAudioMuted || !text) return;
+            const say = () => {
+                const u = new SpeechSynthesisUtterance(String(text));
+                u.lang = LANG_META[learningLanguage]?.bcp47 || 'en-US';
+                u.rate = 0.9;
+                try {
+                    if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+                } catch (_) {}
+                window.speechSynthesis.speak(u);
+            };
+            try { window.speechSynthesis.cancel(); } catch (_) {}
+            if (typeof requestAnimationFrame === 'function') {
+                requestAnimationFrame(() => { setTimeout(say, 30); });
+            } else {
+                setTimeout(say, 30);
+            }
+        }
         window.speakDictWord = (id, e) => {
             e?.stopPropagation?.();
             e?.currentTarget?.blur?.();
@@ -23406,26 +23496,44 @@
             }; _renderBsC();
         }
 
+        function useTrainingPasswordField() {
+            try {
+                if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return true;
+            } catch (_) {}
+            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+        }
+
         function trainingInputAttrs(extra = '') {
-            return `autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="verbatim" enterkeyhint="done" data-lpignore="true" data-1p-ignore data-form-type="other" ${extra}`.trim();
+            return `autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" data-lpignore="true" data-1p-ignore data-form-type="other" ${extra}`.trim();
         }
 
         function applyTrainingInputNoSuggest(inp) {
             if (!inp) return;
-            inp.setAttribute('autocomplete', 'off');
+            const usePwd = useTrainingPasswordField();
+            inp.type = usePwd ? 'password' : 'text';
+            inp.classList.add('train-answer-input');
+            inp.classList.toggle('train-answer--plain', usePwd);
+            inp.setAttribute('autocomplete', usePwd ? 'new-password' : 'off');
             inp.setAttribute('autocorrect', 'off');
             inp.setAttribute('autocapitalize', 'off');
             inp.setAttribute('spellcheck', 'false');
-            inp.setAttribute('inputmode', 'verbatim');
+            if (!usePwd) inp.setAttribute('inputmode', 'verbatim');
+            else inp.removeAttribute('inputmode');
             inp.setAttribute('enterkeyhint', 'done');
             inp.setAttribute('data-lpignore', 'true');
             inp.setAttribute('data-1p-ignore', '');
             inp.setAttribute('data-form-type', 'other');
+            if (usePwd) {
+                inp.setAttribute('name', `train-answer-${Date.now()}`);
+            } else {
+                inp.removeAttribute('name');
+            }
         }
 
         function renderStageTyping(word, area, btnNext, feedback, isAudioMode) {
+            const listenJs = word.word.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
             const promptHTML = isAudioMode
-                ? `<button type="button" onclick="playAudioWord('${word.word.replace(/'/g, "\\'")}')" class="bs-play-audio-btn bs-play-audio-btn--listen mx-auto" title="${t('inline.listen')}" aria-label="${t('inline.listen')}">${trainingPlayAudioIconSvg('w-9 h-9')}</button>`
+                ? `<button type="button" id="btn-listen-audio" onclick="handleListenButtonClick('${listenJs}')" class="bs-play-audio-btn bs-play-audio-btn--listen mx-auto" title="${t('inline.listen')}" aria-label="${t('inline.listen')}">${trainingPlayAudioIconSvg('w-9 h-9')}<span id="btn-listen-audio-badge" class="bs-listen-badge hidden" aria-hidden="true"></span></button>`
                 : `<p class="text-2xl text-indigo-700 font-bold mb-6 uppercase tracking-wider">${word.translation}</p>`;
             area.innerHTML = `${promptHTML}<div class="flex flex-col items-center justify-center gap-3 w-full max-w-sm mx-auto relative"><input type="text" id="bs-type-input" class="w-full p-4 text-center font-bold border-2 border-slate-300 rounded-2xl focus:border-indigo-500 outline-none transition-colors" ${trainingInputAttrs(`lang="${LANG_META[learningLanguage]?.bcp47 || 'es'}"`)} placeholder="${t('train.typeIn', { lang: learnLangLabel() })}"></div>`;
             const inp = document.getElementById('bs-type-input');
