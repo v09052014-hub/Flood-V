@@ -1238,7 +1238,7 @@
             right: 0;
             bottom: 0;
             z-index: 200;
-            padding: 0.35rem 0.45rem calc(0.4rem + env(safe-area-inset-bottom));
+            padding: 0.4rem 0.45rem calc(0.45rem + env(safe-area-inset-bottom));
             background: rgba(248, 250, 252, 0.97);
             backdrop-filter: blur(10px);
             border-top: 1px solid #e2e8f0;
@@ -1246,31 +1246,59 @@
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
+            --train-osk-key-h: 2.85rem;
+            --train-osk-pad: 12rem;
+        }
+        body.train-osk-tall .train-osk {
+            --train-osk-key-h: 3.45rem;
+            --train-osk-pad: 15rem;
+            padding-top: 0.5rem;
         }
         .train-osk.hidden { display: none; }
-        body.train-osk-open #bs-workspace { padding-bottom: 11.5rem; }
+        body.train-osk-open #bs-workspace { padding-bottom: var(--train-osk-pad, 12rem); }
         .train-osk-row {
             display: flex;
             justify-content: center;
-            gap: 0.28rem;
-            margin-bottom: 0.28rem;
+            align-items: stretch;
+            gap: 0.3rem;
+            margin-bottom: 0.3rem;
         }
         .train-osk-row:last-child { margin-bottom: 0; }
         .train-osk-key {
             flex: 1 1 0;
-            max-width: 2.45rem;
-            min-height: 2.7rem;
+            max-width: 2.5rem;
+            min-height: var(--train-osk-key-h);
             border-radius: 0.55rem;
             border: 1px solid #cbd5e1;
             background: #fff;
-            font-size: 1.05rem;
+            font-size: 1.08rem;
             font-weight: 700;
             color: #334155;
             box-shadow: 0 1px 0 #cbd5e1;
             touch-action: manipulation;
             line-height: 1;
         }
+        body.train-osk-tall .train-osk-key { font-size: 1.18rem; }
         .train-osk-key:active { background: #e2e8f0; transform: scale(0.96); }
+        .train-osk-key--tool {
+            flex: 0.95 1 0;
+            max-width: 2.65rem;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .train-osk-key--tool.is-active {
+            background: #e0e7ff;
+            color: #4338ca;
+            border-color: #a5b4fc;
+        }
+        .train-osk-key--backspace {
+            flex: 1.55 1 0;
+            max-width: 3.75rem;
+            font-size: 1.2rem;
+        }
         .train-osk-key--space {
             flex: 3 1 0;
             max-width: none;
@@ -1279,15 +1307,56 @@
         }
         .train-osk-key--enter {
             flex: 1.25 1 0;
-            max-width: 3.25rem;
+            max-width: 3.35rem;
             background: #4f46e5;
             color: #fff;
             border-color: #4338ca;
             box-shadow: 0 1px 0 #3730a3;
         }
         .train-osk-key--enter:active { background: #4338ca; }
-        .train-osk-key--wide { max-width: 2.25rem; flex: 0.85 1 0; }
-        .train-answer-input.train-answer--osk { caret-color: auto; }
+        .train-osk-key--wide { max-width: 2.35rem; flex: 0.9 1 0; }
+        .train-answer-input.train-answer--osk { caret-color: transparent; color: inherit; }
+        .train-input-caret-wrap {
+            position: relative;
+            width: 100%;
+        }
+        .train-input-caret-wrap--inline {
+            display: inline-block;
+            width: auto;
+            max-width: 100%;
+            vertical-align: baseline;
+        }
+        .train-caret-measure {
+            position: absolute;
+            left: 0;
+            top: 0;
+            visibility: hidden;
+            height: auto;
+            width: auto;
+            overflow: hidden;
+            white-space: pre;
+            pointer-events: none;
+            padding: 0;
+            border: 0;
+            margin: 0;
+        }
+        .train-fake-caret {
+            position: absolute;
+            top: 50%;
+            width: 2px;
+            height: 1.05em;
+            background: #6366f1;
+            pointer-events: none;
+            transform: translateY(-50%);
+            animation: trainCaretBlink 1.05s step-end infinite;
+            opacity: 0;
+        }
+        .train-answer-input:focus ~ .train-fake-caret { opacity: 1; }
+        .train-answer-input:disabled ~ .train-fake-caret { opacity: 0 !important; }
+        @keyframes trainCaretBlink {
+            0%, 45% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
         #bs-type-input::placeholder,
         #bs-pic-input::placeholder,
         #bs-def-input::placeholder {
@@ -6725,6 +6794,7 @@
         const READER_PARA_INDENT_KEY = 'linguaspace_reader_para_indent_v1';
         const READER_THEME_KEY = 'linguaspace_reader_theme_v1';
         const READER_QUICK_MATCH_LOG_KEY = 'linguaspace_reader_quick_match_log_v1';
+        const TRAIN_OSK_EXPANDED_KEY = 'linguaspace_train_osk_expanded_v1';
         const READER_QUICK_MATCH_BATCH = 4;
         let settingsActiveTab = 'languages';
         let showTrainingPronunciation = localStorage.getItem(SHOW_IPA_KEY) === '1';
@@ -9251,6 +9321,7 @@
 
         let trainingSessionActive = false;
         let trainingFocusCollapsed = false;
+        let trainOskFocusPinned = false;
         let trainingLastScrollY = 0;
         let trainingScrollLock = false;
         let trainingChromeHeight = 108;
@@ -9290,6 +9361,11 @@
             trainingFocusCooldownUntil = Date.now() + 380;
             setTimeout(() => { trainingScrollLock = false; }, 220);
             trainingLastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+            if (typeof syncTrainOskSize === 'function') syncTrainOskSize();
+        }
+
+        function canAutoCollapseTrainingFocus() {
+            return !trainOskFocusPinned;
         }
 
         function isTrainingUiVisible() {
@@ -9318,7 +9394,7 @@
             if (trainingWheelAcc > 48 && !trainingFocusCollapsed) {
                 applyTrainingFocus(true);
                 trainingWheelAcc = 0;
-            } else if (trainingWheelAcc < -48 && trainingFocusCollapsed) {
+            } else if (trainingWheelAcc < -48 && trainingFocusCollapsed && canAutoCollapseTrainingFocus()) {
                 applyTrainingFocus(false);
                 trainingWheelAcc = 0;
             }
@@ -9337,7 +9413,7 @@
             if (dy > 36 && !trainingFocusCollapsed) {
                 applyTrainingFocus(true);
                 trainingTouchArmed = false;
-            } else if (dy < -36 && trainingFocusCollapsed) {
+            } else if (dy < -36 && trainingFocusCollapsed && canAutoCollapseTrainingFocus()) {
                 applyTrainingFocus(false);
                 trainingTouchArmed = false;
             }
@@ -9356,7 +9432,7 @@
             }
             if (dy > 0 && y > 50 && !trainingFocusCollapsed) {
                 applyTrainingFocus(true);
-            } else if (dy < 0 && trainingFocusCollapsed && y < 90) {
+            } else if (dy < 0 && trainingFocusCollapsed && y < 90 && canAutoCollapseTrainingFocus()) {
                 applyTrainingFocus(false);
             }
             trainingLastScrollY = y;
@@ -22088,6 +22164,8 @@
 
         function exitTrainingFocusMode() {
             trainingSessionActive = false;
+            trainOskFocusPinned = false;
+            applyTrainingFocus(false);
             ensureAppChromeVisible();
             document.removeEventListener('wheel', onTrainingWheel);
             document.removeEventListener('touchstart', onTrainingTouchStart);
@@ -23563,19 +23641,95 @@
 
         let trainOskEl = null;
         let trainOskActiveInput = null;
-        let trainOskHold = null;
+        let trainOskAccentHold = null;
+        let trainOskBsRepeat = null;
+        let trainOskPanel = 'letters';
+        let trainOskExpanded = localStorage.getItem(TRAIN_OSK_EXPANDED_KEY) === '1';
 
         const TRAIN_OSK_ACCENT = { a: 'á', e: 'é', i: 'í', o: 'ó', u: 'ú', n: 'ñ' };
 
-        function clearTrainOskHold() {
-            if (trainOskHold?.timer) clearTimeout(trainOskHold.timer);
-            trainOskHold = null;
+        function clearTrainOskAccentHold() {
+            if (trainOskAccentHold?.timer) clearTimeout(trainOskAccentHold.timer);
+            trainOskAccentHold = null;
+        }
+
+        function stopTrainOskBackspaceRepeat() {
+            if (trainOskBsRepeat) clearTimeout(trainOskBsRepeat);
+            trainOskBsRepeat = null;
+        }
+
+        function syncTrainOskSize() {
+            const tall = document.body.classList.contains('train-osk-open')
+                && (trainingFocusCollapsed || trainOskExpanded);
+            document.body.classList.toggle('train-osk-tall', tall);
+        }
+
+        function syncTrainInputCaret(inp) {
+            if (!inp || !isTrainingTouchDevice()) return;
+            const wrap = inp.closest('.train-input-caret-wrap');
+            if (!wrap) return;
+            const caret = wrap.querySelector('.train-fake-caret');
+            const measure = wrap.querySelector('.train-caret-measure');
+            if (!caret || !measure) return;
+
+            const style = window.getComputedStyle(inp);
+            measure.style.font = style.font;
+            measure.style.fontSize = style.fontSize;
+            measure.style.fontWeight = style.fontWeight;
+            measure.style.fontStyle = style.fontStyle;
+            measure.style.letterSpacing = style.letterSpacing;
+            measure.style.fontFamily = style.fontFamily;
+
+            const pos = inp.selectionStart ?? inp.value.length;
+            const before = inp.value.slice(0, pos);
+            const full = inp.value;
+            measure.textContent = before || '\u200b';
+            const beforeWidth = measure.offsetWidth;
+            measure.textContent = full || '\u200b';
+            const fullWidth = measure.offsetWidth;
+
+            const padL = parseFloat(style.paddingLeft) || 0;
+            const padR = parseFloat(style.paddingRight) || 0;
+            const contentWidth = inp.clientWidth - padL - padR;
+            let left = padL + beforeWidth;
+            if (style.textAlign === 'center') {
+                left = padL + Math.max(0, (contentWidth - fullWidth) / 2) + beforeWidth;
+            } else if (style.textAlign === 'right') {
+                left = padL + Math.max(0, contentWidth - fullWidth) + beforeWidth;
+            }
+            caret.style.left = `${left}px`;
+        }
+
+        function ensureTrainOskCaretWrap(inp) {
+            if (!inp || inp.closest('.train-input-caret-wrap')) return;
+            const wrap = document.createElement('span');
+            wrap.className = 'train-input-caret-wrap'
+                + (inp.classList.contains('inline-context-input') ? ' train-input-caret-wrap--inline' : '');
+            const measure = document.createElement('span');
+            measure.className = 'train-caret-measure';
+            measure.setAttribute('aria-hidden', 'true');
+            const caret = document.createElement('span');
+            caret.className = 'train-fake-caret';
+            caret.setAttribute('aria-hidden', 'true');
+            inp.parentNode.insertBefore(wrap, inp);
+            wrap.appendChild(inp);
+            wrap.appendChild(measure);
+            wrap.appendChild(caret);
+            const sync = () => syncTrainInputCaret(inp);
+            if (!inp._caretSyncWired) {
+                inp._caretSyncWired = true;
+                inp.addEventListener('input', sync);
+                inp.addEventListener('focus', sync);
+            }
+            sync();
         }
 
         function hideTrainOsk() {
             trainOskActiveInput = null;
-            clearTrainOskHold();
-            document.body.classList.remove('train-osk-open');
+            clearTrainOskAccentHold();
+            stopTrainOskBackspaceRepeat();
+            trainOskPanel = 'letters';
+            document.body.classList.remove('train-osk-open', 'train-osk-tall');
             trainOskEl?.classList.add('hidden');
         }
 
@@ -23593,6 +23747,7 @@
             const pos = start + text.length;
             try { inp.setSelectionRange(pos, pos); } catch (_) {}
             inp.dispatchEvent(new Event('input', { bubbles: true }));
+            syncTrainInputCaret(inp);
         }
 
         function backspaceTrainOskInput(inp) {
@@ -23607,11 +23762,51 @@
                 try { inp.setSelectionRange(start - 1, start - 1); } catch (_) {}
             }
             inp.dispatchEvent(new Event('input', { bubbles: true }));
+            syncTrainInputCaret(inp);
+        }
+
+        function startTrainOskBackspaceRepeat() {
+            stopTrainOskBackspaceRepeat();
+            const inp = trainOskActiveInput;
+            if (!inp || inp.disabled) return;
+            backspaceTrainOskInput(inp);
+            let delay = 380;
+            const tick = () => {
+                if (!trainOskActiveInput || trainOskActiveInput.disabled) {
+                    stopTrainOskBackspaceRepeat();
+                    return;
+                }
+                backspaceTrainOskInput(trainOskActiveInput);
+                delay = Math.max(34, delay * 0.84);
+                trainOskBsRepeat = setTimeout(tick, delay);
+            };
+            trainOskBsRepeat = setTimeout(tick, delay);
         }
 
         function submitTrainOskEnter(inp) {
             if (!inp || inp.disabled) return;
             inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+        }
+
+        function toggleTrainOskExpanded() {
+            trainOskExpanded = !trainOskExpanded;
+            localStorage.setItem(TRAIN_OSK_EXPANDED_KEY, trainOskExpanded ? '1' : '0');
+            trainOskFocusPinned = trainOskExpanded;
+            if (trainOskExpanded) applyTrainingFocus(true);
+            else applyTrainingFocus(false);
+            syncTrainOskSize();
+            if (trainOskActiveInput) {
+                renderTrainOsk(getTrainOskLang(trainOskActiveInput));
+                requestAnimationFrame(() => {
+                    syncTrainInputCaret(trainOskActiveInput);
+                    try { trainOskActiveInput.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
+                });
+            }
+        }
+
+        function toggleTrainOskPanel() {
+            trainOskPanel = trainOskPanel === 'letters' ? 'numbers' : 'letters';
+            if (trainOskActiveInput) renderTrainOsk(getTrainOskLang(trainOskActiveInput));
         }
 
         function ensureTrainOsk() {
@@ -23631,22 +23826,24 @@
                 inp.focus({ preventScroll: true });
 
                 const action = btn.dataset.action;
+                if (action === 'toggle-expand') { toggleTrainOskExpanded(); return; }
+                if (action === 'toggle-panel') { toggleTrainOskPanel(); return; }
                 if (action === 'space') { insertTrainOskText(inp, ' '); return; }
-                if (action === 'backspace') { backspaceTrainOskInput(inp); return; }
+                if (action === 'backspace') { startTrainOskBackspaceRepeat(); return; }
                 if (action === 'enter') { submitTrainOskEnter(inp); return; }
 
                 const key = btn.dataset.key;
                 const base = btn.dataset.base || key;
                 if (btn.classList.contains('train-osk-key--accentable')) {
-                    clearTrainOskHold();
-                    trainOskHold = {
+                    clearTrainOskAccentHold();
+                    trainOskAccentHold = {
                         btn,
                         key,
                         timer: setTimeout(() => {
-                            if (!trainOskHold || trainOskHold.btn !== btn) return;
+                            if (!trainOskAccentHold || trainOskAccentHold.btn !== btn) return;
                             const acc = TRAIN_OSK_ACCENT[base];
                             if (acc) insertTrainOskText(inp, acc);
-                            trainOskHold.fired = true;
+                            trainOskAccentHold.fired = true;
                         }, ES_ACCENT_HOLD_MS)
                     };
                 } else {
@@ -23655,14 +23852,21 @@
             });
 
             el.addEventListener('pointerup', () => {
-                if (!trainOskHold) return;
-                const { key, fired } = trainOskHold;
-                clearTrainOskHold();
+                stopTrainOskBackspaceRepeat();
+                if (!trainOskAccentHold) return;
+                const { key, fired } = trainOskAccentHold;
+                clearTrainOskAccentHold();
                 if (fired || !trainOskActiveInput) return;
                 insertTrainOskText(trainOskActiveInput, key);
             });
-            el.addEventListener('pointercancel', clearTrainOskHold);
-            el.addEventListener('pointerleave', clearTrainOskHold);
+            el.addEventListener('pointercancel', () => {
+                stopTrainOskBackspaceRepeat();
+                clearTrainOskAccentHold();
+            });
+            el.addEventListener('pointerleave', () => {
+                stopTrainOskBackspaceRepeat();
+                clearTrainOskAccentHold();
+            });
 
             trainOskEl = el;
             return el;
@@ -23670,41 +23874,87 @@
 
         function renderTrainOsk(lang) {
             const osk = ensureTrainOsk();
-            const rows = [
-                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-                ['z', 'x', 'c', 'v', 'b', 'n', 'm']
-            ];
-            if (lang === 'es') rows.push(['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü']);
-
+            const expandActive = trainOskExpanded ? ' is-active' : '';
+            const panelBtnLabel = trainOskPanel === 'letters' ? '123' : 'ABC';
             let html = '';
-            rows.forEach((row) => {
-                html += '<div class="train-osk-row">';
-                row.forEach((key) => {
+
+            if (trainOskPanel === 'numbers') {
+                html += `<div class="train-osk-row">
+                    <button type="button" class="train-osk-key train-osk-key--tool${expandActive}" data-action="toggle-expand" aria-label="Expand keyboard">⛶</button>
+                    <button type="button" class="train-osk-key train-osk-key--tool is-active" data-action="toggle-panel" aria-label="Letters">ABC</button>`;
+                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].forEach((key) => {
+                    html += `<button type="button" class="train-osk-key" data-key="${key}">${key}</button>`;
+                });
+                html += '</div>';
+                html += `<div class="train-osk-row">
+                    <button type="button" class="train-osk-key train-osk-key--wide" data-key="-">-</button>
+                    <button type="button" class="train-osk-key train-osk-key--wide" data-key=".">.</button>
+                    <button type="button" class="train-osk-key train-osk-key--wide" data-key="'">'</button>
+                    <button type="button" class="train-osk-key train-osk-key--space" data-action="space" aria-label="Space">␣</button>
+                    <button type="button" class="train-osk-key train-osk-key--backspace" data-action="backspace" aria-label="Backspace">⌫</button>
+                    <button type="button" class="train-osk-key train-osk-key--enter" data-action="enter" aria-label="Done">↵</button>
+                </div>`;
+            } else {
+                const rows = [
+                    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+                    ['z', 'x', 'c', 'v', 'b', 'n', 'm']
+                ];
+                html += `<div class="train-osk-row">
+                    <button type="button" class="train-osk-key train-osk-key--tool${expandActive}" data-action="toggle-expand" aria-label="Expand keyboard">⛶</button>`;
+                rows[0].forEach((key) => {
                     const accentable = lang === 'es' && 'aeioun'.includes(key);
                     html += `<button type="button" class="train-osk-key${accentable ? ' train-osk-key--accentable' : ''}" data-key="${key}" data-base="${key}">${key}</button>`;
                 });
                 html += '</div>';
-            });
-            html += `<div class="train-osk-row train-osk-row--bottom">
-                <button type="button" class="train-osk-key train-osk-key--wide" data-key="-">-</button>
-                <button type="button" class="train-osk-key train-osk-key--wide" data-key="'">'</button>
-                <button type="button" class="train-osk-key train-osk-key--space" data-action="space" aria-label="Space">␣</button>
-                <button type="button" class="train-osk-key train-osk-key--wide" data-action="backspace" aria-label="Backspace">⌫</button>
-                <button type="button" class="train-osk-key train-osk-key--enter" data-action="enter" aria-label="Done">↵</button>
-            </div>`;
+                rows.slice(1).forEach((row, idx) => {
+                    html += '<div class="train-osk-row">';
+                    if (idx === 0) {
+                        html += `<button type="button" class="train-osk-key train-osk-key--tool" data-action="toggle-panel" aria-label="Numbers">123</button>`;
+                    }
+                    row.forEach((key) => {
+                        const accentable = lang === 'es' && 'aeioun'.includes(key);
+                        html += `<button type="button" class="train-osk-key${accentable ? ' train-osk-key--accentable' : ''}" data-key="${key}" data-base="${key}">${key}</button>`;
+                    });
+                    if (idx === 1) {
+                        html += `<button type="button" class="train-osk-key train-osk-key--backspace" data-action="backspace" aria-label="Backspace">⌫</button>`;
+                    }
+                    html += '</div>';
+                });
+                if (lang === 'es') {
+                    html += '<div class="train-osk-row">';
+                    ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü'].forEach((key) => {
+                        html += `<button type="button" class="train-osk-key" data-key="${key}">${key}</button>`;
+                    });
+                    html += '</div>';
+                }
+                html += `<div class="train-osk-row train-osk-row--bottom">
+                    <button type="button" class="train-osk-key train-osk-key--wide" data-key="-">-</button>
+                    <button type="button" class="train-osk-key train-osk-key--wide" data-key="'">'</button>
+                    <button type="button" class="train-osk-key train-osk-key--space" data-action="space" aria-label="Space">␣</button>
+                    <button type="button" class="train-osk-key train-osk-key--enter" data-action="enter" aria-label="Done">↵</button>
+                </div>`;
+            }
             osk.innerHTML = html;
         }
 
         function showTrainOsk(inp) {
             if (!inp || inp.disabled || !isTrainingTouchDevice()) return;
             trainOskActiveInput = inp;
+            trainOskPanel = 'letters';
+            ensureTrainOskCaretWrap(inp);
+            if (trainOskExpanded) {
+                trainOskFocusPinned = true;
+                applyTrainingFocus(true);
+            }
             renderTrainOsk(getTrainOskLang(inp));
             const osk = ensureTrainOsk();
             osk.classList.remove('hidden');
             osk.setAttribute('aria-hidden', 'false');
             document.body.classList.add('train-osk-open');
+            syncTrainOskSize();
             requestAnimationFrame(() => {
+                syncTrainInputCaret(inp);
                 try { inp.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
             });
         }
@@ -23750,6 +24000,7 @@
                 inp.setAttribute('inputmode', 'none');
                 inp.classList.add('train-answer--osk');
                 wireTrainOskInput(inp);
+                ensureTrainOskCaretWrap(inp);
                 showTrainOsk(inp);
             } else {
                 inp.readOnly = false;
