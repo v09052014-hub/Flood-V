@@ -1231,11 +1231,63 @@
             font-size: 1.5rem;
             line-height: 1.25;
         }
-        /* Mobile: type=password suppresses Gboard suggestions; show letters not dots */
-        .train-answer-input.train-answer--plain {
-            -webkit-text-security: none;
-            font-family: inherit;
+        /* Mobile training: built-in keyboard (inputmode=none) — no Gboard suggestions */
+        .train-osk {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 200;
+            padding: 0.35rem 0.45rem calc(0.4rem + env(safe-area-inset-bottom));
+            background: rgba(248, 250, 252, 0.97);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -6px 28px rgba(15, 23, 42, 0.1);
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
         }
+        .train-osk.hidden { display: none; }
+        body.train-osk-open #bs-workspace { padding-bottom: 11.5rem; }
+        .train-osk-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.28rem;
+            margin-bottom: 0.28rem;
+        }
+        .train-osk-row:last-child { margin-bottom: 0; }
+        .train-osk-key {
+            flex: 1 1 0;
+            max-width: 2.45rem;
+            min-height: 2.7rem;
+            border-radius: 0.55rem;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #334155;
+            box-shadow: 0 1px 0 #cbd5e1;
+            touch-action: manipulation;
+            line-height: 1;
+        }
+        .train-osk-key:active { background: #e2e8f0; transform: scale(0.96); }
+        .train-osk-key--space {
+            flex: 3 1 0;
+            max-width: none;
+            font-size: 1.2rem;
+            letter-spacing: 0.08em;
+        }
+        .train-osk-key--enter {
+            flex: 1.25 1 0;
+            max-width: 3.25rem;
+            background: #4f46e5;
+            color: #fff;
+            border-color: #4338ca;
+            box-shadow: 0 1px 0 #3730a3;
+        }
+        .train-osk-key--enter:active { background: #4338ca; }
+        .train-osk-key--wide { max-width: 2.25rem; flex: 0.85 1 0; }
+        .train-answer-input.train-answer--osk { caret-color: auto; }
         #bs-type-input::placeholder,
         #bs-pic-input::placeholder,
         #bs-def-input::placeholder {
@@ -22473,6 +22525,7 @@
         };
 
         window.endSession = () => { 
+            hideTrainOsk();
             try { refundDefinitionSessionIfUnused(); } catch (_) {}
             materialTrackState = null;
             bsWordsOrderIds = null;
@@ -22798,6 +22851,7 @@
         }
 
         function triggerSuccessReveal(word) {
+            hideTrainOsk();
             const reveal = document.getElementById('bs-success-reveal');
             const feedback = document.getElementById('bs-feedback');
             const zeroPass = !!word.contextZeroPass;
@@ -23496,7 +23550,7 @@
             }; _renderBsC();
         }
 
-        function useTrainingPasswordField() {
+        function isTrainingTouchDevice() {
             try {
                 if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return true;
             } catch (_) {}
@@ -23507,26 +23561,200 @@
             return `autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" data-lpignore="true" data-1p-ignore data-form-type="other" ${extra}`.trim();
         }
 
+        let trainOskEl = null;
+        let trainOskActiveInput = null;
+        let trainOskHold = null;
+
+        const TRAIN_OSK_ACCENT = { a: 'á', e: 'é', i: 'í', o: 'ó', u: 'ú', n: 'ñ' };
+
+        function clearTrainOskHold() {
+            if (trainOskHold?.timer) clearTimeout(trainOskHold.timer);
+            trainOskHold = null;
+        }
+
+        function hideTrainOsk() {
+            trainOskActiveInput = null;
+            clearTrainOskHold();
+            document.body.classList.remove('train-osk-open');
+            trainOskEl?.classList.add('hidden');
+        }
+
+        function getTrainOskLang(inp) {
+            const lang = String(inp?.getAttribute('lang') || learningLanguage || 'en').slice(0, 2).toLowerCase();
+            return lang === 'es' ? 'es' : 'en';
+        }
+
+        function insertTrainOskText(inp, text) {
+            if (!inp || inp.disabled) return;
+            const start = inp.selectionStart ?? inp.value.length;
+            const end = inp.selectionEnd ?? start;
+            const v = inp.value;
+            inp.value = v.slice(0, start) + text + v.slice(end);
+            const pos = start + text.length;
+            try { inp.setSelectionRange(pos, pos); } catch (_) {}
+            inp.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        function backspaceTrainOskInput(inp) {
+            if (!inp || inp.disabled) return;
+            const start = inp.selectionStart ?? inp.value.length;
+            const end = inp.selectionEnd ?? start;
+            if (start !== end) {
+                inp.value = inp.value.slice(0, start) + inp.value.slice(end);
+                try { inp.setSelectionRange(start, start); } catch (_) {}
+            } else if (start > 0) {
+                inp.value = inp.value.slice(0, start - 1) + inp.value.slice(start);
+                try { inp.setSelectionRange(start - 1, start - 1); } catch (_) {}
+            }
+            inp.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        function submitTrainOskEnter(inp) {
+            if (!inp || inp.disabled) return;
+            inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+        }
+
+        function ensureTrainOsk() {
+            if (trainOskEl) return trainOskEl;
+            const el = document.createElement('div');
+            el.id = 'train-osk';
+            el.className = 'train-osk hidden';
+            el.setAttribute('role', 'group');
+            el.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(el);
+
+            el.addEventListener('pointerdown', (e) => {
+                const btn = e.target.closest('.train-osk-key');
+                if (!btn || !trainOskActiveInput) return;
+                e.preventDefault();
+                const inp = trainOskActiveInput;
+                inp.focus({ preventScroll: true });
+
+                const action = btn.dataset.action;
+                if (action === 'space') { insertTrainOskText(inp, ' '); return; }
+                if (action === 'backspace') { backspaceTrainOskInput(inp); return; }
+                if (action === 'enter') { submitTrainOskEnter(inp); return; }
+
+                const key = btn.dataset.key;
+                const base = btn.dataset.base || key;
+                if (btn.classList.contains('train-osk-key--accentable')) {
+                    clearTrainOskHold();
+                    trainOskHold = {
+                        btn,
+                        key,
+                        timer: setTimeout(() => {
+                            if (!trainOskHold || trainOskHold.btn !== btn) return;
+                            const acc = TRAIN_OSK_ACCENT[base];
+                            if (acc) insertTrainOskText(inp, acc);
+                            trainOskHold.fired = true;
+                        }, ES_ACCENT_HOLD_MS)
+                    };
+                } else {
+                    insertTrainOskText(inp, key);
+                }
+            });
+
+            el.addEventListener('pointerup', () => {
+                if (!trainOskHold) return;
+                const { key, fired } = trainOskHold;
+                clearTrainOskHold();
+                if (fired || !trainOskActiveInput) return;
+                insertTrainOskText(trainOskActiveInput, key);
+            });
+            el.addEventListener('pointercancel', clearTrainOskHold);
+            el.addEventListener('pointerleave', clearTrainOskHold);
+
+            trainOskEl = el;
+            return el;
+        }
+
+        function renderTrainOsk(lang) {
+            const osk = ensureTrainOsk();
+            const rows = [
+                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+                ['z', 'x', 'c', 'v', 'b', 'n', 'm']
+            ];
+            if (lang === 'es') rows.push(['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü']);
+
+            let html = '';
+            rows.forEach((row) => {
+                html += '<div class="train-osk-row">';
+                row.forEach((key) => {
+                    const accentable = lang === 'es' && 'aeioun'.includes(key);
+                    html += `<button type="button" class="train-osk-key${accentable ? ' train-osk-key--accentable' : ''}" data-key="${key}" data-base="${key}">${key}</button>`;
+                });
+                html += '</div>';
+            });
+            html += `<div class="train-osk-row train-osk-row--bottom">
+                <button type="button" class="train-osk-key train-osk-key--wide" data-key="-">-</button>
+                <button type="button" class="train-osk-key train-osk-key--wide" data-key="'">'</button>
+                <button type="button" class="train-osk-key train-osk-key--space" data-action="space" aria-label="Space">␣</button>
+                <button type="button" class="train-osk-key train-osk-key--wide" data-action="backspace" aria-label="Backspace">⌫</button>
+                <button type="button" class="train-osk-key train-osk-key--enter" data-action="enter" aria-label="Done">↵</button>
+            </div>`;
+            osk.innerHTML = html;
+        }
+
+        function showTrainOsk(inp) {
+            if (!inp || inp.disabled || !isTrainingTouchDevice()) return;
+            trainOskActiveInput = inp;
+            renderTrainOsk(getTrainOskLang(inp));
+            const osk = ensureTrainOsk();
+            osk.classList.remove('hidden');
+            osk.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('train-osk-open');
+            requestAnimationFrame(() => {
+                try { inp.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
+            });
+        }
+
+        function wireTrainOskInput(inp) {
+            if (!inp || inp._trainOskWired) return;
+            inp._trainOskWired = true;
+            inp.addEventListener('focus', () => {
+                if (!inp.disabled && isTrainingTouchDevice()) showTrainOsk(inp);
+            });
+            inp.addEventListener('blur', () => {
+                setTimeout(() => {
+                    if (document.activeElement === inp) return;
+                    if (trainOskEl && trainOskEl.contains(document.activeElement)) return;
+                    if (trainOskActiveInput === inp) hideTrainOsk();
+                }, 140);
+            });
+            inp.addEventListener('touchstart', (e) => {
+                if (!isTrainingTouchDevice() || inp.disabled) return;
+                e.preventDefault();
+                inp.focus({ preventScroll: true });
+                showTrainOsk(inp);
+            }, { passive: false });
+        }
+
         function applyTrainingInputNoSuggest(inp) {
             if (!inp) return;
-            const usePwd = useTrainingPasswordField();
-            inp.type = usePwd ? 'password' : 'text';
+            inp.type = 'text';
             inp.classList.add('train-answer-input');
-            inp.classList.toggle('train-answer--plain', usePwd);
-            inp.setAttribute('autocomplete', usePwd ? 'new-password' : 'off');
+            inp.classList.remove('train-answer--plain');
+            inp.setAttribute('autocomplete', 'off');
             inp.setAttribute('autocorrect', 'off');
             inp.setAttribute('autocapitalize', 'off');
             inp.setAttribute('spellcheck', 'false');
-            if (!usePwd) inp.setAttribute('inputmode', 'verbatim');
-            else inp.removeAttribute('inputmode');
             inp.setAttribute('enterkeyhint', 'done');
             inp.setAttribute('data-lpignore', 'true');
             inp.setAttribute('data-1p-ignore', '');
             inp.setAttribute('data-form-type', 'other');
-            if (usePwd) {
-                inp.setAttribute('name', `train-answer-${Date.now()}`);
+            inp.removeAttribute('name');
+
+            if (isTrainingTouchDevice()) {
+                inp.readOnly = true;
+                inp.setAttribute('inputmode', 'none');
+                inp.classList.add('train-answer--osk');
+                wireTrainOskInput(inp);
+                showTrainOsk(inp);
             } else {
-                inp.removeAttribute('name');
+                inp.readOnly = false;
+                inp.classList.remove('train-answer--osk');
+                inp.setAttribute('inputmode', 'verbatim');
             }
         }
 
