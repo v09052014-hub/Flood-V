@@ -1238,7 +1238,9 @@
             right: 0;
             bottom: 0;
             z-index: 200;
-            padding: 0.35rem 0.45rem calc(0.5rem + env(safe-area-inset-bottom));
+            display: flex;
+            flex-direction: column;
+            padding: 0.28rem 0.45rem calc(0.5rem + env(safe-area-inset-bottom));
             background: rgba(248, 250, 252, 0.97);
             backdrop-filter: blur(10px);
             border-top: 1px solid #e2e8f0;
@@ -1260,38 +1262,73 @@
             padding-bottom: calc(var(--train-osk-pad, 11.75rem) + 3.35rem);
         }
         .train-osk-floats {
-            position: absolute;
-            top: 0.18rem;
-            right: 0.42rem;
+            position: relative;
+            top: auto;
+            right: auto;
+            align-self: flex-end;
             display: flex;
-            gap: 0.32rem;
+            gap: 0.28rem;
+            margin: 0 0.08rem 0.3rem 0;
             z-index: 3;
             pointer-events: none;
         }
         .train-osk-float {
             pointer-events: auto;
-            min-height: 1.55rem;
-            padding: 0 0.5rem;
-            border-radius: 0.42rem;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            background: rgba(255, 255, 255, 0.18);
-            color: rgba(71, 85, 105, 0.42);
-            font-size: 0.66rem;
+            min-height: 1.45rem;
+            padding: 0 0.46rem;
+            border-radius: 0.4rem;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(71, 85, 105, 0.34);
+            font-size: 0.64rem;
             font-weight: 800;
             letter-spacing: 0.03em;
             touch-action: manipulation;
             line-height: 1;
         }
         body.train-osk-tall .train-osk-float {
-            color: rgba(71, 85, 105, 0.52);
-            background: rgba(255, 255, 255, 0.24);
+            color: rgba(71, 85, 105, 0.42);
+            background: rgba(255, 255, 255, 0.14);
         }
         .train-osk-float.is-active {
-            background: rgba(224, 231, 255, 0.78);
-            color: #4338ca;
-            border-color: rgba(165, 180, 252, 0.55);
+            background: rgba(224, 231, 255, 0.55);
+            color: rgba(67, 56, 202, 0.78);
+            border-color: rgba(165, 180, 252, 0.38);
         }
-        .train-osk-float:active { background: rgba(226, 232, 240, 0.65); }
+        .train-osk-float:active { background: rgba(226, 232, 240, 0.45); }
+        .train-osk-keys { width: 100%; }
+        .train-osk-key.is-pressed {
+            background: #c7d2fe;
+            border-color: #818cf8;
+            color: #312e81;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.22);
+            transform: scale(0.98);
+        }
+        .train-osk-preview {
+            position: fixed;
+            z-index: 220;
+            transform: translate(-50%, calc(-100% - 0.45rem)) scale(0.88);
+            min-width: 2.85rem;
+            height: 2.85rem;
+            padding: 0 0.35rem;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+            color: #fff;
+            font-size: 1.38rem;
+            font-weight: 700;
+            line-height: 1;
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.38);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.07s ease, transform 0.07s ease;
+        }
+        .train-osk-preview.is-visible {
+            opacity: 1;
+            transform: translate(-50%, calc(-100% - 0.45rem)) scale(1);
+        }
         .train-osk-numbers {
             margin-bottom: 0.28rem;
             padding-bottom: 0.28rem;
@@ -1320,7 +1357,7 @@
             line-height: 1;
         }
         body.train-osk-tall .train-osk-key { font-size: 1.24rem; }
-        .train-osk-key:active { background: #e2e8f0; transform: scale(0.96); }
+        .train-osk-key:active { background: #ddd6fe; border-color: #a5b4fc; color: #312e81; }
         .train-osk-key--backspace {
             flex: 1.55 1 0;
             max-width: 3.85rem;
@@ -1759,6 +1796,30 @@
         }
 
         /* Crossword — normal size (original compact look) */
+        /* Brainstorm toolbar — SRS stage ring (same style as results screen) */
+        .bs-stage-ring {
+            position: relative;
+            width: 2rem;
+            height: 2rem;
+            flex-shrink: 0;
+        }
+        .bs-stage-ring svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .bs-stage-ring-num {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #4f46e5;
+            line-height: 1;
+            pointer-events: none;
+        }
         .cw-board {
             display: grid;
             gap: 0.25rem;
@@ -1904,6 +1965,13 @@
         }
         body.crossword-expand-mode #bs-overall-stage {
             font-size: 0.65rem;
+        }
+        body.crossword-expand-mode .bs-stage-ring {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        body.crossword-expand-mode .bs-stage-ring-num {
+            font-size: 0.5rem;
         }
         body.crossword-expand-mode #bs-word-counter {
             font-size: 0.65rem;
@@ -3191,8 +3259,26 @@
         .train-word-ipa {
             font-variant-numeric: tabular-nums;
             letter-spacing: 0.01em;
-            margin-top: 0.05rem;
+            margin: 0;
             line-height: 1.25;
+        }
+        .train-word-head {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .train-word-head--intro {
+            margin-bottom: 0.35rem;
+        }
+        .train-word-head h3 {
+            margin-bottom: 0.15rem;
+        }
+        .train-word-ipa-slot {
+            min-height: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
         }
         .train-word-ipa[data-ipa-src] {
             cursor: help;
@@ -3394,6 +3480,8 @@
             justify-content: center;
             width: 100%;
             min-height: 100%;
+            position: relative;
+            z-index: 1;
         }
         .train-mode-head {
             display: flex;
@@ -3572,6 +3660,125 @@
             .train-due-badge--brainstorm:focus-visible::after {
                 right: auto;
                 left: 0;
+            }
+        }
+        @media (hover: none), (pointer: coarse) {
+            body.train-due-badges-on .train-mode-card .train-due-badge--ready {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+                pointer-events: auto;
+            }
+            body.train-due-badges-on .train-due-badge--ready.train-due-badge--tip-open::after {
+                content: attr(data-due-tip);
+                position: absolute;
+                top: calc(100% + 0.3rem);
+                right: 0;
+                z-index: 6;
+                min-width: max-content;
+                max-width: 12rem;
+                padding: 0.32rem 0.55rem;
+                border-radius: 0.45rem;
+                font-size: 0.64rem;
+                font-weight: 500;
+                line-height: 1.25;
+                color: #f8fafc;
+                background: rgba(15, 23, 42, 0.92);
+                border: 1px solid rgba(148, 163, 184, 0.25);
+                box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
+                pointer-events: none;
+                white-space: nowrap;
+            }
+            body.train-due-badges-on .train-due-badge--brainstorm.train-due-badge--tip-open::after {
+                right: auto;
+                left: 0;
+            }
+        }
+        body:not(.train-due-badges-on) .train-due-badge {
+            display: none !important;
+        }
+
+        /* Due-count water fill (training cards) */
+        .train-due-water {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            border-radius: inherit;
+            overflow: hidden;
+            --due-a: rgba(125, 211, 252, 0.5);
+            --due-b: rgba(147, 197, 253, 0.42);
+            --due-c: rgba(186, 230, 253, 0.88);
+            --wave-period: 300px;
+        }
+        body:not(.train-due-badges-on) .train-due-water {
+            display: none !important;
+        }
+        .train-due-water--brainstorm {
+            --due-a: rgba(56, 189, 248, 0.46);
+            --due-b: rgba(14, 165, 233, 0.38);
+            --due-c: rgba(2, 132, 199, 0.82);
+        }
+        .train-due-water-body {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: var(--due-fill, 0%);
+            overflow: hidden;
+            transition: height 0.55s ease;
+        }
+        .train-due-water-sine {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: calc(var(--wave-period) * 4);
+            height: 100%;
+            background: linear-gradient(180deg, var(--due-a) 0%, var(--due-b) 48%, var(--due-c) 100%);
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200' preserveAspectRatio='none'%3E%3Cpath fill='white' d='M0 3 C37.5 0 112.5 0 150 3 C187.5 12 262.5 12 300 3 L300 200 L0 200 Z'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200' preserveAspectRatio='none'%3E%3Cpath fill='white' d='M0 3 C37.5 0 112.5 0 150 3 C187.5 12 262.5 12 300 3 L300 200 L0 200 Z'/%3E%3C/svg%3E");
+            -webkit-mask-size: var(--wave-period) 100%;
+            mask-size: var(--wave-period) 100%;
+            -webkit-mask-repeat: repeat-x;
+            mask-repeat: repeat-x;
+            pointer-events: none;
+        }
+        @keyframes trainDueSineDrift {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-1 * var(--wave-period))); }
+        }
+        .train-due-water--has-fill .train-due-water-sine {
+            animation: trainDueSineDrift 18s linear infinite;
+        }
+        .train-mode-card:hover .train-due-water--has-fill .train-due-water-sine,
+        .train-mode-card:focus-visible .train-due-water--has-fill .train-due-water-sine,
+        .train-mode-card.is-peek .train-due-water--has-fill .train-due-water-sine,
+        #train-brainstorm-card:hover .train-due-water--has-fill .train-due-water-sine,
+        #train-brainstorm-card:focus-within .train-due-water--has-fill .train-due-water-sine {
+            animation-duration: 6s;
+        }
+        .train-due-water--waving .train-due-water-sine {
+            animation-duration: 4s !important;
+        }
+        #train-brainstorm-card .train-due-water-body {
+            bottom: 0;
+            margin: 0;
+            padding: 0;
+        }
+        #train-brainstorm-card .train-brainstorm-start-btn {
+            position: relative;
+            z-index: 2;
+        }
+        #train-brainstorm-card .train-brainstorm-tools {
+            z-index: 6;
+        }
+        #train-brainstorm-card .train-brainstorm-decor {
+            z-index: 1;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .train-due-water--has-fill .train-due-water-sine,
+            .train-due-water--waving .train-due-water-sine {
+                animation: none;
             }
         }
 
@@ -3825,6 +4032,45 @@
             color: #fff;
             border-color: rgba(255, 255, 255, 0.45);
         }
+        #train-brainstorm-card.is-cap-reached {
+            background: linear-gradient(135deg, #a5b4fc 0%, #c7d2fe 48%, #ddd6fe 100%) !important;
+            box-shadow: 0 1px 3px rgba(79, 70, 229, 0.12);
+        }
+        #train-brainstorm-card.is-cap-reached .train-brainstorm-decor {
+            opacity: 0.12;
+        }
+        #train-brainstorm-card.is-cap-reached .train-brainstorm-start-btn {
+            cursor: default;
+        }
+        #train-brainstorm-card.is-cap-reached .train-brainstorm-start-btn:hover {
+            background: transparent;
+        }
+        #train-brainstorm-card.is-cap-reached h3,
+        #train-brainstorm-card.is-cap-reached .train-brainstorm-desc {
+            color: rgba(255, 255, 255, 0.88);
+        }
+        .train-brainstorm-cap-msg {
+            margin-top: 0.65rem;
+            font-size: 0.78rem;
+            line-height: 1.4;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.92);
+        }
+        .train-brainstorm-cap-msg.hidden { display: none !important; }
+        .train-brainstorm-cap-settings {
+            display: inline;
+            margin: 0;
+            padding: 0;
+            border: none;
+            background: none;
+            color: #fff;
+            font: inherit;
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            cursor: pointer;
+        }
+        .train-brainstorm-cap-settings:hover { color: #eef2ff; }
         #train-settings {
             position: relative;
             z-index: 1;
@@ -4590,8 +4836,25 @@
                                     <span class="settings-toggle-hint block" data-i18n="settings.introMorphHint">На етапі ознайомлення Brainstorm: префікси, суфікси або частини довгих слів.</span>
                                 </span>
                             </label>
-                            <p class="settings-segment-label" data-i18n="settings.trainModesVisible">Режими тренування</p>
-                            <p class="settings-toggle-hint mb-1" data-i18n="settings.trainModesHint">Оберіть, які вправи показувати на сторінці тренувань.</p>
+                            <div class="mt-4">
+                                <label class="settings-segment-label" for="settings-bs-daily-cap" data-i18n="settings.bsDailyCap">Денний ліміт Brainstorm</label>
+                                <select id="settings-bs-daily-cap" class="settings-select mt-1.5 w-full max-w-xs" onchange="setBrainstormDailyCap(parseInt(this.value, 10))">
+                                    <option value="30">30</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="0" data-i18n="settings.bsDailyCapNone">Без ліміту</option>
+                                </select>
+                                <p class="settings-toggle-hint mt-1.5" data-i18n="settings.bsDailyCapHint">Скільки слів можна пройти в Brainstorm за день. Інші вправи не обмежуються.</p>
+                            </div>
+                            <p class="settings-segment-label mt-4" data-i18n="settings.trainModesVisible">Режими тренування</p>
+                            <label class="settings-toggle-row mt-4">
+                                <input type="checkbox" id="settings-train-due-badges" onchange="setShowTrainDueBadges(this.checked)">
+                                <span>
+                                    <span class="settings-toggle-title" data-i18n="settings.showTrainDue">Кількість слів до тренування</span>
+                                    <span class="settings-toggle-hint block" data-i18n="settings.showTrainDueHint">Цифра на картках вправ: скільки слів готові до повторення. На телефоні торкніться цифри, щоб побачити підказку.</span>
+                                </span>
+                            </label>
+                            <p class="settings-toggle-hint mb-1 mt-4" data-i18n="settings.trainModesHint">Оберіть, які вправи показувати на сторінці тренувань.</p>
                             <div id="settings-train-modes-list" class="settings-mode-grid"></div>
                             <p class="settings-segment-label" data-i18n="settings.dictGrid">Сітка словника</p>
                             <select id="settings-dict-grid-cols" class="settings-select" onchange="setDictGridCols(parseInt(this.value, 10))">
@@ -4802,7 +5065,18 @@
                             </div>
                         </div>
                     </div>
-                    <input type="text" id="manual-context" placeholder="Контекст (необовʼязково)" class="hidden w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-400 font-medium text-sm text-slate-600 bg-slate-50" data-i18n-placeholder="dict.contextPlaceholder" autocomplete="off">
+                    <div id="manual-context-wrap" class="hidden space-y-2">
+                        <div class="relative">
+                            <input type="text" id="manual-context" placeholder="Контекст (необовʼязково)" class="w-full px-3 py-2 pr-11 border border-slate-200 rounded-xl outline-none focus:border-indigo-400 font-medium text-sm text-slate-600 bg-slate-50" data-i18n-placeholder="dict.contextPlaceholder" autocomplete="off">
+                            <button type="button" id="btn-home-context-trans" onclick="fetchManualContextTranslation()" class="hidden absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 inline-flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 transition text-base leading-none disabled:opacity-40 disabled:pointer-events-none" title="Exact translation in sentence" data-i18n-title="inline.contextTrans" aria-label="Context translation">🎯</button>
+                        </div>
+                        <div id="home-manual-context-panel" class="hidden text-left rounded-xl border border-indigo-100 bg-indigo-50/60 px-3 py-2.5">
+                            <p class="inline-ctx-label" data-i18n="inline.contextSource">Речення</p>
+                            <p id="home-manual-context-source" class="text-slate-600 italic mb-2.5 text-sm"></p>
+                            <p class="inline-ctx-label" data-i18n="inline.contextFullTrans">Повний переклад</p>
+                            <p id="home-manual-context-full" class="text-slate-800 font-medium text-sm"></p>
+                        </div>
+                    </div>
                     <button onclick="addWordManual()" id="btn-add-manual" class="w-full bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-sm active:scale-95 text-base" data-i18n="dict.add">Додати до словника</button>
                 </div>
             </div>
@@ -5170,15 +5444,16 @@
                     </div>
 
                     <div class="w-full bg-indigo-600 text-white rounded-2xl shadow-lg relative overflow-hidden group" id="train-brainstorm-card">
-                        <div class="absolute right-0 top-0 bottom-0 w-32 bg-indigo-500 opacity-20 skew-x-12 transform translate-x-4 group-hover:translate-x-0 transition-transform pointer-events-none"></div>
+                        <div class="train-brainstorm-decor absolute right-0 top-0 bottom-0 w-32 bg-indigo-500 opacity-20 skew-x-12 transform translate-x-4 group-hover:translate-x-0 transition-transform pointer-events-none"></div>
                         <div class="train-brainstorm-tools">
                             <span class="train-due-badge train-due-badge--always train-due-badge--brainstorm" data-train-due="all"></span>
                             <button type="button" id="btn-train-settings" onclick="toggleTrainSettings(event)" title="Settings" data-i18n-title="train.settings" aria-label="Settings" aria-expanded="false" aria-controls="train-settings">⚙️</button>
                         </div>
-                        <button type="button" onclick="closeTrainSettings(); startSession('all')" class="w-full p-6 pr-[5.75rem] text-left hover:bg-indigo-700/40 transition active:scale-[0.99]">
+                        <button type="button" id="btn-brainstorm-start" onclick="tryStartBrainstorm()" class="train-brainstorm-start-btn w-full p-6 pr-[5.75rem] text-left hover:bg-indigo-700/40 transition active:scale-[0.99]">
                             <div class="min-w-0">
                                 <h3 class="text-2xl font-bold mb-1">🧠 Brainstorm</h3>
-                                <p class="text-indigo-100 text-sm font-medium" data-i18n="train.bsDesc">Інтенсивне комплексне опрацювання слів</p>
+                                <p class="train-brainstorm-desc text-indigo-100 text-sm font-medium" data-i18n="train.bsDesc">Інтенсивне комплексне опрацювання слів</p>
+                                <p id="train-brainstorm-cap-msg" class="train-brainstorm-cap-msg hidden" aria-live="polite"></p>
                             </div>
                         </button>
                     </div>
@@ -5303,6 +5578,7 @@
                 <div id="bs-toolbar" class="flex items-center justify-between gap-2 mb-3 px-0.5">
                     <button onclick="endSession()" id="btn-end-session" class="h-10 px-3 flex items-center justify-center gap-1.5 bg-white hover:bg-rose-50 text-rose-600 rounded-xl border border-slate-200 shadow-sm text-sm font-bold transition active:scale-95 flex-shrink-0" data-i18n-title="train.interrupt" title="Перервати (Esc)"><span class="text-base leading-none">✕</span><span class="hidden sm:inline" data-i18n="train.stop">Стоп</span></button>
                     <div class="flex items-center justify-center gap-2 min-w-0 flex-1 overflow-hidden px-1">
+                        <div id="bs-stage-ring" class="bs-stage-ring hidden" aria-hidden="true"></div>
                         <span id="bs-overall-stage" class="text-xs font-bold text-slate-500 uppercase tracking-wider truncate"></span>
                         <span id="bs-word-counter" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md flex-shrink-0"></span>
                     </div>
@@ -5332,11 +5608,11 @@
                         </div>
 
                         <div class="mt-3 flex flex-col gap-2 relative z-10 w-full">
-                            <button type="button" id="bs-btn-wrong-sense" onclick="discardWrongDefinitionSense()" class="def-wrong-sense-btn hidden" data-i18n="train.defWrongSense" data-i18n-title="train.defWrongSenseTitle" title="">Не те значення</button>
                             <div class="flex gap-3 w-full">
                                 <button id="bs-btn-dont-know" onclick="markWordAsFailed()" class="flex-shrink-0 bg-slate-100 text-slate-500 hover:bg-slate-200 py-3 px-4 rounded-xl font-bold text-sm transition border border-slate-200 shadow-sm hidden" data-i18n-html="train.dontKnow">Не знаю<br>слово</button>
                                 <button id="bs-btn-next" onclick="nextBrainstormStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-lg hidden active:scale-95 shadow-md transition" data-i18n="train.next">Далі <span class="font-normal">↵</span></button>
                             </div>
+                            <button type="button" id="bs-btn-wrong-sense" onclick="discardWrongDefinitionSense()" class="def-wrong-sense-btn hidden" data-i18n="train.defWrongSense" data-i18n-title="train.defWrongSenseTitle" title="">Не те значення</button>
                         </div>
                     </div>
                     <div id="bs-external-clues" class="w-full lg:w-5/12 hidden transition-all"></div>
@@ -5663,6 +5939,13 @@
                 'settings.trainingSfxHint': 'Звуки відповідей, таймера та завершення сесії. Озвучення слів не змінюється.',
                 'settings.introMorph': 'Підказки про будову слова',
                 'settings.introMorphHint': 'На етапі ознайомлення Brainstorm: префікси, суфікси або частини довгих слів.',
+                'settings.showTrainDue': 'Кількість слів до тренування',
+                'settings.showTrainDueHint': 'Цифра на картках вправ: скільки слів готові до повторення. На телефоні торкніться цифри, щоб побачити підказку.',
+                'settings.bsDailyCap': 'Денний ліміт Brainstorm',
+                'settings.bsDailyCapNone': 'Без ліміту',
+                'settings.bsDailyCapHint': 'Скільки слів можна пройти в Brainstorm за день. Інші вправи не обмежуються.',
+                'train.bsCapReached': 'Ліміт на сьогодні досягнуто ({n} з {cap}). Спробуйте інші вправи',
+                'train.bsCapSettings': 'змінити ліміт у налаштуваннях',
                 'train.introMorphLabel': 'Будова слова',
                 'morph.longWord': 'Довге слово — читай по частинах',
                 'morph.likeWord': 'Схоже на: {word}',
@@ -5941,6 +6224,7 @@
                 'dict.listen': 'Прослухати (Alt/⌥+↵)',
                 'dict.mwOpen': 'Тлумачення · Shift+↵',
                 'dict.contextPlaceholder': 'Контекст (необовʼязково)',
+                'dict.contextWordMissing': 'Слово не знайдено в контексті',
                 'status.connecting': 'Підключення...',
                 'img.searching': 'Шукаємо...', 'img.noKey': 'Немає ключа Unsplash. Показано стандартне.',
                 'img.none': 'Нічого не знайдено.', 'img.limit': 'Ліміт запитів вичерпано. Використовуйте стандартне.',
@@ -6107,6 +6391,13 @@
                 'settings.trainingSfxHint': 'Sounds for answers, timers, and session completion. Word audio is unchanged.',
                 'settings.introMorph': 'Word structure hints',
                 'settings.introMorphHint': 'During Brainstorm introduction: prefixes, suffixes, or chunks of long words.',
+                'settings.showTrainDue': 'Words due for training',
+                'settings.showTrainDueHint': 'Count on exercise cards: how many words are ready to review. On phone, tap the number for details.',
+                'settings.bsDailyCap': 'Daily Brainstorm limit',
+                'settings.bsDailyCapNone': 'No limit',
+                'settings.bsDailyCapHint': 'How many words you can complete in Brainstorm per day. Other exercises are not limited.',
+                'train.bsCapReached': 'Today\'s limit reached ({n} of {cap}). Try other exercises',
+                'train.bsCapSettings': 'change the limit in settings',
                 'train.introMorphLabel': 'Word structure',
                 'morph.longWord': 'Long word — read it in parts',
                 'morph.likeWord': 'Like: {word}',
@@ -6385,6 +6676,7 @@
                 'dict.listen': 'Listen (Alt/⌥+↵)',
                 'dict.mwOpen': 'Dictionary · Shift+↵',
                 'dict.contextPlaceholder': 'Context (optional)',
+                'dict.contextWordMissing': 'Word not found in context',
                 'status.connecting': 'Connecting...',
                 'img.searching': 'Searching...', 'img.noKey': 'No Unsplash key. Showing a default image.',
                 'img.none': 'Nothing found.', 'img.limit': 'Request limit reached. Using a default image.',
@@ -6546,6 +6838,13 @@
                 'settings.trainingSfxHint': 'Sonidos de respuestas, temporizador y fin de sesión. El audio de palabras no cambia.',
                 'settings.introMorph': 'Pistas de estructura de palabras',
                 'settings.introMorphHint': 'En la introducción de Brainstorm: prefijos, sufijos o partes de palabras largas.',
+                'settings.showTrainDue': 'Palabras pendientes de entrenar',
+                'settings.showTrainDueHint': 'Número en las tarjetas: cuántas palabras están listas para repasar. En el móvil, toca el número para ver el detalle.',
+                'settings.bsDailyCap': 'Límite diario de Brainstorm',
+                'settings.bsDailyCapNone': 'Sin límite',
+                'settings.bsDailyCapHint': 'Cuántas palabras puedes completar en Brainstorm al día. Otras actividades no tienen límite.',
+                'train.bsCapReached': 'Límite de hoy alcanzado ({n} de {cap}). Prueba otras actividades',
+                'train.bsCapSettings': 'cambiar el límite en ajustes',
                 'train.introMorphLabel': 'Estructura',
                 'morph.longWord': 'Palabra larga — léela por partes',
                 'morph.likeWord': 'Como: {word}',
@@ -6824,6 +7123,7 @@
                 'dict.listen': 'Escuchar (Alt/⌥+↵)',
                 'dict.mwOpen': 'Definición · Shift+↵',
                 'dict.contextPlaceholder': 'Contexto (opcional)',
+                'dict.contextWordMissing': 'Palabra no encontrada en el contexto',
                 'status.connecting': 'Conectando...',
                 'img.searching': 'Buscando...', 'img.noKey': 'No hay clave de Unsplash. Se muestra una imagen por defecto.',
                 'img.none': 'No se ha encontrado nada.', 'img.limit': 'Límite de peticiones. Se usa una imagen por defecto.',
@@ -6986,12 +7286,21 @@
         const READER_THEME_KEY = 'linguaspace_reader_theme_v1';
         const READER_QUICK_MATCH_LOG_KEY = 'linguaspace_reader_quick_match_log_v1';
         const TRAIN_OSK_EXPANDED_KEY = 'linguaspace_train_osk_expanded_v1';
+        const SHOW_TRAIN_DUE_BADGES_KEY = 'linguaspace_show_train_due_badges_v1';
+        const BS_DAILY_CAP_KEY = 'linguaspace_bs_daily_cap_v1';
+        const BS_DAY_WORDS_KEY = 'linguaspace_bs_day_words_v1';
         const READER_QUICK_MATCH_BATCH = 4;
         let settingsActiveTab = 'languages';
         let showTrainingPronunciation = localStorage.getItem(SHOW_IPA_KEY) === '1';
         let showIpaSourceOnHover = localStorage.getItem(SHOW_IPA_SOURCE_KEY) !== '0';
         let trainingSoundEffects = localStorage.getItem(TRAINING_SFX_KEY) !== '0';
         let showIntroMorphHints = localStorage.getItem(SHOW_INTRO_MORPH_KEY) === '1';
+        let showTrainDueBadges = localStorage.getItem(SHOW_TRAIN_DUE_BADGES_KEY) !== '0';
+        let brainstormDailyCap = (() => {
+            const v = parseInt(localStorage.getItem(BS_DAILY_CAP_KEY) || '30', 10);
+            if (v === 0 || v === 30 || v === 50 || v === 100) return v;
+            return 30;
+        })();
         let hiddenTrainModes = [];
         try {
             hiddenTrainModes = JSON.parse(localStorage.getItem(HIDDEN_TRAIN_MODES_KEY) || '[]');
@@ -7095,6 +7404,7 @@
                 if (modal && !modal.classList.contains('hidden')) renderReviewModesChips();
             }
             if (typeof updateReviewDueBadge === 'function') updateReviewDueBadge();
+            if (typeof syncBrainstormCapUi === 'function') syncBrainstormCapUi();
             if (typeof refreshYearRingUI === 'function') refreshYearRingUI();
         }
         function langPairLabel() {
@@ -7307,6 +7617,8 @@
             localStorage.setItem(SHOW_IPA_SOURCE_KEY, showIpaSourceOnHover ? '1' : '0');
             localStorage.setItem(TRAINING_SFX_KEY, trainingSoundEffects ? '1' : '0');
             localStorage.setItem(SHOW_INTRO_MORPH_KEY, showIntroMorphHints ? '1' : '0');
+            localStorage.setItem(SHOW_TRAIN_DUE_BADGES_KEY, showTrainDueBadges ? '1' : '0');
+            localStorage.setItem(BS_DAILY_CAP_KEY, String(brainstormDailyCap));
             localStorage.setItem(HIDDEN_TRAIN_MODES_KEY, JSON.stringify(hiddenTrainModes));
             localStorage.setItem(DICT_GRID_COLS_KEY, String(dictGridCols));
             localStorage.setItem(READER_HL_COLOR_KEY, readerHighlightColor);
@@ -7315,7 +7627,7 @@
             try {
                 await setDoc(doc(db, 'users', activeUid), {
                     interfaceLanguage, learningLanguage, translationLanguage, activeTrackId, knownTracks,
-                    showTrainingPronunciation, showIpaSourceOnHover, trainingSoundEffects, showIntroMorphHints,
+                    showTrainingPronunciation, showIpaSourceOnHover, trainingSoundEffects, showIntroMorphHints, showTrainDueBadges, brainstormDailyCap,
                     hiddenTrainModes, dictGridCols, readerHighlightColor
                 }, { merge: true });
             } catch (e) { console.error(e); }
@@ -7481,6 +7793,14 @@
                         showIntroMorphHints = d.showIntroMorphHints;
                         localStorage.setItem(SHOW_INTRO_MORPH_KEY, showIntroMorphHints ? '1' : '0');
                     }
+                    if (typeof d.showTrainDueBadges === 'boolean') {
+                        showTrainDueBadges = d.showTrainDueBadges;
+                        localStorage.setItem(SHOW_TRAIN_DUE_BADGES_KEY, showTrainDueBadges ? '1' : '0');
+                    }
+                    if (d.brainstormDailyCap === 0 || d.brainstormDailyCap === 30 || d.brainstormDailyCap === 50 || d.brainstormDailyCap === 100) {
+                        brainstormDailyCap = d.brainstormDailyCap;
+                        localStorage.setItem(BS_DAILY_CAP_KEY, String(brainstormDailyCap));
+                    }
                     if (Array.isArray(d.hiddenTrainModes)) {
                         hiddenTrainModes = d.hiddenTrainModes.filter((m) => typeof m === 'string');
                         localStorage.setItem(HIDDEN_TRAIN_MODES_KEY, JSON.stringify(hiddenTrainModes));
@@ -7556,6 +7876,12 @@
             if (sfxToggle) sfxToggle.checked = !!trainingSoundEffects;
             const morphToggle = document.getElementById('settings-intro-morph');
             if (morphToggle) morphToggle.checked = !!showIntroMorphHints;
+            const dueBadgesToggle = document.getElementById('settings-train-due-badges');
+            if (dueBadgesToggle) dueBadgesToggle.checked = !!showTrainDueBadges;
+            const bsCapSel = document.getElementById('settings-bs-daily-cap');
+            if (bsCapSel) bsCapSel.value = String(brainstormDailyCap);
+            const bsCapNoneOpt = bsCapSel?.querySelector('option[value="0"]');
+            if (bsCapNoneOpt) bsCapNoneOpt.textContent = t('settings.bsDailyCapNone');
             const gridSel = document.getElementById('settings-dict-grid-cols');
             if (gridSel) gridSel.value = String(dictGridCols);
             const enOnly = document.getElementById('settings-show-ipa-en-only');
@@ -7563,6 +7889,8 @@
             renderTrainModeSettingsList();
             renderReaderHlSwatches();
             syncTrainModeVisibility();
+            applyTrainDueBadgesVisibility();
+            syncBrainstormCapUi();
             applyDictGridCols();
             applyReaderHighlightColor();
             syncReaderQuickMatchUi();
@@ -7645,6 +7973,140 @@
             localStorage.setItem(SHOW_IPA_SOURCE_KEY, showIpaSourceOnHover ? '1' : '0');
             await saveUserPrefs();
         };
+
+        window.setBrainstormDailyCap = async (n) => {
+            const v = [0, 30, 50, 100].includes(n) ? n : 30;
+            brainstormDailyCap = v;
+            localStorage.setItem(BS_DAILY_CAP_KEY, String(v));
+            syncBrainstormCapUi();
+            await saveUserPrefs();
+            syncSettingsPanelUi();
+        };
+
+        window.openBrainstormCapSettings = () => {
+            try { openSyncModal(); } catch (_) {}
+            switchSettingsTab('learning');
+            requestAnimationFrame(() => {
+                const el = document.getElementById('settings-bs-daily-cap');
+                el?.focus();
+                el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            });
+        };
+
+        window.tryStartBrainstorm = () => {
+            try { closeTrainSettings(); } catch (_) {}
+            if (isBrainstormDailyCapReached()) {
+                syncBrainstormCapUi();
+                return;
+            }
+            startSession('all');
+        };
+
+        window.setShowTrainDueBadges = async (on) => {
+            showTrainDueBadges = !!on;
+            localStorage.setItem(SHOW_TRAIN_DUE_BADGES_KEY, showTrainDueBadges ? '1' : '0');
+            applyTrainDueBadgesVisibility();
+            await saveUserPrefs();
+            syncSettingsPanelUi();
+        };
+
+        function applyTrainDueBadgesVisibility() {
+            document.body.classList.toggle('train-due-badges-on', !!showTrainDueBadges);
+            updateTrainDueWaves();
+        }
+
+        const TRAIN_DUE_WAVE_CAP = 100;
+        const TRAIN_DUE_WAVE_MS = 3200;
+        const TRAIN_DUE_WATER_INNER = '<div class="train-due-water-body"><div class="train-due-water-sine" aria-hidden="true"></div></div>';
+
+        function trainDueFillPercent(mode) {
+            const n = countDueWordsForMode(mode);
+            if (!n) return 0;
+            return Math.min(TRAIN_DUE_WAVE_CAP, n);
+        }
+
+        function ensureTrainDueWaterLayers() {
+            document.querySelectorAll('[data-train-due]').forEach((badge) => {
+                const mode = badge.dataset.trainDue;
+                if (!mode) return;
+                const host = badge.closest('.train-mode-card, #train-brainstorm-card');
+                if (!host) return;
+                let water = host.querySelector(`[data-train-due-water="${mode}"]`);
+                if (!water) {
+                    water = document.createElement('div');
+                    water.className = 'train-due-water';
+                    water.dataset.trainDueWater = mode;
+                    water.setAttribute('aria-hidden', 'true');
+                    water.innerHTML = TRAIN_DUE_WATER_INNER;
+                    if (host.id === 'train-brainstorm-card') {
+                        water.classList.add('train-due-water--brainstorm');
+                    }
+                    host.insertBefore(water, host.firstChild);
+                } else if (!water.querySelector('.train-due-water-sine') || water.querySelector('.train-due-water-surf')) {
+                    water.innerHTML = TRAIN_DUE_WATER_INNER;
+                }
+            });
+        }
+
+        function updateTrainDueWaves() {
+            ensureTrainDueWaterLayers();
+            document.querySelectorAll('[data-train-due-water]').forEach((el) => {
+                const mode = el.dataset.trainDueWater;
+                if (!mode) return;
+                const pct = trainDueFillPercent(mode);
+                el.style.setProperty('--due-fill', `${pct}%`);
+                el.classList.toggle('train-due-water--has-fill', pct > 0);
+            });
+        }
+
+        function playTrainDueWaveOnEl(el) {
+            if (!el || !showTrainDueBadges || !el.classList.contains('train-due-water--has-fill')) return;
+            el.classList.remove('train-due-water--waving');
+            void el.offsetWidth;
+            el.classList.add('train-due-water--waving');
+            if (el._waveTimer) clearTimeout(el._waveTimer);
+            el._waveTimer = setTimeout(() => {
+                el.classList.remove('train-due-water--waving');
+            }, TRAIN_DUE_WAVE_MS);
+        }
+
+        function playTrainDueWaveAnimation(root) {
+            if (!showTrainDueBadges) return;
+            const scope = root || document.getElementById('view-training');
+            if (!scope) return;
+            scope.querySelectorAll('.train-due-water--has-fill').forEach((el, i) => {
+                setTimeout(() => playTrainDueWaveOnEl(el), i * 45);
+            });
+        }
+
+        function initTrainDueWaveHover() {
+            /* Hover ripples are handled in CSS via .train-mode-card:hover */
+        }
+
+        function initTrainDueBadgeTips() {
+            if (window._trainDueBadgeTipsBound) return;
+            window._trainDueBadgeTipsBound = true;
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.train-due-badge')) return;
+                document.querySelectorAll('.train-due-badge--tip-open').forEach((el) => {
+                    el.classList.remove('train-due-badge--tip-open');
+                });
+            }, true);
+            document.querySelectorAll('[data-train-due]').forEach((el) => {
+                if (el.dataset.dueTipBound) return;
+                el.dataset.dueTipBound = '1';
+                el.addEventListener('click', (e) => {
+                    if (!showTrainDueBadges || !el.classList.contains('train-due-badge--ready')) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const wasOpen = el.classList.contains('train-due-badge--tip-open');
+                    document.querySelectorAll('.train-due-badge--tip-open').forEach((x) => {
+                        x.classList.remove('train-due-badge--tip-open');
+                    });
+                    if (!wasOpen) el.classList.add('train-due-badge--tip-open');
+                });
+            });
+        }
 
         window.setTrainingSoundEffects = async (on) => {
             trainingSoundEffects = !!on;
@@ -8708,6 +9170,10 @@
             syncTrainModeVisibility();
             applyDictGridCols();
             applyReaderHighlightColor();
+            applyTrainDueBadgesVisibility();
+            initTrainDueBadgeTips();
+            initTrainDueWaveHover();
+            syncBrainstormCapUi();
         } catch (e) { console.error(e); }
 
         // Edge-to-edge / chin diagnostics (Chrome Android). Run: window.debugViewportFit()
@@ -8818,12 +9284,12 @@
             { id: 'picture', label: 'По фото' }
         ];
         const ALL_SEPARATE_MODES = [...CORE_TRAIN_MODES, ...EXTRA_TRAIN_MODES];
-        // Після рівня N чекати перед наступним: 0 → 4 год → 24 год → 72 год → 7 дн → 3 тиж → вивчено
-        const SRS_INTERVALS = [0, 4 * 3600000, 24 * 3600000, 72 * 3600000, 7 * 24 * 3600000, 21 * 24 * 3600000, 0];
+        const DAY_MS = 24 * 3600000;
+        // Після рівня N чекати перед наступним: 0 → 1 дн → 4 дн → 7 дн → 14 дн → 28 дн → вивчено
+        const SRS_INTERVALS = [0, 1 * DAY_MS, 4 * DAY_MS, 7 * DAY_MS, 14 * DAY_MS, 28 * DAY_MS, 0];
 
         // Maintenance SRS for fully learned words (6 steps): 30 → 60 → 90 → 180 → 270 → 365 days
         const MAX_MAINT_LEVEL = 6;
-        const DAY_MS = 24 * 3600000;
         const MAINT_INTERVALS = [
             30 * DAY_MS,
             60 * DAY_MS,
@@ -9006,6 +9472,15 @@
         }
 
         function countDueWordsForMode(mode, now = Date.now()) {
+            if (mode === 'sprint') {
+                return Math.min(STANDALONE_SPRINT_POOL, getLooseTrainPool().filter(wordHasTrainPair).length);
+            }
+            if (mode === 'crossword') {
+                return getLooseTrainPool().filter((w) => {
+                    const clean = String(w?.word || '').replace(/[\s-]/g, '').toLowerCase();
+                    return clean.length >= 2 && clean.length <= 15;
+                }).length;
+            }
             let pool = getTrainWordPool();
             if (mode === 'context') {
                 pool = pool.filter((w) => w.context && w.context.length > 5 && contextHasWholeWord(w.context, w.word));
@@ -9037,6 +9512,7 @@
                 const ready = n > 0;
                 el.textContent = ready ? formatTrainDueCount(n) : '';
                 el.classList.toggle('train-due-badge--ready', ready);
+                el.classList.remove('train-due-badge--tip-open');
                 if (ready) {
                     const label = tip(n);
                     el.removeAttribute('title');
@@ -9048,6 +9524,9 @@
                     delete el.dataset.dueTip;
                 }
             });
+            initTrainDueBadgeTips();
+            applyTrainDueBadgesVisibility();
+            updateTrainDueWaves();
         }
 
         function updateReviewDueBadge() {
@@ -9516,14 +9995,67 @@
         let sprintHighScores = [];
         const SPRINT_REPS_PER_WORD = 5;
         const SPRINT_SECONDS_PER_REP = 2;
+        const STANDALONE_SPRINT_SEC = 60;
+        const STANDALONE_SPRINT_POOL = 60;
+        const CROSSWORD_MAX_WORDS = 15;
 
         function getSprintDurationSec(wordCount) {
             const n = Math.max(1, wordCount || 1);
             return n * SPRINT_REPS_PER_WORD * SPRINT_SECONDS_PER_REP;
         }
 
-        function resetSprintRuntimeState(wordCount) {
-            sprintDurationTotal = getSprintDurationSec(wordCount);
+        let sprintPlayPool = [];
+
+        function pickStandaloneSprintPool(allWords, cap = STANDALONE_SPRINT_POOL) {
+            const eligible = (allWords || []).filter(wordHasTrainPair);
+            if (!eligible.length) return [];
+            const limit = Math.min(cap, eligible.length);
+            const scored = eligible.map((w) => {
+                const L = w[`srs_sprint_Level`] || 0;
+                return { w, sortKey: Math.random() + L * 0.14 };
+            });
+            scored.sort((a, b) => a.sortKey - b.sortKey);
+            return scored.slice(0, limit).map((x) => ({ ...x.w, failed: false }));
+        }
+
+        function crosswordSrsLevel(w) {
+            return w[`srs_crossword_Level`] || 0;
+        }
+
+        function scoreCrosswordPoolWord(w) {
+            const L = crosswordSrsLevel(w);
+            const compound = /[\s-]/.test(String(w?.word || '').trim());
+            return Math.random() + L * 0.14 + (compound ? 0.05 : 0);
+        }
+
+        function pickCrosswordSourcePool(allWords, cap = CROSSWORD_MAX_WORDS) {
+            const eligible = (allWords || []).filter((w) => {
+                const clean = String(w?.word || '').replace(/[\s-]/g, '').toLowerCase();
+                return clean.length >= 2 && clean.length <= 15;
+            });
+            if (!eligible.length) return [];
+            const poolSize = Math.min(Math.max(cap * 4, 24), eligible.length);
+            return [...eligible]
+                .sort((a, b) => scoreCrosswordPoolWord(a) - scoreCrosswordPoolWord(b))
+                .slice(0, poolSize);
+        }
+
+        function buildCrosswordSession(allWords, cap = CROSSWORD_MAX_WORDS) {
+            const source = pickCrosswordSourcePool(allWords, cap);
+            if (!source.length) return null;
+            let best = null;
+            for (let attempt = 0; attempt < 14; attempt++) {
+                const batch = attempt === 0 ? source : shuffleWords(source);
+                const cw = makeCrossword(batch, cap);
+                if (!cw || cw.placed.length < 2) continue;
+                if (!best || cw.placed.length > best.placed.length) best = cw;
+                if (best.placed.length >= Math.min(cap, source.length)) break;
+            }
+            return best;
+        }
+
+        function resetSprintRuntimeState(wordCount, { graduation = false } = {}) {
+            sprintDurationTotal = graduation ? getSprintDurationSec(wordCount) : STANDALONE_SPRINT_SEC;
             sprintTimeLeft = sprintDurationTotal;
             sprintScore = 0;
             sprintStreak = 0;
@@ -9895,7 +10427,7 @@
                 const newLevel = w.failed ? currentLevel : Math.min(currentLevel + 1, MAX_SRS_LEVEL);
                 const patch = {
                     srsLevel: newLevel,
-                    nextReviewTime: getNextReviewTime(newLevel),
+                    nextReviewTime: w.failed ? Date.now() + DAY_MS : getNextReviewTime(newLevel),
                     bsHistory: appendTrainingHistory(w, activeSessionMode, w.failed ? currentLevel : newLevel, w.failed)
                 };
                 if (!w.failed && newLevel >= MAX_SRS_LEVEL) {
@@ -9908,7 +10440,7 @@
             const newLevel = w.failed ? currentLevel : Math.min(currentLevel + 1, MAX_SRS_LEVEL);
             const patch = {
                 [`srs_${modeKey}_Level`]: newLevel,
-                [`srs_${modeKey}_NextTime`]: getNextReviewTime(newLevel),
+                [`srs_${modeKey}_NextTime`]: w.failed ? Date.now() + DAY_MS : getNextReviewTime(newLevel),
                 bsHistory: appendTrainingHistory(w, activeSessionMode, w.failed ? currentLevel : newLevel, w.failed)
             };
             return patch;
@@ -10610,16 +11142,24 @@
             applyIpaToElement(el, result.ipa, result.source);
         }
 
-        function injectTrainingPronunciation(word) {
+        function trainIpaSlotHtml() {
+            if (!showTrainingPronunciation || learningLanguage !== 'en') return '';
+            return '<p class="train-word-ipa-slot"><span class="train-word-ipa text-sm text-slate-400 font-normal"></span></p>';
+        }
+
+        function buildTrainWordHeadHtml(wordText, h3Class = 'text-3xl font-bold text-slate-800 tracking-tight') {
+            return `<div class="train-word-head"><h3 class="${h3Class}">${escapeHtmlText(wordText)}</h3>${trainIpaSlotHtml()}</div>`;
+        }
+
+        function mountTrainingPronunciation(root, word) {
             if (!showTrainingPronunciation || learningLanguage !== 'en') return;
-            const area = document.getElementById('bs-interactive-area');
-            if (!area) return;
-            const anchor = area.querySelector('h3');
-            if (!anchor || area.querySelector(':scope > .train-word-ipa')) return;
-            const ipaEl = document.createElement('p');
-            ipaEl.className = 'train-word-ipa text-sm text-slate-400 font-normal mb-3';
-            anchor.insertAdjacentElement('afterend', ipaEl);
-            fillTrainingPronunciationEl(ipaEl, word.word, word.id);
+            const el = (root || document).querySelector('.train-word-ipa');
+            if (!el) return;
+            fillTrainingPronunciationEl(el, word.word, word.id);
+        }
+
+        function injectTrainingPronunciation(word) {
+            mountTrainingPronunciation(document.getElementById('bs-interactive-area'), word);
         }
 
         function injectSuccessRevealPronunciation(word) {
@@ -10829,11 +11369,240 @@
 
         const inputWord = document.getElementById('manual-word'), inputTrans = document.getElementById('manual-trans'), dropdown = document.getElementById('trans-dropdown'), optionsList = document.getElementById('trans-options-list');
         const inputContext = document.getElementById('manual-context');
+        const manualContextWrap = document.getElementById('manual-context-wrap');
+        const btnHomeContextTrans = document.getElementById('btn-home-context-trans');
+        let manualContextSaveData = null;
+
+        function resetHomeManualContextPanel() {
+            document.getElementById('home-manual-context-panel')?.classList.add('hidden');
+            const src = document.getElementById('home-manual-context-source');
+            const full = document.getElementById('home-manual-context-full');
+            if (src) src.textContent = '';
+            if (full) full.textContent = '';
+        }
+
+        function updateHomeContextTransBtnState(active) {
+            if (!btnHomeContextTrans) return;
+            btnHomeContextTrans.classList.toggle('bg-indigo-600', active);
+            btnHomeContextTrans.classList.toggle('text-white', active);
+            btnHomeContextTrans.classList.toggle('border-indigo-600', active);
+            btnHomeContextTrans.classList.toggle('shadow-sm', active);
+            btnHomeContextTrans.classList.toggle('bg-indigo-50', !active);
+            btnHomeContextTrans.classList.toggle('text-indigo-600', !active);
+            btnHomeContextTrans.classList.toggle('border-indigo-100', !active);
+        }
+
+        function showHomeManualContextPanel(sentence, sentenceTrans, contextWordTrans, surfaceWord) {
+            const panel = document.getElementById('home-manual-context-panel');
+            const srcEl = document.getElementById('home-manual-context-source');
+            const fullEl = document.getElementById('home-manual-context-full');
+            const highlight = surfaceWord || '';
+            const wordMatch = sentence && highlight ? findWordInSentence(sentence, highlight) : null;
+            if (srcEl && sentence) {
+                if (wordMatch) {
+                    const before = sentence.slice(0, wordMatch.index);
+                    const mid = sentence.slice(wordMatch.index, wordMatch.index + wordMatch.length);
+                    const after = sentence.slice(wordMatch.index + wordMatch.length);
+                    srcEl.innerHTML = `"${escapeHtmlText(before)}<b class="text-indigo-700 not-italic font-bold">${escapeHtmlText(mid)}</b>${escapeHtmlText(after)}"`;
+                } else {
+                    srcEl.textContent = `"${sentence}"`;
+                }
+            }
+            if (fullEl) {
+                if (sentenceTrans && contextWordTrans) {
+                    fullEl.innerHTML = `"${highlightPhraseInSentence(sentenceTrans, contextWordTrans)}"`;
+                } else {
+                    fullEl.textContent = sentenceTrans ? `"${sentenceTrans}"` : '—';
+                }
+            }
+            panel?.classList.remove('hidden');
+        }
+
+        function tokenizeContextSurfaceWords(text) {
+            const tokens = [];
+            if (!text) return tokens;
+            const re = /[\p{L}\p{M}][\p{L}\p{M}'’-]*/gu;
+            let m;
+            while ((m = re.exec(text)) !== null) {
+                tokens.push({
+                    index: m.index,
+                    length: m[0].length,
+                    matchedText: m[0],
+                    lower: m[0].toLowerCase()
+                });
+            }
+            return tokens;
+        }
+
+        function findLooseWordInContext(contextRaw, hintWord) {
+            const hint = String(hintWord || '').trim().toLowerCase();
+            if (!hint || !contextRaw) return null;
+            const exact = findWordInSentence(contextRaw, hint);
+            if (exact) return exact;
+            const variants = new Set([hint]);
+            if (learningLanguage === 'en' || learningLanguage === 'es') {
+                englishInflectionVariants(hint).forEach((v) => variants.add(v.toLowerCase()));
+            }
+            for (const v of variants) {
+                const m = findWordInSentence(contextRaw, v);
+                if (m) return m;
+            }
+            for (const tok of tokenizeContextSurfaceWords(contextRaw)) {
+                if (stemsLooselyMatch(tok.lower, hint)) return { index: tok.index, length: tok.length, matchedText: tok.matchedText };
+                for (const v of variants) {
+                    if (stemsLooselyMatch(tok.lower, v)) return { index: tok.index, length: tok.length, matchedText: tok.matchedText };
+                }
+            }
+            return null;
+        }
+
+        function resolveManualContextWordMatch(contextRaw, hintWord) {
+            if (hintWord) {
+                const exact = findWordInSentence(contextRaw, hintWord);
+                if (exact) return exact;
+                const loose = findLooseWordInContext(contextRaw, hintWord);
+                if (loose) return loose;
+            }
+            return null;
+        }
+
+        function buildManualContextData() {
+            const word = inputWord?.value.trim() || '';
+            const contextRaw = (inputContext?.value || '').trim();
+            if (!word || !contextRaw) return null;
+            const wordOccurrence = resolveManualContextWordMatch(contextRaw, word);
+            if (!wordOccurrence) return null;
+            const clipResult = extractMinimalContextClip(contextRaw, wordOccurrence);
+            const contextClip = clipResult.clip || contextRaw;
+            const wordMatch = clipResult.wordMatch || wordOccurrence;
+            return {
+                word,
+                context: contextRaw,
+                contextClip,
+                wordMatch,
+                anchorWordMatch: wordMatch,
+                contextReady: false,
+                contextActive: false,
+                sentenceTrans: null,
+                contextWordTrans: null,
+                literalTrans: null,
+                hadTranslationOptions: false
+            };
+        }
+
+        function revertManualContextTranslation() {
+            const data = manualContextSaveData;
+            if (!data) return;
+            if (data.literalTrans != null && inputTrans) inputTrans.value = data.literalTrans;
+            resetHomeManualContextPanel();
+            data.contextActive = false;
+            data.contextReady = false;
+            updateHomeContextTransBtnState(false);
+            if (data.hadTranslationOptions) dropdown?.classList.remove('hidden');
+            manualContextSaveData = null;
+        }
+
+        function applyManualContextTranslation(data) {
+            if (!data) return;
+            if (!data.contextActive && inputTrans) {
+                data.literalTrans = inputTrans.value;
+                data.hadTranslationOptions = !!(dropdown && !dropdown.classList.contains('hidden'));
+            }
+            const expanded = resolveContextPhraseExpansion(data);
+            if (expanded) applyContextPhraseExpansion(data, expanded);
+            if (data.sentenceTrans && data.contextWordTrans && findWholeWordIndex(data.sentenceTrans, data.contextWordTrans) < 0) {
+                const surface = locateTranslatedWordInSentence(
+                    data.sentenceTrans,
+                    data.contextWordTrans,
+                    data.wordMatch,
+                    data.contextClip || data.context || ''
+                );
+                if (surface) data.contextWordTrans = surface.toLowerCase();
+            }
+            if (data.contextWordTrans && inputTrans) {
+                inputTrans.value = data.contextWordTrans;
+                inputTrans.classList.add('ring-2', 'ring-indigo-300');
+                setTimeout(() => inputTrans.classList.remove('ring-2', 'ring-indigo-300'), 1000);
+            }
+            data.contextActive = true;
+            updateHomeContextTransBtnState(true);
+            dropdown?.classList.add('hidden');
+            showHomeManualContextPanel(
+                data.contextClip || data.context,
+                data.sentenceTrans,
+                data.contextWordTrans,
+                data.wordMatch?.matchedText || data.word
+            );
+            manualContextSaveData = data;
+            syncHomeFieldChrome();
+        }
+
+        window.fetchManualContextTranslation = async () => {
+            const word = inputWord?.value.trim() || '';
+            const contextRaw = (inputContext?.value || '').trim();
+            if (!word || !contextRaw) return;
+
+            if (manualContextSaveData?.contextActive) {
+                revertManualContextTranslation();
+                return;
+            }
+
+            const data = buildManualContextData();
+            if (!data?.wordMatch) {
+                window.showModal?.(t('dict.contextWordMissing'));
+                return;
+            }
+
+            if (btnHomeContextTrans) btnHomeContextTrans.disabled = true;
+            try {
+                manualContextSaveData = data;
+                const expanded = resolveContextPhraseExpansion(data);
+                if (expanded) applyContextPhraseExpansion(data, expanded);
+                const result = await prefetchContextTranslation(data.contextClip, data.wordMatch);
+                data.sentenceTrans = result.sentenceTrans;
+                data.contextWordTrans = result.contextWordTrans;
+                data.contextReady = !!(result.contextWordTrans || result.sentenceTrans);
+                if (!data.contextReady) {
+                    window.showModal?.(t('inline.contextFail'));
+                    return;
+                }
+                applyManualContextTranslation(data);
+            } catch (e) {
+                console.error('fetchManualContextTranslation', e);
+                window.showModal?.(t('inline.contextFail'));
+            } finally {
+                if (btnHomeContextTrans) btnHomeContextTrans.disabled = false;
+            }
+        };
+
+        function syncHomeContextTransBtn() {
+            const word = inputWord?.value.trim() || '';
+            const ctx = (inputContext?.value || '').trim();
+            const showBtn = !!(word && ctx);
+            btnHomeContextTrans?.classList.toggle('hidden', !showBtn);
+            if (!showBtn) {
+                if (manualContextSaveData?.contextActive) revertManualContextTranslation();
+                else {
+                    resetHomeManualContextPanel();
+                    manualContextSaveData = null;
+                    updateHomeContextTransBtnState(false);
+                }
+            }
+        }
+
         function syncManualContextVisibility() {
-            if (!inputContext) return;
+            if (!inputContext || !manualContextWrap) return;
             const show = !!(inputWord && inputWord.value.trim());
-            inputContext.classList.toggle('hidden', !show);
-            if (!show) inputContext.value = '';
+            manualContextWrap.classList.toggle('hidden', !show);
+            if (!show) {
+                inputContext.value = '';
+                resetHomeManualContextPanel();
+                manualContextSaveData = null;
+                updateHomeContextTransBtnState(false);
+                btnHomeContextTrans?.classList.add('hidden');
+            } else {
+                syncHomeContextTransBtn();
+            }
         }
         function handleManualAddKeydown(e) {
             if (e.key !== 'Enter' || e.repeat) return;
@@ -10857,6 +11626,9 @@
             } else if (e.target === inputTrans) {
                 autoReverseTranslateManual();
                 inputWord.focus();
+            } else if (e.target === inputContext) {
+                e.preventDefault();
+                e.stopPropagation();
             } else {
                 e.stopPropagation();
                 addWordManual();
@@ -10909,6 +11681,17 @@
         inputWord.addEventListener('input', () => {
             syncManualContextVisibility();
             syncHomeFieldChrome();
+        });
+        inputContext?.addEventListener('input', () => {
+            if (manualContextSaveData?.contextActive) {
+                manualContextSaveData.contextReady = false;
+                manualContextSaveData.contextActive = false;
+                updateHomeContextTransBtnState(false);
+                resetHomeManualContextPanel();
+            } else {
+                manualContextSaveData = null;
+            }
+            syncHomeContextTransBtn();
         });
         inputWord.addEventListener('focus', syncHomeFieldChrome);
         inputWord.addEventListener('blur', () => setTimeout(syncHomeFieldChrome, 0));
@@ -12863,6 +13646,10 @@
                 });
                 try { recordWordsAdded(1); } catch (_) {}
                 inputWord.value = ''; inputTrans.value = ''; if (inputContext) inputContext.value = '';
+                resetHomeManualContextPanel();
+                manualContextSaveData = null;
+                updateHomeContextTransBtnState(false);
+                btnHomeContextTrans?.classList.add('hidden');
                 syncManualContextVisibility();
                 dropdown.classList.add('hidden'); inputWord.focus();
                 if (typeof closeHomeMerriamDict === 'function') closeHomeMerriamDict();
@@ -22308,6 +23095,62 @@
             try { localStorage.setItem(BS_DAY_LEVELS_KEY, JSON.stringify(st)); } catch (_) {}
         }
 
+        function getBsDayWordsState() {
+            try {
+                const raw = JSON.parse(localStorage.getItem(BS_DAY_WORDS_KEY) || 'null');
+                if (raw && raw.day === bsTodayKey() && typeof raw.count === 'number') return raw;
+            } catch (_) {}
+            return { day: bsTodayKey(), count: 0 };
+        }
+
+        function getBsWordsTrainedToday() {
+            return getBsDayWordsState().count || 0;
+        }
+
+        function addBsWordsTrainedToday(n) {
+            const add = Math.max(0, n || 0);
+            if (!add) return;
+            const st = getBsDayWordsState();
+            st.count = (st.count || 0) + add;
+            st.day = bsTodayKey();
+            try { localStorage.setItem(BS_DAY_WORDS_KEY, JSON.stringify(st)); } catch (_) {}
+        }
+
+        function getBrainstormDailyCap() {
+            return brainstormDailyCap;
+        }
+
+        function getBrainstormWordsRemainingToday() {
+            const cap = getBrainstormDailyCap();
+            if (!cap) return null;
+            return Math.max(0, cap - getBsWordsTrainedToday());
+        }
+
+        function isBrainstormDailyCapReached() {
+            const remaining = getBrainstormWordsRemainingToday();
+            return remaining !== null && remaining <= 0;
+        }
+
+        function syncBrainstormCapUi() {
+            const card = document.getElementById('train-brainstorm-card');
+            const msg = document.getElementById('train-brainstorm-cap-msg');
+            const btn = document.getElementById('btn-brainstorm-start');
+            const cap = getBrainstormDailyCap();
+            const trained = getBsWordsTrainedToday();
+            const reached = isBrainstormDailyCapReached();
+            if (card) card.classList.toggle('is-cap-reached', reached);
+            if (btn) btn.setAttribute('aria-disabled', reached ? 'true' : 'false');
+            if (msg) {
+                if (reached && cap > 0) {
+                    msg.classList.remove('hidden');
+                    msg.innerHTML = `${escapeHtmlText(t('train.bsCapReached', { n: trained, cap }))} — <button type="button" class="train-brainstorm-cap-settings" onclick="event.stopPropagation(); openBrainstormCapSettings()">${escapeHtmlText(t('train.bsCapSettings'))}</button>`;
+                } else {
+                    msg.classList.add('hidden');
+                    msg.textContent = '';
+                }
+            }
+        }
+
         function isWordHeavilyOverdue(w, now = Date.now()) {
             const level = w.srsLevel || 0;
             const interval = SRS_INTERVALS[level] || 0;
@@ -22566,6 +23409,16 @@
             return entries;
         }
 
+        function wordHasTrainPair(w) {
+            return !!(String(w?.word || '').trim() && String(w?.translation || '').trim());
+        }
+
+        /** Full scope pool for sprint/crossword — ignores per-session word pick checkboxes. */
+        function getLooseTrainPool() {
+            const scope = getTrainSourceScope();
+            return scope === 'ALL' ? vocabulary.slice() : getWordsForFolderName(scope);
+        }
+
         function getTrainWordPool() {
             ensureTrainWordPickIncluded();
             const scope = getTrainSourceScope();
@@ -22722,6 +23575,10 @@
 
         window.startSession = (mode) => {
             try { closeTrainSettings(); } catch (_) {}
+            if (mode === 'all' && isBrainstormDailyCapReached()) {
+                syncBrainstormCapUi();
+                return;
+            }
             if (mode === 'definition' && learningLanguage !== 'en') {
                 return window.showModal(t('msg.defEnOnly'));
             }
@@ -22729,10 +23586,19 @@
                 return window.showModal(t('msg.defDailyLimit', { n: DEF_SESSIONS_PER_DAY }));
             }
             const reqCount = mode === 'all'
-                ? parseInt(document.getElementById('bs-word-count').value, 10)
+                ? (() => {
+                    let n = parseInt(document.getElementById('bs-word-count').value, 10);
+                    const remaining = getBrainstormWordsRemainingToday();
+                    if (remaining !== null) n = Math.min(n, remaining);
+                    return n;
+                })()
                 : (mode === 'definition' ? DEF_WORDS_PER_SESSION : 10);
+            if (mode === 'all' && (!reqCount || reqCount < 1)) {
+                syncBrainstormCapUi();
+                return;
+            }
 
-            let pool = getTrainWordPool();
+            let pool = (mode === 'sprint' || mode === 'crossword') ? getLooseTrainPool() : getTrainWordPool();
             if (mode === 'context') pool = pool.filter(w => w.context && w.context.length > 5 && contextHasWholeWord(w.context, w.word));
             if (mode === 'definition') {
                 pool = pool.filter((w) => {
@@ -22742,18 +23608,22 @@
             }
 
             if(pool.length === 0) return window.showModal(t('msg.noTrainWords'));
-            
+
             activeSessionMode = mode;
             const now = Date.now();
-            // Strict SRS: only words whose interval has elapsed (never pad with not-due words)
-            let dueWords = shuffleWords(pool.filter(w => isWordDueForMode(w, mode, now)));
-            if (mode === 'picture') {
-                dueWords = dueWords.filter((w) => wordHasRealImage(w.imageUrl));
-            }
-            if (dueWords.length === 0) return window.showModal(t('msg.noDueWords'));
-            if (mode === 'definition') {
-                // Keep a few extras so we can skip words without clear MW defs without burning the session.
-                dueWords = dueWords.slice(0, Math.max(reqCount + 5, 12));
+            const usesLoosePool = mode === 'sprint' || mode === 'crossword';
+            let dueWords = [];
+            if (usesLoosePool) {
+                dueWords = shuffleWords(pool.slice());
+            } else {
+                dueWords = shuffleWords(pool.filter(w => isWordDueForMode(w, mode, now)));
+                if (mode === 'picture') {
+                    dueWords = dueWords.filter((w) => wordHasRealImage(w.imageUrl));
+                }
+                if (dueWords.length === 0) return window.showModal(t('msg.noDueWords'));
+                if (mode === 'definition') {
+                    dueWords = dueWords.slice(0, Math.max(reqCount + 5, 12));
+                }
             }
 
             const mainEl = document.querySelector('main');
@@ -22770,16 +23640,17 @@
             sprintQuestionQueue = [];
             sprintQueueIndex = 0;
             sprintAnsweredCount = 0;
+            sprintPlayPool = [];
 
             if (mode === 'crossword') {
-                currentCrossword = makeCrossword(dueWords, 15); 
+                currentCrossword = buildCrosswordSession(pool, CROSSWORD_MAX_WORDS);
                 if (!currentCrossword || currentCrossword.placed.length < 2) {
                     window.showModal(t('msg.crosswordFail'));
                     return;
                 }
                 
                 bsWords = currentCrossword.placed.map(p => {
-                    const originalWord = dueWords.find(w => w.id === p.id) || pool.find(w => w.id === p.id);
+                    const originalWord = pool.find(w => w.id === p.id) || dueWords.find(w => w.id === p.id);
                     return { ...originalWord, failed: false }; 
                 });
                 
@@ -22796,8 +23667,10 @@
                 if (mode === 'sprint') {
                     window._sprintCountdownActive = true;
                     window._sprintRulesPending = false;
-                    resetSprintRuntimeState(dueWords.length);
-                    bsWords = dueWords.map((w) => ({ ...w, failed: false }));
+                    sprintPlayPool = pickStandaloneSprintPool(pool, STANDALONE_SPRINT_POOL);
+                    bsWords = sprintPlayPool.map((w) => ({ ...w, failed: false }));
+                    if (!bsWords.length) return window.showModal(t('msg.noTrainWords'));
+                    resetSprintRuntimeState(bsWords.length, { graduation: false });
                 } else if (mode === 'all') {
                     const picked = pickBrainstormWords(dueWords, reqCount, now);
                     if (!picked.words.length) return window.showModal(t('msg.noDueWords'));
@@ -22836,7 +23709,7 @@
             bsTotalSteps = bsWords.length * stagesForMode.length; bsCompletedSteps = 0;
             
             if (mode === 'sprint') {
-                bsTotalSteps = getSprintDurationSec(bsWords.length); 
+                bsTotalSteps = STANDALONE_SPRINT_SEC;
             }
             if (mode === 'all' && bsSprintGraduation) {
                 // Sprint is one section for the whole set, not per word
@@ -22923,11 +23796,33 @@
                 clearInterval(sprintTimer);
                 sprintTimer = null;
             }
+            sprintPlayPool = [];
             clearContextRoundTimer();
             syncCrosswordExpandButton();
             closeReviewSetup();
             updateReviewDueBadge();
+            syncBrainstormCapUi();
         };
+
+        function renderBsStageRing() {
+            const wrap = document.getElementById('bs-stage-ring');
+            if (!wrap) return;
+            if (activeSessionMode === 'all' && bsSessionStages) {
+                const level = bsSessionLevel || 0;
+                const stageNum = level + 1;
+                wrap.classList.remove('hidden');
+                wrap.setAttribute('aria-hidden', 'false');
+                wrap.setAttribute('aria-label', t('train.bsStage', { n: stageNum }));
+                wrap.title = t('train.bsStage', { n: stageNum });
+                wrap.innerHTML = `${getSrsSvg(level, false, true, MAX_SRS_LEVEL, { compact: true })}<span class="bs-stage-ring-num">${stageNum}</span>`;
+            } else {
+                wrap.classList.add('hidden');
+                wrap.setAttribute('aria-hidden', 'true');
+                wrap.removeAttribute('aria-label');
+                wrap.removeAttribute('title');
+                wrap.innerHTML = '';
+            }
+        }
 
         function updateBsProgress() {
             const answeredDef = window._defAnswered || 0;
@@ -22940,11 +23835,10 @@
             const stageEl = document.getElementById('bs-overall-stage');
             if (activeSessionMode === 'review') {
                 stageEl.textContent = `${t('stage.review')} · ${t(`stage.${bsCurrentStage}`)}`;
-            } else if (activeSessionMode === 'all' && bsSessionStages) {
-                stageEl.textContent = `${t('train.bsStage', { n: (bsSessionLevel || 0) + 1 })} · ${t(`stage.${bsCurrentStage}`)}`;
             } else {
                 stageEl.textContent = t(`stage.${bsCurrentStage}`);
             }
+            renderBsStageRing();
             const counter = document.getElementById('bs-word-counter');
             if (!counter) return;
             if (activeSessionMode === 'crossword') {
@@ -23008,7 +23902,7 @@
                     if (bsCurrentStage === 8 && activeSessionMode === 'all') {
                         window._sprintRulesPending = true;
                         window._sprintCountdownActive = false;
-                        resetSprintRuntimeState(bsWords.length);
+                        resetSprintRuntimeState(bsWords.length, { graduation: true });
                         prepareBrainstormSprintQueue();
                     }
                 } else {
@@ -23041,12 +23935,17 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             const saveResult = await persistTrainingToFirebase();
+            let trainedIds = [];
             try {
-                const trainedIds = bsWords
+                trainedIds = bsWords
                     .filter((w) => w && w.id && !w._defSkipped && (activeSessionMode !== 'definition' || w._defAttempted))
                     .map((w) => w.id);
                 recordTrainingSession(activeSessionMode, trainedIds);
             } catch (_) {}
+            if (activeSessionMode === 'all') {
+                addBsWordsTrainedToday(trainedIds.length);
+                syncBrainstormCapUi();
+            }
 
             document.getElementById('bs-saving').classList.add('hidden');
             document.getElementById('bs-results').classList.remove('hidden');
@@ -23321,7 +24220,7 @@
             if (bsCurrentStage === 9) { renderStagePicture(word, area, btnNext, feedback); }
             if (bsCurrentStage === 10) { renderStageDefinition(word, area, btnNext, feedback); }
 
-            if (bsCurrentStage === 0 || bsCurrentStage === 1) injectTrainingPronunciation(word);
+            if (bsCurrentStage === 0 || bsCurrentStage === 1) mountTrainingPronunciation(area, word);
 
             preserveTrainingFocusState();
 
@@ -23412,9 +24311,10 @@
         function renderStageIntro(word, area, btnNext) {
             const morph = showIntroMorphHints ? buildIntroMorphHint(word) : null;
             const morphHtml = morph ? renderIntroMorphHtml(morph) : '';
+            const ipaSlot = trainIpaSlotHtml();
             const wordHeadline = morphHtml
-                ? morphHtml
-                : `<h3 class="text-3xl font-bold text-indigo-700 mb-1 tracking-tight">${escapeHtmlText(word.word)}</h3>`;
+                ? `<div class="train-word-head train-word-head--intro">${morphHtml}${ipaSlot}</div>`
+                : `<div class="train-word-head train-word-head--intro"><h3 class="text-3xl font-bold text-indigo-700 tracking-tight">${escapeHtmlText(word.word)}</h3>${ipaSlot}</div>`;
             area.innerHTML = `<div class="mx-auto w-40 h-40 rounded-xl overflow-hidden shadow-sm mb-4"><img src="${word.imageUrl}" class="w-full h-full object-cover" onerror="imgError(this)"></div>${wordHeadline}<p class="text-xl text-slate-900 font-semibold mb-2">${escapeHtmlText(word.translation)}</p><button type="button" id="btn-intro-audio" class="bs-play-audio-btn bs-play-audio-btn--intro mx-auto" title="${t('inline.listen')}" aria-label="${t('inline.listen')}">${trainingPlayAudioIconSvg('w-7 h-7')}</button>`;
             document.getElementById('btn-intro-audio').onclick = () => playAudioWord(word.word); btnNext.innerHTML = withEnterHint(t('train.gotIt')); btnNext.classList.remove('hidden');
         }
@@ -23653,7 +24553,7 @@
             const count = inBs && bsHardMcq ? 6 : 4;
             const opts = getOptions(word, { count, hard, field: 'translation' });
             const grid = count >= 6 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-4';
-            area.innerHTML = `<h3 class="text-3xl font-bold text-slate-800 mb-6 tracking-tight">${word.word}</h3><div class="${grid}" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-base sm:text-lg shadow-sm flex justify-between items-center"><span>${o.translation}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
+            area.innerHTML = `${buildTrainWordHeadHtml(word.word)}<div class="${grid}" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-base sm:text-lg shadow-sm flex justify-between items-center"><span>${o.translation}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
             bindTestButtons(word, feedback);
         }
 
@@ -23940,6 +24840,8 @@
 
         let trainOskEl = null;
         let trainOskActiveInput = null;
+        let trainOskPreviewEl = null;
+        let trainOskPressedBtn = null;
         let trainOskAccentHold = null;
         let trainOskBsRepeat = null;
         let trainOskNumbersOpen = false;
@@ -24070,6 +24972,7 @@
 
         function hideTrainOsk() {
             trainOskActiveInput = null;
+            hideTrainOskKeyPreview();
             clearTrainOskAccentHold();
             stopTrainOskBackspaceRepeat();
             trainOskNumbersOpen = false;
@@ -24162,6 +25065,40 @@
             }
         }
 
+        function ensureTrainOskPreview() {
+            if (trainOskPreviewEl) return trainOskPreviewEl;
+            const pop = document.createElement('div');
+            pop.id = 'train-osk-preview';
+            pop.className = 'train-osk-preview';
+            pop.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(pop);
+            trainOskPreviewEl = pop;
+            return pop;
+        }
+
+        function showTrainOskKeyPreview(btn, label) {
+            if (!btn || label == null || label === '') return;
+            const pop = ensureTrainOskPreview();
+            pop.textContent = label;
+            const r = btn.getBoundingClientRect();
+            pop.style.left = `${r.left + r.width / 2}px`;
+            pop.style.top = `${r.top}px`;
+            pop.classList.add('is-visible');
+            if (trainOskPressedBtn && trainOskPressedBtn !== btn) {
+                trainOskPressedBtn.classList.remove('is-pressed');
+            }
+            trainOskPressedBtn = btn;
+            btn.classList.add('is-pressed');
+        }
+
+        function hideTrainOskKeyPreview() {
+            trainOskPreviewEl?.classList.remove('is-visible');
+            if (trainOskPressedBtn) {
+                trainOskPressedBtn.classList.remove('is-pressed');
+                trainOskPressedBtn = null;
+            }
+        }
+
         function ensureTrainOsk() {
             if (trainOskEl) return trainOskEl;
             const el = document.createElement('div');
@@ -24181,6 +25118,12 @@
                 const action = btn.dataset.action;
                 if (action === 'toggle-expand') { toggleTrainOskExpanded(); return; }
                 if (action === 'toggle-numbers') { toggleTrainOskNumbers(); return; }
+
+                if (btn.classList.contains('train-osk-key')) {
+                    const previewLabel = btn.dataset.key || btn.textContent.trim();
+                    showTrainOskKeyPreview(btn, previewLabel);
+                }
+
                 if (action === 'space') { insertTrainOskText(inp, ' '); return; }
                 if (action === 'backspace') { startTrainOskBackspaceRepeat(); return; }
                 if (action === 'enter') { submitTrainOskEnter(inp); return; }
@@ -24195,7 +25138,10 @@
                         timer: setTimeout(() => {
                             if (!trainOskAccentHold || trainOskAccentHold.btn !== btn) return;
                             const acc = TRAIN_OSK_ACCENT[base];
-                            if (acc) insertTrainOskText(inp, acc);
+                            if (acc) {
+                                insertTrainOskText(inp, acc);
+                                showTrainOskKeyPreview(btn, acc);
+                            }
                             trainOskAccentHold.fired = true;
                         }, ES_ACCENT_HOLD_MS)
                     };
@@ -24205,6 +25151,7 @@
             });
 
             el.addEventListener('pointerup', () => {
+                hideTrainOskKeyPreview();
                 stopTrainOskBackspaceRepeat();
                 if (!trainOskAccentHold) return;
                 const { key, fired } = trainOskAccentHold;
@@ -24213,10 +25160,12 @@
                 insertTrainOskText(trainOskActiveInput, key);
             });
             el.addEventListener('pointercancel', () => {
+                hideTrainOskKeyPreview();
                 stopTrainOskBackspaceRepeat();
                 clearTrainOskAccentHold();
             });
             el.addEventListener('pointerleave', () => {
+                hideTrainOskKeyPreview();
                 stopTrainOskBackspaceRepeat();
                 clearTrainOskAccentHold();
             });
@@ -24251,6 +25200,7 @@
         function renderTrainOsk(lang) {
             const osk = ensureTrainOsk();
             let html = renderTrainOskFloats();
+            html += '<div class="train-osk-keys">';
             html += renderTrainOskNumbersRow();
 
             const rows = [
@@ -24282,6 +25232,7 @@
                 <button type="button" class="train-osk-key train-osk-key--space" data-action="space" aria-label="Space">␣</button>
                 <button type="button" class="train-osk-key train-osk-key--enter" data-action="enter" aria-label="Done">↵</button>
             </div>`;
+            html += '</div>';
             osk.innerHTML = html;
         }
 
@@ -24333,6 +25284,25 @@
                     setTrainInputCaretFromTap(inp, t.clientX);
                 }
             }, { passive: true });
+        }
+
+        function applyTrainingInputNative(inp) {
+            if (!inp) return;
+            if (trainOskActiveInput === inp) hideTrainOsk();
+            inp.type = 'text';
+            inp.classList.add('train-answer-input', 'train-answer--plain');
+            inp.classList.remove('train-answer--osk');
+            inp.readOnly = false;
+            inp.setAttribute('autocomplete', 'off');
+            inp.setAttribute('autocorrect', 'off');
+            inp.setAttribute('autocapitalize', 'off');
+            inp.setAttribute('spellcheck', 'false');
+            inp.setAttribute('enterkeyhint', 'done');
+            inp.setAttribute('data-lpignore', 'true');
+            inp.setAttribute('data-1p-ignore', '');
+            inp.setAttribute('data-form-type', 'other');
+            inp.removeAttribute('name');
+            inp.removeAttribute('inputmode');
         }
 
         function applyTrainingInputNoSuggest(inp) {
@@ -24440,7 +25410,7 @@
                         </div>
                     </div>`;
                 const inp = document.getElementById('bs-def-input');
-                applyTrainingInputNoSuggest(inp);
+                applyTrainingInputNative(inp);
                 setTimeout(() => inp?.focus(), 50);
                 const answers = (prompt.answers || englishDefinitionAnswers(word.word, prompt.lemma))
                     .map((a) => String(a).trim().toLowerCase())
@@ -24839,7 +25809,7 @@
             body.innerHTML = decorateContextEllipses(blanked, leading, trailing);
             const inp = document.getElementById('ctx-type-input');
             if (inp) {
-                applyTrainingInputNoSuggest(inp);
+                applyTrainingInputNative(inp);
                 if (keepInputValue) inp.value = prevVal;
                 inp.addEventListener('keydown', (e) => {
                     if (e.key !== 'Enter') return;
@@ -25415,7 +26385,7 @@
             `;
             
             const inp = document.getElementById('ctx-type-input');
-            applyTrainingInputNoSuggest(inp);
+            applyTrainingInputNative(inp);
             setTimeout(() => inp?.focus(), 50);
             inp?.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -25492,10 +26462,14 @@
 
             if (cleaned.length === 0) return null;
 
-            // Prefer longer words first for structure, but shuffle within length bands
+            // Longer words help grid structure; tiny nudge so compounds are not the only seeds
             const sorted = cleaned.sort((a, b) => {
-                if (b.cleanWord.length !== a.cleanWord.length) return b.cleanWord.length - a.cleanWord.length;
-                return Math.random() - 0.5;
+                const rank = (w) => {
+                    const len = w.cleanWord.length;
+                    const compound = /[\s-]/.test(String(w.word || ''));
+                    return len * 10 + (compound ? 3 : 0) + Math.random() * 0.6;
+                };
+                return rank(b) - rank(a);
             });
 
             function canPlace(word, startX, startY, dir) {
@@ -25700,6 +26674,68 @@
             }
         };
 
+        function isCrosswordWordComplete(p) {
+            if (!p || !currentCrossword) return false;
+            for (let i = 0; i < p.cleanWord.length; i++) {
+                const x = p.x + (p.dir === 'H' ? i : 0);
+                const y = p.y + (p.dir === 'V' ? i : 0);
+                const cell = currentCrossword.grid[y][x];
+                if (!cell || (cell.userChar || '').toLowerCase() !== p.cleanWord[i].toLowerCase()) return false;
+            }
+            return true;
+        }
+
+        function crosswordClueOrder() {
+            const placed = currentCrossword?.placed || [];
+            const across = placed
+                .filter((p) => p.dir === 'H')
+                .sort((a, b) => (a.number || 0) - (b.number || 0));
+            const down = placed
+                .filter((p) => p.dir === 'V')
+                .sort((a, b) => (a.number || 0) - (b.number || 0));
+            return [...across, ...down];
+        }
+
+        function updateCrosswordClueStrike(p) {
+            const clueEl = document.getElementById(`cw-clue-${p.origIndex}`);
+            if (!clueEl) return;
+            if (isCrosswordWordComplete(p)) clueEl.classList.add('line-through', 'text-slate-400');
+            else clueEl.classList.remove('line-through', 'text-slate-400');
+        }
+
+        function isCrosswordPuzzleComplete() {
+            return (currentCrossword?.placed || []).every((p) => isCrosswordWordComplete(p));
+        }
+
+        function advanceCrosswordToNextWord(fromOrigIndex) {
+            const ordered = crosswordClueOrder();
+            const startIdx = Math.max(0, ordered.findIndex((p) => p.origIndex === fromOrigIndex));
+            for (let i = startIdx + 1; i < ordered.length; i++) {
+                if (!isCrosswordWordComplete(ordered[i])) {
+                    focusCell(ordered[i].origIndex, 0);
+                    return;
+                }
+            }
+            for (const p of ordered) {
+                if (!isCrosswordWordComplete(p)) {
+                    focusCell(p.origIndex, 0);
+                    return;
+                }
+            }
+        }
+
+        function onCrosswordWordMaybeComplete(origIndex) {
+            const w = currentCrossword.placed.find((p) => p.origIndex === origIndex);
+            if (!w || !isCrosswordWordComplete(w)) return false;
+            updateCrosswordClueStrike(w);
+            if (isCrosswordPuzzleComplete()) {
+                checkCrosswordStatus();
+                return true;
+            }
+            setTimeout(() => advanceCrosswordToNextWord(origIndex), 80);
+            return true;
+        }
+
         window.handleCwInput = (e, x, y, inputEl) => {
             const char = inputEl.value.trim().toLowerCase();
             const cell = currentCrossword.grid[y][x];
@@ -25712,7 +26748,7 @@
             const nextCharIdx = activeCharIndex + 1;
             if (nextCharIdx < w.cleanWord.length) {
                 focusCell(activeWordIndex, nextCharIdx);
-            } else {
+            } else if (!onCrosswordWordMaybeComplete(activeWordIndex)) {
                 checkCrosswordStatus();
             }
         };
@@ -25756,30 +26792,9 @@
         };
 
         window.checkCrosswordStatus = () => {
-            let allCorrect = true;
-            
-            currentCrossword.placed.forEach(p => {
-                let wordCorrect = true;
-                for (let i = 0; i < p.cleanWord.length; i++) {
-                    const x = p.x + (p.dir === 'H' ? i : 0);
-                    const y = p.y + (p.dir === 'V' ? i : 0);
-                    const cell = currentCrossword.grid[y][x];
-                    if (!cell || (cell.userChar || '').toLowerCase() !== p.cleanWord[i].toLowerCase()) {
-                        wordCorrect = false;
-                        allCorrect = false;
-                    }
-                }
-                const clueEl = document.getElementById(`cw-clue-${p.origIndex}`);
-                if (clueEl) {
-                    if (wordCorrect) {
-                        clueEl.classList.add('line-through', 'text-slate-400');
-                    } else {
-                        clueEl.classList.remove('line-through', 'text-slate-400');
-                    }
-                }
-            });
+            currentCrossword.placed.forEach((p) => updateCrosswordClueStrike(p));
 
-            if (allCorrect) {
+            if (isCrosswordPuzzleComplete()) {
                 const feedback = document.getElementById('bs-feedback');
                 feedback.innerHTML = `
                     <div class="w-full rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-sm">
@@ -25820,7 +26835,7 @@
                 if (nextCharIdx < w.cleanWord.length) {
                     focusCell(activeWordIndex, nextCharIdx);
                 } else {
-                    checkCrosswordStatus();
+                    onCrosswordWordMaybeComplete(activeWordIndex);
                 }
             }
         };
@@ -25844,12 +26859,16 @@
                     if (cell) cell.userChar = correctLetter.toLowerCase();
                 }
             }
-            checkCrosswordStatus();
+            onCrosswordWordMaybeComplete(activeWordIndex);
         };
 
         function renderStageCrossword(area, btnNext, feedback) {
-            const across = currentCrossword.placed.filter(p => p.dir === 'H');
-            const down = currentCrossword.placed.filter(p => p.dir === 'V');
+            const across = currentCrossword.placed
+                .filter(p => p.dir === 'H')
+                .sort((a, b) => (a.number || 0) - (b.number || 0));
+            const down = currentCrossword.placed
+                .filter(p => p.dir === 'V')
+                .sort((a, b) => (a.number || 0) - (b.number || 0));
             const bounds = getCrosswordBounds(currentCrossword);
             const { minX, minY, cols, rows } = bounds;
             
@@ -26126,8 +27145,17 @@
                 word = item?.word || item;
                 reverse = !!(item && item.reverse);
             } else {
-                word = bsWords[Math.floor(Math.random() * bsWords.length)];
+                const playPool = (sprintPlayPool.length ? sprintPlayPool : bsWords).filter(wordHasTrainPair);
+                if (!playPool.length) {
+                    finishSprintSession();
+                    return;
+                }
+                word = playPool[Math.floor(Math.random() * playPool.length)];
                 reverse = false;
+            }
+            if (!word) {
+                finishSprintSession();
+                return;
             }
             const isCorrect = Math.random() < 0.5;
             // Same visual roles always: top = "prompt" style (bold word look),
@@ -26309,6 +27337,12 @@
                 try { closeTrainSettings(); } catch (_) {}
                 endSession();
                 closeReviewSetup();
+            }
+            if (tab === 'training') {
+                try { updateTrainDueWaves(); } catch (_) {}
+                requestAnimationFrame(() => {
+                    try { playTrainDueWaveAnimation(); } catch (_) {}
+                });
             }
         };
     </script>
