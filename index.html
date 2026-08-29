@@ -1238,7 +1238,7 @@
             right: 0;
             bottom: 0;
             z-index: 200;
-            padding: 0.4rem 0.45rem calc(0.45rem + env(safe-area-inset-bottom));
+            padding: 0.35rem 0.45rem calc(0.45rem + env(safe-area-inset-bottom));
             background: rgba(248, 250, 252, 0.97);
             backdrop-filter: blur(10px);
             border-top: 1px solid #e2e8f0;
@@ -1246,27 +1246,57 @@
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
-            --train-osk-key-h: 2.85rem;
-            --train-osk-pad: 12rem;
+            --train-osk-key-h: 3.05rem;
+            --train-osk-pad: 13.5rem;
         }
         body.train-osk-tall .train-osk {
-            --train-osk-key-h: 3.45rem;
-            --train-osk-pad: 15rem;
-            padding-top: 0.5rem;
+            --train-osk-key-h: 4rem;
+            --train-osk-pad: 17.5rem;
+            padding-top: 0.45rem;
         }
         .train-osk.hidden { display: none; }
-        body.train-osk-open #bs-workspace { padding-bottom: var(--train-osk-pad, 12rem); }
+        body.train-osk-open #bs-workspace { padding-bottom: var(--train-osk-pad, 13.5rem); }
+        .train-osk-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.35rem;
+            min-height: 1.35rem;
+            margin-bottom: 0.28rem;
+            padding: 0 0.05rem;
+        }
+        .train-osk-toolbar-btn {
+            border: none;
+            background: transparent;
+            color: rgba(100, 116, 139, 0.72);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            padding: 0.18rem 0.55rem;
+            border-radius: 0.45rem;
+            touch-action: manipulation;
+            line-height: 1;
+        }
+        .train-osk-toolbar-btn:active {
+            background: rgba(226, 232, 240, 0.55);
+            color: #475569;
+        }
+        .train-osk-toolbar-btn.is-active {
+            color: #4338ca;
+            background: rgba(224, 231, 255, 0.55);
+        }
         .train-osk-row {
             display: flex;
             justify-content: center;
             align-items: stretch;
-            gap: 0.3rem;
-            margin-bottom: 0.3rem;
+            gap: 0.32rem;
+            margin-bottom: 0.32rem;
         }
+        body.train-osk-tall .train-osk-row { gap: 0.38rem; margin-bottom: 0.38rem; }
         .train-osk-row:last-child { margin-bottom: 0; }
         .train-osk-key {
             flex: 1 1 0;
-            max-width: 2.5rem;
+            max-width: 2.55rem;
             min-height: var(--train-osk-key-h);
             border-radius: 0.55rem;
             border: 1px solid #cbd5e1;
@@ -1278,7 +1308,7 @@
             touch-action: manipulation;
             line-height: 1;
         }
-        body.train-osk-tall .train-osk-key { font-size: 1.18rem; }
+        body.train-osk-tall .train-osk-key { font-size: 1.22rem; max-width: 2.75rem; }
         .train-osk-key:active { background: #e2e8f0; transform: scale(0.96); }
         .train-osk-key--tool {
             flex: 0.95 1 0;
@@ -1296,7 +1326,7 @@
         }
         .train-osk-key--backspace {
             flex: 1.55 1 0;
-            max-width: 3.75rem;
+            max-width: 3.85rem;
             font-size: 1.2rem;
         }
         .train-osk-key--space {
@@ -1307,15 +1337,15 @@
         }
         .train-osk-key--enter {
             flex: 1.25 1 0;
-            max-width: 3.35rem;
+            max-width: 3.45rem;
             background: #4f46e5;
             color: #fff;
             border-color: #4338ca;
             box-shadow: 0 1px 0 #3730a3;
         }
         .train-osk-key--enter:active { background: #4338ca; }
-        .train-osk-key--wide { max-width: 2.35rem; flex: 0.9 1 0; }
-        .train-answer-input.train-answer--osk { caret-color: transparent; color: inherit; }
+        .train-osk-key--wide { max-width: 2.45rem; flex: 0.9 1 0; }
+        .train-answer-input.train-answer--osk { caret-color: transparent; color: inherit; cursor: text; }
         .train-input-caret-wrap {
             position: relative;
             width: 100%;
@@ -23700,6 +23730,52 @@
             caret.style.left = `${left}px`;
         }
 
+        function applyTrainCaretMeasureStyle(inp, measure) {
+            const style = window.getComputedStyle(inp);
+            measure.style.font = style.font;
+            measure.style.fontSize = style.fontSize;
+            measure.style.fontWeight = style.fontWeight;
+            measure.style.fontStyle = style.fontStyle;
+            measure.style.letterSpacing = style.letterSpacing;
+            measure.style.fontFamily = style.fontFamily;
+        }
+
+        function setTrainInputCaretFromClientX(inp, clientX) {
+            if (!inp || inp.disabled) return;
+            const wrap = inp.closest('.train-input-caret-wrap');
+            const measure = wrap?.querySelector('.train-caret-measure');
+            if (!measure) return;
+
+            applyTrainCaretMeasureStyle(inp, measure);
+            const style = window.getComputedStyle(inp);
+            const rect = inp.getBoundingClientRect();
+            const padL = parseFloat(style.paddingLeft) || 0;
+            const padR = parseFloat(style.paddingRight) || 0;
+            const contentWidth = inp.clientWidth - padL - padR;
+            const text = inp.value;
+
+            measure.textContent = text || '\u200b';
+            const fullWidth = measure.offsetWidth;
+            let relX = clientX - rect.left - padL;
+            if (style.textAlign === 'center') {
+                relX -= Math.max(0, (contentWidth - fullWidth) / 2);
+            } else if (style.textAlign === 'right') {
+                relX -= Math.max(0, contentWidth - fullWidth);
+            }
+            relX = Math.max(0, Math.min(relX, fullWidth));
+
+            let lo = 0;
+            let hi = text.length;
+            while (lo < hi) {
+                const mid = Math.ceil((lo + hi) / 2);
+                measure.textContent = text.slice(0, mid) || '\u200b';
+                if (measure.offsetWidth <= relX) lo = mid;
+                else hi = mid - 1;
+            }
+            try { inp.setSelectionRange(lo, lo); } catch (_) {}
+            syncTrainInputCaret(inp);
+        }
+
         function ensureTrainOskCaretWrap(inp) {
             if (!inp || inp.closest('.train-input-caret-wrap')) return;
             const wrap = document.createElement('span');
@@ -23819,7 +23895,7 @@
             document.body.appendChild(el);
 
             el.addEventListener('pointerdown', (e) => {
-                const btn = e.target.closest('.train-osk-key');
+                const btn = e.target.closest('.train-osk-key, .train-osk-toolbar-btn');
                 if (!btn || !trainOskActiveInput) return;
                 e.preventDefault();
                 const inp = trainOskActiveInput;
@@ -23872,16 +23948,22 @@
             return el;
         }
 
+        function renderTrainOskToolbar(panelLabel, panelActive) {
+            const expandActive = trainOskExpanded ? ' is-active' : '';
+            const panelActiveClass = panelActive ? ' is-active' : '';
+            return `<div class="train-osk-toolbar">
+                <button type="button" class="train-osk-toolbar-btn${expandActive}" data-action="toggle-expand" aria-label="Expand keyboard">⛶</button>
+                <button type="button" class="train-osk-toolbar-btn${panelActiveClass}" data-action="toggle-panel" aria-label="Switch keyboard panel">${panelLabel}</button>
+            </div>`;
+        }
+
         function renderTrainOsk(lang) {
             const osk = ensureTrainOsk();
-            const expandActive = trainOskExpanded ? ' is-active' : '';
-            const panelBtnLabel = trainOskPanel === 'letters' ? '123' : 'ABC';
             let html = '';
 
             if (trainOskPanel === 'numbers') {
-                html += `<div class="train-osk-row">
-                    <button type="button" class="train-osk-key train-osk-key--tool${expandActive}" data-action="toggle-expand" aria-label="Expand keyboard">⛶</button>
-                    <button type="button" class="train-osk-key train-osk-key--tool is-active" data-action="toggle-panel" aria-label="Letters">ABC</button>`;
+                html += renderTrainOskToolbar('ABC', true);
+                html += `<div class="train-osk-row">`;
                 ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].forEach((key) => {
                     html += `<button type="button" class="train-osk-key" data-key="${key}">${key}</button>`;
                 });
@@ -23900,8 +23982,8 @@
                     ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
                     ['z', 'x', 'c', 'v', 'b', 'n', 'm']
                 ];
-                html += `<div class="train-osk-row">
-                    <button type="button" class="train-osk-key train-osk-key--tool${expandActive}" data-action="toggle-expand" aria-label="Expand keyboard">⛶</button>`;
+                html += renderTrainOskToolbar('123', false);
+                html += `<div class="train-osk-row">`;
                 rows[0].forEach((key) => {
                     const accentable = lang === 'es' && 'aeioun'.includes(key);
                     html += `<button type="button" class="train-osk-key${accentable ? ' train-osk-key--accentable' : ''}" data-key="${key}" data-base="${key}">${key}</button>`;
@@ -23909,9 +23991,6 @@
                 html += '</div>';
                 rows.slice(1).forEach((row, idx) => {
                     html += '<div class="train-osk-row">';
-                    if (idx === 0) {
-                        html += `<button type="button" class="train-osk-key train-osk-key--tool" data-action="toggle-panel" aria-label="Numbers">123</button>`;
-                    }
                     row.forEach((key) => {
                         const accentable = lang === 'es' && 'aeioun'.includes(key);
                         html += `<button type="button" class="train-osk-key${accentable ? ' train-osk-key--accentable' : ''}" data-key="${key}" data-base="${key}">${key}</button>`;
@@ -23962,6 +24041,10 @@
         function wireTrainOskInput(inp) {
             if (!inp || inp._trainOskWired) return;
             inp._trainOskWired = true;
+            let touchMoved = false;
+            let touchStartX = 0;
+            let touchStartY = 0;
+
             inp.addEventListener('focus', () => {
                 if (!inp.disabled && isTrainingTouchDevice()) showTrainOsk(inp);
             });
@@ -23972,12 +24055,32 @@
                     if (trainOskActiveInput === inp) hideTrainOsk();
                 }, 140);
             });
+            inp.addEventListener('click', (e) => {
+                if (!isTrainingTouchDevice() || inp.disabled) return;
+                setTrainInputCaretFromClientX(inp, e.clientX);
+            });
             inp.addEventListener('touchstart', (e) => {
                 if (!isTrainingTouchDevice() || inp.disabled) return;
+                touchMoved = false;
+                const touch = e.changedTouches[0];
+                touchStartX = touch?.clientX ?? 0;
+                touchStartY = touch?.clientY ?? 0;
                 e.preventDefault();
                 inp.focus({ preventScroll: true });
                 showTrainOsk(inp);
             }, { passive: false });
+            inp.addEventListener('touchmove', (e) => {
+                const touch = e.changedTouches[0];
+                if (!touch) return;
+                const dx = Math.abs(touch.clientX - touchStartX);
+                const dy = Math.abs(touch.clientY - touchStartY);
+                if (dx > 8 || dy > 8) touchMoved = true;
+            }, { passive: true });
+            inp.addEventListener('touchend', (e) => {
+                if (!isTrainingTouchDevice() || inp.disabled || touchMoved) return;
+                const touch = e.changedTouches[0];
+                if (touch) setTrainInputCaretFromClientX(inp, touch.clientX);
+            }, { passive: true });
         }
 
         function applyTrainingInputNoSuggest(inp) {
