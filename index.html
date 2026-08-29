@@ -1246,58 +1246,56 @@
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
-            --train-osk-key-h: 3.05rem;
-            --train-osk-pad: 13.5rem;
+            --train-osk-key-h: 2.8rem;
+            --train-osk-pad: 11.75rem;
         }
         body.train-osk-tall .train-osk {
-            --train-osk-key-h: 3.85rem;
-            --train-osk-pad: 18rem;
-            padding-top: 0.45rem;
+            --train-osk-key-h: 3.9rem;
+            --train-osk-pad: 17.5rem;
+            padding-top: 0.4rem;
         }
         .train-osk.hidden { display: none; }
-        body.train-osk-open #bs-workspace { padding-bottom: var(--train-osk-pad, 13.5rem); }
-        .train-osk-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.4rem;
-            padding: 0.1rem 0.15rem 0.4rem;
-            margin-bottom: 0.2rem;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+        body.train-osk-open #bs-workspace { padding-bottom: var(--train-osk-pad, 11.75rem); }
+        body.train-osk-open.train-osk-numbers-open #bs-workspace {
+            padding-bottom: calc(var(--train-osk-pad, 11.75rem) + 3.35rem);
         }
-        .train-osk-toolbar-side {
+        .train-osk-floats {
+            position: absolute;
+            top: 0.18rem;
+            right: 0.42rem;
             display: flex;
-            align-items: center;
-            gap: 0.35rem;
+            gap: 0.32rem;
+            z-index: 3;
+            pointer-events: none;
         }
-        .train-osk-tool {
-            min-height: 1.9rem;
-            min-width: 2.15rem;
-            padding: 0 0.7rem;
-            border-radius: 0.5rem;
-            border: 1px solid transparent;
-            background: rgba(255, 255, 255, 0.28);
-            color: #64748b;
-            font-size: 0.72rem;
+        .train-osk-float {
+            pointer-events: auto;
+            min-height: 1.55rem;
+            padding: 0 0.5rem;
+            border-radius: 0.42rem;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            background: rgba(255, 255, 255, 0.18);
+            color: rgba(71, 85, 105, 0.42);
+            font-size: 0.66rem;
             font-weight: 800;
             letter-spacing: 0.03em;
             touch-action: manipulation;
             line-height: 1;
         }
-        body.train-osk-tall .train-osk-tool {
-            min-height: 2.05rem;
-            font-size: 0.76rem;
+        body.train-osk-tall .train-osk-float {
+            color: rgba(71, 85, 105, 0.52);
+            background: rgba(255, 255, 255, 0.24);
         }
-        .train-osk-tool.is-active {
-            background: rgba(224, 231, 255, 0.82);
+        .train-osk-float.is-active {
+            background: rgba(224, 231, 255, 0.78);
             color: #4338ca;
             border-color: rgba(165, 180, 252, 0.55);
         }
-        .train-osk-tool:active { background: rgba(226, 232, 240, 0.75); }
-        .train-osk-tool--arrow {
-            min-width: 2.35rem;
-            font-size: 0.82rem;
-            padding: 0 0.55rem;
+        .train-osk-float:active { background: rgba(226, 232, 240, 0.65); }
+        .train-osk-numbers {
+            margin-bottom: 0.28rem;
+            padding-bottom: 0.28rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
         }
         .train-osk-row {
             display: flex;
@@ -1321,7 +1319,7 @@
             touch-action: manipulation;
             line-height: 1;
         }
-        body.train-osk-tall .train-osk-key { font-size: 1.22rem; }
+        body.train-osk-tall .train-osk-key { font-size: 1.24rem; }
         .train-osk-key:active { background: #e2e8f0; transform: scale(0.96); }
         .train-osk-key--backspace {
             flex: 1.55 1 0;
@@ -1372,9 +1370,12 @@
         .train-fake-caret {
             position: absolute;
             top: 50%;
-            width: 2px;
-            height: 1.05em;
-            background: #6366f1;
+            width: 3px;
+            height: 1.22em;
+            min-height: 1.2rem;
+            background: #4f46e5;
+            border-radius: 1px;
+            box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
             pointer-events: none;
             transform: translateY(-50%);
             animation: trainCaretBlink 1.05s step-end infinite;
@@ -1628,6 +1629,8 @@
             #inline-popup {
                 width: calc(100vw - 1rem);
                 max-width: calc(100vw - 1rem);
+            }
+            #inline-popup.inline-popup--dock-mobile {
                 left: 0.5rem !important;
                 right: 0.5rem;
             }
@@ -2649,14 +2652,26 @@
             overflow-y: auto;
         }
         @media (max-width: 639px) {
+            #year-activity-modal {
+                align-items: flex-start;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
+            }
             #year-activity-modal .year-activity-card {
                 width: min(94vw, 21rem);
                 max-width: min(94vw, 21rem);
                 min-height: 0;
+                max-height: none;
+                overflow: visible;
+                margin: 0 auto;
             }
             #year-activity-modal.is-expanded .year-activity-card {
                 width: min(98vw, 100%);
                 max-width: 98vw;
+                max-height: 92vh;
+                overflow-y: auto;
             }
             .year-activity-disk {
                 width: min(100%, 260px);
@@ -3457,6 +3472,109 @@
         .train-mode-card.border-hover-cyan:hover,
         .train-mode-card.border-hover-cyan.is-peek { border-color: #22d3ee; }
 
+        .train-due-badge {
+            position: absolute;
+            top: 0.42rem;
+            right: 0.46rem;
+            z-index: 2;
+            min-width: 2.65rem;
+            height: 1.22rem;
+            padding: 0 0.72rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.015em;
+            line-height: 1.22rem;
+            text-align: center;
+            color: #3730a3;
+            background: linear-gradient(180deg, #faf8ff 0%, #ede9fe 100%);
+            border: 1px solid rgba(129, 140, 248, 0.28);
+            box-shadow:
+                0 1px 2px rgba(79, 70, 229, 0.07),
+                inset 0 1px 0 rgba(255, 255, 255, 0.72);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(2px);
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease, box-shadow 0.18s ease;
+            pointer-events: none;
+        }
+        .train-mode-card:hover .train-due-badge--ready,
+        .train-mode-card.is-peek .train-due-badge--ready {
+            box-shadow:
+                0 2px 6px rgba(79, 70, 229, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+        .train-due-badge--brainstorm {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            top: auto;
+            right: auto;
+            min-width: 2.45rem;
+            height: 1.18rem;
+            padding: 0 0.58rem;
+            font-size: 0.68rem;
+            font-weight: 600;
+            line-height: 1;
+            color: #312e81;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(237, 233, 254, 0.92) 100%);
+            border-color: rgba(255, 255, 255, 0.62);
+            box-shadow: 0 1px 4px rgba(30, 27, 75, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+            transform: none;
+            flex-shrink: 0;
+            margin: 0;
+            vertical-align: middle;
+        }
+        .train-due-badge--always.train-due-badge--ready {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .train-mode-card.is-peek .train-due-badge--ready {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        @media (hover: hover) and (pointer: fine) {
+            .train-mode-card:hover .train-due-badge--ready,
+            .train-mode-card:focus-within .train-due-badge--ready {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+                pointer-events: auto;
+            }
+            .train-due-badge--ready:hover::after,
+            .train-due-badge--ready:focus-visible::after {
+                content: attr(data-due-tip);
+                position: absolute;
+                top: calc(100% + 0.3rem);
+                right: 0;
+                z-index: 5;
+                min-width: max-content;
+                max-width: 11rem;
+                padding: 0.28rem 0.5rem;
+                border-radius: 0.45rem;
+                font-size: 0.62rem;
+                font-weight: 500;
+                letter-spacing: 0;
+                line-height: 1.25;
+                color: #f8fafc;
+                background: rgba(15, 23, 42, 0.92);
+                border: 1px solid rgba(148, 163, 184, 0.25);
+                box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
+                pointer-events: none;
+                white-space: nowrap;
+            }
+            .train-due-badge--brainstorm:hover::after,
+            .train-due-badge--brainstorm:focus-visible::after {
+                right: auto;
+                left: 0;
+            }
+        }
+
         .inline-context-input {
             display: inline-block;
             width: 7ch;
@@ -3675,11 +3793,17 @@
 
         /* Training hub — Brainstorm settings + selects */
         #bs-hero-wrap { position: relative; }
-        #btn-train-settings {
+        .train-brainstorm-tools {
             position: absolute;
             top: 0.7rem;
             right: 0.7rem;
             z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 0.42rem;
+        }
+        #btn-train-settings {
+            position: static;
             width: 2.35rem;
             height: 2.35rem;
             display: inline-flex;
@@ -3693,6 +3817,7 @@
             line-height: 1;
             backdrop-filter: blur(4px);
             transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+            flex-shrink: 0;
         }
         #btn-train-settings:hover,
         #btn-train-settings.is-open {
@@ -4042,6 +4167,27 @@
             font-size: 0.6875rem;
             color: #64748b;
             line-height: 1.3;
+        }
+        @media (max-width: 519px) {
+            #train-word-pick-title { font-size: 1.2rem; }
+            #train-word-pick-modal-hint { font-size: 0.8125rem; line-height: 1.4; }
+            .train-word-pick-folder-btn {
+                font-size: 0.8125rem;
+                font-weight: 700;
+                padding: 0.5rem 0.6rem;
+            }
+            .train-word-pick-words-title { font-size: 0.8125rem; font-weight: 700; }
+            .train-word-pick-mini-btn { font-size: 0.75rem; font-weight: 700; }
+            .train-word-pick-item { padding: 0.5rem 0.5rem; }
+            .train-word-pick-item-word {
+                font-size: 0.9375rem;
+                font-weight: 700;
+                line-height: 1.3;
+            }
+            .train-word-pick-item-trans { font-size: 0.8125rem; line-height: 1.35; }
+            #train-word-pick-total { font-size: 0.8125rem; font-weight: 700; }
+            .train-word-pick-open-btn { font-size: 0.8125rem; font-weight: 700; }
+            .train-word-pick-summary { font-size: 0.75rem; }
         }
         .def-blank {
             display: inline-block;
@@ -4500,7 +4646,7 @@
                 <button type="button" id="btn-anki-import" onclick="toggleAnkiImport()" class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition" data-i18n-title="bulk.anki" title="Імпорт з Anki">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/3/3d/Anki-icon.svg" alt="Anki" class="duocards-logo" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Anki-icon.svg/64px-Anki-icon.svg.png'">
                 </button>
-                <span class="w-px self-stretch bg-slate-200 mx-1.5" aria-hidden="true"></span>
+                <span class="w-px self-stretch bg-slate-200 mx-1.5"></span>
                 <button type="button" id="btn-photo-import" onclick="togglePhotoImport()" class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition text-lg" data-i18n-title="bulk.photo" title="Імпорт з фото">🖼️</button>
             </div>
 
@@ -5023,11 +5169,14 @@
                         </div>
                     </div>
 
-                    <div class="w-full bg-indigo-600 text-white rounded-2xl shadow-lg relative overflow-hidden group">
+                    <div class="w-full bg-indigo-600 text-white rounded-2xl shadow-lg relative overflow-hidden group" id="train-brainstorm-card">
                         <div class="absolute right-0 top-0 bottom-0 w-32 bg-indigo-500 opacity-20 skew-x-12 transform translate-x-4 group-hover:translate-x-0 transition-transform pointer-events-none"></div>
-                        <button type="button" id="btn-train-settings" onclick="toggleTrainSettings(event)" title="Settings" data-i18n-title="train.settings" aria-label="Settings" aria-expanded="false" aria-controls="train-settings">⚙️</button>
-                        <button type="button" onclick="closeTrainSettings(); startSession('all')" class="w-full p-6 pr-14 text-left flex justify-between items-center hover:bg-indigo-700/40 transition active:scale-[0.99]">
-                            <div>
+                        <div class="train-brainstorm-tools">
+                            <span class="train-due-badge train-due-badge--always train-due-badge--brainstorm" data-train-due="all"></span>
+                            <button type="button" id="btn-train-settings" onclick="toggleTrainSettings(event)" title="Settings" data-i18n-title="train.settings" aria-label="Settings" aria-expanded="false" aria-controls="train-settings">⚙️</button>
+                        </div>
+                        <button type="button" onclick="closeTrainSettings(); startSession('all')" class="w-full p-6 pr-[5.75rem] text-left hover:bg-indigo-700/40 transition active:scale-[0.99]">
+                            <div class="min-w-0">
                                 <h3 class="text-2xl font-bold mb-1">🧠 Brainstorm</h3>
                                 <p class="text-indigo-100 text-sm font-medium" data-i18n="train.bsDesc">Інтенсивне комплексне опрацювання слів</p>
                             </div>
@@ -5047,6 +5196,7 @@
                 <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 px-1" data-i18n="train.separate">Окремі вправи</h3>
                 <div id="train-mode-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <button type="button" data-train-mode="word-trans" onclick="startSession('word-trans')" class="train-mode-card border-hover-indigo">
+                        <span class="train-due-badge" data-train-due="word-trans"></span>
                         <div class="train-mode-visual">
                             <div class="train-mode-head">
                                 <div id="train-flag-wt" class="train-mode-emoji">🇬🇧➡️🇺🇦</div>
@@ -5056,6 +5206,7 @@
                         </div>
                     </button>
                     <button type="button" data-train-mode="trans-word" onclick="startSession('trans-word')" class="train-mode-card border-hover-violet">
+                        <span class="train-due-badge" data-train-due="trans-word"></span>
                         <div class="train-mode-visual">
                             <div class="train-mode-head">
                                 <div id="train-flag-tw" class="train-mode-emoji">🇬🇧⬅️🇺🇦</div>
@@ -5065,6 +5216,7 @@
                         </div>
                     </button>
                     <button type="button" data-train-mode="constructor" onclick="startSession('constructor')" class="train-mode-card border-hover-fuchsia">
+                        <span class="train-due-badge" data-train-due="constructor"></span>
                         <div class="train-mode-visual">
                             <div class="train-mode-head">
                                 <div class="train-mode-emoji">🔠🔄</div>
@@ -5074,6 +5226,7 @@
                         </div>
                     </button>
                     <button type="button" data-train-mode="typing" onclick="startSession('typing')" class="train-mode-card border-hover-emerald">
+                        <span class="train-due-badge" data-train-due="typing"></span>
                         <div class="train-mode-visual">
                             <div class="train-mode-head">
                                 <div class="train-mode-emoji">⌨️✍️</div>
@@ -5083,6 +5236,7 @@
                         </div>
                     </button>
                     <button type="button" data-train-mode="listening" onclick="startSession('listening')" class="train-mode-card border-hover-sky">
+                        <span class="train-due-badge" data-train-due="listening"></span>
                         <div class="train-mode-visual">
                             <div class="train-mode-head">
                                 <div class="train-mode-emoji">🎧👂</div>
@@ -5092,6 +5246,7 @@
                         </div>
                     </button>
                     <button type="button" data-train-mode="context" onclick="startSession('context')" class="train-mode-card border-hover-amber">
+                        <span class="train-due-badge" data-train-due="context"></span>
                         <div class="train-mode-visual">
                             <div class="train-mode-head">
                                 <div class="train-mode-emoji">🧩📄</div>
@@ -5101,6 +5256,7 @@
                         </div>
                     </button>
                     <button type="button" id="train-card-definition" data-train-mode="definition" onclick="startSession('definition')" class="train-mode-card border-hover-violet">
+                        <span class="train-due-badge" data-train-due="definition"></span>
                         <div class="train-mode-visual">
                             <div class="train-mode-head">
                                 <div class="train-mode-emoji">📘🎯</div>
@@ -5110,6 +5266,7 @@
                         </div>
                     </button>
                     <button type="button" data-train-mode="crossword" onclick="startSession('crossword')" class="train-mode-card border-hover-indigo">
+                        <span class="train-due-badge" data-train-due="crossword"></span>
                         <div class="train-mode-visual">
                             <div class="train-mode-head">
                                 <div class="train-mode-emoji">🧩✍️</div>
@@ -5119,6 +5276,7 @@
                         </div>
                     </button>
                     <button type="button" data-train-mode="sprint" onclick="startSession('sprint')" class="train-mode-card border-hover-amber">
+                        <span class="train-due-badge" data-train-due="sprint"></span>
                         <div class="train-mode-visual">
                             <div class="train-mode-head">
                                 <div class="train-mode-emoji">⚡🏃‍♂️</div>
@@ -5128,6 +5286,7 @@
                         </div>
                     </button>
                     <button type="button" data-train-mode="picture" onclick="startSession('picture')" class="train-mode-card border-hover-cyan">
+                        <span class="train-due-badge" data-train-due="picture"></span>
                         <div class="train-mode-visual">
                             <div class="train-mode-head">
                                 <div class="train-mode-emoji">🖼️🤔</div>
@@ -5574,6 +5733,7 @@
                 'train.pickWordsDone': 'Готово',
                 'train.pickWordsTotal': 'Усього обрано: {selected} з {total}',
                 'train.pickWordsEmpty': 'У цій папці немає слів',
+                'train.dueTooltip': '{n} слів до тренування',
                 'train.bsStage': 'Етап {n}',
                 'train.ctorStrictTip': 'З 4-го етапу помилка в літері означає, що слово не перейде далі — навіть якщо ви потім виправите.',
                 'train.sprintRulesTitle': 'Фінальний спринт',
@@ -6017,6 +6177,7 @@
                 'train.pickWordsDone': 'Done',
                 'train.pickWordsTotal': 'Selected: {selected} of {total}',
                 'train.pickWordsEmpty': 'No words in this folder',
+                'train.dueTooltip': '{n} words to train',
                 'train.bsStage': 'Stage {n}',
                 'train.ctorStrictTip': 'From stage 4 onward, a wrong letter means this word will not advance — even if you fix it afterward.',
                 'train.sprintRulesTitle': 'Final sprint',
@@ -6455,6 +6616,7 @@
                 'train.pickWordsDone': 'Listo',
                 'train.pickWordsTotal': 'Seleccionadas: {selected} de {total}',
                 'train.pickWordsEmpty': 'No hay palabras en esta carpeta',
+                'train.dueTooltip': '{n} palabras para entrenar',
                 'train.bsStage': 'Etapa {n}',
                 'train.ctorStrictTip': 'Desde la etapa 4, una letra incorrecta hace que la palabra no avance, aunque la corrijas después.',
                 'train.sprintRulesTitle': 'Sprint final',
@@ -8843,8 +9005,54 @@
             btn.style.setProperty('--review-u', String(Math.max(0, Math.min(1, stats.urgency))));
         }
 
+        function countDueWordsForMode(mode, now = Date.now()) {
+            let pool = getTrainWordPool();
+            if (mode === 'context') {
+                pool = pool.filter((w) => w.context && w.context.length > 5 && contextHasWholeWord(w.context, w.word));
+            }
+            if (mode === 'definition') {
+                pool = pool.filter((w) => {
+                    const ww = String(w.word || '').trim();
+                    return ww && !/\s/.test(ww) && ww.length >= 2;
+                });
+            }
+            let due = pool.filter((w) => isWordDueForMode(w, mode, now));
+            if (mode === 'picture') {
+                due = due.filter((w) => wordHasRealImage(w.imageUrl));
+            }
+            return due.length;
+        }
+
+        function formatTrainDueCount(n) {
+            if (n > 99) return '99+';
+            return String(n);
+        }
+
+        function updateTrainDueBadges() {
+            const tip = (n) => t('train.dueTooltip', { n });
+            document.querySelectorAll('[data-train-due]').forEach((el) => {
+                const mode = el.dataset.trainDue;
+                if (!mode) return;
+                const n = countDueWordsForMode(mode);
+                const ready = n > 0;
+                el.textContent = ready ? formatTrainDueCount(n) : '';
+                el.classList.toggle('train-due-badge--ready', ready);
+                if (ready) {
+                    const label = tip(n);
+                    el.removeAttribute('title');
+                    el.setAttribute('aria-label', label);
+                    el.dataset.dueTip = label;
+                } else {
+                    el.removeAttribute('title');
+                    el.removeAttribute('aria-label');
+                    delete el.dataset.dueTip;
+                }
+            });
+        }
+
         function updateReviewDueBadge() {
             applyReviewButtonUrgency(getReviewUrgencyStats());
+            updateTrainDueBadges();
         }
 
         function syncReviewSetupDueLine() {
@@ -9142,7 +9350,7 @@
             if (!el) {
                 el = document.createElement('div');
                 el.id = 'app-toast';
-                el.innerHTML = '<span class="app-toast-dot" aria-hidden="true"></span><span class="app-toast-text"></span>';
+                el.innerHTML = '<span class="app-toast-dot"></span><span class="app-toast-text"></span>';
                 document.body.appendChild(el);
             }
             const textEl = el.querySelector('.app-toast-text') || el;
@@ -17410,6 +17618,42 @@
         let selectionRepositionRaf = null;
         let selectionAdjusting = false;
 
+        function getInlinePopupViewport() {
+            const vv = window.visualViewport;
+            if (vv) {
+                return {
+                    top: vv.offsetTop,
+                    left: vv.offsetLeft,
+                    width: vv.width,
+                    height: vv.height,
+                    bottom: vv.offsetTop + vv.height,
+                    right: vv.offsetLeft + vv.width
+                };
+            }
+            return {
+                top: 0,
+                left: 0,
+                width: window.innerWidth,
+                height: window.innerHeight,
+                bottom: window.innerHeight,
+                right: window.innerWidth
+            };
+        }
+
+        function isInlinePopupTypingActive() {
+            const ae = document.activeElement;
+            if (!ae || !inlinePopup || !inlinePopup.contains(ae)) return false;
+            const tag = ae.tagName;
+            return tag === 'INPUT' || tag === 'TEXTAREA' || ae.isContentEditable;
+        }
+
+        function shouldDockInlinePopupMobile(vp) {
+            if (vp.width >= 640) return false;
+            if (isInlinePopupTypingActive()) return true;
+            const ctxPanel = document.getElementById('inline-context-panel');
+            return !!(ctxPanel && !ctxPanel.classList.contains('hidden'));
+        }
+
         function positionInlinePopup(anchorRect) {
             if (!inlinePopup || !anchorRect) return;
             lastInlineAnchorRect = {
@@ -17427,8 +17671,14 @@
 
             const pad = 10;
             const gap = 10;
-            const vw = window.innerWidth;
-            const vh = window.innerHeight;
+            const vp = getInlinePopupViewport();
+            const vw = vp.width;
+            const vh = vp.height;
+            const vTop = vp.top;
+            const vBottom = vp.bottom;
+            const dockMobile = shouldDockInlinePopupMobile(vp);
+            inlinePopup.classList.toggle('inline-popup--dock-mobile', dockMobile);
+
             const maxW = Math.min(vw < 640 ? vw - pad * 2 : 420, vw - pad * 2);
             inlinePopup.style.width = maxW + 'px';
             inlinePopup.style.maxWidth = `calc(100vw - ${pad * 2}px)`;
@@ -17437,40 +17687,48 @@
             const pw = inlinePopup.offsetWidth || maxW;
             const ph = inlinePopup.offsetHeight || 180;
 
-            let left = lastInlineAnchorRect.left + lastInlineAnchorRect.width / 2 - pw / 2;
-            left = Math.max(pad, Math.min(left, vw - pw - pad));
-
-            const spaceBelow = vh - pad - (lastInlineAnchorRect.bottom + gap);
-            const spaceAbove = lastInlineAnchorRect.top - gap - pad;
-            const fitsBelow = spaceBelow >= ph;
-            const fitsAbove = spaceAbove >= ph;
-
+            let left;
             let top;
-            if (fitsBelow && fitsAbove) {
-                top = spaceBelow >= spaceAbove
-                    ? lastInlineAnchorRect.bottom + gap
-                    : lastInlineAnchorRect.top - ph - gap;
-            } else if (fitsBelow) {
-                top = lastInlineAnchorRect.bottom + gap;
-            } else if (fitsAbove) {
-                top = lastInlineAnchorRect.top - ph - gap;
-            } else {
-                top = spaceBelow >= spaceAbove
-                    ? lastInlineAnchorRect.bottom + gap
-                    : lastInlineAnchorRect.top - ph - gap;
-                top = Math.max(pad, Math.min(top, vh - ph - pad));
-            }
 
-            // Keep popup from covering the highlighted text / selection handles
-            const popupBottom = top + ph;
-            const overlapsAnchor = top < lastInlineAnchorRect.bottom + gap && popupBottom > lastInlineAnchorRect.top - gap;
-            if (overlapsAnchor) {
-                if (top >= lastInlineAnchorRect.bottom) {
+            if (dockMobile) {
+                left = Math.max(vp.left + pad, vp.left + (vw - pw) / 2);
+                left = Math.min(left, vp.right - pw - pad);
+                top = vBottom - ph - pad;
+                top = Math.max(vTop + pad, top);
+            } else {
+                left = lastInlineAnchorRect.left + lastInlineAnchorRect.width / 2 - pw / 2;
+                left = Math.max(vp.left + pad, Math.min(left, vp.right - pw - pad));
+
+                const spaceBelow = vBottom - pad - (lastInlineAnchorRect.bottom + gap);
+                const spaceAbove = lastInlineAnchorRect.top - gap - vTop - pad;
+                const fitsBelow = spaceBelow >= ph;
+                const fitsAbove = spaceAbove >= ph;
+
+                if (fitsBelow && fitsAbove) {
+                    top = spaceBelow >= spaceAbove
+                        ? lastInlineAnchorRect.bottom + gap
+                        : lastInlineAnchorRect.top - ph - gap;
+                } else if (fitsBelow) {
+                    top = lastInlineAnchorRect.bottom + gap;
+                } else if (fitsAbove) {
                     top = lastInlineAnchorRect.top - ph - gap;
                 } else {
-                    top = lastInlineAnchorRect.bottom + gap;
+                    top = spaceBelow >= spaceAbove
+                        ? lastInlineAnchorRect.bottom + gap
+                        : lastInlineAnchorRect.top - ph - gap;
+                    top = Math.max(vTop + pad, Math.min(top, vBottom - ph - pad));
                 }
-                top = Math.max(pad, Math.min(top, vh - ph - pad));
+
+                const popupBottom = top + ph;
+                const overlapsAnchor = top < lastInlineAnchorRect.bottom + gap && popupBottom > lastInlineAnchorRect.top - gap;
+                if (overlapsAnchor) {
+                    if (top >= lastInlineAnchorRect.bottom) {
+                        top = lastInlineAnchorRect.top - ph - gap;
+                    } else {
+                        top = lastInlineAnchorRect.bottom + gap;
+                    }
+                    top = Math.max(vTop + pad, Math.min(top, vBottom - ph - pad));
+                }
             }
 
             inlinePopup.style.left = `${Math.round(left)}px`;
@@ -17495,7 +17753,16 @@
 
         function repositionInlinePopupSoon() {
             if (!lastInlineAnchorRect || inlinePopup.classList.contains('hidden')) return;
-            requestAnimationFrame(() => positionInlinePopup(lastInlineAnchorRect));
+            requestAnimationFrame(() => {
+                positionInlinePopup(lastInlineAnchorRect);
+                requestAnimationFrame(() => positionInlinePopup(lastInlineAnchorRect));
+            });
+        }
+
+        if (window.visualViewport && !window._inlinePopupVpBound) {
+            window._inlinePopupVpBound = true;
+            window.visualViewport.addEventListener('resize', repositionInlinePopupSoon);
+            window.visualViewport.addEventListener('scroll', repositionInlinePopupSoon);
         }
 
         function getReaderSelectionRangeRect() {
@@ -17624,12 +17891,15 @@
         });
         
         document.getElementById('inline-popup-trans-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') { e.preventDefault(); saveWordFromInlinePopup(); } });
+        document.getElementById('inline-popup-trans-input').addEventListener('focus', repositionInlinePopupSoon);
+        document.getElementById('inline-popup-trans-input').addEventListener('blur', () => { setTimeout(repositionInlinePopupSoon, 100); });
 
         window.selectInlineTranslation = (text) => { document.getElementById('inline-popup-trans-input').value = text; }
         window.closeInlinePopup = () => {
             clearTimeout(selectionFetchTimeout);
             setInlinePopupSelectionAdjusting(false);
             inlinePopup.classList.add('hidden');
+            inlinePopup.classList.remove('inline-popup--dock-mobile');
             applyReaderThemeClasses(inlinePopup, '');
             hideInlineDupRow();
             pendingInlineSaveData = null;
@@ -18136,7 +18406,7 @@
         }
 
         function formatDefExampleHtml(text) {
-            return escapeHtmlText(text).replace(/⟦BLANK⟧/g, '<span class="def-blank" aria-hidden="true"></span>');
+            return escapeHtmlText(text).replace(/⟦BLANK⟧/g, '<span class="def-blank"></span>');
         }
 
         function scoreDefAgainstWord(defText, wordObj) {
@@ -23672,7 +23942,7 @@
         let trainOskActiveInput = null;
         let trainOskAccentHold = null;
         let trainOskBsRepeat = null;
-        let trainOskPanel = 'letters';
+        let trainOskNumbersOpen = false;
         let trainOskExpanded = localStorage.getItem(TRAIN_OSK_EXPANDED_KEY) === '1';
         let trainOskTapStart = null;
 
@@ -23730,16 +24000,6 @@
             syncTrainInputCaret(inp);
         }
 
-        function moveTrainInputCaret(inp, delta) {
-            if (!inp || inp.disabled) return;
-            const start = inp.selectionStart ?? inp.value.length;
-            const end = inp.selectionEnd ?? start;
-            const anchor = start === end ? start : end;
-            const next = Math.max(0, Math.min(inp.value.length, anchor + delta));
-            try { inp.setSelectionRange(next, next); } catch (_) {}
-            syncTrainInputCaret(inp);
-        }
-
         function clearTrainOskAccentHold() {
             if (trainOskAccentHold?.timer) clearTimeout(trainOskAccentHold.timer);
             trainOskAccentHold = null;
@@ -23750,10 +24010,16 @@
             trainOskBsRepeat = null;
         }
 
+        function isTrainOskFocusMode() {
+            return trainingFocusCollapsed || trainOskFocusPinned;
+        }
+
         function syncTrainOskSize() {
-            const tall = document.body.classList.contains('train-osk-open')
-                && (trainingFocusCollapsed || trainOskExpanded);
+            const open = document.body.classList.contains('train-osk-open');
+            const focus = isTrainOskFocusMode();
+            const tall = open && focus && trainOskExpanded;
             document.body.classList.toggle('train-osk-tall', tall);
+            document.body.classList.toggle('train-osk-numbers-open', open && trainOskNumbersOpen);
         }
 
         function syncTrainInputCaret(inp) {
@@ -23806,8 +24072,8 @@
             trainOskActiveInput = null;
             clearTrainOskAccentHold();
             stopTrainOskBackspaceRepeat();
-            trainOskPanel = 'letters';
-            document.body.classList.remove('train-osk-open', 'train-osk-tall');
+            trainOskNumbersOpen = false;
+            document.body.classList.remove('train-osk-open', 'train-osk-tall', 'train-osk-numbers-open');
             trainOskEl?.classList.add('hidden');
         }
 
@@ -23848,14 +24114,14 @@
             const inp = trainOskActiveInput;
             if (!inp || inp.disabled) return;
             backspaceTrainOskInput(inp);
-            let delay = 380;
+            let delay = 200;
             const tick = () => {
                 if (!trainOskActiveInput || trainOskActiveInput.disabled) {
                     stopTrainOskBackspaceRepeat();
                     return;
                 }
                 backspaceTrainOskInput(trainOskActiveInput);
-                delay = Math.max(34, delay * 0.84);
+                delay = Math.max(20, delay * 0.7);
                 trainOskBsRepeat = setTimeout(tick, delay);
             };
             trainOskBsRepeat = setTimeout(tick, delay);
@@ -23867,11 +24133,16 @@
         }
 
         function toggleTrainOskExpanded() {
-            trainOskExpanded = !trainOskExpanded;
+            const focus = isTrainOskFocusMode();
+            if (!focus) {
+                applyTrainingFocus(true);
+                trainOskFocusPinned = true;
+                trainOskExpanded = true;
+            } else {
+                trainOskExpanded = !trainOskExpanded;
+                if (!trainOskExpanded) trainOskFocusPinned = false;
+            }
             localStorage.setItem(TRAIN_OSK_EXPANDED_KEY, trainOskExpanded ? '1' : '0');
-            trainOskFocusPinned = trainOskExpanded;
-            if (trainOskExpanded) applyTrainingFocus(true);
-            else applyTrainingFocus(false);
             syncTrainOskSize();
             if (trainOskActiveInput) {
                 renderTrainOsk(getTrainOskLang(trainOskActiveInput));
@@ -23882,9 +24153,13 @@
             }
         }
 
-        function toggleTrainOskPanel() {
-            trainOskPanel = trainOskPanel === 'letters' ? 'numbers' : 'letters';
-            if (trainOskActiveInput) renderTrainOsk(getTrainOskLang(trainOskActiveInput));
+        function toggleTrainOskNumbers() {
+            trainOskNumbersOpen = !trainOskNumbersOpen;
+            syncTrainOskSize();
+            if (trainOskActiveInput) {
+                renderTrainOsk(getTrainOskLang(trainOskActiveInput));
+                syncTrainInputCaret(trainOskActiveInput);
+            }
         }
 
         function ensureTrainOsk() {
@@ -23897,7 +24172,7 @@
             document.body.appendChild(el);
 
             el.addEventListener('pointerdown', (e) => {
-                const btn = e.target.closest('.train-osk-key, .train-osk-tool');
+                const btn = e.target.closest('.train-osk-key, .train-osk-float');
                 if (!btn || !trainOskActiveInput) return;
                 e.preventDefault();
                 const inp = trainOskActiveInput;
@@ -23905,9 +24180,7 @@
 
                 const action = btn.dataset.action;
                 if (action === 'toggle-expand') { toggleTrainOskExpanded(); return; }
-                if (action === 'toggle-panel') { toggleTrainOskPanel(); return; }
-                if (action === 'cursor-left') { moveTrainInputCaret(inp, -1); return; }
-                if (action === 'cursor-right') { moveTrainInputCaret(inp, 1); return; }
+                if (action === 'toggle-numbers') { toggleTrainOskNumbers(); return; }
                 if (action === 'space') { insertTrainOskText(inp, ' '); return; }
                 if (action === 'backspace') { startTrainOskBackspaceRepeat(); return; }
                 if (action === 'enter') { submitTrainOskEnter(inp); return; }
@@ -23952,83 +24225,70 @@
             return el;
         }
 
-        function renderTrainOskToolbar() {
-            const expandActive = trainOskExpanded ? ' is-active' : '';
-            const panelLabel = trainOskPanel === 'letters' ? '123' : 'ABC';
-            const panelActive = trainOskPanel === 'numbers' ? ' is-active' : '';
-            return `<div class="train-osk-toolbar">
-                <div class="train-osk-toolbar-side">
-                    <button type="button" class="train-osk-tool train-osk-tool--arrow" data-action="cursor-left" aria-label="Move left">◀</button>
-                    <button type="button" class="train-osk-tool train-osk-tool--arrow" data-action="cursor-right" aria-label="Move right">▶</button>
-                </div>
-                <div class="train-osk-toolbar-side">
-                    <button type="button" class="train-osk-tool${panelActive}" data-action="toggle-panel" aria-label="Switch panel">${panelLabel}</button>
-                    <button type="button" class="train-osk-tool${expandActive}" data-action="toggle-expand" aria-label="Expand keyboard">⛶</button>
-                </div>
+        function renderTrainOskFloats() {
+            const expandActive = trainOskExpanded && isTrainOskFocusMode() ? ' is-active' : '';
+            const numsActive = trainOskNumbersOpen ? ' is-active' : '';
+            return `<div class="train-osk-floats">
+                <button type="button" class="train-osk-float${numsActive}" data-action="toggle-numbers" aria-label="Numbers">123</button>
+                <button type="button" class="train-osk-float${expandActive}" data-action="toggle-expand" aria-label="Tall keyboard">⛶</button>
             </div>`;
+        }
+
+        function renderTrainOskNumbersRow() {
+            if (!trainOskNumbersOpen) return '';
+            let html = '<div class="train-osk-numbers"><div class="train-osk-row">';
+            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].forEach((key) => {
+                html += `<button type="button" class="train-osk-key" data-key="${key}">${key}</button>`;
+            });
+            html += `</div><div class="train-osk-row">
+                <button type="button" class="train-osk-key train-osk-key--wide" data-key="-">-</button>
+                <button type="button" class="train-osk-key train-osk-key--wide" data-key=".">.</button>
+                <button type="button" class="train-osk-key train-osk-key--wide" data-key="'">'</button>
+            </div></div>`;
+            return html;
         }
 
         function renderTrainOsk(lang) {
             const osk = ensureTrainOsk();
-            let html = renderTrainOskToolbar();
+            let html = renderTrainOskFloats();
+            html += renderTrainOskNumbersRow();
 
-            if (trainOskPanel === 'numbers') {
+            const rows = [
+                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+                ['z', 'x', 'c', 'v', 'b', 'n', 'm']
+            ];
+            rows.forEach((row, idx) => {
                 html += '<div class="train-osk-row">';
-                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].forEach((key) => {
+                row.forEach((key) => {
+                    const accentable = lang === 'es' && 'aeioun'.includes(key);
+                    html += `<button type="button" class="train-osk-key${accentable ? ' train-osk-key--accentable' : ''}" data-key="${key}" data-base="${key}">${key}</button>`;
+                });
+                if (idx === 2) {
+                    html += `<button type="button" class="train-osk-key train-osk-key--backspace" data-action="backspace" aria-label="Backspace">⌫</button>`;
+                }
+                html += '</div>';
+            });
+            if (lang === 'es') {
+                html += '<div class="train-osk-row">';
+                ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü'].forEach((key) => {
                     html += `<button type="button" class="train-osk-key" data-key="${key}">${key}</button>`;
                 });
                 html += '</div>';
-                html += `<div class="train-osk-row">
-                    <button type="button" class="train-osk-key train-osk-key--wide" data-key="-">-</button>
-                    <button type="button" class="train-osk-key train-osk-key--wide" data-key=".">.</button>
-                    <button type="button" class="train-osk-key train-osk-key--wide" data-key="'">'</button>
-                    <button type="button" class="train-osk-key train-osk-key--space" data-action="space" aria-label="Space">␣</button>
-                    <button type="button" class="train-osk-key train-osk-key--backspace" data-action="backspace" aria-label="Backspace">⌫</button>
-                    <button type="button" class="train-osk-key train-osk-key--enter" data-action="enter" aria-label="Done">↵</button>
-                </div>`;
-            } else {
-                const rows = [
-                    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-                    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-                    ['z', 'x', 'c', 'v', 'b', 'n', 'm']
-                ];
-                rows.forEach((row, idx) => {
-                    html += '<div class="train-osk-row">';
-                    row.forEach((key) => {
-                        const accentable = lang === 'es' && 'aeioun'.includes(key);
-                        html += `<button type="button" class="train-osk-key${accentable ? ' train-osk-key--accentable' : ''}" data-key="${key}" data-base="${key}">${key}</button>`;
-                    });
-                    if (idx === 2) {
-                        html += `<button type="button" class="train-osk-key train-osk-key--backspace" data-action="backspace" aria-label="Backspace">⌫</button>`;
-                    }
-                    html += '</div>';
-                });
-                if (lang === 'es') {
-                    html += '<div class="train-osk-row">';
-                    ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü'].forEach((key) => {
-                        html += `<button type="button" class="train-osk-key" data-key="${key}">${key}</button>`;
-                    });
-                    html += '</div>';
-                }
-                html += `<div class="train-osk-row train-osk-row--bottom">
-                    <button type="button" class="train-osk-key train-osk-key--wide" data-key="-">-</button>
-                    <button type="button" class="train-osk-key train-osk-key--wide" data-key="'">'</button>
-                    <button type="button" class="train-osk-key train-osk-key--space" data-action="space" aria-label="Space">␣</button>
-                    <button type="button" class="train-osk-key train-osk-key--enter" data-action="enter" aria-label="Done">↵</button>
-                </div>`;
             }
+            html += `<div class="train-osk-row train-osk-row--bottom">
+                <button type="button" class="train-osk-key train-osk-key--wide" data-key="-">-</button>
+                <button type="button" class="train-osk-key train-osk-key--wide" data-key="'">'</button>
+                <button type="button" class="train-osk-key train-osk-key--space" data-action="space" aria-label="Space">␣</button>
+                <button type="button" class="train-osk-key train-osk-key--enter" data-action="enter" aria-label="Done">↵</button>
+            </div>`;
             osk.innerHTML = html;
         }
 
         function showTrainOsk(inp) {
             if (!inp || inp.disabled || !isTrainingTouchDevice()) return;
             trainOskActiveInput = inp;
-            trainOskPanel = 'letters';
             ensureTrainOskCaretWrap(inp);
-            if (trainOskExpanded) {
-                trainOskFocusPinned = true;
-                applyTrainingFocus(true);
-            }
             renderTrainOsk(getTrainOskLang(inp));
             const osk = ensureTrainOsk();
             osk.classList.remove('hidden');
@@ -24107,7 +24367,7 @@
         function renderStageTyping(word, area, btnNext, feedback, isAudioMode) {
             const listenJs = word.word.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
             const promptHTML = isAudioMode
-                ? `<button type="button" id="btn-listen-audio" onclick="handleListenButtonClick('${listenJs}')" class="bs-play-audio-btn bs-play-audio-btn--listen mx-auto" title="${t('inline.listen')}" aria-label="${t('inline.listen')}">${trainingPlayAudioIconSvg('w-9 h-9')}<span id="btn-listen-audio-badge" class="bs-listen-badge hidden" aria-hidden="true"></span></button>`
+                ? `<button type="button" id="btn-listen-audio" onclick="handleListenButtonClick('${listenJs}')" class="bs-play-audio-btn bs-play-audio-btn--listen mx-auto" title="${t('inline.listen')}" aria-label="${t('inline.listen')}">${trainingPlayAudioIconSvg('w-9 h-9')}<span id="btn-listen-audio-badge" class="bs-listen-badge hidden"></span></button>`
                 : `<p class="text-2xl text-indigo-700 font-bold mb-6 uppercase tracking-wider">${word.translation}</p>`;
             area.innerHTML = `${promptHTML}<div class="flex flex-col items-center justify-center gap-3 w-full max-w-sm mx-auto relative"><input type="text" id="bs-type-input" class="w-full p-4 text-center font-bold border-2 border-slate-300 rounded-2xl focus:border-indigo-500 outline-none transition-colors" ${trainingInputAttrs(`lang="${LANG_META[learningLanguage]?.bcp47 || 'es'}"`)} placeholder="${t('train.typeIn', { lang: learnLangLabel() })}"></div>`;
             const inp = document.getElementById('bs-type-input');
