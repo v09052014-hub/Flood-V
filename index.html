@@ -1347,16 +1347,16 @@
             position: fixed;
             z-index: 220;
             transform: translate(-50%, calc(-100% - 0.5rem)) scale(0.9);
-            min-width: 3rem;
-            height: 3rem;
-            padding: 0 0.45rem;
+            min-width: 2.5rem;
+            height: 2.5rem;
+            padding: 0 0.38rem;
             border-radius: 999px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
             color: #4338ca;
-            font-size: 1.42rem;
+            font-size: 1.18rem;
             font-weight: 700;
             line-height: 1;
             border: 1px solid rgba(199, 210, 254, 0.65);
@@ -1375,6 +1375,17 @@
         }
         .train-osk-row--es-accent {
             display: none;
+        }
+        body.train-osk-accent-open .train-osk-row--es-accent {
+            display: flex;
+        }
+        body.train-osk-open.train-osk-accent-open #bs-workspace {
+            padding-bottom: calc(var(--train-osk-pad, 11.75rem) + 2.85rem);
+        }
+        .train-ctx-gap {
+            color: #4338ca;
+            font-weight: 700;
+            letter-spacing: 0.06em;
         }
         .train-osk-row--uk-dense .train-osk-key {
             max-width: 2.05rem;
@@ -3199,11 +3210,35 @@
             justify-content: center;
         }
         .lang-chip-compact .lang-chip-flag { font-size: 1.05rem; }
+        .track-pair-stack {
+            position: relative;
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            line-height: 1;
+            flex-shrink: 0;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", sans-serif;
+        }
+        .track-pair-main {
+            display: block;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+        .track-pair-sub {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            transform: translate(32%, 38%);
+            font-size: 0.72rem;
+            line-height: 1;
+            filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.95));
+        }
         .track-pair-chip {
             display: inline-flex;
             align-items: center;
-            gap: 0.35rem;
-            padding: 0.4rem 0.65rem;
+            justify-content: center;
+            gap: 0;
+            padding: 0.38rem 0.5rem;
             border-radius: 0.7rem;
             border: 1px solid #e2e8f0;
             background: #fff;
@@ -3237,6 +3272,46 @@
             letter-spacing: 0.06em;
             text-transform: uppercase;
             margin-bottom: 0.55rem;
+        }
+        .learner-level-block {
+            margin-top: 1rem;
+            padding-top: 0.85rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        .learner-ctx-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.55rem 0.65rem;
+            margin-top: 0.45rem;
+        }
+        @media (max-width: 480px) {
+            .learner-ctx-grid { grid-template-columns: 1fr; }
+        }
+        .learner-ctx-field label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 0.28rem;
+        }
+        .learner-ctx-field input {
+            width: 100%;
+            padding: 0.45rem 0.55rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.55rem;
+            font-size: 0.82rem;
+            color: #334155;
+            background: #f8fafc;
+            outline: none;
+        }
+        .learner-ctx-field input:focus {
+            border-color: #a5b4fc;
+            background: #fff;
+        }
+        .learner-ctx-counter {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            margin-top: 0.35rem;
         }
         .settings-panel-learn .settings-panel-sublabel {
             color: #818cf8;
@@ -3485,54 +3560,64 @@
         }
         #sync-id-details summary { list-style: none; }
         #sync-id-details summary::-webkit-details-marker { display: none; }
+        .header-profile-cluster {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.18rem 0.22rem;
+            border-radius: 0.72rem;
+            background: linear-gradient(180deg, #eef2ff 0%, #e8eeff 100%);
+            border: 1px solid #c7d2fe;
+            box-shadow: 0 1px 2px rgba(79, 70, 229, 0.08);
+        }
         .header-profile-btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
-            background: linear-gradient(180deg, #eef2ff 0%, #e0e7ff 100%);
+            justify-content: center;
+            background: transparent;
             color: #3730a3;
-            border: 1px solid #c7d2fe;
-            padding: 0.4rem 0.7rem;
-            border-radius: 0.7rem;
-            box-shadow: 0 1px 2px rgba(79, 70, 229, 0.08);
-            transition: background 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+            border: none;
+            padding: 0.34rem 0.42rem;
+            border-radius: 0.55rem;
+            transition: background 0.15s ease, transform 0.1s ease;
         }
         .header-profile-btn:hover {
-            background: linear-gradient(180deg, #e0e7ff 0%, #c7d2fe 100%);
-            border-color: #a5b4fc;
+            background: rgba(199, 210, 254, 0.45);
         }
         .header-profile-btn:active { transform: scale(0.97); }
-        .header-profile-key { font-size: 1.1rem; line-height: 1; }
-        .header-track-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.22rem;
-            font-weight: 800;
-            font-size: 0.95rem;
-            line-height: 1;
-            opacity: 0.82;
-        }
-        .header-profile-btn:hover .header-track-pill,
-        .header-profile-btn:focus-visible .header-track-pill {
-            opacity: 1;
-        }
-        .header-track-arrow {
-            font-size: 0.95rem;
-            font-weight: 900;
-            opacity: 0.7;
-            margin: 0 0.04rem;
-            line-height: 1;
-            color: #4338ca;
-        }
-        /* Always flags (same emoji as profile menu) — never country codes */
-        .header-track-flag {
+        .header-profile-key { font-size: 1.05rem; line-height: 1; }
+        .header-track-cycle-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.15rem;
-            line-height: 1;
-            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", sans-serif;
+            padding: 0.28rem 0.36rem;
+            border: none;
+            background: transparent;
+            border-radius: 0.55rem;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
         }
+        .header-track-cycle-btn:hover {
+            background: rgba(199, 210, 254, 0.45);
+        }
+        .header-track-cycle-btn:active { transform: scale(0.97); }
+        .header-track-cycle-btn:disabled {
+            opacity: 0.45;
+            cursor: default;
+        }
+        .header-track-cycle-btn:disabled:hover { background: transparent; }
+        .header-track-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .header-track-stack {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        .header-track-stack .track-pair-main { font-size: 1.15rem; }
+        .header-track-stack .track-pair-sub { font-size: 0.68rem; }
         .header-track-code { display: none !important; }
         .lang-flag-wrap {
             display: inline-flex;
@@ -3555,8 +3640,12 @@
         .lang-flag-wrap:has(.lang-flag-img.is-broken) .lang-flag-fallback,
         .lang-flag-fallback.is-fallback-on { display: inline; }
         @media (max-width: 640px) {
-            .header-profile-btn { padding: 0.38rem 0.55rem; gap: 0.35rem; }
-            .header-track-flag { font-size: 1.2rem; }
+            .header-profile-cluster { gap: 0.15rem; padding: 0.15rem 0.18rem; }
+            .header-profile-btn { padding: 0.3rem 0.36rem; }
+            .header-track-cycle-btn { padding: 0.24rem 0.3rem; }
+            .header-track-stack { width: 1.22rem; height: 1.22rem; }
+            .header-track-stack .track-pair-main { font-size: 1.1rem; }
+            .header-track-stack .track-pair-sub { font-size: 0.64rem; }
         }
         .track-pair-flag { font-size: 1.05rem; line-height: 1; }
         .track-pair-flag .lang-flag-img { width: 1.2rem; height: 0.9rem; }
@@ -5023,6 +5112,29 @@
             line-height: 1;
             margin-bottom: 0.75rem;
         }
+        .story-audio-wait-hint {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-top: 0.65rem;
+            line-height: 1.45;
+        }
+        .story-audio-wait-hint.hidden { display: none; }
+        .story-listen-basic-btn {
+            margin-top: 0.55rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 0.75rem;
+            border: 1px solid #c7d2fe;
+            background: #eef2ff;
+            color: #4338ca;
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .story-listen-basic-btn:hover {
+            background: #e0e7ff;
+            border-color: #a5b4fc;
+        }
+        .story-listen-basic-btn.hidden { display: none; }
         /* Story listen: same controls as reader, but no transcript peek */
         .story-stage .reader-audio-toggle,
         .story-stage .reader-audio-transcript {
@@ -5299,6 +5411,7 @@
         .echo-sentence-line {
             margin: 0;
             text-align: left;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
         .echo-speaker-row {
             display: flex;
@@ -5374,9 +5487,10 @@
             margin: 0 0.08em;
         }
         .echo-gap-hint {
-            font-size: 0.62rem;
+            font-size: 0.58rem;
             font-weight: 800;
-            color: #94a3b8;
+            color: #6366f1;
+            letter-spacing: 0.04em;
             letter-spacing: 0.04em;
             min-height: 0.85rem;
             line-height: 1;
@@ -7521,6 +7635,65 @@
                             <p class="settings-segment-label mt-4" data-i18n="settings.trainModesVisible">🎯 Режими тренування</p>
                             <p class="settings-toggle-hint mb-1" data-i18n="settings.trainModesHint">Оберіть, які вправи показувати на сторінці тренувань.</p>
                             <div id="settings-train-modes-list" class="settings-mode-grid"></div>
+                            <div id="settings-learner-profile" class="learner-level-block">
+                                <p class="settings-segment-label" data-i18n="settings.learnerLevelTitle">Поточний рівень мови</p>
+                                <p class="settings-toggle-hint mb-2" data-i18n="settings.learnerLevelHint">Орієнтир для історій (~80% на цьому рівні). Не «дах»: трохи вище або нижче — нормально, без штучної граматики.</p>
+                                <label class="settings-segment-label" for="settings-learner-cefr" data-i18n="settings.learnerCefr">Оцінка рівня (CEFR)</label>
+                                <select id="settings-learner-cefr" class="settings-select mt-1.5 w-full max-w-xs" onchange="setLearnerCefrLevel(this.value)">
+                                    <option value="" data-i18n="settings.learnerCefrAuto">Авто (за словами)</option>
+                                    <option value="A1">A1</option>
+                                    <option value="A2">A2</option>
+                                    <option value="B1">B1</option>
+                                    <option value="B2">B2</option>
+                                    <option value="C1">C1</option>
+                                    <option value="C2">C2</option>
+                                </select>
+                                <label class="settings-toggle-row mt-4">
+                                    <input type="checkbox" id="settings-story-use-context" onchange="setStoryUseLearnerContext(this.checked)">
+                                    <span>
+                                        <span class="settings-toggle-title" data-i18n="settings.storyUseContext">Враховувати контекст у історіях</span>
+                                        <span class="settings-toggle-hint block" data-i18n="settings.storyUseContextHint">Легкі вплетення — не в кожній історії.</span>
+                                    </span>
+                                </label>
+                                <p class="settings-segment-label mt-3 mb-1" data-i18n="settings.storyLearnerContext">Контекст (до 100 символів сумарно)</p>
+                                <div class="learner-ctx-grid">
+                                    <div class="learner-ctx-field">
+                                        <label for="settings-ctx-geo" data-i18n="settings.ctxGeo">🌍 Географія / місто</label>
+                                        <input type="text" id="settings-ctx-geo" maxlength="40" placeholder="" oninput="setStoryLearnerContextPart('geo', this.value)">
+                                    </div>
+                                    <div class="learner-ctx-field">
+                                        <label for="settings-ctx-hobbies" data-i18n="settings.ctxHobbies">🎯 Хобі</label>
+                                        <input type="text" id="settings-ctx-hobbies" maxlength="40" placeholder="" oninput="setStoryLearnerContextPart('hobbies', this.value)">
+                                    </div>
+                                    <div class="learner-ctx-field">
+                                        <label for="settings-ctx-work" data-i18n="settings.ctxWork">💼 Робота</label>
+                                        <input type="text" id="settings-ctx-work" maxlength="40" placeholder="" oninput="setStoryLearnerContextPart('work', this.value)">
+                                    </div>
+                                    <div class="learner-ctx-field">
+                                        <label for="settings-ctx-other" data-i18n="settings.ctxOther">✨ Інше</label>
+                                        <input type="text" id="settings-ctx-other" maxlength="40" placeholder="" oninput="setStoryLearnerContextPart('other', this.value)">
+                                    </div>
+                                </div>
+                                <p id="settings-ctx-counter" class="learner-ctx-counter" aria-live="polite"></p>
+                            </div>
+                            <div id="settings-personal-extras" class="hidden mt-4">
+                                <p class="settings-segment-label" data-i18n="settings.storyGenTitle">📜 Генерація історії та аудіо</p>
+                                <p class="settings-toggle-hint mb-2" data-i18n="settings.storyGenHint">Експериментальні опції — лише для вашого режиму.</p>
+                                <label class="settings-segment-label" for="settings-story-provider" data-i18n="settings.storyProvider">Модель тексту історії</label>
+                                <select id="settings-story-provider" class="settings-select mt-1.5 w-full max-w-xs" onchange="setStoryProvider(this.value)">
+                                    <option value="openrouter" data-i18n="story.providerOpenRouter">OpenRouter</option>
+                                    <option value="openai" data-i18n="story.providerOpenAI">GPT-4o mini</option>
+                                    <option value="gemini" data-i18n="story.providerGemini">Gemini</option>
+                                </select>
+                                <p class="settings-toggle-hint mt-2" data-i18n="settings.storyTtsPipeline">Озвучення: OpenRouter (Fish) → Google TTS, якщо не встигне.</p>
+                                <label class="settings-toggle-row mt-4">
+                                    <input type="checkbox" id="settings-story-cooldown" onchange="setStoryCooldownPref(this.checked)">
+                                    <span>
+                                        <span class="settings-toggle-title" data-i18n="settings.storyCooldown">⏳ Ліміт 1 історія / 24 год</span>
+                                        <span class="settings-toggle-hint block" data-i18n="settings.storyCooldownHint">Вимкніть, щоб генерувати історії без очікування.</span>
+                                    </span>
+                                </label>
+                            </div>
                             <p class="settings-segment-label" data-i18n="settings.dictGrid">📖 Сітка словника</p>
                             <select id="settings-dict-grid-cols" class="settings-select" onchange="setDictGridCols(parseInt(this.value, 10))">
                                 <option value="4" data-i18n="settings.dictGrid4">4 стовпці</option>
@@ -7646,10 +7819,14 @@
         </h1>
         <div class="header-right-tools">
             <button type="button" id="btn-year-ring-header" class="year-ring-btn year-ring-btn--header" onclick="openYearActivityModal()" data-i18n-title="year.ringTitle" title="Рік навчання" aria-label="Year progress"></button>
-            <button onclick="openSyncModal()" class="header-profile-btn" data-i18n-title="header.profile" title="Профіль">
-                <span class="header-profile-key" aria-hidden="true">🔑</span>
-                <span id="header-track-flags" class="header-track-pill"></span>
-            </button>
+            <div class="header-profile-cluster">
+                <button type="button" onclick="openSyncModal()" class="header-profile-btn" data-i18n-title="header.profile" title="Профіль" aria-label="Profile">
+                    <span class="header-profile-key" aria-hidden="true">🔑</span>
+                </button>
+                <button type="button" id="btn-header-track-cycle" class="header-track-cycle-btn" onclick="cycleKnownTrack()" data-i18n-title="header.cycleTrack" title="Змінити пару мов" aria-label="Switch language pair">
+                    <span id="header-track-flags" class="header-track-pill"></span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -8314,11 +8491,7 @@
                         <div class="story-gen-water" id="story-gen-water" aria-hidden="true">
                             <div class="train-due-water-body"><div class="train-due-water-sine"></div></div>
                         </div>
-                        <select id="story-provider-select" class="story-provider-select hidden" aria-label="AI provider" onchange="setStoryProvider(this.value)" onclick="event.stopPropagation()">
-                            <option value="openrouter" data-i18n="story.providerOpenRouter">OpenRouter</option>
-                            <option value="openai" data-i18n="story.providerOpenAI">GPT-4o mini</option>
-                            <option value="gemini" data-i18n="story.providerGemini">Gemini</option>
-                        </select>
+                        <select id="story-provider-select" class="story-provider-select hidden" aria-hidden="true"></select>
                         <button type="button" id="btn-story-headliner" class="train-story-start-btn w-full p-6 pr-[5.75rem] text-left transition active:scale-[0.99]" onclick="onStoryHeadlinerClick()">
                             <div class="train-story-copy min-w-0">
                                 <h3 class="text-2xl font-bold mb-1"><span class="train-story-emoji" aria-hidden="true">📜</span> <span data-i18n="mode.story">Історія дня</span></h3>
@@ -8611,7 +8784,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, updateDoc, setDoc, getDoc, writeBatch, arrayUnion, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, updateDoc, setDoc, getDoc, getDocs, writeBatch, arrayUnion, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARJpUlEfJ53Q1a9qd9fyYC6gmHY58AKfI",
@@ -8746,6 +8919,7 @@
         const I18N = {
             uk: {
                 'header.profile': 'Профіль',
+                'header.cycleTrack': 'Змінити пару мов',
                 'tabs.dictionary': 'Словник', 'tabs.library': 'Бібліотека', 'tabs.training': 'Тренування',
                 'profile.title': 'Профіль / Налаштування',
                 'profile.hint': 'Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.',
@@ -8776,6 +8950,22 @@
                 'settings.bsDailyCap': '📊 Денний ліміт Brainstorm',
                 'settings.bsDailyCapNone': 'Без ліміту',
                 'settings.bsDailyCapHint': 'Скільки слів можна пройти в Brainstorm за день. Інші вправи не обмежуються.',
+                'settings.aiLearnerTitle': '🎓 Рівень і контекст для ШІ',
+                'settings.aiLearnerHint': 'Орієнтир для генерації історій — не жорстке обмеження.',
+                'settings.learnerLevelTitle': 'Поточний рівень мови',
+                'settings.learnerLevelHint': 'Орієнтир для історій (~80% на цьому рівні). Не «дах»: трохи вище або нижче — нормально, без штучної граматики.',
+                'settings.learnerCefr': 'Оцінка рівня (CEFR)',
+                'settings.learnerCefrAuto': 'Авто (за словами)',
+                'settings.storyUseContext': 'Враховувати контекст у історіях',
+                'settings.storyUseContextHint': 'Легкі вплетення — не в кожній історії.',
+                'settings.storyLearnerContext': 'Контекст (до 100 символів сумарно)',
+                'settings.ctxGeo': '🌍 Географія / місто',
+                'settings.ctxHobbies': '🎯 Хобі',
+                'settings.ctxWork': '💼 Робота',
+                'settings.ctxOther': '✨ Інше',
+                'settings.ctxCharCount': '{n} / {max} символів',
+                'settings.storyTtsPipeline': 'Озвучення: OpenRouter (Fish) → Google TTS, якщо не встигне.',
+                'settings.storyLearnerContextHint': 'До 100 символів: інтереси, професія, хобі — для легкого фону в історіях.',
                 'train.bsCapReached': 'Ліміт на сьогодні досягнуто ({n} з {cap}). Спробуйте інші вправи',
                 'train.bsCapSettings': 'змінити ліміт у налаштуваннях',
                 'train.introMorphLabel': 'Будова слова',
@@ -8962,6 +9152,8 @@
                 'mode.story': 'Історія дня', 'mode.story.desc': 'Коротка історія з ваших свіжих слів — слухання, читання й вправи',
                 'story.generating': 'Створюємо історію…', 'story.generatingHint': 'Це може зайняти 1–2 хвилини. Можете залишити вкладку відкритою — ми продовжимо автоматично.',
                 'story.listen': 'Слухання', 'story.listenHint': 'Прослухайте історію без тексту на екрані',
+                'story.audioWaitHint': 'Генеруємо аудіо — зазвичай до 30 с. Можете прослухати одразу звичайним голосом.',
+                'story.listenNowBasic': 'Прослухати звичайним голосом',
                 'story.read': 'Читання', 'story.trueFalse': 'Правда чи ні?', 'story.fillIn': 'Заповніть пропуск',
                 'story.play': '▶ Прослухати', 'story.replay': '↻ Ще раз', 'story.showText': 'Показати текст',
                 'story.true': 'Правда', 'story.false': 'Неправда', 'story.check': 'Перевірити',
@@ -9333,6 +9525,7 @@
             },
             en: {
                 'header.profile': 'Profile',
+                'header.cycleTrack': 'Switch language pair',
                 'tabs.dictionary': 'Dictionary', 'tabs.library': 'Library', 'tabs.training': 'Training',
                 'profile.title': 'Profile / Settings',
                 'profile.hint': 'Your dictionary is tied to this account ID. Most users can leave it unchanged.',
@@ -9363,6 +9556,21 @@
                 'settings.bsDailyCap': '📊 Daily Brainstorm limit',
                 'settings.bsDailyCapNone': 'No limit',
                 'settings.bsDailyCapHint': 'How many words you can complete in Brainstorm per day. Other exercises are not limited.',
+                'settings.aiLearnerTitle': '🎓 AI level & context',
+                'settings.aiLearnerHint': 'Guide for story generation — not a strict limit.',
+                'settings.learnerLevelTitle': 'Current language level',
+                'settings.learnerLevelHint': 'Guide for stories (~80% at this level). Not a ceiling — slightly above/below is fine; keep it natural.',
+                'settings.learnerCefr': 'Level (CEFR)',
+                'settings.learnerCefrAuto': 'Auto (from vocabulary)',
+                'settings.storyUseContext': 'Use context in stories',
+                'settings.storyUseContextHint': 'Light touches — not in every story.',
+                'settings.storyLearnerContext': 'Context (up to 100 chars total)',
+                'settings.ctxGeo': '🌍 Geography / city',
+                'settings.ctxHobbies': '🎯 Hobbies',
+                'settings.ctxWork': '💼 Work',
+                'settings.ctxOther': '✨ Other',
+                'settings.ctxCharCount': '{n} / {max} characters',
+                'settings.storyTtsPipeline': 'Audio: OpenRouter (Fish) → Google TTS if it times out.',
                 'train.bsCapReached': 'Today\'s limit reached ({n} of {cap}). Try other exercises',
                 'train.bsCapSettings': 'change the limit in settings',
                 'train.introMorphLabel': 'Word structure',
@@ -9549,6 +9757,8 @@
                 'mode.story': 'Story of the Day', 'mode.story.desc': 'A short story from your recent words — listen, read, and practice',
                 'story.generating': 'Creating your story…', 'story.generatingHint': 'This may take 1–2 minutes. You can leave this tab open — we will continue automatically.',
                 'story.listen': 'Listening', 'story.listenHint': 'Listen to the story without text on screen',
+                'story.audioWaitHint': 'Generating audio — usually up to 30 seconds. You can listen right away with your device voice.',
+                'story.listenNowBasic': 'Listen with device voice',
                 'story.read': 'Reading', 'story.trueFalse': 'True or false?', 'story.fillIn': 'Fill in the blank',
                 'story.play': '▶ Play', 'story.replay': '↻ Again', 'story.showText': 'Show text',
                 'story.true': 'True', 'story.false': 'False', 'story.check': 'Check',
@@ -9915,6 +10125,7 @@
             },
             es: {
                 'header.profile': 'Perfil',
+                'header.cycleTrack': 'Cambiar pareja de idiomas',
                 'tabs.dictionary': 'Diccionario', 'tabs.library': 'Biblioteca', 'tabs.training': 'Entrenamiento',
                 'profile.title': 'Perfil / Ajustes',
                 'profile.hint': 'Tu diccionario está vinculado a este ID de cuenta. La mayoría puede dejarlo como está.',
@@ -9945,6 +10156,21 @@
                 'settings.bsDailyCap': '📊 Límite diario de Brainstorm',
                 'settings.bsDailyCapNone': 'Sin límite',
                 'settings.bsDailyCapHint': 'Cuántas palabras puedes completar en Brainstorm al día. Otras actividades no tienen límite.',
+                'settings.aiLearnerTitle': '🎓 Nivel y contexto para IA',
+                'settings.aiLearnerHint': 'Orientación para historias — no es un límite estricto.',
+                'settings.learnerLevelTitle': 'Nivel actual del idioma',
+                'settings.learnerLevelHint': 'Guía para historias (~80% en este nivel). No es un techo: un poco más o menos está bien.',
+                'settings.learnerCefr': 'Nivel (MCER)',
+                'settings.learnerCefrAuto': 'Auto (según vocabulario)',
+                'settings.storyUseContext': 'Usar contexto en historias',
+                'settings.storyUseContextHint': 'Toques ligeros — no en cada historia.',
+                'settings.storyLearnerContext': 'Contexto (hasta 100 caracteres en total)',
+                'settings.ctxGeo': '🌍 Geografía / ciudad',
+                'settings.ctxHobbies': '🎯 Aficiones',
+                'settings.ctxWork': '💼 Trabajo',
+                'settings.ctxOther': '✨ Otro',
+                'settings.ctxCharCount': '{n} / {max} caracteres',
+                'settings.storyTtsPipeline': 'Audio: OpenRouter (Fish) → Google TTS si tarda demasiado.',
                 'train.bsCapReached': 'Límite de hoy alcanzado ({n} de {cap}). Prueba otras actividades',
                 'train.bsCapSettings': 'cambiar el límite en ajustes',
                 'train.introMorphLabel': 'Estructura',
@@ -10131,6 +10357,8 @@
                 'mode.story': 'Historia del día', 'mode.story.desc': 'Una historia corta con tus palabras recientes — escuchar, leer y practicar',
                 'story.generating': 'Creando la historia…', 'story.generatingHint': 'Puede tardar 1–2 minutos. Puedes dejar esta pestaña abierta — continuaremos automáticamente.',
                 'story.listen': 'Escucha', 'story.listenHint': 'Escucha la historia sin texto en pantalla',
+                'story.audioWaitHint': 'Generando audio — normalmente hasta 30 s. Puedes escuchar ahora con la voz del dispositivo.',
+                'story.listenNowBasic': 'Escuchar con voz del dispositivo',
                 'story.read': 'Lectura', 'story.trueFalse': '¿Verdadero o falso?', 'story.fillIn': 'Completa el hueco',
                 'story.play': '▶ Reproducir', 'story.replay': '↻ Otra vez', 'story.showText': 'Mostrar texto',
                 'story.true': 'Verdadero', 'story.false': 'Falso', 'story.check': 'Comprobar',
@@ -10654,6 +10882,12 @@
             if (typeof syncExerciseTypeSelectLabels === 'function') syncExerciseTypeSelectLabels();
             if (typeof refreshYearRingUI === 'function') refreshYearRingUI();
         }
+        function trackPairStackHtml(learnCode, transCode, extraClass = '') {
+            const a = LANG_META[learnCode] || {};
+            const b = LANG_META[transCode] || {};
+            const extra = extraClass ? ` ${extraClass}` : '';
+            return `<span class="track-pair-stack${extra}" aria-hidden="true"><span class="track-pair-main">${a.flag || ''}</span><span class="track-pair-sub">${b.flag || ''}</span></span>`;
+        }
         function langPairLabel() {
             const a = LANG_META[learningLanguage] || {};
             const b = LANG_META[translationLanguage] || {};
@@ -10661,16 +10895,24 @@
         }
         function updateHeaderTrackFlags() {
             const el = document.getElementById('header-track-flags');
-            const a = LANG_META[learningLanguage] || {};
-            const b = LANG_META[translationLanguage] || {};
+            const cycleBtn = document.getElementById('btn-header-track-cycle');
             if (el) {
-                // Same emoji flags as the profile language menu (those already render on this phone)
-                el.innerHTML =
-                    `<span class="header-track-flag" aria-hidden="true">${a.flag || ''}</span>`
-                    + `<span class="header-track-arrow">→</span>`
-                    + `<span class="header-track-flag" aria-hidden="true">${b.flag || ''}</span>`;
+                el.innerHTML = trackPairStackHtml(learningLanguage, translationLanguage, 'header-track-stack');
+            }
+            if (cycleBtn) {
+                let pairCount = [...new Set(knownTracks.map(parseTrackId).filter(Boolean).map((p) => p.id))].length;
+                if (STUDENT_EDITION) pairCount = 1;
+                cycleBtn.disabled = pairCount <= 1;
             }
         }
+        window.cycleKnownTrack = async () => {
+            if (STUDENT_EDITION) return;
+            const ids = [...new Set(knownTracks.map(parseTrackId).filter(Boolean).map((p) => p.id))];
+            if (ids.length <= 1) return;
+            const idx = ids.indexOf(activeTrackId);
+            const nextId = ids[(idx >= 0 ? idx + 1 : 0) % ids.length];
+            await selectKnownTrack(nextId);
+        };
         function bindLangFlagFallbacks(root) {
             (root || document).querySelectorAll('.lang-flag-img').forEach((img) => {
                 if (img.dataset.fallbackBound) return;
@@ -10715,7 +10957,7 @@
             A: 'Á', E: 'É', I: 'Í', O: 'Ó', U: 'Ú', N: 'Ñ'
         };
         const ES_ACCENT_HOLD_MS = 275; // a bit more room for natural first-letter presses
-        const TRAIN_OSK_ACCENT_HOLD_MS = 190;
+        const TRAIN_OSK_ACCENT_HOLD_MS = 275;
         const ES_ACCENT_RELEASE_GRACE_MS = 520; // ignore key-repeat after accent so finger can lift
         let esAccentHold = null;
         let esAccentSuppress = null; // { key, el, until }
@@ -10930,7 +11172,7 @@
                         const b = LANG_META[p.trans] || {};
                         const on = activeTrackId === p.id;
                         const label = `${a.native || a.code || ''} → ${b.native || b.code || ''}`;
-                        return `<button type="button" onclick="selectKnownTrack('${p.id}')" class="track-pair-chip${on ? ' is-on' : ''}" title="${label}"><span class="track-pair-flag" aria-hidden="true">${a.flag || ''}</span><span class="pair-arrow">→</span><span class="track-pair-flag" aria-hidden="true">${b.flag || ''}</span></button>`;
+                        return `<button type="button" onclick="selectKnownTrack('${p.id}')" class="track-pair-chip${on ? ' is-on' : ''}" title="${label}">${trackPairStackHtml(p.learn, p.trans)}</button>`;
                     }).join('');
                 }
             }
@@ -10972,6 +11214,7 @@
         async function applyTrackChange(opts = {}) {
             const fromDeepLink = !!opts.fromDeepLink;
             activeTrackId = `${learningLanguage}-${translationLanguage}`;
+            reloadLearnerProfileFromStorage();
             persistLangLocal();
             if (typeof loadTrainWordPickForTrack === 'function') loadTrainWordPickForTrack();
             currentDictFilter = 'all';
@@ -11100,6 +11343,7 @@
                     persistLangLocal();
                 }
             } catch (e) { console.error(e); }
+            reloadLearnerProfileFromStorage();
             applyI18n();
             renderLanguagePickers();
             syncSettingsPanelUi();
@@ -11128,6 +11372,17 @@
             if (sfxToggle) sfxToggle.checked = !!trainingSoundEffects;
             const morphToggle = document.getElementById('settings-intro-morph');
             if (morphToggle) morphToggle.checked = !!showIntroMorphHints;
+            const personalExtras = document.getElementById('settings-personal-extras');
+            if (personalExtras) personalExtras.classList.toggle('hidden', !!STUDENT_EDITION);
+            const storyProvSel = document.getElementById('settings-story-provider');
+            if (storyProvSel) storyProvSel.value = getStoryProvider();
+            const storyCooldownToggle = document.getElementById('settings-story-cooldown');
+            if (storyCooldownToggle) storyCooldownToggle.checked = !!storyCooldownPrefEnabled;
+            const cefrSel = document.getElementById('settings-learner-cefr');
+            if (cefrSel) cefrSel.value = learnerCefrLevel || '';
+            syncLearnerContextFieldsUi();
+            const ctxCb = document.getElementById('settings-story-use-context');
+            if (ctxCb) ctxCb.checked = !!storyUseLearnerContext;
             const dueIndicatorSel = document.getElementById('settings-train-due-indicator');
             if (dueIndicatorSel) dueIndicatorSel.value = trainDueIndicator;
             const bsCapSel = document.getElementById('settings-bs-daily-cap');
@@ -13287,12 +13542,30 @@
             const eligible = (allWords || []).filter(wordHasTrainPair);
             if (!eligible.length) return [];
             const limit = Math.min(cap, eligible.length);
-            const scored = eligible.map((w) => {
-                const L = w[`srs_sprint_Level`] || 0;
-                return { w, sortKey: Math.random() + L * 0.14 };
+            const weighted = eligible.map((w) => {
+                const L = clampSrsLevel(w[`srs_sprint_Level`] || 0);
+                const freshWeight = (MAX_SRS_LEVEL - L + 1) * 2.15;
+                return { w, weight: freshWeight };
             });
-            scored.sort((a, b) => a.sortKey - b.sortKey);
-            return scored.slice(0, limit).map((x) => ({ ...x.w, failed: false }));
+            const picked = [];
+            const used = new Set();
+            while (picked.length < limit) {
+                let total = 0;
+                weighted.forEach(({ w, weight }) => { if (!used.has(w.id)) total += weight; });
+                if (!total) break;
+                let r = Math.random() * total;
+                for (const { w, weight } of weighted) {
+                    if (used.has(w.id)) continue;
+                    r -= weight;
+                    if (r <= 0) {
+                        picked.push({ ...w, failed: false });
+                        used.add(w.id);
+                        break;
+                    }
+                }
+                if (used.size >= eligible.length) break;
+            }
+            return picked;
         }
 
         function crosswordSrsLevel(w) {
@@ -13784,7 +14057,7 @@
                     updatedScores.sort((a, b) => b.score - a.score);
                     updatedScores = updatedScores.slice(0, 100);
                     await firestoreOpWithTimeout(
-                        setDoc(docRef('stats', 'sprint'), { topScores: updatedScores }, { merge: true })
+                        setDoc(docRef('stats', getSprintStatsDocId()), { topScores: updatedScores, trackId: activeTrackId }, { merge: true })
                     );
                     sprintHighScores = updatedScores;
                 }
@@ -14324,12 +14597,17 @@
                 renderBulkFolderDropdown();
             });
 
-            const statsDocRef = docRef('stats', 'sprint');
+            const statsDocRef = docRef('stats', getSprintStatsDocId());
             onSnapshot(statsDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     sprintHighScores = docSnap.data().topScores || [];
                 } else {
                     sprintHighScores = [];
+                    getDoc(docRef('stats', 'sprint')).then((legacy) => {
+                        if (legacy.exists() && legacy.data()?.topScores?.length) {
+                            sprintHighScores = legacy.data().topScores;
+                        }
+                    }).catch(() => {});
                 }
             });
 
@@ -14340,6 +14618,8 @@
                     contextHighScores = [];
                 }
             });
+
+            syncStoryArchiveFromFirestore();
         }
 
         window.openSyncModal = () => {
@@ -21938,25 +22218,32 @@
         }
 
         async function fetchOpenRouterTtsBlob(text, lang) {
-            const res = await fetch(OPENROUTER_PROXY.replace(/\/$/, '') + '/speak-long', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    text: String(text || '').trim(),
-                    lang: lang || getReaderTtsLang()
-                })
-            });
-            if (!res.ok) {
-                let msg = 'openrouter-tts-http';
-                try {
-                    const err = await res.json();
-                    if (err?.error) msg = String(err.error);
-                } catch (_) {}
-                throw new Error(msg);
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 130000);
+            try {
+                const res = await fetch(OPENROUTER_PROXY.replace(/\/$/, '') + '/speak-long', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: String(text || '').trim(),
+                        lang: lang || getReaderTtsLang()
+                    }),
+                    signal: controller.signal
+                });
+                if (!res.ok) {
+                    let msg = 'openrouter-tts-http';
+                    try {
+                        const err = await res.json();
+                        if (err?.error) msg = String(err.error);
+                    } catch (_) {}
+                    throw new Error(msg);
+                }
+                const blob = await res.blob();
+                if (!blob || blob.size < 32) throw new Error('openrouter-tts-empty');
+                return blob;
+            } finally {
+                clearTimeout(timeout);
             }
-            const blob = await res.blob();
-            if (!blob || blob.size < 32) throw new Error('openrouter-tts-empty');
-            return blob;
         }
 
         function resolveStoryTtsEngine(data) {
@@ -21965,28 +22252,45 @@
             if (data?.useGeminiTts) return 'gemini';
             if (data?.useOpenRouterTts) return 'openrouter';
             if (data?.useGoogleTts) return 'google';
-            return STORY_TTS_ENGINE;
+            return getStoryTtsEngine();
         }
 
-        async function fetchStoryTtsBlob(text, lang, engine = STORY_TTS_ENGINE) {
-            const e = engine || STORY_TTS_ENGINE;
+        async function fetchOpenRouterTtsBlobWithRetry(text, lang) {
+            let lastErr = null;
+            for (let attempt = 0; attempt < STORY_TTS_OR_RETRY_ATTEMPTS; attempt++) {
+                try {
+                    return await fetchOpenRouterTtsBlob(text, lang);
+                } catch (err) {
+                    lastErr = err;
+                    const msg = String(err?.message || err || '');
+                    const retryable = /abort|timeout|502|503|429|failed|empty|network|fetch/i.test(msg);
+                    if (attempt < STORY_TTS_OR_RETRY_ATTEMPTS - 1 && retryable) {
+                        await new Promise((r) => setTimeout(r, STORY_TTS_OR_RETRY_DELAY_MS));
+                        continue;
+                    }
+                    throw err;
+                }
+            }
+            throw lastErr || new Error('openrouter-tts-failed');
+        }
+
+        async function fetchStoryTtsBlob(text, lang, engine = getStoryTtsEngine()) {
+            const e = engine || getStoryTtsEngine();
+            if (e === 'openrouter') return fetchOpenRouterTtsBlobWithRetry(text, lang);
             if (e === 'gemini') return fetchGeminiTtsBlob(text, lang);
-            if (e === 'openrouter') return fetchOpenRouterTtsBlob(text, lang);
             return fetchGoogleTtsBlob(text, lang, true);
         }
 
         async function fetchStoryTtsBlobWithFallback(text, lang) {
-            const engines = [STORY_TTS_ENGINE, STORY_TTS_FALLBACK_ENGINE].filter((e, i, a) => e && a.indexOf(e) === i);
-            let lastErr = null;
-            for (const engine of engines) {
-                try {
-                    const blob = await fetchStoryTtsBlob(text, lang, engine);
-                    if (blob && blob.size >= 32) return { blob, engine };
-                } catch (err) {
-                    lastErr = err;
-                }
+            try {
+                const blob = await fetchOpenRouterTtsBlobWithRetry(text, lang);
+                if (blob && blob.size >= 32) return { blob, engine: 'openrouter' };
+            } catch (orErr) {
+                console.warn('Story TTS OpenRouter failed, falling back to Google:', orErr?.message || orErr);
             }
-            throw lastErr || new Error('story-tts-failed');
+            const blob = await fetchGoogleTtsBlob(text, lang, true);
+            if (!blob || blob.size < 32) throw new Error('story-tts-failed');
+            return { blob, engine: 'google' };
         }
 
         function storyTtsCacheKeyFor(dateKey, lang, engine) {
@@ -21995,7 +22299,7 @@
         }
 
         function storyTtsEnginesToTry(preferredEngine) {
-            return [preferredEngine, STORY_TTS_ENGINE, STORY_TTS_FALLBACK_ENGINE, 'google']
+            return [preferredEngine, 'openrouter', STORY_TTS_FALLBACK_ENGINE]
                 .filter((e, i, a) => e && a.indexOf(e) === i);
         }
 
@@ -22175,7 +22479,7 @@
             }).catch(() => {});
         }
 
-        function getStoryTtsCachedBlob(cacheKey, engine = STORY_TTS_ENGINE) {
+        function getStoryTtsCachedBlob(cacheKey, engine = getStoryTtsEngine()) {
             if (storyTtsBlobMemory.has(cacheKey)) return storyTtsBlobMemory.get(cacheKey);
             try {
                 const b64 = localStorage.getItem(cacheKey);
@@ -22187,7 +22491,7 @@
             } catch (_) { return null; }
         }
 
-        function findStoryTtsCache(dateKey, lang, preferredEngine = STORY_TTS_ENGINE) {
+        function findStoryTtsCache(dateKey, lang, preferredEngine = getStoryTtsEngine()) {
             for (const engine of storyTtsEnginesToTry(preferredEngine)) {
                 const cacheKey = storyTtsCacheKeyFor(dateKey, lang, engine);
                 const blob = getStoryTtsCachedBlob(cacheKey, engine);
@@ -22209,7 +22513,7 @@
             const langCode = lang || LANG_META[learningLanguage]?.bcp47 || 'en-US';
             const existing = findStoryTtsCache(dateKey, langCode);
             if (existing) return existing;
-            const waitKey = storyTtsCacheKeyFor(dateKey, langCode, STORY_TTS_ENGINE);
+            const waitKey = storyTtsCacheKeyFor(dateKey, langCode, getStoryTtsEngine());
             if (storyTtsPrefetchJobs.has(waitKey)) {
                 await storyTtsPrefetchJobs.get(waitKey);
                 return findStoryTtsCache(dateKey, langCode);
@@ -27235,12 +27539,159 @@
         const STORY_WORD_FRESH_WINDOW = 20;
         const STORY_WORD_MID_END = 150;
         const STORY_COOLDOWN_LS_KEY = 'linguaspace_story_cooldown_v1_';
+        const STORY_COOLDOWN_PREF_LS_KEY = 'linguaspace_story_cooldown_pref_v1';
         const STORY_INPROGRESS_LS_KEY = 'linguaspace_story_inprogress_v1_';
         const STORY_COOLDOWN_MS = 24 * 60 * 60 * 1000;
-        /** Story audio: primary OpenRouter Fish (free), fallback Gemini Flash Preview TTS */
-        const STORY_TTS_ENGINE = 'openrouter';
-        const STORY_TTS_FALLBACK_ENGINE = 'gemini';
+        /** Story audio: OpenRouter Fish first, fallback Google TTS (not Gemini). */
+        const STORY_TTS_FALLBACK_ENGINE = 'google';
+        const STORY_TTS_OR_RETRY_ATTEMPTS = 1;
+        const STORY_TTS_OR_RETRY_DELAY_MS = 0;
+        function getStoryTtsEngine() { return 'openrouter'; }
+        let storyCooldownPrefEnabled = (() => {
+            if (STUDENT_EDITION) return false;
+            try {
+                const v = localStorage.getItem(STORY_COOLDOWN_PREF_LS_KEY);
+                return v === null ? true : v === '1';
+            } catch (_) { return true; }
+        })();
         const STORY_CEFR_LEVEL = 'B1';
+        const LEARNER_CEFR_LS_KEY = 'linguaspace_learner_cefr_v1_';
+        const STORY_LEARNER_CTX_PARTS_LS_KEY = 'linguaspace_story_ctx_parts_v1_';
+        const STORY_USE_CTX_LS_KEY = 'linguaspace_story_use_ctx_v1_';
+        const STORY_LEARNER_CTX_MAX = 100;
+        const STORY_CTX_PART_KEYS = ['geo', 'hobbies', 'work', 'other'];
+
+        function emptyStoryLearnerContextParts() {
+            return { geo: '', hobbies: '', work: '', other: '' };
+        }
+
+        function learnerProfileStorageKey(base) {
+            return `${base}${activeTrackId || learningLanguage || 'en'}`;
+        }
+
+        let learnerCefrLevel = '';
+        let storyLearnerContextParts = emptyStoryLearnerContextParts();
+        let storyUseLearnerContext = false;
+
+        function parseStoryLearnerContextParts(raw) {
+            if (!raw) return emptyStoryLearnerContextParts();
+            try {
+                const data = JSON.parse(raw);
+                if (data && typeof data === 'object') {
+                    return {
+                        geo: String(data.geo || '').trim(),
+                        hobbies: String(data.hobbies || '').trim(),
+                        work: String(data.work || '').trim(),
+                        other: String(data.other || '').trim()
+                    };
+                }
+            } catch (_) {}
+            return { geo: '', hobbies: '', work: '', other: '', _legacy: String(raw || '').trim() };
+        }
+
+        function buildStoryLearnerContextFromParts(parts) {
+            const p = parts || storyLearnerContextParts;
+            if (p._legacy) return String(p._legacy).slice(0, STORY_LEARNER_CTX_MAX);
+            const chunks = STORY_CTX_PART_KEYS.map((k) => String(p[k] || '').trim()).filter(Boolean);
+            return chunks.join(' · ').slice(0, STORY_LEARNER_CTX_MAX);
+        }
+
+        function saveStoryLearnerContextParts() {
+            try {
+                localStorage.setItem(
+                    learnerProfileStorageKey(STORY_LEARNER_CTX_PARTS_LS_KEY),
+                    JSON.stringify({
+                        geo: storyLearnerContextParts.geo || '',
+                        hobbies: storyLearnerContextParts.hobbies || '',
+                        work: storyLearnerContextParts.work || '',
+                        other: storyLearnerContextParts.other || ''
+                    })
+                );
+            } catch (_) {}
+            syncLearnerContextCounterUi();
+        }
+
+        function reloadLearnerProfileFromStorage() {
+            try {
+                learnerCefrLevel = localStorage.getItem(learnerProfileStorageKey(LEARNER_CEFR_LS_KEY)) || '';
+                const partsRaw = localStorage.getItem(learnerProfileStorageKey(STORY_LEARNER_CTX_PARTS_LS_KEY));
+                if (partsRaw) {
+                    storyLearnerContextParts = parseStoryLearnerContextParts(partsRaw);
+                } else {
+                    const legacy = localStorage.getItem(learnerProfileStorageKey('linguaspace_story_learner_ctx_v1_'));
+                    storyLearnerContextParts = legacy
+                        ? parseStoryLearnerContextParts(JSON.stringify({ _legacy: legacy }))
+                        : emptyStoryLearnerContextParts();
+                }
+                storyUseLearnerContext = localStorage.getItem(learnerProfileStorageKey(STORY_USE_CTX_LS_KEY)) === '1';
+            } catch (_) {}
+        }
+
+        function syncLearnerContextCounterUi() {
+            const el = document.getElementById('settings-ctx-counter');
+            if (!el) return;
+            const n = buildStoryLearnerContextFromParts().length;
+            el.textContent = t('settings.ctxCharCount', { n, max: STORY_LEARNER_CTX_MAX });
+        }
+
+        function syncLearnerContextFieldsUi() {
+            const map = {
+                geo: 'settings-ctx-geo',
+                hobbies: 'settings-ctx-hobbies',
+                work: 'settings-ctx-work',
+                other: 'settings-ctx-other'
+            };
+            STORY_CTX_PART_KEYS.forEach((k) => {
+                const inp = document.getElementById(map[k]);
+                if (inp) inp.value = storyLearnerContextParts[k] || '';
+            });
+            syncLearnerContextCounterUi();
+        }
+
+        function getStoryCefrLevelForApi() {
+            const v = String(learnerCefrLevel || '').trim().toUpperCase();
+            return ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].includes(v) ? v : '';
+        }
+
+        function getStoryGenerationPayloadExtras() {
+            const learnerContext = buildStoryLearnerContextFromParts();
+            return {
+                level: getStoryCefrLevelForApi(),
+                learnerContext,
+                useLearnerContext: !!storyUseLearnerContext && !!learnerContext
+            };
+        }
+
+        window.setLearnerCefrLevel = (val) => {
+            const v = String(val || '').trim().toUpperCase();
+            learnerCefrLevel = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].includes(v) ? v : '';
+            try { localStorage.setItem(learnerProfileStorageKey(LEARNER_CEFR_LS_KEY), learnerCefrLevel); } catch (_) {}
+            const sel = document.getElementById('settings-learner-cefr');
+            if (sel) sel.value = learnerCefrLevel;
+        };
+
+        window.setStoryLearnerContextPart = (key, val) => {
+            const k = String(key || '').trim();
+            if (!STORY_CTX_PART_KEYS.includes(k)) return;
+            const parts = { ...storyLearnerContextParts, [k]: String(val || '').trim() };
+            let combined = buildStoryLearnerContextFromParts(parts);
+            if (combined.length > STORY_LEARNER_CTX_MAX) {
+                const inp = document.getElementById(`settings-ctx-${k}`);
+                const over = combined.length - STORY_LEARNER_CTX_MAX;
+                parts[k] = String(parts[k]).slice(0, Math.max(0, parts[k].length - over));
+                combined = buildStoryLearnerContextFromParts(parts);
+                if (inp) inp.value = parts[k];
+            }
+            storyLearnerContextParts = parts;
+            saveStoryLearnerContextParts();
+        };
+
+        window.setStoryUseLearnerContext = (on) => {
+            storyUseLearnerContext = !!on;
+            try { localStorage.setItem(learnerProfileStorageKey(STORY_USE_CTX_LS_KEY), storyUseLearnerContext ? '1' : '0'); } catch (_) {}
+            const cb = document.getElementById('settings-story-use-context');
+            if (cb) cb.checked = storyUseLearnerContext;
+        };
         const STORY_FETCH_TIMEOUT_MS = STUDENT_EDITION ? 60000 : 180000;
         let restoreTimer = null;
         let contextMatFocusId = null;
@@ -28162,7 +28613,10 @@
                 const core = echoWordCore(tok);
                 let hint = '';
                 if (cells && hintLevel >= 1 && core) {
-                    hint = hintLevel >= 2 ? core.slice(-1) : core.slice(0, 1);
+                    const first = core[0] || '';
+                    const last = core.length > 1 ? core.slice(-1) : '';
+                    const mid = '·'.repeat(Math.max(0, core.length - 2));
+                    hint = first + mid + last;
                 }
                 const val = echoState?.answers?.[i] || '';
                 const size = Math.max(4, Math.min(11, core.length + 1));
@@ -28175,12 +28629,13 @@
 
         function echoTotalSteps(state) {
             const maxP = echoMaxPhase(state.isDialogue);
-            return state.sentences.length * (maxP + 1);
+            return state.sentences.length * maxP;
         }
 
         function echoCompletedSteps(state) {
             const maxP = echoMaxPhase(state.isDialogue);
-            return state.sentenceIdx * (maxP + 1) + state.phase;
+            const phaseProgress = state.phase <= 0 ? 0 : state.phase;
+            return state.sentenceIdx * maxP + phaseProgress;
         }
 
         window.echoPlayAudio = async () => {
@@ -28280,13 +28735,10 @@
             const matTitle = materialDisplayTitle(echoState.material) || echoState.material.title || '';
             const sent = echoState.sentences[echoState.sentenceIdx];
             const phase = echoState.phase;
-            const maxP = echoMaxPhase(echoState.isDialogue);
-            const phaseLabel = echoPhaseLabel(phase, echoState.isDialogue);
-            const progressPill = t('train.echoProgress', {
-                sent: echoState.sentenceIdx + 1,
-                totalSent: echoState.sentences.length,
-                phase: `${phase + 1}/${maxP + 1} · ${phaseLabel}`
-            });
+            const maxExercisePhase = echoMaxPhase(echoState.isDialogue);
+            const progressPill = phase === 0
+                ? t('train.echoPhaseListen')
+                : `${phase} / ${maxExercisePhase}`;
 
             let workHtml = '';
             if (phase === 0) {
@@ -28311,6 +28763,8 @@
                     </div>`;
             }
 
+            const showContextScroll = phase === 0 || (phase >= 1 && phase <= 3);
+
             area.innerHTML = `
                 <div class="echo-stage">
                     <div class="restore-top-bar">
@@ -28318,7 +28772,7 @@
                         <span class="echo-phase-pill">${escapeHtmlText(progressPill)}</span>
                     </div>
                     <div class="restore-text-scroll text-exercise-reader echo-work-panel">
-                        <div class="echo-context-scroll">${renderEchoContextHtml()}</div>
+                        ${showContextScroll ? `<div class="echo-context-scroll">${renderEchoContextHtml()}</div>` : ''}
                         ${workHtml}
                     </div>
                 </div>`;
@@ -29678,14 +30132,14 @@
 
             const need = Math.max(1, reqCount || 6);
             const count = (L) => (byLevel.get(L) || []).length;
+            const minPickFor = (L) => (L === 0 ? 1 : (bsPrioritizeFullSets ? need : 1));
             const order = getBrainstormOrder();
-            const minPick = bsPrioritizeFullSets ? need : 1;
-            const fillableLevels = levels.filter((L) => count(L) >= minPick);
+            const fillableLevels = levels.filter((L) => count(L) >= minPickFor(L));
             const emergency = levels.filter((L) => byLevel.get(L).some((w) => isWordHeavilyOverdue(w, now)));
 
             function pickLowestFrom(cands) {
                 if (!cands.length) return null;
-                const fillable = cands.filter((L) => count(L) >= minPick);
+                const fillable = cands.filter((L) => count(L) >= minPickFor(L));
                 const pool = fillable.length ? fillable : cands;
                 if (!fillable.length) {
                     const bestCount = Math.max(...pool.map(count));
@@ -29698,7 +30152,7 @@
 
             function pickHighestFrom(cands) {
                 if (!cands.length) return null;
-                const fillable = cands.filter((L) => count(L) >= minPick);
+                const fillable = cands.filter((L) => count(L) >= minPickFor(L));
                 const pool = fillable.length ? fillable : cands;
                 if (!fillable.length) {
                     const bestCount = Math.max(...pool.map(count));
@@ -29715,7 +30169,7 @@
 
             function pickWithEmergency(cands, picker) {
                 if (!cands.length) return null;
-                const fillable = cands.filter((L) => count(L) >= minPick);
+                const fillable = cands.filter((L) => count(L) >= minPickFor(L));
                 if (fillable.length) {
                     const overdueFillable = emergency.filter((L) => fillable.includes(L));
                     return picker(overdueFillable.length ? overdueFillable : fillable);
@@ -29726,7 +30180,7 @@
             }
 
             if (order === 'new') {
-                if (count(0) >= minPick) return 0;
+                if (count(0) >= minPickFor(0)) return 0;
                 return pickWithEmergency(levels, pickLowestFrom);
             }
 
@@ -29737,7 +30191,7 @@
             // Mixed: alternate new batch ↔ older batch (default)
             const lastBatch = getBsMixLastBatch();
             const wantNew = lastBatch !== 'new';
-            const canNew = count(0) >= minPick;
+            const canNew = count(0) >= minPickFor(0);
             const olderPick = () => pickWithEmergency(
                 levels.filter((L) => L >= 1),
                 pickHighestFrom
@@ -29748,7 +30202,7 @@
                 return olderPick() ?? pickLowestFrom(levels);
             }
             const older = olderPick();
-            if (older != null && count(older) >= minPick) return older;
+            if (older != null && count(older) >= minPickFor(older)) return older;
             if (canNew) return 0;
             return older ?? pickWithEmergency(levels, pickHighestFrom) ?? pickLowestFrom(levels);
         }
@@ -29758,7 +30212,10 @@
             const level = pickBrainstormLevel(dueWords, now, need);
             if (level == null) return { level: 0, words: [] };
             const cohort = shuffleWords(dueWords.filter((w) => (w.srsLevel || 0) === level));
-            return { level, words: cohort.slice(0, need).map((w) => ({ ...w, failed: false })) };
+            const take = (level === 0 && cohort.length > 0 && cohort.length < need)
+                ? cohort.length
+                : Math.min(need, cohort.length);
+            return { level, words: cohort.slice(0, take).map((w) => ({ ...w, failed: false })) };
         }
 
         function configureBrainstormSessionFlags(level) {
@@ -30301,6 +30758,12 @@
                 updateBsProgress();
                 renderBsStage();
                 if (preload?.story?.paragraphs?.length) {
+                    const dateKey = preload.dateKey || storyState.meta?.dateKey || getDailyStoryDocId();
+                    prefetchStoryTtsAudio(
+                        dateKey,
+                        normalizeStoryParagraphs(preload.story.paragraphs).join('\n\n'),
+                        LANG_META[learningLanguage]?.bcp47 || 'en-US'
+                    );
                     persistStorySessionProgress();
                     return;
                 }
@@ -30326,6 +30789,11 @@
                     if (!storyState.meta.provider) storyState.meta.provider = getStoryProvider();
                     storyState.words = payload.words?.length ? payload.words : words;
                     storyState.phase = 'listen';
+                    prefetchStoryTtsAudio(
+                        payload.dateKey || key,
+                        normalizeStoryParagraphs(payload.story.paragraphs).join('\n\n'),
+                        LANG_META[learningLanguage]?.bcp47 || 'en-US'
+                    );
                     updateBsProgress();
                     renderBsStage();
                 })();
@@ -30589,6 +31057,8 @@
             updateReviewDueBadge();
             syncBrainstormCapUi();
             syncStorySessionArchiveSelect();
+            activeSessionMode = null;
+            storySelectedArchiveKey = '';
             try { syncStoryHeadlinerUi(); } catch (_) {}
         };
 
@@ -30666,13 +31136,8 @@
                 counter.classList.remove('hidden');
                 counter.textContent = `0 / 1`;
             } else if (activeSessionMode === 'echo' && echoState) {
-                counter.classList.remove('hidden');
-                const maxP = echoMaxPhase(echoState.isDialogue);
-                counter.textContent = t('train.echoProgress', {
-                    sent: echoState.sentenceIdx + 1,
-                    totalSent: echoState.sentences.length,
-                    phase: `${echoState.phase + 1}/${maxP + 1}`
-                });
+                counter.classList.add('hidden');
+                counter.textContent = '';
             } else if (activeSessionMode === 'story' && storyState) {
                 counter.classList.remove('hidden');
                 if (storyState.phase === 'tf') {
@@ -30881,8 +31346,7 @@
                 resultsIcon = "⚡";
                 resultsTitle = t('train.sprintDone');
                 resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100">${t('train.yourScore', { n: sprintScore })}</div>`;
-                lbdSection.classList.remove('hidden');
-                renderSprintLeaderboard();
+                lbdSection.classList.add('hidden');
             } else if (sessionMode === 'context') {
                 resultsIcon = "📖";
                 resultsTitle = t('train.contextDone');
@@ -30971,7 +31435,7 @@
             const resultWords = sessionMode === 'definition'
                 ? bsWords.filter((w) => w && w._defAttempted && !w._defSkipped)
                 : bsWords;
-            document.getElementById('bs-results-list').innerHTML = (sessionMode === 'restore' || sessionMode === 'order' || sessionMode === 'echo') ? '' : resultWords.map(w => {
+            document.getElementById('bs-results-list').innerHTML = (sessionMode === 'restore' || sessionMode === 'order' || sessionMode === 'echo' || sessionMode === 'sprint') ? '' : resultWords.map(w => {
                 const isReview = sessionMode === 'review';
                 const displayLevel = isReview ? clampMaintLevel(w.maintLevel) : clampSrsLevel(getWordModeLevel(w, sessionMode));
                 const ringMax = isReview ? MAX_MAINT_LEVEL : MAX_SRS_LEVEL;
@@ -31475,17 +31939,25 @@
             }
             const chunks = chunkLongWordParts(raw);
             if (chunks) {
-                return { parts: chunks, hints: [t('morph.longWord')] };
+                return { parts: chunks, hints: [] };
             }
             return null;
         }
+
+        window.replayIntroMorphAnimation = (el) => {
+            if (!el) return;
+            el.querySelectorAll('.bs-morph-part').forEach((seg) => {
+                seg.style.animation = 'none';
+                seg.offsetHeight;
+                seg.style.animation = '';
+            });
+        };
 
         function renderIntroMorphHtml(morph) {
             const segs = (morph.parts || []).map((p, i) =>
                 `<span class="bs-morph-part" style="animation-delay:${(i * 0.55).toFixed(2)}s">${escapeHtmlText(p.text)}</span>`
             ).join('');
-            const hintLine = (morph.hints || []).filter(Boolean).join(' · ');
-            return `<div class="bs-intro-morph"><p class="bs-intro-morph-label">${escapeHtmlText(t('train.introMorphLabel'))}</p><div class="bs-intro-morph-segments">${segs}</div>${hintLine ? `<p class="bs-intro-morph-hints">${escapeHtmlText(hintLine)}</p>` : ''}</div>`;
+            return `<div class="bs-intro-morph"><p class="bs-intro-morph-label">${escapeHtmlText(t('train.introMorphLabel'))}</p><div class="bs-intro-morph-segments" onclick="replayIntroMorphAnimation(this)">${segs}</div></div>`;
         }
 
         function scoreMcqDistractor(candidate, target, field) {
@@ -31535,6 +32007,24 @@
             return list.filter((w) => normalizeTranslationKey(w.translation) === key).length;
         }
 
+        function buildContextEllipsisMask(word) {
+            const w = String(word || '').trim();
+            if (!w) return '<span class="train-ctx-gap">···</span>';
+            if (w.length <= 2) return `<span class="train-ctx-gap">${escapeHtmlText(w)}</span>`;
+            const mid = '·'.repeat(Math.max(1, w.length - 2));
+            return `<span class="train-ctx-gap">${escapeHtmlText(w[0])}${mid}${escapeHtmlText(w.slice(-1))}</span>`;
+        }
+
+        function maskTargetWordInText(text, word) {
+            const ctx = String(text || '');
+            if (!ctx.trim()) return '';
+            const match = findContextWordMatch(ctx, word);
+            if (!match) return escapeHtmlText(ctx);
+            const before = ctx.slice(0, match.index);
+            const after = ctx.slice(match.index + match.length);
+            return escapeHtmlText(before) + buildContextEllipsisMask(word) + escapeHtmlText(after);
+        }
+
         function isTranslationAmbiguous(word, pool) {
             return countWordsWithTranslation(word?.translation, pool) >= 2;
         }
@@ -31551,7 +32041,7 @@
             const imgHtml = img
                 ? `<img src="${escapeHtmlText(img)}" alt="" onerror="imgError(this)">`
                 : '';
-            const ctxHtml = ctxText ? `<p>${escapeHtmlText(ctxText)}</p>` : '';
+            const ctxHtml = ctxText ? `<p>${maskTargetWordInText(ctxText, word.word)}</p>` : '';
             return `<div class="train-trans-ambig-hint">${imgHtml}<div class="train-trans-ambig-copy"><span class="train-trans-ambig-label">${escapeHtmlText(t('train.transAmbigLabel'))}</span>${ctxHtml}</div></div>`;
         }
 
@@ -31561,6 +32051,7 @@
             const count = inBs && bsHardMcq ? 6 : 4;
             const opts = getOptions(word, { count, hard, field: 'translation' });
             const grid = count >= 6 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-4';
+            const hintHtml = buildTransAmbiguityHintHtml(word);
             area.innerHTML = `${buildTrainWordHeadHtml(word.word)}<div class="${grid}" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-base sm:text-lg shadow-sm flex justify-between items-center"><span>${o.translation}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
             bindTestButtons(word, feedback);
         }
@@ -31721,10 +32212,11 @@
             let ctorFreeUsed = false;
             let ctorBusy = false;
             window._bsCtorBusy = false;
+            const ambigHint = isTranslationAmbiguous(word) ? buildTransAmbiguityHintHtml(word) : '';
             const promptHtml = blind
                 ? `<p class="text-sm text-slate-400 font-bold mb-6 uppercase tracking-wider">${t('stage.2')}</p>`
                 : `<p class="text-xl text-indigo-600 font-bold mb-6 uppercase tracking-wider">${escapeHtmlText(word.translation)}</p>`;
-            area.innerHTML = `${promptHtml}<div id="bs-c-slots" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 min-h-[3.5rem]"></div><div id="bs-c-pool" class="flex flex-wrap justify-center gap-2 sm:gap-2.5 min-h-[3.5rem]"></div>`;
+            area.innerHTML = `${promptHtml}${ambigHint}<div id="bs-c-slots" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 min-h-[3.5rem]"></div><div id="bs-c-pool" class="flex flex-wrap justify-center gap-2 sm:gap-2.5 min-h-[3.5rem]"></div>`;
             document.addEventListener('keydown', handleConstructorKeyboard);
 
             const markMismatchSlots = (slots) => {
@@ -31854,6 +32346,7 @@
         let trainOskAccentHold = null;
         let trainOskBsRepeat = null;
         let trainOskNumbersOpen = false;
+        let trainOskAccentOpen = false;
         let trainOskExpanded = localStorage.getItem(TRAIN_OSK_EXPANDED_KEY) !== '0';
         let trainOskTapStart = null;
         let trainOskPreviewHideTimer = null;
@@ -31933,6 +32426,7 @@
             const tall = open && trainOskExpanded;
             document.body.classList.toggle('train-osk-tall', tall);
             document.body.classList.toggle('train-osk-numbers-open', open && trainOskNumbersOpen);
+            document.body.classList.toggle('train-osk-accent-open', open && trainOskAccentOpen);
         }
 
         function syncTrainInputCaret(inp) {
@@ -31987,7 +32481,8 @@
             clearTrainOskAccentHold();
             stopTrainOskBackspaceRepeat();
             trainOskNumbersOpen = false;
-            document.body.classList.remove('train-osk-open', 'train-osk-tall', 'train-osk-numbers-open');
+            trainOskAccentOpen = false;
+            document.body.classList.remove('train-osk-open', 'train-osk-tall', 'train-osk-numbers-open', 'train-osk-accent-open');
             trainOskEl?.classList.add('hidden');
             if (trainOskHistoryPushed && !fromPopstate) {
                 trainOskHistoryPushed = false;
@@ -32099,6 +32594,15 @@
             }
         }
 
+        function toggleTrainOskAccent() {
+            trainOskAccentOpen = !trainOskAccentOpen;
+            syncTrainOskSize();
+            if (trainOskActiveInput) {
+                renderTrainOsk(getTrainOskLang(trainOskActiveInput));
+                syncTrainInputCaret(trainOskActiveInput);
+            }
+        }
+
         function toggleTrainOskNumbers() {
             trainOskNumbersOpen = !trainOskNumbersOpen;
             syncTrainOskSize();
@@ -32190,6 +32694,7 @@
                 const action = btn.dataset.action;
                 if (action === 'toggle-expand') { toggleTrainOskExpanded(); return; }
                 if (action === 'toggle-numbers') { toggleTrainOskNumbers(); return; }
+                if (action === 'toggle-accent') { toggleTrainOskAccent(); return; }
 
                 if (btn.classList.contains('train-osk-key')) {
                     const previewLabel = btn.dataset.key || btn.textContent.trim();
@@ -32256,11 +32761,16 @@
             return el;
         }
 
-        function renderTrainOskFloats() {
+        function renderTrainOskFloats(lang) {
             const expandActive = trainOskExpanded ? ' is-active' : '';
             const numsActive = trainOskNumbersOpen ? ' is-active' : '';
+            const accentActive = trainOskAccentOpen ? ' is-active' : '';
+            const accentBtn = lang === 'es'
+                ? `<button type="button" class="train-osk-float${accentActive}" data-action="toggle-accent" aria-label="Accents">á</button>`
+                : '';
             return `<div class="train-osk-floats">
                 <button type="button" class="train-osk-float${numsActive}" data-action="toggle-numbers" aria-label="Numbers">123</button>
+                ${accentBtn}
                 <button type="button" class="train-osk-float${expandActive}" data-action="toggle-expand" aria-label="Tall keyboard">⛶</button>
             </div>`;
         }
@@ -32281,7 +32791,7 @@
 
         function renderTrainOsk(lang) {
             const osk = ensureTrainOsk();
-            let html = renderTrainOskFloats();
+            let html = renderTrainOskFloats(lang);
             html += '<div class="train-osk-keys">';
             html += renderTrainOskNumbersRow();
 
@@ -32432,10 +32942,11 @@
 
         function renderStageTyping(word, area, btnNext, feedback, isAudioMode) {
             const listenJs = word.word.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+            const ambigHint = !isAudioMode ? buildTransAmbiguityHintHtml(word) : '';
             const promptHTML = isAudioMode
                 ? `<button type="button" id="btn-listen-audio" onclick="handleListenButtonClick('${listenJs}')" class="bs-play-audio-btn bs-play-audio-btn--listen mx-auto" title="${t('inline.listen')}" aria-label="${t('inline.listen')}">${trainingPlayAudioIconSvg('w-9 h-9')}<span id="btn-listen-audio-badge" class="bs-listen-badge hidden"></span></button>`
                 : `<p class="text-2xl text-indigo-700 font-bold mb-6 uppercase tracking-wider">${word.translation}</p>`;
-            area.innerHTML = `${promptHTML}<div class="flex flex-col items-center justify-center gap-3 w-full max-w-sm mx-auto relative"><input type="text" id="bs-type-input" class="w-full p-4 text-center font-bold border-2 border-slate-300 rounded-2xl focus:border-indigo-500 outline-none transition-colors" ${trainingInputAttrs(`lang="${LANG_META[learningLanguage]?.bcp47 || 'es'}"`)} placeholder="${t('train.typeIn', { lang: learnLangLabel() })}"></div>`;
+            area.innerHTML = `${promptHTML}${ambigHint}<div class="flex flex-col items-center justify-center gap-3 w-full max-w-sm mx-auto relative"><input type="text" id="bs-type-input" class="w-full p-4 text-center font-bold border-2 border-slate-300 rounded-2xl focus:border-indigo-500 outline-none transition-colors" ${trainingInputAttrs(`lang="${LANG_META[learningLanguage]?.bcp47 || 'es'}"`)} placeholder="${t('train.typeIn', { lang: learnLangLabel() })}"></div>`;
             const inp = document.getElementById('bs-type-input');
             applyTrainingInputNoSuggest(inp);
             setTimeout(()=>inp.focus(), 50);
@@ -33785,7 +34296,19 @@
         }
 
         function isStoryCooldownEnabled() {
-            return !STUDENT_EDITION;
+            if (STUDENT_EDITION) return false;
+            return !!storyCooldownPrefEnabled;
+        }
+
+        window.setStoryCooldownPref = (enabled) => {
+            if (STUDENT_EDITION) return;
+            storyCooldownPrefEnabled = !!enabled;
+            try { localStorage.setItem(STORY_COOLDOWN_PREF_LS_KEY, storyCooldownPrefEnabled ? '1' : '0'); } catch (_) {}
+            syncStoryHeadlinerUi();
+        };
+
+        function getSprintStatsDocId() {
+            return `sprint_${activeTrackId || learningLanguage || 'en'}`;
         }
 
         function loadStoryCooldownUntil() {
@@ -34005,13 +34528,27 @@
             renderStoryArchiveSelect();
         }
 
-        function formatStoryArchiveDate(dateKey) {
+        function formatStoryArchiveDate(dateKey, savedAt) {
+            if (savedAt) {
+                try {
+                    return new Date(savedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+                } catch (_) {}
+            }
             const part = String(dateKey || '').split('_').pop() || dateKey;
             if (/^\d{4}-\d{2}-\d{2}$/.test(part)) {
                 try {
                     const [y, m, d] = part.split('-').map(Number);
-                    return new Date(y, m - 1, d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+                    return new Date(y, m - 1, d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
                 } catch (_) {}
+            }
+            const sm = part.match(/^s(\d{10,})$/);
+            if (sm) {
+                const ts = parseInt(sm[1], 10);
+                if (Number.isFinite(ts)) {
+                    try {
+                        return new Date(ts).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+                    } catch (_) {}
+                }
             }
             return part;
         }
@@ -34025,6 +34562,8 @@
             if (STUDENT_EDITION) return;
             storyProviderPref = normalizeStoryProvider(val);
             try { localStorage.setItem(STORY_PROVIDER_LS_KEY, storyProviderPref); } catch (_) {}
+            const sel = document.getElementById('settings-story-provider');
+            if (sel) sel.value = getStoryProvider();
             syncStoryHeadlinerUi();
         };
 
@@ -34040,12 +34579,12 @@
             sel.classList.remove('hidden');
             const opts = list.map((e) => {
                 const title = String(e.story?.title || e.title || t('mode.story')).trim();
-                const label = `${formatStoryArchiveDate(e.dateKey)} — ${title.slice(0, 36)}`;
+                const label = `${formatStoryArchiveDate(e.dateKey, e.savedAt)} — ${title.slice(0, 36)}`;
                 const selected = (storySelectedArchiveKey || list[0]?.dateKey) === e.dateKey ? ' selected' : '';
                 return `<option value="${escapeHtmlText(e.dateKey)}"${selected}>${escapeHtmlText(label)}</option>`;
             });
             sel.innerHTML = opts.join('');
-            if (!storySelectedArchiveKey && list[0]) storySelectedArchiveKey = list[0].dateKey;
+            if (activeSessionMode === 'story' && !storySelectedArchiveKey && list[0]) storySelectedArchiveKey = list[0].dateKey;
         }
 
         function syncStorySessionArchiveSelect() {
@@ -34131,11 +34670,8 @@
 
             restoreStoryHeadlinerFromInProgress();
 
-            if (prov) {
-                prov.value = getStoryProvider();
-                prov.classList.toggle('hidden', !!STUDENT_EDITION);
-            }
-            renderStoryArchiveSelect();
+            if (prov) prov.value = getStoryProvider();
+            if (activeSessionMode !== 'story') renderStoryArchiveSelect();
 
             const gate = canRequestNewStory();
             const cooldownMs = getStoryCooldownRemainingMs();
@@ -34677,9 +35213,9 @@
                             body: JSON.stringify({
                                 words,
                                 lang: learningLanguage,
-                                level: STORY_CEFR_LEVEL,
+                                ...getStoryGenerationPayloadExtras(),
                                 provider: p,
-                                allowFallback: !!STUDENT_EDITION,
+                                allowFallback: true,
                                 timeoutMs: STORY_FETCH_TIMEOUT_MS
                             }),
                             signal: controller.signal
@@ -34714,21 +35250,46 @@
             }
         }
 
+        async function syncStoryArchiveFromFirestore() {
+            if (!activeUid) return;
+            try {
+                const snap = await getDocs(colRef('storyArchive'));
+                if (snap.empty) return;
+                const map = new Map();
+                loadStoryArchive().forEach((e) => { if (e?.dateKey) map.set(e.dateKey, e); });
+                snap.forEach((d) => {
+                    const data = d.data();
+                    if (!data?.story?.paragraphs?.length) return;
+                    const dateKey = data.dateKey || d.id;
+                    const entry = { ...data, dateKey };
+                    const prev = map.get(dateKey);
+                    if (!prev || (entry.savedAt || 0) > (prev.savedAt || 0)) map.set(dateKey, entry);
+                });
+                const merged = [...map.values()]
+                    .sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0))
+                    .slice(0, STORY_ARCHIVE_MAX);
+                try { localStorage.setItem(getStoryArchiveStorageKey(), JSON.stringify(merged)); } catch (_) {}
+                renderStoryArchiveSelect();
+            } catch (_) {}
+        }
+
         async function callDailyStoryApi(words, opts = {}) {
             const preferred = normalizeStoryProvider(opts?.provider || getStoryProvider());
             try {
                 return await fetchDailyStoryOnce(words, preferred);
             } catch (err) {
-                if (!STUDENT_EDITION || preferred !== 'openrouter') throw err;
-                try {
-                    const data = await fetchDailyStoryOnce(words, 'openai');
-                    if (!data._meta) data._meta = {};
-                    if (!data._meta.fallbackFrom) data._meta.fallbackFrom = 'openrouter';
-                    if (!data._meta.provider) data._meta.provider = 'openai';
-                    return data;
-                } catch (_) {
-                    throw err;
+                if (preferred === 'openrouter') {
+                    try {
+                        const data = await fetchDailyStoryOnce(words, 'openai');
+                        if (!data._meta) data._meta = {};
+                        if (!data._meta.fallbackFrom) data._meta.fallbackFrom = 'openrouter';
+                        if (!data._meta.provider) data._meta.provider = 'openai';
+                        return data;
+                    } catch (_) {
+                        throw err;
+                    }
                 }
+                throw err;
             }
         }
 
@@ -34809,6 +35370,40 @@
             btnNext.onclick = onClick;
         }
 
+        function isStoryTtsCachedForSession() {
+            const dateKey = getStoryAudioDateKey();
+            const lang = LANG_META[learningLanguage]?.bcp47 || 'en-US';
+            return !!findStoryTtsCache(dateKey, lang);
+        }
+
+        function syncStoryListenAudioUi(area) {
+            const root = area || document.getElementById('bs-interactive-area');
+            const block = root?.querySelector('.reader-audio-block');
+            const hintEl = root?.querySelector('#story-audio-wait-hint');
+            const basicBtn = root?.querySelector('#story-listen-basic-btn');
+            const cached = isStoryTtsCachedForSession();
+            if (hintEl) {
+                hintEl.textContent = t('story.audioWaitHint');
+                hintEl.classList.toggle('hidden', cached);
+            }
+            if (basicBtn) basicBtn.classList.toggle('hidden', cached);
+            if (block && cached) {
+                setReaderAudioLoading(block, false);
+                setReaderAudioStatus(block, t('reader.audioReady'));
+            }
+        }
+
+        window.storyListenPlayBasicVoice = () => {
+            if (!storyState || storyState.phase !== 'listen') return;
+            const area = document.getElementById('bs-interactive-area');
+            ensureStoryAudioData();
+            const data = readerAudioStore[STORY_AUDIO_ID];
+            const block = area?.querySelector('.reader-audio-block');
+            const playBtn = block?.querySelector('.reader-audio-play');
+            stopReaderAudioPlayback();
+            startReaderBrowserTtsPlayback(STORY_AUDIO_ID, data, playBtn);
+        };
+
         function ensureStoryAudioData() {
             const lang = LANG_META[learningLanguage]?.bcp47 || 'en-US';
             readerAudioStore[STORY_AUDIO_ID] = {
@@ -34817,7 +35412,7 @@
                 bodyHtml: '',
                 lang,
                 voiceHint: '',
-                storyTtsEngine: STORY_TTS_ENGINE,
+                storyTtsEngine: getStoryTtsEngine(),
                 storyTtsFallbackEngine: STORY_TTS_FALLBACK_ENGINE,
                 useGeminiTts: false,
                 useOpenRouterTts: true,
@@ -35063,25 +35658,37 @@
                         <div class="story-listen-icon" aria-hidden="true">🎧</div>
                         <h3 class="text-xl font-bold text-slate-800">${escapeHtmlText(t('story.listen'))}</h3>
                         <p class="text-sm text-slate-500 mt-1">${escapeHtmlText(t('story.listenHint'))}</p>
+                        <p id="story-audio-wait-hint" class="story-audio-wait-hint hidden">${escapeHtmlText(t('story.audioWaitHint'))}</p>
+                        <button type="button" id="story-listen-basic-btn" class="story-listen-basic-btn hidden" onclick="storyListenPlayBasicVoice()">${escapeHtmlText(t('story.listenNowBasic'))}</button>
                     </div>`, true);
+                syncStoryListenAudioUi(area);
                 if (!storyState.listenStarted && !isGlobalAudioMuted) {
                     storyState.listenStarted = true;
-                    setTimeout(async () => {
-                        if (!storyState || storyState.phase !== 'listen') return;
-                        const block = area.querySelector('.reader-audio-block');
-                        const lang = LANG_META[learningLanguage]?.bcp47 || 'en-US';
+                    const block = area.querySelector('.reader-audio-block');
+                    const lang = LANG_META[learningLanguage]?.bcp47 || 'en-US';
+                    const dateKey = getStoryAudioDateKey();
+                    const text = storyPlainText();
+                    const cached = isStoryTtsCachedForSession();
+                    if (!cached) {
+                        storyState.ttsPrefetching = true;
                         setReaderAudioLoading(block, true);
                         setReaderAudioStatus(block, t('reader.audioLoading'));
-                        await ensureStoryTtsReady(
-                            getStoryAudioDateKey(),
-                            storyPlainText(),
-                            lang
-                        );
-                        if (!storyState || storyState.phase !== 'listen') return;
-                        setReaderAudioLoading(block, false);
-                        const playBtn = area.querySelector('.reader-audio-play');
-                        if (playBtn && readerAudioActiveId !== STORY_AUDIO_ID) playBtn.click();
-                    }, 400);
+                        prefetchStoryTtsAudio(dateKey, text, lang).then(() => {
+                            storyState.ttsPrefetching = false;
+                            if (!storyState || storyState.phase !== 'listen') return;
+                            syncStoryListenAudioUi(document.getElementById('bs-interactive-area'));
+                            if (!isGlobalAudioMuted && isStoryTtsCachedForSession()) {
+                                const playBtn = area.querySelector('.reader-audio-play');
+                                if (playBtn && readerAudioActiveId !== STORY_AUDIO_ID) playBtn.click();
+                            }
+                        });
+                    } else {
+                        setTimeout(() => {
+                            if (!storyState || storyState.phase !== 'listen') return;
+                            const playBtn = area.querySelector('.reader-audio-play');
+                            if (playBtn && readerAudioActiveId !== STORY_AUDIO_ID) playBtn.click();
+                        }, 400);
+                    }
                 }
                 if (storyState.listenDone) {
                     showStoryContinueBtn(btnNext, () => storyAdvanceStep());
