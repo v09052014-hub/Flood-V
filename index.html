@@ -19884,13 +19884,61 @@
                 || /\*\*[^*]+\*\*/.test(s)
                 || /__[^\n]+__/.test(s)
                 || /^={1,6}\s*.+\s*={1,6}\s*$/m.test(s)
-                || /^ {0,3}>/m.test(s);
+                || /^ {0,3}>/m.test(s)
+                || /\$\\[A-Za-z]+\$/.test(s);
         }
         function isMarkdownQuoteLine(line) {
             return /^ {0,3}>/.test(String(line || ''));
         }
         function stripMarkdownQuotePrefix(line) {
             return String(line || '').replace(/^ {0,3}>{1,3} ?/, '');
+        }
+        function textHasLatexSymbols(s) {
+            return /\$\\[A-Za-z]+\$/.test(String(s || '')) || /(?:^|[\s(])\\(?:rightarrow|leftarrow|leftrightarrow|to)(?=[\s).,]|$)/i.test(String(s || ''));
+        }
+        function normalizeLatexSymbolsInText(s) {
+            let t = String(s || '');
+            const pairs = [
+                [/\$\\longrightarrow\$/g, '⟶'],
+                [/\$\\longleftarrow\$/g, '⟵'],
+                [/\$\\leftrightarrow\$/gi, '↔'],
+                [/\$\\Leftrightarrow\$/g, '⇔'],
+                [/\$\\Rightarrow\$/g, '⇒'],
+                [/\$\\Leftarrow\$/g, '⇐'],
+                [/\$\\rightarrow\$/gi, '→'],
+                [/\$\\leftarrow\$/gi, '←'],
+                [/\$\\to\$/gi, '→'],
+                [/\$\\times\$/gi, '×'],
+                [/\$\\cdot\$/gi, '·'],
+                [/\$\\ldots\$/gi, '…'],
+                [/\$\\dots\$/gi, '…'],
+                [/\$\\infty\$/gi, '∞'],
+                [/\$\\approx\$/gi, '≈'],
+                [/\$\\neq\$/gi, '≠'],
+                [/\$\\leq\$/gi, '≤'],
+                [/\$\\geq\$/gi, '≥'],
+                [/\$\\pm\$/gi, '±'],
+            ];
+            for (const [re, ch] of pairs) t = t.replace(re, ch);
+            t = t.replace(/(^|[\s(])\\rightarrow(?=[\s).,]|$)/gi, '$1→');
+            t = t.replace(/(^|[\s(])\\longrightarrow(?=[\s).,]|$)/gi, '$1⟶');
+            t = t.replace(/(^|[\s(])\\to(?=[\s).,]|$)/gi, '$1→');
+            t = t.replace(/(^|[\s(])\\leftarrow(?=[\s).,]|$)/gi, '$1←');
+            t = t.replace(/(^|[\s(])\\leftrightarrow(?=[\s).,]|$)/gi, '$1↔');
+            return t;
+        }
+        function normalizeLatexSymbolsInMaterialHtml(html) {
+            const root = document.createElement('div');
+            root.innerHTML = String(html || '');
+            if (!root.innerHTML) return '';
+            const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+            const nodes = [];
+            while (walk.nextNode()) nodes.push(walk.currentNode);
+            nodes.forEach((n) => {
+                const next = normalizeLatexSymbolsInText(n.nodeValue || '');
+                if (next !== n.nodeValue) n.nodeValue = next;
+            });
+            return root.innerHTML;
         }
         function maybeFillTitleFromLeadingLine(bodyText, titleEl) {
             if (!titleEl || titleEl.value.trim()) return;
@@ -19914,7 +19962,7 @@
             if (title) titleEl.value = title;
         }
         function formatInlineMarkdown(s) {
-            let t = escapeHtmlText(s);
+            let t = escapeHtmlText(normalizeLatexSymbolsInText(s));
             t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
             t = t.replace(/__(.+?)__/g, '<strong>$1</strong>');
             t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -19924,7 +19972,7 @@
             return t;
         }
         function markdownToHtml(raw) {
-            const text = String(raw || '').replace(/\r\n/g, '\n');
+            const text = normalizeLatexSymbolsInText(String(raw || '').replace(/\r\n/g, '\n'));
             if (!text.trim()) return '';
             const lines = text.split('\n');
             const out = [];
@@ -20137,7 +20185,7 @@
         function materialHtmlFromStored(s) {
             if (!s) return '';
             const html = looksLikeMaterialHtml(s) ? sanitizeMaterialHtml(s) : markdownToHtml(s);
-            return normalizeMarkdownQuotesInMaterialHtml(html);
+            return normalizeLatexSymbolsInMaterialHtml(normalizeMarkdownQuotesInMaterialHtml(html));
         }
         function setMaterialEditorContent(id, raw) {
             const el = document.getElementById(id);
@@ -20151,7 +20199,9 @@
         function getMaterialEditorContent(id) {
             const el = document.getElementById(id);
             if (!el) return '';
-            const html = normalizeMarkdownQuotesInMaterialHtml(sanitizeMaterialHtml(el.innerHTML)).trim();
+            const html = normalizeLatexSymbolsInMaterialHtml(
+                normalizeMarkdownQuotesInMaterialHtml(sanitizeMaterialHtml(el.innerHTML))
+            ).trim();
             if (!html || html === '<br>' || html === '<p><br></p>' || html === '<p></p>') return '';
             return html;
         }
@@ -20165,9 +20215,11 @@
             return { title, body: text.slice(ls[0].length).trimStart() };
         }
         function plainPasteToMaterialHtml(text) {
-            const trimmed = String(text || '').trim();
+            const trimmed = normalizeLatexSymbolsInText(String(text || '').trim());
             if (!trimmed) return '';
-            if (materialTextHasMarkup(trimmed) || /^ {0,3}>/m.test(trimmed)) return markdownToHtml(trimmed);
+            if (materialTextHasMarkup(trimmed) || /^ {0,3}>/m.test(trimmed) || textHasLatexSymbols(String(text || ''))) {
+                return markdownToHtml(String(text || '').trim());
+            }
             const paras = trimmed.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
             if (!paras.length) return `<p>${escapeHtmlText(trimmed)}</p>`;
             return paras.map((p) => `<p>${escapeHtmlText(p).replace(/\n/g, '<br>')}</p>`).join('');
@@ -20474,7 +20526,7 @@
                 if (!text) return;
                 const parsed = parseLinguaSpaceTitlePaste(text);
                 const bodyText = parsed.title ? parsed.body : text;
-                const shouldSmartPaste = parsed.title || materialTextHasMarkup(bodyText) || /\n\s*\n/.test(bodyText) || /^ {0,3}>/m.test(bodyText);
+                const shouldSmartPaste = parsed.title || materialTextHasMarkup(bodyText) || /\n\s*\n/.test(bodyText) || /^ {0,3}>/m.test(bodyText) || textHasLatexSymbols(bodyText);
                 if (!shouldSmartPaste) return;
                 e.preventDefault();
                 const titleEl = id === 'material-content'
