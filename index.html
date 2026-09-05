@@ -12160,11 +12160,18 @@
             activeTrackId = `${learningLanguage}-${translationLanguage}`;
             if (!activeUid || !db) return;
             try {
-                await setDoc(doc(db, 'users', activeUid), {
+                const prefs = {
                     interfaceLanguage, learningLanguage, translationLanguage, activeTrackId, knownTracks,
                     showTrainingPronunciation, showIpaSourceOnHover, trainingSoundEffects, showIntroMorphHints, trainDueIndicator, brainstormDailyCap,
                     hiddenTrainModes, textExercisesGate, dictGridCols, readerHighlightColor
-                }, { merge: true });
+                };
+                if (typeof collectLearnerProfileCloudPrefs === 'function') {
+                    Object.assign(prefs, collectLearnerProfileCloudPrefs());
+                }
+                if (typeof collectExtraCloudPrefs === 'function') {
+                    Object.assign(prefs, collectExtraCloudPrefs());
+                }
+                await setDoc(doc(db, 'users', activeUid), prefs, { merge: true });
             } catch (e) { console.error(e); }
         }
         function renderLanguagePickers() {
@@ -12363,6 +12370,12 @@
                     if (['yellow', 'mint', 'lavender'].includes(d.readerHighlightColor)) {
                         readerHighlightColor = d.readerHighlightColor;
                         localStorage.setItem(READER_HL_COLOR_KEY, readerHighlightColor);
+                    }
+                    if (typeof applyLearnerProfileFromCloud === 'function') {
+                        applyLearnerProfileFromCloud(d);
+                    }
+                    if (typeof applyExtraCloudPrefs === 'function') {
+                        applyExtraCloudPrefs(d);
                     }
                     if (d.ipaCacheV1 && typeof d.ipaCacheV1 === 'object') {
                         mergeIpaCacheFromObject(d.ipaCacheV1);
@@ -13939,6 +13952,7 @@
 
         function saveReviewModesSelection() {
             try { localStorage.setItem(REVIEW_MODES_STORAGE_KEY, JSON.stringify(selectedReviewModes)); } catch (_) {}
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         }
 
         function clampMaintLevel(level) {
@@ -21705,12 +21719,14 @@
             try { localStorage.setItem(READER_QUICK_MATCH_KEY, readerQuickMatchEnabled ? '1' : '0'); } catch (_) {}
             syncReaderQuickMatchUi();
             syncReaderParaIndentUi();
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
         window.setReaderParaIndent = (on) => {
             readerParaIndent = !!on;
             try { localStorage.setItem(READER_PARA_INDENT_KEY, readerParaIndent ? '1' : '0'); } catch (_) {}
             syncReaderParaIndentUi();
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
         const READER_THEME_CYCLE = ['', 'warm', 'dark'];
@@ -21721,6 +21737,7 @@
             readerTheme = theme === 'warm' || theme === 'dark' ? theme : '';
             try { localStorage.setItem(READER_THEME_KEY, readerTheme); } catch (_) {}
             syncReaderThemeUi();
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
         window.cycleReaderTheme = () => {
@@ -29626,6 +29643,107 @@
                 localStorage.setItem(learnerProfileStorageKey(STORY_LEARNER_CTX_PARTS_LS_KEY), JSON.stringify(payload));
             } catch (_) {}
             renderStoryContextChipBoxes();
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
+        }
+
+        function collectLearnerProfileCloudPrefs() {
+            const ctx = {};
+            STORY_CTX_CHIP_KEYS.forEach((k) => {
+                ctx[k] = normalizeContextChipList(storyLearnerContextParts?.[k]);
+            });
+            return {
+                learnerCefrLevel: learnerCefrLevel || '',
+                learnerGrammarCefrLevel: learnerGrammarCefrLevel || '',
+                storyUseLearnerContext: !!storyUseLearnerContext,
+                storyLearnerContextParts: ctx
+            };
+        }
+
+        function applyLearnerProfileFromCloud(d) {
+            if (!d || typeof d !== 'object') return;
+            if (typeof d.learnerCefrLevel === 'string') {
+                const v = d.learnerCefrLevel.trim().toUpperCase();
+                learnerCefrLevel = CEFR_LEVELS.includes(v) ? v : '';
+                try { localStorage.setItem(learnerProfileStorageKey(LEARNER_CEFR_LS_KEY), learnerCefrLevel); } catch (_) {}
+            }
+            if (typeof d.learnerGrammarCefrLevel === 'string') {
+                const v = d.learnerGrammarCefrLevel.trim().toUpperCase();
+                learnerGrammarCefrLevel = CEFR_LEVELS.includes(v) ? v : '';
+                try { localStorage.setItem(learnerProfileStorageKey(LEARNER_GRAMMAR_CEFR_LS_KEY), learnerGrammarCefrLevel); } catch (_) {}
+            }
+            if (typeof d.storyUseLearnerContext === 'boolean') {
+                storyUseLearnerContext = d.storyUseLearnerContext;
+                try { localStorage.setItem(learnerProfileStorageKey(STORY_USE_CTX_LS_KEY), storyUseLearnerContext ? '1' : '0'); } catch (_) {}
+            }
+            if (d.storyLearnerContextParts && typeof d.storyLearnerContextParts === 'object') {
+                storyLearnerContextParts = parseStoryLearnerContextParts(JSON.stringify(d.storyLearnerContextParts));
+                try {
+                    const payload = {};
+                    STORY_CTX_CHIP_KEYS.forEach((k) => {
+                        payload[k] = normalizeContextChipList(storyLearnerContextParts[k]);
+                    });
+                    localStorage.setItem(learnerProfileStorageKey(STORY_LEARNER_CTX_PARTS_LS_KEY), JSON.stringify(payload));
+                } catch (_) {}
+            }
+        }
+
+        /** Teacher-tunable prefs (not caches / progress) — synced to Firebase users/{uid}. */
+        function collectExtraCloudPrefs() {
+            const out = {};
+            try {
+                if (typeof readerQuickMatchEnabled === 'boolean') out.readerQuickMatchEnabled = readerQuickMatchEnabled;
+                if (typeof readerParaIndent === 'boolean') out.readerParaIndent = readerParaIndent;
+                if (typeof readerTheme === 'string') out.readerTheme = readerTheme;
+                if (typeof brainstormOrderPref === 'string') out.brainstormOrderPref = brainstormOrderPref;
+                if (typeof bsPrioritizeFullSets === 'boolean') out.bsPrioritizeFullSets = bsPrioritizeFullSets;
+                if (typeof storyCooldownPrefEnabled === 'boolean') out.storyCooldownPrefEnabled = !!storyCooldownPrefEnabled;
+                if (typeof storyProviderPref === 'string') out.storyProviderPref = storyProviderPref;
+                if (typeof loadRestoreBatch10Pref === 'function') out.restoreBatch10Pref = !!loadRestoreBatch10Pref();
+                if (Array.isArray(selectedReviewModes)) out.selectedReviewModes = selectedReviewModes.slice();
+            } catch (_) {}
+            return out;
+        }
+
+        function applyExtraCloudPrefs(d) {
+            if (!d || typeof d !== 'object') return;
+            if (typeof d.readerQuickMatchEnabled === 'boolean') {
+                readerQuickMatchEnabled = d.readerQuickMatchEnabled;
+                try { localStorage.setItem(READER_QUICK_MATCH_KEY, readerQuickMatchEnabled ? '1' : '0'); } catch (_) {}
+            }
+            if (typeof d.readerParaIndent === 'boolean') {
+                readerParaIndent = d.readerParaIndent;
+                try { localStorage.setItem(READER_PARA_INDENT_KEY, readerParaIndent ? '1' : '0'); } catch (_) {}
+            }
+            if (d.readerTheme === '' || d.readerTheme === 'warm' || d.readerTheme === 'dark') {
+                readerTheme = d.readerTheme;
+                try { localStorage.setItem(READER_THEME_KEY, readerTheme); } catch (_) {}
+            }
+            if (d.brainstormOrderPref === 'new' || d.brainstormOrderPref === 'mixed' || d.brainstormOrderPref === 'reviews') {
+                brainstormOrderPref = d.brainstormOrderPref;
+                try { localStorage.setItem(BS_ORDER_KEY, brainstormOrderPref); } catch (_) {}
+            }
+            if (typeof d.bsPrioritizeFullSets === 'boolean') {
+                bsPrioritizeFullSets = d.bsPrioritizeFullSets;
+                try { localStorage.setItem(BS_PRIORITIZE_FULL_KEY, bsPrioritizeFullSets ? '1' : '0'); } catch (_) {}
+            }
+            if (typeof d.storyCooldownPrefEnabled === 'boolean') {
+                storyCooldownPrefEnabled = d.storyCooldownPrefEnabled;
+                try { localStorage.setItem(STORY_COOLDOWN_PREF_LS_KEY, storyCooldownPrefEnabled ? '1' : '0'); } catch (_) {}
+            }
+            if (typeof d.storyProviderPref === 'string' && typeof normalizeStoryProvider === 'function') {
+                storyProviderPref = normalizeStoryProvider(d.storyProviderPref);
+                try { localStorage.setItem(STORY_PROVIDER_LS_KEY, storyProviderPref); } catch (_) {}
+            }
+            if (typeof d.restoreBatch10Pref === 'boolean') {
+                try { localStorage.setItem(RESTORE_BATCH10_PREF_KEY, d.restoreBatch10Pref ? '1' : '0'); } catch (_) {}
+            }
+            if (Array.isArray(d.selectedReviewModes) && typeof REVIEW_MODE_IDS !== 'undefined') {
+                const cleaned = d.selectedReviewModes.filter((id) => REVIEW_MODE_IDS.includes(id));
+                if (cleaned.length) {
+                    selectedReviewModes = cleaned;
+                    try { localStorage.setItem(REVIEW_MODES_STORAGE_KEY, JSON.stringify(selectedReviewModes)); } catch (_) {}
+                }
+            }
         }
 
         function reloadLearnerProfileFromStorage() {
@@ -29752,6 +29870,7 @@
             learnerCefrLevel = CEFR_LEVELS.includes(v) ? v : '';
             try { localStorage.setItem(learnerProfileStorageKey(LEARNER_CEFR_LS_KEY), learnerCefrLevel); } catch (_) {}
             renderCefrBarPicker('settings-vocab-cefr-bars', learnerCefrLevel, (lv) => setLearnerCefrLevel(lv));
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
         window.setLearnerGrammarCefrLevel = (val) => {
@@ -29759,6 +29878,7 @@
             learnerGrammarCefrLevel = CEFR_LEVELS.includes(v) ? v : '';
             try { localStorage.setItem(learnerProfileStorageKey(LEARNER_GRAMMAR_CEFR_LS_KEY), learnerGrammarCefrLevel); } catch (_) {}
             renderCefrBarPicker('settings-grammar-cefr-bars', learnerGrammarCefrLevel, (lv) => setLearnerGrammarCefrLevel(lv));
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
         window.setStoryUseLearnerContext = (on) => {
@@ -29766,6 +29886,7 @@
             try { localStorage.setItem(learnerProfileStorageKey(STORY_USE_CTX_LS_KEY), storyUseLearnerContext ? '1' : '0'); } catch (_) {}
             const cb = document.getElementById('settings-story-use-context');
             if (cb) cb.checked = storyUseLearnerContext;
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
         const STORY_FETCH_TIMEOUT_MS = STUDENT_EDITION ? 60000 : 180000;
         let restoreTimer = null;
@@ -31800,6 +31921,7 @@
 
         function saveRestoreBatch10Pref(on) {
             try { localStorage.setItem(RESTORE_BATCH10_PREF_KEY, on ? '1' : '0'); } catch (_) {}
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         }
 
         function loadRestoreBatchProgressMap() {
@@ -33000,12 +33122,14 @@
             brainstormOrderPref = (pref === 'reviews' || pref === 'new' || pref === 'mixed') ? pref : 'mixed';
             try { localStorage.setItem(BS_ORDER_KEY, brainstormOrderPref); } catch (_) {}
             syncBrainstormOrderUI();
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
         window.setBsPrioritizeFullSets = (on) => {
             bsPrioritizeFullSets = !!on;
             try { localStorage.setItem(BS_PRIORITIZE_FULL_KEY, bsPrioritizeFullSets ? '1' : '0'); } catch (_) {}
             syncBrainstormOrderUI();
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
         function getBsMixLastBatch() {
@@ -37766,6 +37890,7 @@
             storyCooldownPrefEnabled = !!enabled;
             try { localStorage.setItem(STORY_COOLDOWN_PREF_LS_KEY, storyCooldownPrefEnabled ? '1' : '0'); } catch (_) {}
             syncStoryHeadlinerUi();
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
         function getSprintStatsDocId() {
@@ -38187,6 +38312,7 @@
             const sel = document.getElementById('settings-story-provider');
             if (sel) sel.value = getStoryProvider();
             syncStoryHeadlinerUi();
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
         function renderStoryArchiveSelect() {
