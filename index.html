@@ -909,7 +909,14 @@
             padding: 0 1px;
         }
         .text-reader strong, .text-reader b { font-weight: 800; color: #0f172a; }
-        .text-reader em, .text-reader i { font-style: italic; }
+        .material-editor em, .material-editor i {
+            font-style: italic;
+            font-family: inherit;
+        }
+        .text-reader em, .text-reader i {
+            font-style: italic;
+            font-family: inherit;
+        }
         .text-reader u { text-underline-offset: 2px; }
         .wiki-w-img {
             display: inline-block;
@@ -1089,6 +1096,15 @@
         .material-editor h2 { font-size: 1.2em; }
         .material-editor h3 { font-size: 1.08em; }
         .material-editor mark { background: rgba(253, 224, 71, 0.35); border-radius: 2px; }
+        .material-editor.is-file-drag {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            background: #f8fafc;
+        }
+        .material-editor.is-file-busy {
+            opacity: 0.72;
+            pointer-events: none;
+        }
         #edit-mat-content.material-editor {
             min-height: 0;
             flex: 1;
@@ -8274,9 +8290,9 @@
                 <div id="edit-mat-yt-preview" class="w-full aspect-video bg-black rounded-xl mb-3 hidden overflow-hidden shadow-inner"></div>
                 <div id="edit-srt-drop-zone" class="border-2 border-dashed border-slate-200 rounded-xl p-5 sm:p-6 text-center transition-colors hover:border-indigo-300 bg-slate-50/60 cursor-pointer relative" data-sub-target="edit-yt-sub-raw" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="document.getElementById('edit-yt-sub-file').click()">
                     <div class="text-4xl mb-2">📄</div>
-                    <h4 class="font-bold text-slate-700 text-base" data-i18n="lib.srtTitle">Перетягніть файл субтитрів (.srt)</h4>
+                    <h4 class="font-bold text-slate-700 text-base" data-i18n="lib.srtTitle">Перетягніть файл субтитрів (.srt / .txt / .pdf)</h4>
                     <p class="text-xs text-slate-500 mt-1" data-i18n="lib.srtOrClick">або натисніть, щоб вибрати файл</p>
-                    <input type="file" id="edit-yt-sub-file" accept=".srt,.txt" class="hidden" data-sub-target="edit-yt-sub-raw" onchange="handleSubFileUpload(event)">
+                    <input type="file" id="edit-yt-sub-file" accept=".srt,.txt,.pdf,application/pdf,text/plain" class="hidden" data-sub-target="edit-yt-sub-raw" onchange="handleSubFileUpload(event)">
                     <div class="mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center">
                         <button type="button" onclick="event.stopPropagation(); toggleManualSubInput('edit-yt-sub-raw')" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition">📝 <span data-i18n="lib.pasteSub">Вставити текст вручну</span></button>
                         <span class="hidden sm:inline text-slate-300">|</span>
@@ -8904,9 +8920,9 @@
                     
                     <div id="srt-drop-zone" class="border-2 border-dashed border-slate-200 rounded-xl p-5 sm:p-6 text-center transition-colors hover:border-indigo-300 bg-slate-50/60 cursor-pointer relative" data-sub-target="yt-sub-raw" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="document.getElementById('yt-sub-file').click()">
                         <div class="text-4xl mb-2">📄</div>
-                        <h4 class="font-bold text-slate-700 text-base" data-i18n="lib.srtTitle">Перетягніть файл субтитрів (.srt)</h4>
+                        <h4 class="font-bold text-slate-700 text-base" data-i18n="lib.srtTitle">Перетягніть файл субтитрів (.srt / .txt / .pdf)</h4>
                         <p class="text-xs text-slate-500 mt-1" data-i18n="lib.srtOrClick">або натисніть, щоб вибрати файл</p>
-                        <input type="file" id="yt-sub-file" accept=".srt,.txt" class="hidden" data-sub-target="yt-sub-raw" onchange="handleSubFileUpload(event)">
+                        <input type="file" id="yt-sub-file" accept=".srt,.txt,.pdf,application/pdf,text/plain" class="hidden" data-sub-target="yt-sub-raw" onchange="handleSubFileUpload(event)">
                         
                         <div class="mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center">
                             <button type="button" onclick="event.stopPropagation(); toggleManualSubInput('yt-sub-raw')" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition">📝 <span data-i18n="lib.pasteSub">Вставити текст вручну</span></button>
@@ -10136,7 +10152,7 @@
                 'lib.articleFromNet': 'Стаття з Інтернету',
                 'lib.searchVideo': 'Пошук відео', 'lib.ytQuery': 'Назва, тема або посилання YouTube...',
                 'lib.orPaste': 'Або вставити посилання вручну', 'lib.ytUrl': 'Пряме посилання на YouTube',
-                'lib.addVideo': 'Додати відео', 'lib.srtTitle': 'Перетягніть файл субтитрів (.srt)',
+                'lib.addVideo': 'Додати відео', 'lib.srtTitle': 'Перетягніть файл субтитрів (.srt / .txt / .pdf)',
                 'lib.srtOrClick': 'або натисніть, щоб вибрати файл', 'lib.pasteSub': 'Вставити текст вручну',
                 'lib.downsub': 'Завантажити з DownSub', 'lib.saveMat': 'Зберегти матеріал',
                 'reader.fontSize': 'Розмір тексту', 'reader.width': 'Ширина вікна', 'reader.font': 'Шрифт',
@@ -10265,6 +10281,12 @@
                 'msg.wikiOk': 'Статтю успішно завантажено!', 'msg.wikiFail': 'Помилка завантаження статті.',
                 'msg.ytPicked': 'Відео вибрано! Тепер ви можете додати субтитри.',
                 'msg.badYt': 'Невірне посилання YouTube.', 'msg.srtOk': 'Файл субтитрів завантажено.',
+                'msg.pdfLoading': 'Читаємо PDF…',
+                'msg.pdfOk': 'Текст із PDF завантажено ({n} стор.).',
+                'msg.pdfEmpty': 'У PDF не знайдено тексту. Потрібен текстовий PDF (не скан), або скопіюйте текст вручну.',
+                'msg.pdfFail': 'Не вдалося прочитати PDF.',
+                'msg.pdfTooBig': 'PDF завеликий (макс. {mb} МБ).',
+                'msg.txtOk': 'Текст із файлу завантажено.',
                 'msg.needVideo': 'Спочатку додайте відео або виберіть його з пошуку.',
                 'msg.needContent': 'Вставте текст або додайте відео.', 'msg.matSaved': 'Матеріал збережено!',
                 'msg.deleteMat': 'Видалити матеріал?', 'msg.matSaveFail': 'Помилка збереження матеріалу.',
@@ -10814,7 +10836,7 @@
                 'lib.articleFromNet': 'Article from the web',
                 'lib.searchVideo': 'Search videos', 'lib.ytQuery': 'Title, topic, or YouTube link...',
                 'lib.orPaste': 'Or paste a link manually', 'lib.ytUrl': 'Direct YouTube link',
-                'lib.addVideo': 'Add video', 'lib.srtTitle': 'Drop a subtitle file (.srt)',
+                'lib.addVideo': 'Add video', 'lib.srtTitle': 'Drop a subtitle file (.srt / .txt / .pdf)',
                 'lib.srtOrClick': 'or click to choose a file', 'lib.pasteSub': 'Paste text manually',
                 'lib.downsub': 'Download from DownSub', 'lib.saveMat': 'Save material',
                 'reader.fontSize': 'Text size', 'reader.width': 'Window width', 'reader.font': 'Font',
@@ -10938,6 +10960,12 @@
                 'msg.wikiOk': 'Article loaded!', 'msg.wikiFail': 'Could not load the article.',
                 'msg.ytPicked': 'Video selected! You can now add subtitles.',
                 'msg.badYt': 'Invalid YouTube link.', 'msg.srtOk': 'Subtitle file loaded.',
+                'msg.pdfLoading': 'Reading PDF…',
+                'msg.pdfOk': 'PDF text loaded ({n} pages).',
+                'msg.pdfEmpty': 'No text found in this PDF. Use a text PDF (not a scan), or paste the text manually.',
+                'msg.pdfFail': 'Could not read this PDF.',
+                'msg.pdfTooBig': 'PDF is too large (max {mb} MB).',
+                'msg.txtOk': 'Text file loaded.',
                 'msg.needVideo': 'Add a video or pick one from search first.',
                 'msg.needContent': 'Paste text or add a video.', 'msg.matSaved': 'Material saved!',
                 'msg.deleteMat': 'Delete this material?', 'msg.matSaveFail': 'Could not save the material.',
@@ -11487,7 +11515,7 @@
                 'lib.articleFromNet': 'Artículo de internet',
                 'lib.searchVideo': 'Buscar vídeos', 'lib.ytQuery': 'Título, tema o enlace de YouTube...',
                 'lib.orPaste': 'O pegar un enlace a mano', 'lib.ytUrl': 'Enlace directo de YouTube',
-                'lib.addVideo': 'Añadir vídeo', 'lib.srtTitle': 'Suelta un archivo de subtítulos (.srt)',
+                'lib.addVideo': 'Añadir vídeo', 'lib.srtTitle': 'Suelta un archivo de subtítulos (.srt / .txt / .pdf)',
                 'lib.srtOrClick': 'o pulsa para elegir un archivo', 'lib.pasteSub': 'Pegar texto a mano',
                 'lib.downsub': 'Descargar con DownSub', 'lib.saveMat': 'Guardar material',
                 'reader.fontSize': 'Tamaño del texto', 'reader.width': 'Ancho de la ventana', 'reader.font': 'Fuente',
@@ -11611,6 +11639,12 @@
                 'msg.wikiOk': '¡Artículo cargado!', 'msg.wikiFail': 'No se pudo cargar el artículo.',
                 'msg.ytPicked': '¡Vídeo elegido! Ya puedes añadir subtítulos.',
                 'msg.badYt': 'Enlace de YouTube no válido.', 'msg.srtOk': 'Archivo de subtítulos cargado.',
+                'msg.pdfLoading': 'Leyendo PDF…',
+                'msg.pdfOk': 'Texto del PDF cargado ({n} pág.).',
+                'msg.pdfEmpty': 'No hay texto en este PDF. Usa un PDF de texto (no un escaneo) o pega el texto a mano.',
+                'msg.pdfFail': 'No se pudo leer este PDF.',
+                'msg.pdfTooBig': 'El PDF es demasiado grande (máx. {mb} MB).',
+                'msg.txtOk': 'Archivo de texto cargado.',
                 'msg.needVideo': 'Añade un vídeo o elígelo en la búsqueda primero.',
                 'msg.needContent': 'Pega texto o añade un vídeo.', 'msg.matSaved': '¡Material guardado!',
                 'msg.deleteMat': '¿Eliminar el material?', 'msg.matSaveFail': 'No se pudo guardar el material.',
@@ -19846,7 +19880,17 @@
         }
         function materialTextHasMarkup(text) {
             const s = String(text || '');
-            return /^#{1,6}\s/m.test(s) || /\*\*[^*]+\*\*/.test(s) || /__[^\n]+__/.test(s) || /^={1,6}\s*.+\s*={1,6}\s*$/m.test(s);
+            return /^#{1,6}\s/m.test(s)
+                || /\*\*[^*]+\*\*/.test(s)
+                || /__[^\n]+__/.test(s)
+                || /^={1,6}\s*.+\s*={1,6}\s*$/m.test(s)
+                || /^ {0,3}>/m.test(s);
+        }
+        function isMarkdownQuoteLine(line) {
+            return /^ {0,3}>/.test(String(line || ''));
+        }
+        function stripMarkdownQuotePrefix(line) {
+            return String(line || '').replace(/^ {0,3}>{1,3} ?/, '');
         }
         function maybeFillTitleFromLeadingLine(bodyText, titleEl) {
             if (!titleEl || titleEl.value.trim()) return;
@@ -19884,24 +19928,155 @@
             if (!text.trim()) return '';
             const lines = text.split('\n');
             const out = [];
-            for (const line of lines) {
-                const trimmed = line.replace(/\s+$/, '');
-                if (!trimmed.trim()) continue;
+            let i = 0;
+            while (i < lines.length) {
+                const rawLine = lines[i].replace(/\s+$/, '');
+
+                // Markdown blockquotes (email/chat poetry): strip ">" and render as italic lines
+                if (isMarkdownQuoteLine(rawLine)) {
+                    const stanza = [];
+                    while (i < lines.length) {
+                        const ln = lines[i].replace(/\s+$/, '');
+                        if (!ln.trim()) {
+                            if (stanza.length) break;
+                            i += 1;
+                            continue;
+                        }
+                        if (!isMarkdownQuoteLine(ln)) break;
+                        const body = stripMarkdownQuotePrefix(ln).trim();
+                        if (body) stanza.push(body);
+                        i += 1;
+                    }
+                    stanza.forEach((line) => {
+                        out.push(`<p><em>${formatInlineMarkdown(line)}</em></p>`);
+                    });
+                    continue;
+                }
+
+                const trimmed = rawLine;
+                if (!trimmed.trim()) {
+                    i += 1;
+                    continue;
+                }
                 const wm = /^(=+)\s*(.+?)\s*\1\s*$/.exec(trimmed.trim());
                 if (wm) {
                     const level = Math.min(wm[1].length, 3);
                     out.push(`<h${level}>${formatInlineMarkdown(wm[2].trim())}</h${level}>`);
+                    i += 1;
                     continue;
                 }
                 const hm = /^(#{1,6})\s+(.+)$/.exec(trimmed.trim());
                 if (hm) {
                     const level = Math.min(hm[1].length, 3);
                     out.push(`<h${level}>${formatInlineMarkdown(hm[2].trim())}</h${level}>`);
+                    i += 1;
                     continue;
                 }
                 out.push(`<p>${formatInlineMarkdown(trimmed)}</p>`);
+                i += 1;
             }
             return out.join('');
+        }
+        /** Convert consecutive markdown quote lines ("> …") already in the editor into italic paragraphs. */
+        function normalizeMarkdownQuotesInMaterialHtml(html) {
+            const root = document.createElement('div');
+            root.innerHTML = String(html || '');
+            if (!root.innerHTML.trim()) return '';
+
+            const solidQuote = (t) => {
+                const s = String(t || '').replace(/\u00a0/g, ' ').trim();
+                return isMarkdownQuoteLine(s) && !!stripMarkdownQuotePrefix(s).trim();
+            };
+            const isQuoteLine = (t) => isMarkdownQuoteLine(String(t || '').replace(/\u00a0/g, ' ').trim());
+
+            function italicParaFromQuoteText(raw) {
+                const body = stripMarkdownQuotePrefix(String(raw || '').replace(/\u00a0/g, ' ').trim()).trim();
+                if (!body) return null;
+                const p = document.createElement('p');
+                const em = document.createElement('em');
+                em.textContent = body;
+                p.appendChild(em);
+                return p;
+            }
+
+            // Split a single block with <br> quote lines into sibling <p>s when ≥2 quote lines
+            [...root.querySelectorAll('p, div')].forEach((el) => {
+                if (el.querySelector('p, div, h1, h2, h3')) return;
+                if (!/<br\s*\/?>/i.test(el.innerHTML)) return;
+                const texts = el.innerHTML.split(/<br\s*\/?>/i).map((seg) => {
+                    const d = document.createElement('div');
+                    d.innerHTML = seg;
+                    return String(d.textContent || '').replace(/\u00a0/g, ' ');
+                });
+                if (texts.filter(solidQuote).length < 2) return;
+                const frag = document.createDocumentFragment();
+                texts.forEach((t) => {
+                    if (!isQuoteLine(t) && t.trim()) return;
+                    const p = italicParaFromQuoteText(t);
+                    if (p) frag.appendChild(p);
+                });
+                if (frag.childNodes.length) el.replaceWith(frag);
+            });
+
+            const items = [];
+            [...root.childNodes].forEach((n) => {
+                if (n.nodeType === 3) {
+                    const t = String(n.textContent || '').replace(/\u00a0/g, ' ');
+                    if (!t.trim()) return;
+                    t.split(/\n/).forEach((part) => items.push({ node: n, text: part, sharedText: true }));
+                } else if (n.nodeType === 1) {
+                    if (n.tagName === 'BR') items.push({ node: n, text: '' });
+                    else items.push({ node: n, text: String(n.textContent || '').replace(/\u00a0/g, ' ') });
+                }
+            });
+
+            const runs = [];
+            let i = 0;
+            while (i < items.length) {
+                if (!isQuoteLine(items[i].text)) {
+                    i += 1;
+                    continue;
+                }
+                let j = i;
+                let solids = 0;
+                while (j < items.length) {
+                    const t = items[j].text.trim();
+                    if (isQuoteLine(t)) {
+                        if (stripMarkdownQuotePrefix(t).trim()) solids += 1;
+                        j += 1;
+                        continue;
+                    }
+                    if (!t && j + 1 < items.length && isQuoteLine(items[j + 1].text)) {
+                        j += 1;
+                        continue;
+                    }
+                    break;
+                }
+                if (solids >= 2) runs.push({ start: i, end: j });
+                i = Math.max(j, i + 1);
+            }
+
+            if (!runs.length) return root.innerHTML;
+
+            for (let r = runs.length - 1; r >= 0; r -= 1) {
+                const { start, end } = runs[r];
+                const frag = document.createDocumentFragment();
+                for (let k = start; k < end; k += 1) {
+                    const p = italicParaFromQuoteText(items[k].text);
+                    if (p) frag.appendChild(p);
+                }
+                const first = items[start].node;
+                if (!first.parentNode) continue;
+                first.parentNode.insertBefore(frag, first);
+                const removed = new Set();
+                for (let k = start; k < end; k += 1) {
+                    const n = items[k].node;
+                    if (removed.has(n)) continue;
+                    removed.add(n);
+                    if (n.parentNode) n.remove();
+                }
+            }
+            return root.innerHTML;
         }
         function sanitizeMaterialHtml(html) {
             const allowed = { B: 1, STRONG: 1, I: 1, EM: 1, U: 1, MARK: 1, H1: 1, H2: 1, H3: 1, P: 1, BR: 1, DIV: 1 };
@@ -19961,8 +20136,8 @@
         }
         function materialHtmlFromStored(s) {
             if (!s) return '';
-            if (looksLikeMaterialHtml(s)) return sanitizeMaterialHtml(s);
-            return markdownToHtml(s);
+            const html = looksLikeMaterialHtml(s) ? sanitizeMaterialHtml(s) : markdownToHtml(s);
+            return normalizeMarkdownQuotesInMaterialHtml(html);
         }
         function setMaterialEditorContent(id, raw) {
             const el = document.getElementById(id);
@@ -19976,7 +20151,7 @@
         function getMaterialEditorContent(id) {
             const el = document.getElementById(id);
             if (!el) return '';
-            const html = sanitizeMaterialHtml(el.innerHTML).trim();
+            const html = normalizeMarkdownQuotesInMaterialHtml(sanitizeMaterialHtml(el.innerHTML)).trim();
             if (!html || html === '<br>' || html === '<p><br></p>' || html === '<p></p>') return '';
             return html;
         }
@@ -19992,7 +20167,7 @@
         function plainPasteToMaterialHtml(text) {
             const trimmed = String(text || '').trim();
             if (!trimmed) return '';
-            if (materialTextHasMarkup(trimmed)) return markdownToHtml(trimmed);
+            if (materialTextHasMarkup(trimmed) || /^ {0,3}>/m.test(trimmed)) return markdownToHtml(trimmed);
             const paras = trimmed.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
             if (!paras.length) return `<p>${escapeHtmlText(trimmed)}</p>`;
             return paras.map((p) => `<p>${escapeHtmlText(p).replace(/\n/g, '<br>')}</p>`).join('');
@@ -20299,7 +20474,7 @@
                 if (!text) return;
                 const parsed = parseLinguaSpaceTitlePaste(text);
                 const bodyText = parsed.title ? parsed.body : text;
-                const shouldSmartPaste = parsed.title || materialTextHasMarkup(bodyText) || /\n\s*\n/.test(bodyText);
+                const shouldSmartPaste = parsed.title || materialTextHasMarkup(bodyText) || /\n\s*\n/.test(bodyText) || /^ {0,3}>/m.test(bodyText);
                 if (!shouldSmartPaste) return;
                 e.preventDefault();
                 const titleEl = id === 'material-content'
@@ -20314,6 +20489,28 @@
         }
         bindMaterialEditorPaste('material-content');
         bindMaterialEditorPaste('edit-mat-content');
+        (function bindMaterialContentFileDrop() {
+            const el = document.getElementById('material-content');
+            if (!el || el.dataset.boundFileDrop) return;
+            el.dataset.boundFileDrop = '1';
+            el.addEventListener('dragover', (e) => {
+                if (![...e.dataTransfer?.types || []].includes('Files')) return;
+                e.preventDefault();
+                el.classList.add('is-file-drag');
+            });
+            el.addEventListener('dragleave', (e) => {
+                if (e.relatedTarget && el.contains(e.relatedTarget)) return;
+                el.classList.remove('is-file-drag');
+            });
+            el.addEventListener('drop', (e) => {
+                const file = e.dataTransfer?.files?.[0];
+                if (!file) return;
+                e.preventDefault();
+                e.stopPropagation();
+                el.classList.remove('is-file-drag');
+                ingestMaterialTextFile(file, { asSubtitles: false });
+            });
+        })();
 
         let addMaterialMode = 'text'; 
         window.showAddTextForm = () => { 
@@ -20934,18 +21131,174 @@
 
         window.handleDragOver = (e) => { e.preventDefault(); e.currentTarget.classList.add('border-indigo-500', 'bg-indigo-50'); };
         window.handleDragLeave = (e) => { e.preventDefault(); e.currentTarget.classList.remove('border-indigo-500', 'bg-indigo-50'); };
+
+        const PDF_JS_VERSION = '3.11.174';
+        const PDF_JS_CDN = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDF_JS_VERSION}`;
+        const MAT_PDF_MAX_BYTES = 20 * 1024 * 1024;
+        let pdfJsLoadPromise = null;
+
+        function loadExternalScript(src) {
+            return new Promise((resolve, reject) => {
+                const existing = document.querySelector(`script[src="${src}"]`);
+                if (existing && window.pdfjsLib) { resolve(); return; }
+                const s = document.createElement('script');
+                s.src = src;
+                s.async = true;
+                s.onload = () => resolve();
+                s.onerror = () => reject(new Error('script'));
+                document.head.appendChild(s);
+            });
+        }
+
+        async function ensurePdfJs() {
+            if (window.pdfjsLib) return window.pdfjsLib;
+            if (!pdfJsLoadPromise) {
+                pdfJsLoadPromise = loadExternalScript(`${PDF_JS_CDN}/pdf.min.js`).then(() => {
+                    if (!window.pdfjsLib) throw new Error('pdfjs');
+                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = `${PDF_JS_CDN}/pdf.worker.min.js`;
+                    return window.pdfjsLib;
+                }).catch((err) => {
+                    pdfJsLoadPromise = null;
+                    throw err;
+                });
+            }
+            return pdfJsLoadPromise;
+        }
+
+        function isPdfFile(file) {
+            if (!file) return false;
+            const name = String(file.name || '').toLowerCase();
+            const type = String(file.type || '').toLowerCase();
+            return name.endsWith('.pdf') || type === 'application/pdf';
+        }
+
+        function isPlainTextFile(file) {
+            if (!file) return false;
+            const name = String(file.name || '').toLowerCase();
+            const type = String(file.type || '').toLowerCase();
+            return name.endsWith('.txt') || name.endsWith('.srt') || type.startsWith('text/') || type === 'application/x-subrip';
+        }
+
+        function joinPdfTextItems(items) {
+            let lastY = null;
+            let line = '';
+            const lines = [];
+            (items || []).forEach((it) => {
+                const str = String(it?.str || '');
+                if (!str) return;
+                const y = Array.isArray(it.transform) ? it.transform[5] : null;
+                if (lastY != null && y != null && Math.abs(y - lastY) > 5.5) {
+                    if (line.trim()) lines.push(line.replace(/\s+/g, ' ').trim());
+                    line = '';
+                }
+                const glue = line && !/\s$/.test(line) && !/^\s/.test(str) && !/^[.,;:!?)\]%]/.test(str);
+                line += (glue ? ' ' : '') + str;
+                if (y != null) lastY = y;
+            });
+            if (line.trim()) lines.push(line.replace(/\s+/g, ' ').trim());
+            // Soft-wrap: join short consecutive lines; blank line on large breaks already via pages
+            return lines.join('\n');
+        }
+
+        async function extractTextFromPdfFile(file) {
+            const pdfjs = await ensurePdfJs();
+            const data = new Uint8Array(await file.arrayBuffer());
+            const doc = await pdfjs.getDocument({ data }).promise;
+            const pages = [];
+            for (let i = 1; i <= doc.numPages; i++) {
+                const page = await doc.getPage(i);
+                const content = await page.getTextContent();
+                const text = joinPdfTextItems(content.items);
+                if (text.trim()) pages.push(text.trim());
+            }
+            return { text: pages.join('\n\n'), pageCount: doc.numPages };
+        }
+
+        function suggestTitleFromFileName(file) {
+            const base = String(file?.name || '').replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
+            return base.slice(0, 120);
+        }
+
+        function applyExtractedTextToMaterialEditor(text, file) {
+            const html = plainPasteToMaterialHtml(text);
+            if (!html) return false;
+            setMaterialEditorContent('material-content', html);
+            const titleEl = document.getElementById('material-title');
+            if (titleEl && !String(titleEl.value || '').trim()) {
+                const tip = suggestTitleFromFileName(file);
+                if (tip) titleEl.value = tip;
+            }
+            return true;
+        }
+
+        async function ingestMaterialTextFile(file, opts = {}) {
+            if (!file) return;
+            const asSubtitles = !!opts.asSubtitles;
+            const textareaId = opts.textareaId || '';
+            const editor = document.getElementById('material-content');
+            if (isPdfFile(file)) {
+                if (file.size > MAT_PDF_MAX_BYTES) {
+                    window.showModal(t('msg.pdfTooBig', { mb: Math.round(MAT_PDF_MAX_BYTES / (1024 * 1024)) }));
+                    return;
+                }
+                editor?.classList.add('is-file-busy');
+                try {
+                    if (typeof setSystemStatus === 'function') setSystemStatus(t('msg.pdfLoading'), 'info');
+                    const { text, pageCount } = await extractTextFromPdfFile(file);
+                    if (!String(text || '').trim()) {
+                        window.showModal(t('msg.pdfEmpty'));
+                        return;
+                    }
+                    if (asSubtitles && textareaId) {
+                        const el = document.getElementById(textareaId);
+                        if (el) {
+                            el.value = text;
+                            el.classList.remove('hidden');
+                        }
+                        window.showModal(t('msg.pdfOk', { n: pageCount }));
+                        return;
+                    }
+                    if (!applyExtractedTextToMaterialEditor(text, file)) {
+                        window.showModal(t('msg.pdfEmpty'));
+                        return;
+                    }
+                    window.showModal(t('msg.pdfOk', { n: pageCount }));
+                } catch (_) {
+                    window.showModal(t('msg.pdfFail'));
+                } finally {
+                    editor?.classList.remove('is-file-busy', 'is-file-drag');
+                }
+                return;
+            }
+            if (isPlainTextFile(file) || asSubtitles) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const text = String(ev.target?.result || '');
+                    if (asSubtitles && textareaId) {
+                        const el = document.getElementById(textareaId);
+                        if (el) {
+                            el.value = text;
+                            el.classList.remove('hidden');
+                        }
+                        window.showModal(t('msg.srtOk'));
+                        return;
+                    }
+                    if (!applyExtractedTextToMaterialEditor(text, file)) {
+                        window.showModal(t('msg.pdfEmpty'));
+                        return;
+                    }
+                    window.showModal(t('msg.txtOk'));
+                };
+                reader.onerror = () => window.showModal(t('msg.pdfFail'));
+                reader.readAsText(file);
+                return;
+            }
+            window.showModal(t('msg.pdfFail'));
+        }
+
         function loadSubFileToTextarea(file, textareaId) {
             if (!file || !textareaId) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                const el = document.getElementById(textareaId);
-                if (el) {
-                    el.value = ev.target.result;
-                    el.classList.remove('hidden');
-                }
-                window.showModal(t('msg.srtOk'));
-            };
-            reader.readAsText(file);
+            ingestMaterialTextFile(file, { asSubtitles: true, textareaId });
         }
         window.handleDrop = (e) => {
             e.preventDefault(); e.currentTarget.classList.remove('border-indigo-500', 'bg-indigo-50');
