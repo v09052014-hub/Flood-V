@@ -658,8 +658,8 @@
         }
         .text-reader mark.reader-hl {
             display: inline;
-            background: transparent;
-            color: #ca8a04;
+            background: rgba(253, 224, 71, 0.55);
+            color: inherit;
             padding: 0;
             margin: 0;
             border-radius: 0;
@@ -678,14 +678,15 @@
             opacity: 0.9;
         }
         #library-read-view[data-hl-color="mint"] .text-reader mark.reader-hl:not(.reader-hl-book) {
-            color: #0d9488;
+            background: rgba(94, 234, 212, 0.45);
+            color: inherit;
         }
         #library-read-view[data-hl-color="lavender"] .text-reader mark.reader-hl:not(.reader-hl-book) {
-            color: #7c3aed;
+            background: rgba(196, 181, 253, 0.5);
+            color: inherit;
         }
         ::highlight(reader-hl) {
-            background-color: transparent;
-            color: #ca8a04;
+            background-color: rgba(253, 224, 71, 0.55);
         }
         /* Reader words: no box padding — keeps sentence highlights continuous (marker on or off) */
         #library-read-view .text-reader .word-clickable {
@@ -857,22 +858,28 @@
             color: #8ecdb0;
         }
         #library-read-view.reader-theme-dark .text-reader mark.reader-hl:not(.reader-hl-book) {
-            color: #fbbf24;
+            background: rgba(234, 179, 8, 0.42);
+            color: inherit;
         }
         #library-read-view.reader-theme-dark[data-hl-color="mint"] .text-reader mark.reader-hl:not(.reader-hl-book) {
-            color: #5eead4;
+            background: rgba(45, 212, 191, 0.35);
+            color: inherit;
         }
         #library-read-view.reader-theme-dark[data-hl-color="lavender"] .text-reader mark.reader-hl:not(.reader-hl-book) {
-            color: #c4b5fd;
+            background: rgba(167, 139, 250, 0.4);
+            color: inherit;
         }
         #library-read-view.reader-theme-warm .text-reader mark.reader-hl:not(.reader-hl-book) {
-            color: #b45309;
+            background: rgba(251, 191, 36, 0.5);
+            color: inherit;
         }
         #library-read-view.reader-theme-warm[data-hl-color="mint"] .text-reader mark.reader-hl:not(.reader-hl-book) {
-            color: #0f766e;
+            background: rgba(45, 212, 191, 0.4);
+            color: inherit;
         }
         #library-read-view.reader-theme-warm[data-hl-color="lavender"] .text-reader mark.reader-hl:not(.reader-hl-book) {
-            color: #6d28d9;
+            background: rgba(167, 139, 250, 0.42);
+            color: inherit;
         }
         #library-read-view.reader-theme-dark .text-reader mark:not(.reader-hl):not(.reader-hl-book) {
             background: rgba(186, 152, 48, 0.3);
@@ -3108,16 +3115,32 @@
             border-color: #c7d2fe;
         }
         .year-cal-cell.is-selected {
-            border-color: #6366f1 !important;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+            border-color: #a5b4fc !important;
+            box-shadow: 0 0 0 2px rgba(165, 180, 252, 0.35);
+        }
+        .year-cal-cell:focus,
+        .year-cal-cell:focus-visible {
+            outline: none;
         }
         .year-disk-wedge {
             cursor: pointer;
             transition: opacity 0.15s ease, filter 0.15s ease;
+            outline: none;
         }
-        .year-disk-wedge:hover { filter: brightness(0.92); }
-        .year-disk-wedge.is-hover { filter: brightness(0.9); stroke-width: 0.9 !important; }
-        .year-disk-wedge.is-selected { filter: brightness(0.86); stroke-width: 1.15 !important; }
+        .year-disk-wedge:focus,
+        .year-disk-wedge:focus-visible {
+            outline: none;
+        }
+        .year-disk-wedge:hover { filter: brightness(0.94); }
+        .year-disk-wedge.is-hover { filter: brightness(0.92); }
+        .year-disk-wedge.is-selected {
+            filter: brightness(0.9) saturate(1.08);
+            stroke-width: 0.55 !important;
+        }
+        #year-activity-disk svg:focus,
+        #year-activity-disk path:focus {
+            outline: none;
+        }
         #year-activity-main-view { transition: opacity 0.2s ease; }
         #year-day-side-panel .year-day-stat-grid {
             grid-template-columns: 1fr;
@@ -5770,6 +5793,11 @@
         body.order-session.reader-theme-dark .order-list {
             background: #141210;
             border-color: #44403c;
+        }
+        body.restore-session.reader-theme-dark .text-exercise-reader,
+        body.order-session.reader-theme-dark .text-exercise-reader,
+        body.restore-session.reader-theme-dark .restore-para {
+            color: #d6d3d1;
         }
         .echo-stage {
             display: flex;
@@ -11784,6 +11812,21 @@
             mint: '#0d9488',
             lavender: '#7c3aed'
         };
+        const READER_HL_BG = {
+            yellow: 'rgba(253, 224, 71, 0.55)',
+            mint: 'rgba(94, 234, 212, 0.45)',
+            lavender: 'rgba(196, 181, 253, 0.5)'
+        };
+        const READER_HL_BG_WARM = {
+            yellow: 'rgba(251, 191, 36, 0.5)',
+            mint: 'rgba(45, 212, 191, 0.4)',
+            lavender: 'rgba(167, 139, 250, 0.42)'
+        };
+        const READER_HL_BG_DARK = {
+            yellow: 'rgba(234, 179, 8, 0.42)',
+            mint: 'rgba(45, 212, 191, 0.35)',
+            lavender: 'rgba(167, 139, 250, 0.4)'
+        };
         const READER_HL_FG_WARM = {
             yellow: '#b45309',
             mint: '#0f766e',
@@ -12451,6 +12494,15 @@
             const lib = document.getElementById('library-read-view');
             if (lib) lib.dataset.hlColor = readerHighlightColor;
             ensureReaderHighlightCss();
+        }
+
+        function getReaderHighlightBg() {
+            const key = readerHighlightColor in READER_HL_BG ? readerHighlightColor : 'yellow';
+            const view = document.getElementById('library-read-view');
+            const readOpen = !!(view && !view.classList.contains('hidden'));
+            if (readOpen && readerTheme === 'dark') return READER_HL_BG_DARK[key];
+            if (readOpen && readerTheme === 'warm') return READER_HL_BG_WARM[key];
+            return READER_HL_BG[key];
         }
 
         function getReaderHighlightFg() {
@@ -13606,6 +13658,9 @@
                 }
                 const selected = yearSelectedDayKey === key ? ' is-selected' : '';
                 const hovered = yearHoverDayKey === key ? ' is-hover' : '';
+                if (yearSelectedDayKey === key) {
+                    stroke = dayMeetsYearGoal(rec) ? '#a7f3d0' : '#c7d2fe';
+                }
                 parts.push(
                     `<path class="year-disk-wedge${selected}${hovered}" data-year-day="${key}" role="button" tabindex="0"`
                     + ` d="${wedgePath(cx, cy, r0, r1, a0, a1)}" fill="${fill}" stroke="${stroke}" stroke-width="0.35"`
@@ -22384,14 +22439,15 @@
         }
 
         function ensureReaderHighlightCss() {
-            const fg = getReaderHighlightFg();
+            const bg = getReaderHighlightBg();
             let style = document.getElementById('reader-hl-style');
             if (!style) {
                 style = document.createElement('style');
                 style.id = 'reader-hl-style';
                 document.head.appendChild(style);
             }
-            style.textContent = `::highlight(reader-hl){background-color:transparent;color:${fg}}`;
+            // Marker paint: background only — keep underlying text color
+            style.textContent = `::highlight(reader-hl){background-color:${bg}}`;
         }
 
         function clearReaderHighlightPaint() {
@@ -23120,7 +23176,7 @@
         }
 
         function listPhraseCollections() {
-            const list = materials
+            let list = materials
                 .filter((m) => m?.phraseCollection && materialIsOrderOnly(m))
                 .sort((a, b) => {
                     const emptyA = getPhraseTextsFromCollection(a).length === 0 ? 1 : 0;
@@ -23130,7 +23186,12 @@
                     const tb = phraseCollectionDisplayTitle(b).toLowerCase();
                     return ta.localeCompare(tb, uiLocale());
                 });
-            // Always surface standalone "Фрази" (even empty) first among empties
+            // Collapse duplicate empty standalone "Фрази" folders (race / double-create)
+            const emptyStandalone = list.filter((m) => !m.restoreParentId && getPhraseTextsFromCollection(m).length === 0);
+            if (emptyStandalone.length > 1) {
+                const keepId = emptyStandalone[0].id;
+                list = list.filter((m) => m.restoreParentId || getPhraseTextsFromCollection(m).length > 0 || m.id === keepId);
+            }
             return list;
         }
 
@@ -26623,28 +26684,62 @@
             return fork;
         }
 
+        let standalonePhraseEnsurePromise = null;
+
+        async function dedupeEmptyStandalonePhraseCollections(keep) {
+            const empties = materials.filter((m) =>
+                m?.phraseCollection && materialIsOrderOnly(m) && !m.restoreParentId
+                && getPhraseTextsFromCollection(m).length === 0
+            );
+            if (empties.length <= 1) return keep || empties[0] || null;
+            const keeper = keep && empties.some((m) => m.id === keep.id)
+                ? keep
+                : empties.slice().sort((a, b) => String(a.createdAt || 0).localeCompare(String(b.createdAt || 0)))[0];
+            for (const m of empties) {
+                if (!m?.id || m.id === keeper.id) continue;
+                try {
+                    if (db && activeUid) await deleteDoc(docRef('materials', m.id));
+                } catch (_) {}
+                const idx = materials.findIndex((x) => x.id === m.id);
+                if (idx >= 0) materials.splice(idx, 1);
+            }
+            return keeper;
+        }
+
         async function ensureStandalonePhraseCollection() {
             if (!activeUid || !db) return null;
             let fork = findStandalonePhraseCollection();
-            if (fork) return fork;
-            const title = t('filter.phrases');
-            const payload = {
-                title,
-                content: '<p></p>',
-                phraseCollection: true,
-                orderOnly: true,
-                orderMode: true,
-                orderSplit: 'phrases',
-                orderPhrases: [],
-                orderPhraseMeta: [],
-                orderSegments: [],
-                createdAt: serverTimestamp(),
-                updatedAt: Date.now()
-            };
-            const ref = await addDoc(colRef('materials'), payload);
-            fork = { id: ref.id, ...payload, createdAt: Date.now() };
-            materials.unshift(fork);
-            return fork;
+            if (fork) {
+                return dedupeEmptyStandalonePhraseCollections(fork);
+            }
+            if (standalonePhraseEnsurePromise) return standalonePhraseEnsurePromise;
+            standalonePhraseEnsurePromise = (async () => {
+                try {
+                    fork = findStandalonePhraseCollection();
+                    if (fork) return dedupeEmptyStandalonePhraseCollections(fork);
+                    const title = t('filter.phrases');
+                    const payload = {
+                        title,
+                        content: '<p></p>',
+                        phraseCollection: true,
+                        orderOnly: true,
+                        orderMode: true,
+                        orderSplit: 'phrases',
+                        orderPhrases: [],
+                        orderPhraseMeta: [],
+                        orderSegments: [],
+                        createdAt: serverTimestamp(),
+                        updatedAt: Date.now()
+                    };
+                    const ref = await addDoc(colRef('materials'), payload);
+                    fork = { id: ref.id, ...payload, createdAt: Date.now() };
+                    materials.unshift(fork);
+                    return dedupeEmptyStandalonePhraseCollections(fork);
+                } finally {
+                    standalonePhraseEnsurePromise = null;
+                }
+            })();
+            return standalonePhraseEnsurePromise;
         }
 
         async function upsertPhraseInCollection(fork, phrase, translation) {
