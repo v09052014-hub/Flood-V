@@ -565,6 +565,108 @@
             accent-color: #4f46e5;
             cursor: pointer;
         }
+        .reader-page-info-inner {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .reader-page-num {
+            appearance: none;
+            border: 1px dashed transparent;
+            background: transparent;
+            color: #4f46e5;
+            font: inherit;
+            font-weight: 800;
+            padding: 0.1rem 0.35rem;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            line-height: 1.2;
+            min-width: 1.5rem;
+            text-align: center;
+        }
+        .reader-page-num:hover, .reader-page-num:focus-visible {
+            border-color: #c7d2fe;
+            background: #eef2ff;
+            outline: none;
+        }
+        .reader-page-jump-input {
+            width: 3.25rem;
+            text-align: center;
+            font: inherit;
+            font-weight: 800;
+            color: #312e81;
+            border: 1px solid #a5b4fc;
+            border-radius: 0.4rem;
+            padding: 0.15rem 0.25rem;
+            background: #fff;
+        }
+        .reader-hl-digest {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            font-family: inherit;
+        }
+        .reader-hl-digest-empty {
+            text-align: center;
+            color: #94a3b8;
+            font-weight: 700;
+            padding: 2rem 1rem;
+            font-family: system-ui, sans-serif;
+            font-size: 0.95rem;
+        }
+        .reader-hl-digest-ctx {
+            margin-top: 0.65rem;
+            padding-top: 0.35rem;
+        }
+        .reader-hl-digest-h {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.82em;
+            line-height: 1.35;
+            letter-spacing: 0.01em;
+            font-family: system-ui, sans-serif;
+        }
+        .reader-hl-digest-h + .reader-hl-digest-h {
+            margin-top: 0.1rem;
+            font-size: 0.78em;
+            color: #a8b3c2;
+        }
+        .reader-hl-digest-item {
+            margin: 0;
+            padding: 0;
+        }
+        .reader-hl-digest-quote {
+            margin: 0;
+            padding: 0;
+            font-style: normal;
+        }
+        .reader-hl-digest-quote mark.reader-hl {
+            background: rgba(253, 224, 71, 0.45);
+            color: inherit;
+            border-radius: 2px;
+            padding: 0.05em 0.12em;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+        .reader-hl-digest-page {
+            display: inline-block;
+            margin-top: 0.35rem;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.72rem;
+            font-weight: 700;
+            font-family: system-ui, sans-serif;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .reader-hl-digest-page:hover { color: #64748b; }
+        #library-read-view.reader-hl-only #reader-pagination-top { display: none !important; }
+        #library-read-view.reader-hl-only #reader-pagination { display: none !important; }
         .reader-settings-icon-row {
             display: flex;
             align-items: center;
@@ -918,6 +1020,181 @@
             font-family: inherit;
         }
         .text-reader u { text-underline-offset: 2px; }
+        .material-editor ul.md-list,
+        .text-reader ul.md-list {
+            list-style: none;
+            margin: 0.15rem 0 1rem;
+            padding: 0;
+            text-align: left;
+        }
+        .material-editor ul.md-list li,
+        .text-reader ul.md-list li {
+            position: relative;
+            margin: 0;
+            padding: 0.28rem 0 0.28rem 1.2rem;
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+        .material-editor ul.md-list li::before,
+        .text-reader ul.md-list li::before {
+            content: '';
+            position: absolute;
+            left: 0.2rem;
+            top: 0.78em;
+            width: 0.38rem;
+            height: 0.38rem;
+            border-radius: 50%;
+            background: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        }
+        #library-read-view.reader-theme-warm ul.md-list li::before {
+            background: #b45309;
+            box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.14);
+        }
+        #library-read-view.reader-theme-dark ul.md-list li::before {
+            background: #a5b4fc;
+            box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.16);
+        }
+        .material-editor .md-table-wrap,
+        .text-reader .md-table-wrap {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 0 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            overscroll-behavior-x: contain;
+            text-align: left;
+        }
+        .material-editor table.md-table,
+        .text-reader table.md-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92em;
+            line-height: 1.45;
+            min-width: 16rem;
+            text-align: left;
+        }
+        .material-editor table.md-table th,
+        .material-editor table.md-table td,
+        .text-reader table.md-table th,
+        .text-reader table.md-table td {
+            padding: 0.55rem 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            text-align: left;
+        }
+        .material-editor table.md-table th,
+        .text-reader table.md-table th {
+            background: #f8fafc;
+            font-weight: 800;
+            color: #334155;
+            white-space: nowrap;
+        }
+        .material-editor table.md-table tr:last-child td,
+        .text-reader table.md-table tr:last-child td {
+            border-bottom: none;
+        }
+        .material-editor table.md-table td:last-child,
+        .text-reader table.md-table td:last-child {
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+        #library-read-view.reader-theme-warm .md-table-wrap {
+            background: #fbf6ec;
+            border-color: #e6d9c4;
+        }
+        #library-read-view.reader-theme-warm table.md-table th {
+            background: #f3e9d8;
+            color: #2c2418;
+        }
+        #library-read-view.reader-theme-warm table.md-table th,
+        #library-read-view.reader-theme-warm table.md-table td {
+            border-bottom-color: #e6d9c4;
+        }
+        #library-read-view.reader-theme-dark .md-table-wrap {
+            background: #1c1917;
+            border-color: #44403c;
+        }
+        #library-read-view.reader-theme-dark table.md-table th {
+            background: #292524;
+            color: #fafaf9;
+        }
+        #library-read-view.reader-theme-dark table.md-table th,
+        #library-read-view.reader-theme-dark table.md-table td {
+            border-bottom-color: #44403c;
+        }
+        @media (max-width: 640px) {
+            .material-editor .md-table-wrap[data-cols="2"] table.md-table,
+            .text-reader .md-table-wrap[data-cols="2"] table.md-table {
+                min-width: 0;
+                font-size: 0.88em;
+            }
+            .material-editor .md-table-wrap[data-cols="2"] thead,
+            .text-reader .md-table-wrap[data-cols="2"] thead {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+            .material-editor .md-table-wrap[data-cols="2"] tbody,
+            .material-editor .md-table-wrap[data-cols="2"] tr,
+            .material-editor .md-table-wrap[data-cols="2"] td,
+            .text-reader .md-table-wrap[data-cols="2"] tbody,
+            .text-reader .md-table-wrap[data-cols="2"] tr,
+            .text-reader .md-table-wrap[data-cols="2"] td {
+                display: block;
+                width: 100%;
+            }
+            .material-editor .md-table-wrap[data-cols="2"] tr,
+            .text-reader .md-table-wrap[data-cols="2"] tr {
+                padding: 0.7rem 0.85rem;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            .material-editor .md-table-wrap[data-cols="2"] tr:last-child,
+            .text-reader .md-table-wrap[data-cols="2"] tr:last-child {
+                border-bottom: none;
+            }
+            .material-editor .md-table-wrap[data-cols="2"] td,
+            .text-reader .md-table-wrap[data-cols="2"] td {
+                border: none;
+                padding: 0.12rem 0;
+                white-space: normal;
+            }
+            .material-editor .md-table-wrap[data-cols="2"] td:last-child,
+            .text-reader .md-table-wrap[data-cols="2"] td:last-child {
+                margin-top: 0.2rem;
+                font-weight: 800;
+                color: #4f46e5;
+                white-space: nowrap;
+            }
+            #library-read-view.reader-theme-warm .md-table-wrap[data-cols="2"] tr {
+                border-bottom-color: #e6d9c4;
+            }
+            #library-read-view.reader-theme-warm .md-table-wrap[data-cols="2"] td:last-child {
+                color: #9a3412;
+            }
+            #library-read-view.reader-theme-dark .md-table-wrap[data-cols="2"] tr {
+                border-bottom-color: #44403c;
+            }
+            #library-read-view.reader-theme-dark .md-table-wrap[data-cols="2"] td:last-child {
+                color: #a5b4fc;
+            }
+            .material-editor .md-table-wrap:not([data-cols="2"]) table.md-table,
+            .text-reader .md-table-wrap:not([data-cols="2"]) table.md-table {
+                font-size: 0.82em;
+                min-width: 22rem;
+            }
+        }
         .wiki-w-img {
             display: inline-block;
             width: 1.15rem;
@@ -8998,6 +9275,13 @@
                         </label>
                         <div id="reader-quick-match-tip" class="reader-settings-tip hidden" role="tooltip"></div>
                     </div>
+                    <label class="reader-settings-toggle reader-settings-toggle--qm" onclick="event.stopPropagation()" style="margin-top:0.65rem;padding-top:0.65rem;border-top:1px solid #f1f5f9">
+                        <input type="checkbox" id="reader-hl-only-toggle" onchange="setReaderHighlightsOnly(this.checked)">
+                        <span class="reader-settings-toggle-head flex-1 min-w-0">
+                            <span class="reader-settings-toggle-title" data-i18n="reader.hlOnly">Лише виділення</span>
+                            <span class="reader-settings-toggle-hint" data-i18n="reader.hlOnlyHint">Усі маркери з книги + сірі заголовки для контексту</span>
+                        </span>
+                    </label>
                 </div>
                 
                 <div id="reader-yt-wrapper" class="w-full aspect-video bg-black rounded-xl mb-4 hidden shadow-md overflow-hidden z-[100] transition-all duration-300">
@@ -9008,7 +9292,7 @@
 
                 <div id="reader-pagination-top" class="hidden flex justify-between items-center bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
                     <button type="button" onclick="changeReaderPage(-1)" id="btn-reader-prev-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.prevPage" title="Попередня сторінка">‹</button>
-                    <span id="reader-page-info-top" class="text-xs sm:text-sm font-bold text-slate-500">Сторінка 1 з 1</span>
+                    <span id="reader-page-info-top" class="text-xs sm:text-sm font-bold text-slate-500 reader-page-info"></span>
                     <button type="button" onclick="changeReaderPage(1)" id="btn-reader-next-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.nextPage" title="Наступна сторінка">›</button>
                 </div>
                 
@@ -9018,7 +9302,7 @@
 
                 <div id="reader-pagination" class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
                     <button onclick="changeReaderPage(-1)" id="btn-reader-prev" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.prevPage" title="Попередня сторінка">‹</button>
-                    <span id="reader-page-info" class="text-xs sm:text-sm font-bold text-slate-500">Сторінка 1 з 1</span>
+                    <span id="reader-page-info" class="text-xs sm:text-sm font-bold text-slate-500 reader-page-info"></span>
                     <button onclick="changeReaderPage(1)" id="btn-reader-next" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.nextPage" title="Наступна сторінка">›</button>
                 </div>
 
@@ -10138,6 +10422,13 @@
                 'bulk.savingProgress': 'Зберігаємо {n} / {total}…',
                 'lib.add': 'Додати новий матеріал', 'lib.addLead': 'Додайте текст, статтю або відео — і читайте з підсвіткою слів зі словника.', 'common.back': 'Назад', 'common.next': 'Вперед',
                 'page': 'Сторінка {n} з {total}',
+                'reader.pageWord': 'Сторінка',
+                'reader.pageOf': 'з',
+                'reader.jumpPage': 'Натисніть, щоб перейти на сторінку · Enter підтверджує',
+                'reader.hlOnly': 'Лише виділення',
+                'reader.hlOnlyHint': 'Усі маркери з книги + сірі заголовки для контексту',
+                'reader.hlOnlyEmpty': 'Поки немає виділеного тексту',
+                'reader.hlOnlyPage': 'стор. {n}',
                 'lib.tabText': 'Текст', 'lib.tabUrl': 'Стаття (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Назва матеріалу', 'lib.textPh': 'Оригінальний текст (або скрипт відео)...',
                 'lib.chatGptPhotoBtn': 'Витягнути текст із фото',
@@ -10822,6 +11113,13 @@
                 'bulk.savingProgress': 'Saving {n} / {total}…',
                 'lib.add': 'Add new material', 'lib.addLead': 'Add text, an article, or a video — then read with your dictionary words highlighted.', 'common.back': 'Back', 'common.next': 'Next',
                 'page': 'Page {n} of {total}',
+                'reader.pageWord': 'Page',
+                'reader.pageOf': 'of',
+                'reader.jumpPage': 'Click to jump to a page · Enter confirms',
+                'reader.hlOnly': 'Highlights only',
+                'reader.hlOnlyHint': 'All book highlights with gray headings for context',
+                'reader.hlOnlyEmpty': 'No highlights yet',
+                'reader.hlOnlyPage': 'p. {n}',
                 'lib.tabText': 'Text', 'lib.tabUrl': 'Article (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Material title', 'lib.textPh': 'Original text (or video script)...',
                 'lib.chatGptPhotoBtn': 'Extract text from photo',
@@ -11501,6 +11799,13 @@
                 'bulk.savingProgress': 'Guardando {n} / {total}…',
                 'lib.add': 'Añadir material nuevo', 'lib.addLead': 'Añade texto, un artículo o un vídeo — y lee con las palabras del diccionario resaltadas.', 'common.back': 'Atrás', 'common.next': 'Siguiente',
                 'page': 'Página {n} de {total}',
+                'reader.pageWord': 'Página',
+                'reader.pageOf': 'de',
+                'reader.jumpPage': 'Pulsa para ir a una página · Enter confirma',
+                'reader.hlOnly': 'Solo resaltados',
+                'reader.hlOnlyHint': 'Todos los resaltados del libro con títulos grises de contexto',
+                'reader.hlOnlyEmpty': 'Aún no hay resaltados',
+                'reader.hlOnlyPage': 'pág. {n}',
                 'lib.tabText': 'Texto', 'lib.tabUrl': 'Artículo (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Título del material', 'lib.textPh': 'Texto original (o guion del vídeo)...',
                 'lib.chatGptPhotoBtn': 'Extraer texto de foto',
@@ -11799,6 +12104,7 @@
         const READER_PARA_INDENT_KEY = 'linguaspace_reader_para_indent_v1';
         const READER_THEME_KEY = 'linguaspace_reader_theme_v1';
         const READER_QUICK_MATCH_LOG_KEY = 'linguaspace_reader_quick_match_log_v1';
+        const READER_HL_ONLY_KEY = 'linguaspace_reader_hl_only_v1';
         const TRAIN_OSK_EXPANDED_KEY = 'linguaspace_train_osk_expanded_v1';
         const SHOW_TRAIN_DUE_BADGES_KEY = 'linguaspace_show_train_due_badges_v1';
         const TRAIN_DUE_INDICATOR_KEY = 'linguaspace_train_due_indicator_v1';
@@ -14634,6 +14940,8 @@
         let readerSaveSource = null;
         let readerQuickMatchEnabled = localStorage.getItem(READER_QUICK_MATCH_KEY) === '1';
         let readerParaIndent = localStorage.getItem(READER_PARA_INDENT_KEY) === '1';
+        let readerHighlightsOnly = localStorage.getItem(READER_HL_ONLY_KEY) === '1';
+        let readerPageHeadingStarts = [];
         let readerTheme = (() => {
             const v = localStorage.getItem(READER_THEME_KEY) || '';
             return v === 'warm' || v === 'dark' ? v : '';
@@ -19873,10 +20181,89 @@
             } catch (_) {}
         }
         function looksLikeMaterialHtml(s) {
-            return /<\/?(?:b|strong|i|em|u|mark|h[1-3]|p|div|br|span)\b/i.test(String(s || ''));
+            return /<\/?(?:b|strong|i|em|u|mark|h[1-3]|p|div|br|span|table|thead|tbody|tr|th|td|ul|ol|li)\b/i.test(String(s || ''));
         }
         function isWikiHeadingLine(line) {
             return /^(=+)\s*.+\s*\1\s*$/.test(String(line || '').trim());
+        }
+        function matchMarkdownBulletLine(line) {
+            // Require marker + whitespace so "*note" / "**bold**" stay untouched
+            const m = /^ {0,3}([*+-])[ \t]+(.+)$/.exec(String(line || '').replace(/\u00a0/g, ' '));
+            if (!m) return null;
+            const body = String(m[2] || '').trim();
+            if (!body) return null;
+            return { marker: m[1], body };
+        }
+        function textHasMarkdownList(s) {
+            const lines = String(s || '').replace(/\r\n/g, '\n').split('\n');
+            let run = 0;
+            for (const line of lines) {
+                if (matchMarkdownBulletLine(line)) {
+                    run += 1;
+                    if (run >= 2) return true;
+                } else if (String(line || '').trim()) {
+                    run = 0;
+                }
+            }
+            return false;
+        }
+        function buildMarkdownListHtml(items) {
+            if (!items || items.length < 2) return '';
+            let html = '<ul class="md-list">';
+            items.forEach((body) => {
+                html += `<li>${formatInlineMarkdown(body)}</li>`;
+            });
+            html += '</ul>';
+            return html;
+        }
+        function isMarkdownTableRowLine(line) {
+            const t = String(line || '').replace(/\u00a0/g, ' ').trim();
+            if (!t.startsWith('|') || t.indexOf('|', 1) < 0) return false;
+            return !isMarkdownTableSepLine(t);
+        }
+        function isMarkdownTableSepLine(line) {
+            const t = String(line || '').replace(/\u00a0/g, ' ').trim();
+            if (!t.includes('|') || !/-{3,}/.test(t)) return false;
+            const cells = splitMarkdownTableRow(t);
+            return cells.length > 0 && cells.every((c) => /^:?-{3,}:?$/.test(String(c || '').trim()));
+        }
+        function splitMarkdownTableRow(line) {
+            let t = String(line || '').replace(/\u00a0/g, ' ').trim();
+            if (t.startsWith('|')) t = t.slice(1);
+            if (t.endsWith('|')) t = t.slice(0, -1);
+            return t.split('|').map((c) => c.trim());
+        }
+        function textHasMarkdownTable(s) {
+            const lines = String(s || '').replace(/\r\n/g, '\n').split('\n');
+            for (let i = 0; i < lines.length; i += 1) {
+                const a = String(lines[i] || '').trim();
+                if (!(a.startsWith('|') && a.includes('|', 1))) continue;
+                let j = i + 1;
+                while (j < lines.length && !String(lines[j] || '').trim()) j += 1;
+                if (j < lines.length && isMarkdownTableSepLine(lines[j])) return true;
+            }
+            return false;
+        }
+        function buildMarkdownTableHtml(rows) {
+            if (!rows || !rows.length) return '';
+            const cols = Math.max(1, ...rows.map((r) => r.length));
+            const norm = rows.map((r) => {
+                const copy = r.slice(0, cols);
+                while (copy.length < cols) copy.push('');
+                return copy;
+            });
+            const head = norm[0];
+            const body = norm.slice(1);
+            let html = `<div class="md-table-wrap" data-cols="${cols}"><table class="md-table"><thead><tr>`;
+            head.forEach((c) => { html += `<th>${formatInlineMarkdown(c)}</th>`; });
+            html += '</tr></thead><tbody>';
+            body.forEach((row) => {
+                html += '<tr>';
+                row.forEach((c) => { html += `<td>${formatInlineMarkdown(c)}</td>`; });
+                html += '</tr>';
+            });
+            html += '</tbody></table></div>';
+            return html;
         }
         function materialTextHasMarkup(text) {
             const s = String(text || '');
@@ -19885,7 +20272,9 @@
                 || /__[^\n]+__/.test(s)
                 || /^={1,6}\s*.+\s*={1,6}\s*$/m.test(s)
                 || /^ {0,3}>/m.test(s)
-                || /\$\\[A-Za-z]+\$/.test(s);
+                || /\$\\[A-Za-z]+\$/.test(s)
+                || textHasMarkdownTable(s)
+                || textHasMarkdownList(s);
         }
         function isMarkdownQuoteLine(line) {
             return /^ {0,3}>/.test(String(line || ''));
@@ -20006,6 +20395,63 @@
                     i += 1;
                     continue;
                 }
+
+                // Markdown pipe tables
+                const look = trimmed.trim();
+                if (look.startsWith('|') && look.includes('|', 1)) {
+                    let sepIdx = i + 1;
+                    while (sepIdx < lines.length && !String(lines[sepIdx] || '').trim()) sepIdx += 1;
+                    if (sepIdx < lines.length && isMarkdownTableSepLine(lines[sepIdx])) {
+                        const rows = [splitMarkdownTableRow(look)];
+                        i = sepIdx + 1;
+                        while (i < lines.length) {
+                            let ln = lines[i].replace(/\s+$/, '').trim();
+                            if (!ln) {
+                                let k = i + 1;
+                                while (k < lines.length && !String(lines[k] || '').trim()) k += 1;
+                                const peek = String(lines[k] || '').trim();
+                                if (peek.startsWith('|') && peek.includes('|', 1) && !isMarkdownTableSepLine(peek)) {
+                                    i = k;
+                                    ln = peek;
+                                } else break;
+                            }
+                            if (!ln.startsWith('|') || !ln.includes('|', 1) || isMarkdownTableSepLine(ln)) break;
+                            rows.push(splitMarkdownTableRow(ln));
+                            i += 1;
+                        }
+                        out.push(buildMarkdownTableHtml(rows));
+                        continue;
+                    }
+                }
+
+                // Markdown bullet lists (* / - / +) — only runs of 2+ items
+                const bullet0 = matchMarkdownBulletLine(trimmed);
+                if (bullet0) {
+                    const items = [bullet0.body];
+                    let j = i + 1;
+                    while (j < lines.length) {
+                        const ln = lines[j].replace(/\s+$/, '');
+                        if (!ln.trim()) {
+                            let k = j + 1;
+                            while (k < lines.length && !String(lines[k] || '').trim()) k += 1;
+                            if (k < lines.length && matchMarkdownBulletLine(lines[k])) {
+                                j = k;
+                                continue;
+                            }
+                            break;
+                        }
+                        const b = matchMarkdownBulletLine(ln);
+                        if (!b) break;
+                        items.push(b.body);
+                        j += 1;
+                    }
+                    if (items.length >= 2) {
+                        out.push(buildMarkdownListHtml(items));
+                        i = j;
+                        continue;
+                    }
+                }
+
                 const wm = /^(=+)\s*(.+?)\s*\1\s*$/.exec(trimmed.trim());
                 if (wm) {
                     const level = Math.min(wm[1].length, 3);
@@ -20024,6 +20470,89 @@
                 i += 1;
             }
             return out.join('');
+        }
+        /** Convert markdown pipe-table lines already in the editor into real HTML tables. */
+        function normalizeMarkdownTablesInMaterialHtml(html) {
+            const root = document.createElement('div');
+            root.innerHTML = String(html || '');
+            if (!root.innerHTML.trim()) return '';
+
+            const items = [];
+            [...root.childNodes].forEach((n) => {
+                if (n.nodeType === 3) {
+                    const t = String(n.textContent || '').replace(/\u00a0/g, ' ');
+                    if (!t.trim()) return;
+                    t.split(/\n/).forEach((part) => items.push({ node: n, text: part }));
+                } else if (n.nodeType === 1) {
+                    if (n.tagName === 'BR') items.push({ node: n, text: '' });
+                    else if (/^(P|DIV)$/i.test(n.tagName) && !n.querySelector('table, p, div, h1, h2, h3') && /<br\s*\/?>/i.test(n.innerHTML)) {
+                        n.innerHTML.split(/<br\s*\/?>/i).forEach((seg) => {
+                            const d = document.createElement('div');
+                            d.innerHTML = seg;
+                            items.push({ node: n, text: String(d.textContent || '').replace(/\u00a0/g, ' '), shared: true });
+                        });
+                    } else if (/^(P|DIV)$/i.test(n.tagName) && !n.querySelector('table')) {
+                        items.push({ node: n, text: String(n.textContent || '').replace(/\u00a0/g, ' ') });
+                    } else {
+                        items.push({ node: n, text: '', keep: true });
+                    }
+                }
+            });
+
+            const runs = [];
+            let i = 0;
+            while (i < items.length - 1) {
+                if (items[i].keep) { i += 1; continue; }
+                const a = String(items[i].text || '').trim();
+                if (!(a.startsWith('|') && a.includes('|', 1))) { i += 1; continue; }
+                let sepAt = i + 1;
+                while (sepAt < items.length && !String(items[sepAt].text || '').trim() && !items[sepAt].keep) sepAt += 1;
+                const b = String(items[sepAt]?.text || '').trim();
+                if (sepAt < items.length && !items[sepAt].keep && isMarkdownTableSepLine(b)) {
+                    let j = sepAt + 1;
+                    const rowTexts = [a];
+                    while (j < items.length) {
+                        let t = String(items[j].text || '').trim();
+                        if (!t) {
+                            let k = j + 1;
+                            while (k < items.length && !String(items[k].text || '').trim() && !items[k].keep) k += 1;
+                            const peek = String(items[k]?.text || '').trim();
+                            if (!items[k]?.keep && peek.startsWith('|') && peek.includes('|', 1) && !isMarkdownTableSepLine(peek)) {
+                                j = k;
+                                t = peek;
+                            } else break;
+                        }
+                        if (items[j].keep) break;
+                        if (!t.startsWith('|') || !t.includes('|', 1) || isMarkdownTableSepLine(t)) break;
+                        rowTexts.push(t);
+                        j += 1;
+                    }
+                    runs.push({ start: i, end: j, rows: rowTexts.map(splitMarkdownTableRow) });
+                    i = j;
+                    continue;
+                }
+                i += 1;
+            }
+            if (!runs.length) return root.innerHTML;
+
+            for (let r = runs.length - 1; r >= 0; r -= 1) {
+                const { start, end, rows } = runs[r];
+                const wrap = document.createElement('div');
+                wrap.innerHTML = buildMarkdownTableHtml(rows);
+                const frag = document.createDocumentFragment();
+                while (wrap.firstChild) frag.appendChild(wrap.firstChild);
+                const first = items[start].node;
+                if (!first.parentNode) continue;
+                first.parentNode.insertBefore(frag, first);
+                const removed = new Set();
+                for (let k = start; k < end; k += 1) {
+                    const n = items[k].node;
+                    if (removed.has(n)) continue;
+                    removed.add(n);
+                    if (n.parentNode) n.remove();
+                }
+            }
+            return root.innerHTML;
         }
         /** Convert consecutive markdown quote lines ("> …") already in the editor into italic paragraphs. */
         function normalizeMarkdownQuotesInMaterialHtml(html) {
@@ -20126,8 +20655,91 @@
             }
             return root.innerHTML;
         }
+        /** Convert markdown bullet lines (* / -) already in the editor into real lists (2+ items only). */
+        function normalizeMarkdownListsInMaterialHtml(html) {
+            const root = document.createElement('div');
+            root.innerHTML = String(html || '');
+            if (!root.innerHTML.trim()) return '';
+
+            const items = [];
+            [...root.childNodes].forEach((n) => {
+                if (n.nodeType === 3) {
+                    const t = String(n.textContent || '').replace(/\u00a0/g, ' ');
+                    if (!t.trim()) return;
+                    t.split(/\n/).forEach((part) => items.push({ node: n, text: part }));
+                } else if (n.nodeType === 1) {
+                    if (n.tagName === 'BR') items.push({ node: n, text: '' });
+                    else if (/^(UL|OL)$/i.test(n.tagName)) items.push({ node: n, text: '', keep: true });
+                    else if (/^(P|DIV)$/i.test(n.tagName) && !n.querySelector('table, ul, ol, p, div, h1, h2, h3') && /<br\s*\/?>/i.test(n.innerHTML)) {
+                        n.innerHTML.split(/<br\s*\/?>/i).forEach((seg) => {
+                            const d = document.createElement('div');
+                            d.innerHTML = seg;
+                            items.push({ node: n, text: String(d.textContent || '').replace(/\u00a0/g, ' '), shared: true });
+                        });
+                    } else if (/^(P|DIV)$/i.test(n.tagName) && !n.querySelector('table, ul, ol')) {
+                        items.push({ node: n, text: String(n.textContent || '').replace(/\u00a0/g, ' ') });
+                    } else {
+                        items.push({ node: n, text: '', keep: true });
+                    }
+                }
+            });
+
+            const runs = [];
+            let i = 0;
+            while (i < items.length) {
+                if (items[i].keep) { i += 1; continue; }
+                const first = matchMarkdownBulletLine(items[i].text);
+                if (!first) { i += 1; continue; }
+                const bodies = [first.body];
+                let j = i + 1;
+                while (j < items.length) {
+                    if (items[j].keep) break;
+                    const t = String(items[j].text || '').trim();
+                    if (!t) {
+                        let k = j + 1;
+                        while (k < items.length && !String(items[k].text || '').trim() && !items[k].keep) k += 1;
+                        if (k < items.length && !items[k].keep && matchMarkdownBulletLine(items[k].text)) {
+                            j = k;
+                            continue;
+                        }
+                        break;
+                    }
+                    const b = matchMarkdownBulletLine(items[j].text);
+                    if (!b) break;
+                    bodies.push(b.body);
+                    j += 1;
+                }
+                if (bodies.length >= 2) runs.push({ start: i, end: j, bodies });
+                i = Math.max(j, i + 1);
+            }
+            if (!runs.length) return root.innerHTML;
+
+            for (let r = runs.length - 1; r >= 0; r -= 1) {
+                const { start, end, bodies } = runs[r];
+                const wrap = document.createElement('div');
+                wrap.innerHTML = buildMarkdownListHtml(bodies);
+                const frag = document.createDocumentFragment();
+                while (wrap.firstChild) frag.appendChild(wrap.firstChild);
+                const firstNode = items[start].node;
+                if (!firstNode.parentNode) continue;
+                firstNode.parentNode.insertBefore(frag, firstNode);
+                const removed = new Set();
+                for (let k = start; k < end; k += 1) {
+                    const n = items[k].node;
+                    if (removed.has(n)) continue;
+                    removed.add(n);
+                    if (n.parentNode) n.remove();
+                }
+            }
+            return root.innerHTML;
+        }
         function sanitizeMaterialHtml(html) {
-            const allowed = { B: 1, STRONG: 1, I: 1, EM: 1, U: 1, MARK: 1, H1: 1, H2: 1, H3: 1, P: 1, BR: 1, DIV: 1 };
+            const allowed = {
+                B: 1, STRONG: 1, I: 1, EM: 1, U: 1, MARK: 1,
+                H1: 1, H2: 1, H3: 1, P: 1, BR: 1, DIV: 1,
+                TABLE: 1, THEAD: 1, TBODY: 1, TR: 1, TH: 1, TD: 1,
+                UL: 1, OL: 1, LI: 1
+            };
             const tmp = document.createElement('div');
             tmp.innerHTML = String(html || '');
             function appendKids(target, kids) {
@@ -20170,6 +20782,15 @@
                     return frag;
                 }
                 const el = document.createElement(node.tagName.toLowerCase());
+                if (node.tagName === 'DIV' && /md-table-wrap/i.test(cls)) {
+                    el.className = 'md-table-wrap';
+                    const cols = node.getAttribute('data-cols');
+                    if (cols) el.setAttribute('data-cols', cols);
+                } else if (node.tagName === 'TABLE') {
+                    el.className = 'md-table';
+                } else if (node.tagName === 'UL' && /md-list/i.test(cls)) {
+                    el.className = 'md-list';
+                }
                 appendKids(el, kids);
                 return el;
             }
@@ -20185,7 +20806,13 @@
         function materialHtmlFromStored(s) {
             if (!s) return '';
             const html = looksLikeMaterialHtml(s) ? sanitizeMaterialHtml(s) : markdownToHtml(s);
-            return normalizeLatexSymbolsInMaterialHtml(normalizeMarkdownQuotesInMaterialHtml(html));
+            return normalizeLatexSymbolsInMaterialHtml(
+                normalizeMarkdownListsInMaterialHtml(
+                    normalizeMarkdownTablesInMaterialHtml(
+                        normalizeMarkdownQuotesInMaterialHtml(html)
+                    )
+                )
+            );
         }
         function setMaterialEditorContent(id, raw) {
             const el = document.getElementById(id);
@@ -20200,7 +20827,11 @@
             const el = document.getElementById(id);
             if (!el) return '';
             const html = normalizeLatexSymbolsInMaterialHtml(
-                normalizeMarkdownQuotesInMaterialHtml(sanitizeMaterialHtml(el.innerHTML))
+                normalizeMarkdownListsInMaterialHtml(
+                    normalizeMarkdownTablesInMaterialHtml(
+                        normalizeMarkdownQuotesInMaterialHtml(sanitizeMaterialHtml(el.innerHTML))
+                    )
+                )
             ).trim();
             if (!html || html === '<br>' || html === '<p><br></p>' || html === '<p></p>') return '';
             return html;
@@ -20217,7 +20848,7 @@
         function plainPasteToMaterialHtml(text) {
             const trimmed = normalizeLatexSymbolsInText(String(text || '').trim());
             if (!trimmed) return '';
-            if (materialTextHasMarkup(trimmed) || /^ {0,3}>/m.test(trimmed) || textHasLatexSymbols(String(text || ''))) {
+            if (materialTextHasMarkup(trimmed) || /^ {0,3}>/m.test(trimmed) || textHasLatexSymbols(String(text || '')) || textHasMarkdownTable(String(text || '')) || textHasMarkdownList(String(text || ''))) {
                 return markdownToHtml(String(text || '').trim());
             }
             const paras = trimmed.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
@@ -20526,7 +21157,7 @@
                 if (!text) return;
                 const parsed = parseLinguaSpaceTitlePaste(text);
                 const bodyText = parsed.title ? parsed.body : text;
-                const shouldSmartPaste = parsed.title || materialTextHasMarkup(bodyText) || /\n\s*\n/.test(bodyText) || /^ {0,3}>/m.test(bodyText) || textHasLatexSymbols(bodyText);
+                const shouldSmartPaste = parsed.title || materialTextHasMarkup(bodyText) || /\n\s*\n/.test(bodyText) || /^ {0,3}>/m.test(bodyText) || textHasLatexSymbols(bodyText) || textHasMarkdownTable(bodyText) || textHasMarkdownList(bodyText);
                 if (!shouldSmartPaste) return;
                 e.preventDefault();
                 const titleEl = id === 'material-content'
@@ -22134,6 +22765,225 @@
             if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
+        window.setReaderHighlightsOnly = (on) => {
+            readerHighlightsOnly = !!on;
+            try { localStorage.setItem(READER_HL_ONLY_KEY, readerHighlightsOnly ? '1' : '0'); } catch (_) {}
+            syncReaderHighlightsOnlyUi();
+            if (document.getElementById('library-read-view') && !document.getElementById('library-read-view').classList.contains('hidden')) {
+                renderReaderContent();
+            }
+        };
+
+        function syncReaderHighlightsOnlyUi() {
+            const cb = document.getElementById('reader-hl-only-toggle');
+            if (cb) cb.checked = !!readerHighlightsOnly;
+            document.getElementById('library-read-view')?.classList.toggle('reader-hl-only', !!readerHighlightsOnly);
+        }
+
+        function rebuildReaderPageHeadingIndex() {
+            readerPageHeadingStarts = [];
+            if (!readerPages.length || currentMaterial?.subtitles) {
+                readerPageHeadingStarts = readerPages.map(() => ({ h1: '', h2: '', h3: '' }));
+                return;
+            }
+            let h1 = '', h2 = '', h3 = '';
+            readerPages.forEach((pageHtml) => {
+                readerPageHeadingStarts.push({ h1, h2, h3 });
+                const root = document.createElement('div');
+                root.innerHTML = String(pageHtml || '');
+                root.querySelectorAll('h1, h2, h3').forEach((el) => {
+                    const text = (el.textContent || '').replace(/\s+/g, ' ').trim();
+                    if (!text) return;
+                    if (el.tagName === 'H1') { h1 = text; h2 = ''; h3 = ''; }
+                    else if (el.tagName === 'H2') { h2 = text; h3 = ''; }
+                    else { h3 = text; }
+                });
+            });
+        }
+
+        function resolveReaderHeadingsAtOffset(pageNum, offset) {
+            const idx = Math.max(0, (pageNum || 1) - 1);
+            const base = readerPageHeadingStarts[idx] || { h1: '', h2: '', h3: '' };
+            let h1 = base.h1, h2 = base.h2, h3 = base.h3;
+            if (currentMaterial?.subtitles) return [h1, h2, h3].filter(Boolean);
+            const root = document.createElement('div');
+            root.innerHTML = String(readerPages[idx] || '');
+            const target = Math.max(0, Number(offset) || 0);
+            let pos = 0;
+            const visit = (node) => {
+                if (pos >= target) return true;
+                if (node.nodeType === 3) {
+                    pos += node.textContent.length;
+                    return pos >= target;
+                }
+                if (node.nodeType !== 1) return false;
+                if (/^H[123]$/i.test(node.tagName)) {
+                    const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
+                    const len = (node.textContent || '').length;
+                    if (pos + len <= target && text) {
+                        if (node.tagName === 'H1') { h1 = text; h2 = ''; h3 = ''; }
+                        else if (node.tagName === 'H2') { h2 = text; h3 = ''; }
+                        else { h3 = text; }
+                    }
+                    pos += len;
+                    return pos >= target;
+                }
+                for (const child of node.childNodes) {
+                    if (visit(child)) return true;
+                }
+                return false;
+            };
+            visit(root);
+            return [h1, h2, h3].filter(Boolean);
+        }
+
+        function collectReaderHighlightDigestItems() {
+            const items = [];
+            const total = Math.max(1, readerTotalPages || 1);
+            for (let p = 1; p <= total; p += 1) {
+                const list = getReaderHighlightsForPage(p)
+                    .slice()
+                    .sort((a, b) => (a.start || 0) - (b.start || 0));
+                list.forEach((h) => {
+                    const text = String(h?.text || '').trim();
+                    if (!text) return;
+                    items.push({
+                        page: p,
+                        text,
+                        headings: resolveReaderHeadingsAtOffset(p, h.start || 0)
+                    });
+                });
+            }
+            return items;
+        }
+
+        function renderHighlightsOnlyHtml() {
+            const items = collectReaderHighlightDigestItems();
+            if (!items.length) {
+                return `<div class="reader-hl-digest-empty" data-reader-ui="1">${escapeHtmlText(t('reader.hlOnlyEmpty'))}</div>`;
+            }
+            let lastHeadKey = null;
+            let html = '<div class="reader-hl-digest" data-reader-ui="1">';
+            items.forEach((it) => {
+                const headKey = it.headings.join('\0');
+                if (headKey && headKey !== lastHeadKey) {
+                    html += '<div class="reader-hl-digest-ctx">';
+                    it.headings.forEach((h) => {
+                        html += `<div class="reader-hl-digest-h">${escapeHtmlText(h)}</div>`;
+                    });
+                    html += '</div>';
+                    lastHeadKey = headKey;
+                } else if (!headKey) {
+                    lastHeadKey = '';
+                }
+                html += `<figure class="reader-hl-digest-item">
+                    <blockquote class="reader-hl-digest-quote"><mark class="reader-hl reader-hl-book">${escapeHtmlText(it.text)}</mark></blockquote>
+                    <button type="button" class="reader-hl-digest-page" onclick="goToReaderPageFromDigest(${it.page})">${escapeHtmlText(t('reader.hlOnlyPage', { n: it.page }))}</button>
+                </figure>`;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function fillReaderPageInfoEl(el) {
+            if (!el) return;
+            if (el.querySelector('.reader-page-jump-input')) return;
+            el.innerHTML = `<span class="reader-page-info-inner">
+                <span class="reader-page-label">${escapeHtmlText(t('reader.pageWord'))}</span>
+                <button type="button" class="reader-page-num" onclick="startReaderPageJump(event, this)" title="${escapeHtmlText(t('reader.jumpPage'))}" aria-label="${escapeHtmlText(t('reader.jumpPage'))}">${readerCurrentPage}</button>
+                <span class="reader-page-of">${escapeHtmlText(t('reader.pageOf'))}</span>
+                <span class="reader-page-total">${readerTotalPages}</span>
+            </span>`;
+        }
+
+        function syncReaderPageChrome() {
+            const atFirst = readerCurrentPage === 1;
+            const atLast = readerCurrentPage === readerTotalPages;
+            const multiPage = readerTotalPages > 1 && !readerHighlightsOnly;
+
+            const bot = document.getElementById('reader-pagination');
+            const prev = document.getElementById('btn-reader-prev');
+            const next = document.getElementById('btn-reader-next');
+            if (bot) bot.classList.toggle('hidden', !multiPage);
+            if (prev) prev.disabled = atFirst;
+            if (next) next.disabled = atLast;
+            fillReaderPageInfoEl(document.getElementById('reader-page-info'));
+
+            const topBar = document.getElementById('reader-pagination-top');
+            const topPrev = document.getElementById('btn-reader-prev-top');
+            const topNext = document.getElementById('btn-reader-next-top');
+            if (topBar) topBar.classList.toggle('hidden', !multiPage || atFirst);
+            if (topPrev) topPrev.disabled = atFirst;
+            if (topNext) topNext.disabled = atLast;
+            fillReaderPageInfoEl(document.getElementById('reader-page-info-top'));
+        }
+
+        window.goToReaderPage = (pageNum, opts = {}) => {
+            const n = parseInt(pageNum, 10);
+            if (!Number.isFinite(n) || n < 1 || n > readerTotalPages) return false;
+            if (n === readerCurrentPage && !opts.force) {
+                syncReaderPageChrome();
+                return true;
+            }
+            if (activeUid && currentMaterial) {
+                updateDoc(docRef('materials', currentMaterial.id), {
+                    lastPage: n
+                }).catch((err) => console.error(err));
+                currentMaterial.lastPage = n;
+            }
+            readerCurrentPage = n;
+            renderReaderContent();
+            if (!opts.noScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+            return true;
+        };
+
+        window.goToReaderPageFromDigest = (pageNum) => {
+            readerHighlightsOnly = false;
+            try { localStorage.setItem(READER_HL_ONLY_KEY, '0'); } catch (_) {}
+            syncReaderHighlightsOnlyUi();
+            goToReaderPage(pageNum, { force: true });
+        };
+
+        window.startReaderPageJump = (e, btn) => {
+            if (e) e.stopPropagation();
+            if (!btn || readerTotalPages <= 1 || readerHighlightsOnly) return;
+            const host = btn.closest('.reader-page-info') || btn.parentElement;
+            if (!host) return;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.inputMode = 'numeric';
+            input.pattern = '[0-9]*';
+            input.className = 'reader-page-jump-input';
+            input.value = String(readerCurrentPage);
+            input.setAttribute('aria-label', t('reader.jumpPage'));
+            const cancel = () => {
+                fillReaderPageInfoEl(host);
+            };
+            const commit = () => {
+                const n = parseInt(String(input.value || '').trim(), 10);
+                if (!goToReaderPage(n)) fillReaderPageInfoEl(host);
+            };
+            input.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Enter') {
+                    ev.preventDefault();
+                    commit();
+                } else if (ev.key === 'Escape') {
+                    ev.preventDefault();
+                    cancel();
+                }
+            });
+            input.addEventListener('blur', () => {
+                // Blur without Enter cancels — avoids accidental jumps
+                setTimeout(() => {
+                    if (host.contains(input)) cancel();
+                }, 0);
+            });
+            host.innerHTML = '';
+            host.appendChild(input);
+            input.focus();
+            input.select();
+        };
+
         const READER_THEME_CYCLE = ['', 'warm', 'dark'];
         const READER_THEME_ICON = { '': '📖', warm: '💡', dark: '🌙' };
         const READER_THEME_I18N = { '': 'reader.themeNormal', warm: 'reader.themeWarm', dark: 'reader.themeDark' };
@@ -22971,6 +23821,7 @@
         }
 
         function handleReaderHighlightSelection(range) {
+            if (readerHighlightsOnly) return;
             const offsets = getRawRangeOffsetsInReader(range);
             if (!offsets || offsets.text.length > 600) return;
             const materialId = currentMaterial?.id;
@@ -23118,6 +23969,7 @@
             resetReaderSessionWords();
             syncReaderQuickMatchUi();
             syncReaderParaIndentUi();
+            syncReaderHighlightsOnlyUi();
             readerAudioStore = {};
             readerAudioSeq = 0;
             stopReaderAudioPlayback();
@@ -23146,6 +23998,7 @@
                 readerPages = paginateTextMaterial(m.content, 8000);
             }
             readerTotalPages = readerPages.length;
+            rebuildReaderPageHeadingIndex();
             
             readerCurrentPage = m.lastPage && m.lastPage <= readerTotalPages ? m.lastPage : 1;
 
@@ -23872,18 +24725,7 @@
         }
 
         window.changeReaderPage = (direction) => {
-            const newPage = readerCurrentPage + direction;
-            if (newPage >= 1 && newPage <= readerTotalPages) {
-                if (activeUid && currentMaterial) {
-                    updateDoc(docRef('materials', currentMaterial.id), {
-                        lastPage: newPage
-                    }).catch(err => console.error(err));
-                    currentMaterial.lastPage = newPage;
-                }
-                readerCurrentPage = newPage;
-                renderReaderContent();
-                window.scrollTo({top: 0, behavior: 'smooth'});
-            }
+            goToReaderPage(readerCurrentPage + direction);
         };
 
         window.markCurrentAsRead = async () => {
@@ -25000,6 +25842,13 @@
             const container = document.getElementById('reader-content'); 
             const savedLexicon = buildReaderSavedLexicon(vocabulary, currentMaterial?.id);
             const wordOccMap = new Map();
+
+            if (readerHighlightsOnly) {
+                currentSubtitlesLyricMode = false;
+                container.innerHTML = renderHighlightsOnlyHtml();
+                syncReaderPageChrome();
+                return;
+            }
             
             const currentPageData = readerPages[readerCurrentPage - 1];
 
@@ -25023,26 +25872,7 @@
             }
 
             applyStoredHighlightsToReader();
-
-            const pageText = pageLabel(readerCurrentPage, readerTotalPages);
-            const atFirst = readerCurrentPage === 1;
-            const atLast = readerCurrentPage === readerTotalPages;
-            const multiPage = readerTotalPages > 1;
-
-            document.getElementById('reader-page-info').textContent = pageText;
-            document.getElementById('btn-reader-prev').disabled = atFirst;
-            document.getElementById('btn-reader-next').disabled = atLast;
-            document.getElementById('reader-pagination').classList.toggle('hidden', !multiPage);
-
-            // Top prev/next: only from page 2 (handy after scrolling a long page)
-            const topBar = document.getElementById('reader-pagination-top');
-            const topInfo = document.getElementById('reader-page-info-top');
-            const topPrev = document.getElementById('btn-reader-prev-top');
-            const topNext = document.getElementById('btn-reader-next-top');
-            if (topBar) topBar.classList.toggle('hidden', !multiPage || atFirst);
-            if (topInfo) topInfo.textContent = pageText;
-            if (topPrev) topPrev.disabled = atFirst;
-            if (topNext) topNext.disabled = atLast;
+            syncReaderPageChrome();
         }
 
         const inlinePopup = document.getElementById('inline-popup');
