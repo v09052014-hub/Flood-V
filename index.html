@@ -700,6 +700,182 @@
             color: #4f46e5;
             box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.12);
         }
+        .reader-hl-only-glyph {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            line-height: 1;
+            color: #94a3b8;
+        }
+        .reader-hl-only-glyph .hl-b {
+            margin: 0 0.01em;
+            padding: 0.02em 0.06em;
+            border-radius: 0.15em;
+            background: rgba(250, 204, 21, 0.72);
+            color: #0f172a;
+            font-weight: 700;
+        }
+        #reader-hl-only-btn.reader-settings-icon-btn {
+            min-width: 2.15rem;
+            padding: 0 0.4rem;
+        }
+        .reader-settings-icon-btn.is-active .reader-hl-only-glyph {
+            color: #94a3b8;
+        }
+        .reader-settings-icon-btn.is-active .reader-hl-only-glyph .hl-b {
+            background: rgba(250, 204, 21, 0.9);
+            color: #0f172a;
+        }
+        .reader-toc-glyph {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+        .reader-layout {
+            display: block;
+            width: 100%;
+        }
+        .reader-main-col {
+            min-width: 0;
+            width: 100%;
+        }
+        .reader-toc-rail {
+            display: none;
+        }
+        .reader-toc-mobile {
+            display: none;
+            margin: 0 0 0.85rem;
+        }
+        #library-read-view.reader-toc-on .reader-toc-mobile {
+            display: block;
+        }
+        #library-read-view.reader-toc-on.reader-hl-only .reader-toc-mobile,
+        #library-read-view.reader-toc-on.reader-hl-only .reader-toc-rail {
+            display: none !important;
+        }
+        .reader-toc-mobile-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.7rem 0.9rem;
+            border-radius: 0.85rem;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .reader-toc-mobile-toggle:hover { background: #f1f5f9; color: #475569; }
+        .reader-toc-mobile-panel {
+            margin-top: 0.45rem;
+            max-height: 14rem;
+            overflow-y: auto;
+            border-radius: 0.85rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            padding: 0.35rem;
+        }
+        .reader-toc-mobile-panel.hidden { display: none; }
+        .reader-toc-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .reader-toc-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            font-weight: 600;
+            line-height: 1.35;
+            padding: 0.45rem 0.55rem;
+            border-radius: 0.45rem;
+            overflow-wrap: anywhere;
+        }
+        .reader-toc-item:hover {
+            background: #f8fafc;
+            color: #64748b;
+        }
+        .reader-toc-item.is-active {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+        .reader-toc-item.is-part {
+            font-weight: 800;
+            text-transform: none;
+            color: #64748b;
+            margin-top: 0.35rem;
+        }
+        .reader-toc-item.is-chapter { font-weight: 700; }
+        .reader-toc-item.is-h2 { padding-left: 0.85rem; }
+        .reader-toc-item.is-h3 { padding-left: 1.2rem; font-size: 0.74rem; }
+        .reader-toc-empty {
+            padding: 0.65rem;
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        @media (min-width: 960px) {
+            #library-read-view.reader-toc-on .reader-layout {
+                display: grid;
+                grid-template-columns: 10.5rem minmax(0, 1fr);
+                gap: 0.85rem;
+                align-items: start;
+            }
+            #library-read-view.reader-toc-on .reader-toc-rail {
+                display: block;
+                position: sticky;
+                top: 4.5rem;
+                max-height: calc(100vh - 5.5rem);
+                overflow-y: auto;
+                padding: 0.55rem 0.35rem;
+                border-radius: 0.85rem;
+                background: rgba(248, 250, 252, 0.92);
+                border: 1px solid #eef2f7;
+            }
+            #library-read-view.reader-toc-on .reader-toc-mobile { display: none; }
+            #library-read-view.reader-toc-on .reader-toc-item {
+                font-size: 0.72rem;
+                padding: 0.38rem 0.45rem;
+                color: #94a3b8;
+            }
+            #library-read-view.reader-toc-on .reader-toc-item.is-part {
+                color: #64748b;
+                font-size: 0.74rem;
+            }
+        }
+        #library-read-view.reader-theme-warm .reader-toc-rail,
+        #library-read-view.reader-theme-warm .reader-toc-mobile-toggle,
+        #library-read-view.reader-theme-warm .reader-toc-mobile-panel {
+            background: #f3e9d8;
+            border-color: #e6d9c4;
+        }
+        #library-read-view.reader-theme-warm .reader-toc-item:hover { background: #efe4d0; color: #5c4e3a; }
+        #library-read-view.reader-theme-warm .reader-toc-item.is-active { background: #e7d5b8; color: #9a3412; }
+        #library-read-view.reader-theme-dark .reader-toc-rail,
+        #library-read-view.reader-theme-dark .reader-toc-mobile-toggle,
+        #library-read-view.reader-theme-dark .reader-toc-mobile-panel {
+            background: #1c1917;
+            border-color: #44403c;
+            color: #a8a29e;
+        }
+        #library-read-view.reader-theme-dark .reader-toc-item { color: #78716c; }
+        #library-read-view.reader-theme-dark .reader-toc-item:hover { background: #292524; color: #d6d3d1; }
+        #library-read-view.reader-theme-dark .reader-toc-item.is-active { background: #292524; color: #a5b4fc; }
         .reader-settings-info-btn {
             flex-shrink: 0;
             width: 1.25rem;
@@ -1055,6 +1231,83 @@
             background: #a5b4fc;
             box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.16);
         }
+        .material-editor blockquote.md-quote,
+        .text-reader blockquote.md-quote {
+            margin: 0.85rem 0 1rem;
+            padding: 0.55rem 0 0.55rem 1rem;
+            border-left: 3px solid #c7d2fe;
+            color: #475569;
+            font-style: italic;
+            text-align: left;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.06), transparent 70%);
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .material-editor blockquote.md-quote p,
+        .text-reader blockquote.md-quote p {
+            margin: 0 0 0.55rem;
+            text-align: left;
+        }
+        .material-editor blockquote.md-quote p:last-child,
+        .text-reader blockquote.md-quote p:last-child { margin-bottom: 0; }
+        .material-editor blockquote.md-quote.md-quote--verse p,
+        .text-reader blockquote.md-quote.md-quote--verse p {
+            margin-bottom: 0.2rem;
+        }
+        .material-editor .md-footnote,
+        .text-reader .md-footnote {
+            margin: 0.35rem 0 0.85rem;
+            padding: 0.45rem 0.65rem 0.45rem 0.75rem;
+            font-size: 0.86em;
+            line-height: 1.45;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 0.55rem;
+            border: 1px solid #eef2f7;
+            text-align: left;
+            font-style: normal;
+        }
+        .material-editor .md-fn-mark,
+        .material-editor .md-fn-ref,
+        .text-reader .md-fn-mark,
+        .text-reader .md-fn-ref {
+            font-size: 0.75em;
+            font-weight: 800;
+            color: #6366f1;
+            font-style: normal;
+            line-height: 0;
+        }
+        .material-editor .md-fn-mark,
+        .text-reader .md-fn-mark {
+            margin-right: 0.35em;
+        }
+        .material-editor .md-fn-ref,
+        .text-reader .md-fn-ref {
+            padding-left: 0.05em;
+        }
+        #library-read-view.reader-theme-warm blockquote.md-quote {
+            border-left-color: #d6b98c;
+            color: #5c4e3a;
+            background: linear-gradient(90deg, rgba(180, 83, 9, 0.08), transparent 70%);
+        }
+        #library-read-view.reader-theme-warm .md-footnote {
+            background: #f3e9d8;
+            border-color: #e6d9c4;
+            color: #6b5b45;
+        }
+        #library-read-view.reader-theme-warm .md-fn-mark,
+        #library-read-view.reader-theme-warm .md-fn-ref { color: #b45309; }
+        #library-read-view.reader-theme-dark blockquote.md-quote {
+            border-left-color: #57534e;
+            color: #a8a29e;
+            background: linear-gradient(90deg, rgba(168, 162, 158, 0.08), transparent 70%);
+        }
+        #library-read-view.reader-theme-dark .md-footnote {
+            background: #1c1917;
+            border-color: #44403c;
+            color: #a8a29e;
+        }
+        #library-read-view.reader-theme-dark .md-fn-mark,
+        #library-read-view.reader-theme-dark .md-fn-ref { color: #a5b4fc; }
         .material-editor .md-table-wrap,
         .text-reader .md-table-wrap {
             width: 100%;
@@ -9264,6 +9517,8 @@
                     <div class="reader-settings-icon-row reader-settings-row" onclick="event.stopPropagation()">
                         <button type="button" id="reader-para-indent-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderParaIndent()" data-i18n-title="reader.paraIndent" title="Відступ першого рядка" aria-pressed="false" aria-label="Paragraph indent">¶</button>
                         <button type="button" id="reader-comfort-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); cycleReaderTheme()" data-i18n-title="reader.themeNormal" title="Звичайний вигляд" aria-pressed="false" aria-label="Reading comfort">📖</button>
+                        <button type="button" id="reader-hl-only-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderHighlightsOnly()" data-i18n-title="reader.hlOnly" title="Лише виділення" aria-pressed="false" aria-label="Highlights only"><span class="reader-hl-only-glyph" aria-hidden="true">A<span class="hl-b">B</span>C</span></button>
+                        <button type="button" id="reader-toc-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderToc()" data-i18n-title="reader.toc" title="Розділи" aria-pressed="false" aria-label="Chapters"><span class="reader-toc-glyph" aria-hidden="true">§</span></button>
                     </div>
                     <div class="reader-settings-qm-wrap" onmouseleave="hideReaderQuickMatchTip()">
                         <label class="reader-settings-toggle reader-settings-toggle--qm" onclick="event.stopPropagation()">
@@ -9275,13 +9530,6 @@
                         </label>
                         <div id="reader-quick-match-tip" class="reader-settings-tip hidden" role="tooltip"></div>
                     </div>
-                    <label class="reader-settings-toggle reader-settings-toggle--qm" onclick="event.stopPropagation()" style="margin-top:0.65rem;padding-top:0.65rem;border-top:1px solid #f1f5f9">
-                        <input type="checkbox" id="reader-hl-only-toggle" onchange="setReaderHighlightsOnly(this.checked)">
-                        <span class="reader-settings-toggle-head flex-1 min-w-0">
-                            <span class="reader-settings-toggle-title" data-i18n="reader.hlOnly">Лише виділення</span>
-                            <span class="reader-settings-toggle-hint" data-i18n="reader.hlOnlyHint">Усі маркери з книги + сірі заголовки для контексту</span>
-                        </span>
-                    </label>
                 </div>
                 
                 <div id="reader-yt-wrapper" class="w-full aspect-video bg-black rounded-xl mb-4 hidden shadow-md overflow-hidden z-[100] transition-all duration-300">
@@ -9290,20 +9538,33 @@
                 </div>
                 <button type="button" id="reader-yt-jump" onclick="jumpToActiveSubtitle()" aria-label="Current line" data-i18n-title="lib.jumpToLine" title="До поточного рядка">↓</button>
 
-                <div id="reader-pagination-top" class="hidden flex justify-between items-center bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
-                    <button type="button" onclick="changeReaderPage(-1)" id="btn-reader-prev-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.prevPage" title="Попередня сторінка">‹</button>
-                    <span id="reader-page-info-top" class="text-xs sm:text-sm font-bold text-slate-500 reader-page-info"></span>
-                    <button type="button" onclick="changeReaderPage(1)" id="btn-reader-next-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.nextPage" title="Наступна сторінка">›</button>
-                </div>
-                
-                <div id="reader-content-wrapper" class="bg-white px-3 py-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 relative mb-4 overflow-hidden">
-                    <div id="reader-content" class="text-reader" style="font-size: 18px; font-family: 'Georgia', serif;"></div>
-                </div>
+                <div id="reader-layout" class="reader-layout">
+                    <nav id="reader-toc-rail" class="reader-toc-rail" aria-label="Sections"></nav>
+                    <div id="reader-main-col" class="reader-main-col">
+                        <div id="reader-toc-mobile" class="reader-toc-mobile">
+                            <button type="button" id="reader-toc-mobile-toggle" class="reader-toc-mobile-toggle" onclick="toggleReaderTocMobilePanel()">
+                                <span data-i18n="reader.toc">Розділи</span>
+                                <span id="reader-toc-mobile-chevron">▾</span>
+                            </button>
+                            <div id="reader-toc-mobile-panel" class="reader-toc-mobile-panel hidden"></div>
+                        </div>
 
-                <div id="reader-pagination" class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
-                    <button onclick="changeReaderPage(-1)" id="btn-reader-prev" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.prevPage" title="Попередня сторінка">‹</button>
-                    <span id="reader-page-info" class="text-xs sm:text-sm font-bold text-slate-500 reader-page-info"></span>
-                    <button onclick="changeReaderPage(1)" id="btn-reader-next" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.nextPage" title="Наступна сторінка">›</button>
+                        <div id="reader-pagination-top" class="hidden flex justify-between items-center bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
+                            <button type="button" onclick="changeReaderPage(-1)" id="btn-reader-prev-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.prevPage" title="Попередня сторінка">‹</button>
+                            <span id="reader-page-info-top" class="text-xs sm:text-sm font-bold text-slate-500 reader-page-info"></span>
+                            <button type="button" onclick="changeReaderPage(1)" id="btn-reader-next-top" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.nextPage" title="Наступна сторінка">›</button>
+                        </div>
+                        
+                        <div id="reader-content-wrapper" class="bg-white px-3 py-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 relative mb-4 overflow-hidden">
+                            <div id="reader-content" class="text-reader" style="font-size: 18px; font-family: 'Georgia', serif;"></div>
+                        </div>
+
+                        <div id="reader-pagination" class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
+                            <button onclick="changeReaderPage(-1)" id="btn-reader-prev" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.prevPage" title="Попередня сторінка">‹</button>
+                            <span id="reader-page-info" class="text-xs sm:text-sm font-bold text-slate-500 reader-page-info"></span>
+                            <button onclick="changeReaderPage(1)" id="btn-reader-next" class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition" data-i18n-title="reader.nextPage" title="Наступна сторінка">›</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="reader-quick-match-panel" class="hidden" data-reader-ui="1" aria-live="polite">
@@ -10429,6 +10690,8 @@
                 'reader.hlOnlyHint': 'Усі маркери з книги + сірі заголовки для контексту',
                 'reader.hlOnlyEmpty': 'Поки немає виділеного тексту',
                 'reader.hlOnlyPage': 'стор. {n}',
+                'reader.toc': 'Розділи',
+                'reader.tocEmpty': 'Немає заголовків розділів',
                 'lib.tabText': 'Текст', 'lib.tabUrl': 'Стаття (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Назва матеріалу', 'lib.textPh': 'Оригінальний текст (або скрипт відео)...',
                 'lib.chatGptPhotoBtn': 'Витягнути текст із фото',
@@ -10580,6 +10843,10 @@
                 'msg.txtOk': 'Текст із файлу завантажено.',
                 'msg.needVideo': 'Спочатку додайте відео або виберіть його з пошуку.',
                 'msg.needContent': 'Вставте текст або додайте відео.', 'msg.matSaved': 'Матеріал збережено!',
+                'msg.matSavedSplit': 'Збережено як {n} частини — продовження не обірветься.',
+                'msg.matTooLarge': 'Текст завеликий для одного документа Firebase (~{mb} МБ). Розбити на {n} пов’язані матеріали (частина 1/2…)?',
+                'msg.matPartContinues': 'Далі — частина {n}/{total}.',
+                'msg.matPartContinuesFrom': 'Продовження з частини {n}/{total}.',
                 'msg.deleteMat': 'Видалити матеріал?', 'msg.matSaveFail': 'Помилка збереження матеріалу.',
                 'msg.matRead': 'Матеріал відмічено як опрацьований.',
                 'msg.crosswordFail': 'Не вдалося згенерувати кросворд. Потрібно більше слів зі спільними літерами.',
@@ -11120,6 +11387,8 @@
                 'reader.hlOnlyHint': 'All book highlights with gray headings for context',
                 'reader.hlOnlyEmpty': 'No highlights yet',
                 'reader.hlOnlyPage': 'p. {n}',
+                'reader.toc': 'Sections',
+                'reader.tocEmpty': 'No section headings',
                 'lib.tabText': 'Text', 'lib.tabUrl': 'Article (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Material title', 'lib.textPh': 'Original text (or video script)...',
                 'lib.chatGptPhotoBtn': 'Extract text from photo',
@@ -11266,6 +11535,10 @@
                 'msg.txtOk': 'Text file loaded.',
                 'msg.needVideo': 'Add a video or pick one from search first.',
                 'msg.needContent': 'Paste text or add a video.', 'msg.matSaved': 'Material saved!',
+                'msg.matSavedSplit': 'Saved as {n} parts — the continuation is preserved.',
+                'msg.matTooLarge': 'Text is too large for one Firebase document (~{mb} MB). Split into {n} linked materials (part 1/2…)?',
+                'msg.matPartContinues': 'Continued in part {n}/{total}.',
+                'msg.matPartContinuesFrom': 'Continued from part {n}/{total}.',
                 'msg.deleteMat': 'Delete this material?', 'msg.matSaveFail': 'Could not save the material.',
                 'msg.matRead': 'Material marked as read.',
                 'msg.crosswordFail': 'Could not generate a crossword. More words with shared letters are needed.',
@@ -11806,6 +12079,8 @@
                 'reader.hlOnlyHint': 'Todos los resaltados del libro con títulos grises de contexto',
                 'reader.hlOnlyEmpty': 'Aún no hay resaltados',
                 'reader.hlOnlyPage': 'pág. {n}',
+                'reader.toc': 'Secciones',
+                'reader.tocEmpty': 'No hay encabezados de sección',
                 'lib.tabText': 'Texto', 'lib.tabUrl': 'Artículo (URL)', 'lib.tabYt': 'YouTube',
                 'lib.titlePh': 'Título del material', 'lib.textPh': 'Texto original (o guion del vídeo)...',
                 'lib.chatGptPhotoBtn': 'Extraer texto de foto',
@@ -11952,6 +12227,10 @@
                 'msg.txtOk': 'Archivo de texto cargado.',
                 'msg.needVideo': 'Añade un vídeo o elígelo en la búsqueda primero.',
                 'msg.needContent': 'Pega texto o añade un vídeo.', 'msg.matSaved': '¡Material guardado!',
+                'msg.matSavedSplit': 'Guardado en {n} partes — la continuación se conserva.',
+                'msg.matTooLarge': 'El texto es demasiado grande para un documento de Firebase (~{mb} MB). ¿Dividirlo en {n} materiales enlazados (parte 1/2…)?',
+                'msg.matPartContinues': 'Continúa en la parte {n}/{total}.',
+                'msg.matPartContinuesFrom': 'Continuación de la parte {n}/{total}.',
                 'msg.deleteMat': '¿Eliminar el material?', 'msg.matSaveFail': 'No se pudo guardar el material.',
                 'msg.matRead': 'Material marcado como leído.',
                 'msg.crosswordFail': 'No se pudo generar el crucigrama. Hacen falta más palabras con letras en común.',
@@ -12105,6 +12384,7 @@
         const READER_THEME_KEY = 'linguaspace_reader_theme_v1';
         const READER_QUICK_MATCH_LOG_KEY = 'linguaspace_reader_quick_match_log_v1';
         const READER_HL_ONLY_KEY = 'linguaspace_reader_hl_only_v1';
+        const READER_TOC_KEY = 'linguaspace_reader_toc_v1';
         const TRAIN_OSK_EXPANDED_KEY = 'linguaspace_train_osk_expanded_v1';
         const SHOW_TRAIN_DUE_BADGES_KEY = 'linguaspace_show_train_due_badges_v1';
         const TRAIN_DUE_INDICATOR_KEY = 'linguaspace_train_due_indicator_v1';
@@ -14941,7 +15221,10 @@
         let readerQuickMatchEnabled = localStorage.getItem(READER_QUICK_MATCH_KEY) === '1';
         let readerParaIndent = localStorage.getItem(READER_PARA_INDENT_KEY) === '1';
         let readerHighlightsOnly = localStorage.getItem(READER_HL_ONLY_KEY) === '1';
+        let readerTocEnabled = localStorage.getItem(READER_TOC_KEY) !== '0';
         let readerPageHeadingStarts = [];
+        let readerTocEntries = [];
+        let readerTocMobileOpen = false;
         let readerTheme = (() => {
             const v = localStorage.getItem(READER_THEME_KEY) || '';
             return v === 'warm' || v === 'dark' ? v : '';
@@ -20181,7 +20464,7 @@
             } catch (_) {}
         }
         function looksLikeMaterialHtml(s) {
-            return /<\/?(?:b|strong|i|em|u|mark|h[1-3]|p|div|br|span|table|thead|tbody|tr|th|td|ul|ol|li)\b/i.test(String(s || ''));
+            return /<\/?(?:b|strong|i|em|u|mark|h[1-3]|p|div|br|span|table|thead|tbody|tr|th|td|ul|ol|li|blockquote|sup)\b/i.test(String(s || ''));
         }
         function isWikiHeadingLine(line) {
             return /^(=+)\s*.+\s*\1\s*$/.test(String(line || '').trim());
@@ -20193,6 +20476,31 @@
             const body = String(m[2] || '').trim();
             if (!body) return null;
             return { marker: m[1], body };
+        }
+        function matchMarkdownFootnoteBody(text) {
+            const m = /^[*∗]\s+(.+)$/.exec(String(text || '').replace(/\u00a0/g, ' ').trim());
+            if (!m) return null;
+            const body = String(m[1] || '').trim();
+            return body || null;
+        }
+        function looksLikeFootnoteProse(body) {
+            const s = String(body || '').trim();
+            if (!s) return false;
+            if (s.length >= 55) return true;
+            if (/\b(ed\.|eds\.|ibid|op\.\s*cit|et al|vol\.|trans\.|publishe|quotation|passage|translation|first published|sketched|following)\b/i.test(s)) return true;
+            if (/[.!?]$/.test(s) && s.length >= 35) return true;
+            return false;
+        }
+        function buildMarkdownFootnoteHtml(body) {
+            return `<p class="md-footnote"><sup class="md-fn-mark">∗</sup>${formatInlineMarkdown(body)}</p>`;
+        }
+        function buildMarkdownQuoteHtml(lines) {
+            const parts = (lines || []).map((l) => String(l || '').trim()).filter(Boolean);
+            if (!parts.length) return '';
+            const avg = parts.reduce((a, l) => a + l.length, 0) / parts.length;
+            const verse = parts.length >= 2 && avg <= 55;
+            const cls = verse ? 'md-quote md-quote--verse' : 'md-quote';
+            return `<blockquote class="${cls}">${parts.map((l) => `<p>${formatInlineMarkdown(l)}</p>`).join('')}</blockquote>`;
         }
         function textHasMarkdownList(s) {
             const lines = String(s || '').replace(/\r\n/g, '\n').split('\n');
@@ -20352,6 +20660,8 @@
         }
         function formatInlineMarkdown(s) {
             let t = escapeHtmlText(normalizeLatexSymbolsInText(s));
+            // Footnote markers after punctuation / closing quotes: …psychically."*
+            t = t.replace(/([.!?…"”'»)\]])\*/g, '$1<sup class="md-fn-ref">∗</sup>');
             t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
             t = t.replace(/__(.+?)__/g, '<strong>$1</strong>');
             t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -20369,24 +20679,39 @@
             while (i < lines.length) {
                 const rawLine = lines[i].replace(/\s+$/, '');
 
-                // Markdown blockquotes (email/chat poetry): strip ">" and render as italic lines
+                // Markdown blockquotes + footnote lines inside quotes ("> * note")
                 if (isMarkdownQuoteLine(rawLine)) {
-                    const stanza = [];
+                    const parts = [];
                     while (i < lines.length) {
                         const ln = lines[i].replace(/\s+$/, '');
                         if (!ln.trim()) {
-                            if (stanza.length) break;
+                            if (parts.length) break;
                             i += 1;
                             continue;
                         }
                         if (!isMarkdownQuoteLine(ln)) break;
                         const body = stripMarkdownQuotePrefix(ln).trim();
-                        if (body) stanza.push(body);
+                        if (body) {
+                            const fn = matchMarkdownFootnoteBody(body);
+                            if (fn) parts.push({ type: 'fn', text: fn });
+                            else parts.push({ type: 'quote', text: body });
+                        }
                         i += 1;
                     }
-                    stanza.forEach((line) => {
-                        out.push(`<p><em>${formatInlineMarkdown(line)}</em></p>`);
-                    });
+                    let qi = 0;
+                    while (qi < parts.length) {
+                        if (parts[qi].type === 'fn') {
+                            out.push(buildMarkdownFootnoteHtml(parts[qi].text));
+                            qi += 1;
+                            continue;
+                        }
+                        const quoteLines = [];
+                        while (qi < parts.length && parts[qi].type === 'quote') {
+                            quoteLines.push(parts[qi].text);
+                            qi += 1;
+                        }
+                        out.push(buildMarkdownQuoteHtml(quoteLines));
+                    }
                     continue;
                 }
 
@@ -20424,6 +20749,28 @@
                     }
                 }
 
+                // Single long "* footnote…" (not a list)
+                const loneFn = matchMarkdownBulletLine(trimmed);
+                if (loneFn && looksLikeFootnoteProse(loneFn.body)) {
+                    let j = i + 1;
+                    const fnItems = [loneFn.body];
+                    while (j < lines.length) {
+                        const ln = lines[j].replace(/\s+$/, '');
+                        if (!ln.trim()) break;
+                        const b = matchMarkdownBulletLine(ln);
+                        if (!b || !looksLikeFootnoteProse(b.body)) break;
+                        fnItems.push(b.body);
+                        j += 1;
+                    }
+                    // Only treat as footnotes if this isn't a short-name bullet list
+                    const asList = fnItems.length >= 2 && fnItems.every((x) => !looksLikeFootnoteProse(x));
+                    if (!asList && (fnItems.length === 1 || fnItems.every(looksLikeFootnoteProse))) {
+                        fnItems.forEach((body) => out.push(buildMarkdownFootnoteHtml(body)));
+                        i = j;
+                        continue;
+                    }
+                }
+
                 // Markdown bullet lists (* / - / +) — only runs of 2+ items
                 const bullet0 = matchMarkdownBulletLine(trimmed);
                 if (bullet0) {
@@ -20446,7 +20793,11 @@
                         j += 1;
                     }
                     if (items.length >= 2) {
-                        out.push(buildMarkdownListHtml(items));
+                        if (items.every(looksLikeFootnoteProse)) {
+                            items.forEach((body) => out.push(buildMarkdownFootnoteHtml(body)));
+                        } else {
+                            out.push(buildMarkdownListHtml(items));
+                        }
                         i = j;
                         continue;
                     }
@@ -20554,44 +20905,57 @@
             }
             return root.innerHTML;
         }
-        /** Convert consecutive markdown quote lines ("> …") already in the editor into italic paragraphs. */
+        /** Convert markdown quote / footnote lines already in the editor into blockquotes & footnotes. */
         function normalizeMarkdownQuotesInMaterialHtml(html) {
             const root = document.createElement('div');
             root.innerHTML = String(html || '');
             if (!root.innerHTML.trim()) return '';
 
-            const solidQuote = (t) => {
-                const s = String(t || '').replace(/\u00a0/g, ' ').trim();
-                return isMarkdownQuoteLine(s) && !!stripMarkdownQuotePrefix(s).trim();
-            };
             const isQuoteLine = (t) => isMarkdownQuoteLine(String(t || '').replace(/\u00a0/g, ' ').trim());
 
-            function italicParaFromQuoteText(raw) {
-                const body = stripMarkdownQuotePrefix(String(raw || '').replace(/\u00a0/g, ' ').trim()).trim();
-                if (!body) return null;
-                const p = document.createElement('p');
-                const em = document.createElement('em');
-                em.textContent = body;
-                p.appendChild(em);
-                return p;
+            function appendRenderedQuoteRun(frag, rowTexts) {
+                const parts = [];
+                rowTexts.forEach((raw) => {
+                    const body = stripMarkdownQuotePrefix(String(raw || '').replace(/\u00a0/g, ' ').trim()).trim();
+                    if (!body) return;
+                    const fn = matchMarkdownFootnoteBody(body);
+                    if (fn) parts.push({ type: 'fn', text: fn });
+                    else parts.push({ type: 'quote', text: body });
+                });
+                let qi = 0;
+                while (qi < parts.length) {
+                    if (parts[qi].type === 'fn') {
+                        const wrap = document.createElement('div');
+                        wrap.innerHTML = buildMarkdownFootnoteHtml(parts[qi].text);
+                        while (wrap.firstChild) frag.appendChild(wrap.firstChild);
+                        qi += 1;
+                        continue;
+                    }
+                    const quoteLines = [];
+                    while (qi < parts.length && parts[qi].type === 'quote') {
+                        quoteLines.push(parts[qi].text);
+                        qi += 1;
+                    }
+                    const wrap = document.createElement('div');
+                    wrap.innerHTML = buildMarkdownQuoteHtml(quoteLines);
+                    while (wrap.firstChild) frag.appendChild(wrap.firstChild);
+                }
             }
 
-            // Split a single block with <br> quote lines into sibling <p>s when ≥2 quote lines
+            // Split a single block with <br> quote lines into siblings when ≥1 quote/footnote line
             [...root.querySelectorAll('p, div')].forEach((el) => {
-                if (el.querySelector('p, div, h1, h2, h3')) return;
+                if (el.querySelector('p, div, h1, h2, h3, blockquote, table, ul')) return;
+                if (el.classList?.contains('md-footnote') || el.classList?.contains('md-quote')) return;
                 if (!/<br\s*\/?>/i.test(el.innerHTML)) return;
                 const texts = el.innerHTML.split(/<br\s*\/?>/i).map((seg) => {
                     const d = document.createElement('div');
                     d.innerHTML = seg;
                     return String(d.textContent || '').replace(/\u00a0/g, ' ');
                 });
-                if (texts.filter(solidQuote).length < 2) return;
+                const quoteTexts = texts.filter((t) => isQuoteLine(t.trim()));
+                if (!quoteTexts.length) return;
                 const frag = document.createDocumentFragment();
-                texts.forEach((t) => {
-                    if (!isQuoteLine(t) && t.trim()) return;
-                    const p = italicParaFromQuoteText(t);
-                    if (p) frag.appendChild(p);
-                });
+                appendRenderedQuoteRun(frag, quoteTexts);
                 if (frag.childNodes.length) el.replaceWith(frag);
             });
 
@@ -20600,23 +20964,30 @@
                 if (n.nodeType === 3) {
                     const t = String(n.textContent || '').replace(/\u00a0/g, ' ');
                     if (!t.trim()) return;
-                    t.split(/\n/).forEach((part) => items.push({ node: n, text: part, sharedText: true }));
+                    t.split(/\n/).forEach((part) => items.push({ node: n, text: part }));
                 } else if (n.nodeType === 1) {
                     if (n.tagName === 'BR') items.push({ node: n, text: '' });
-                    else items.push({ node: n, text: String(n.textContent || '').replace(/\u00a0/g, ' ') });
+                    else if (/^(BLOCKQUOTE)$/i.test(n.tagName) || n.classList?.contains('md-footnote')) {
+                        items.push({ node: n, text: '', keep: true });
+                    } else if (/^(P|DIV)$/i.test(n.tagName) && !n.querySelector('table, ul, ol, blockquote')) {
+                        items.push({ node: n, text: String(n.textContent || '').replace(/\u00a0/g, ' ') });
+                    } else {
+                        items.push({ node: n, text: '', keep: true });
+                    }
                 }
             });
 
             const runs = [];
             let i = 0;
             while (i < items.length) {
-                if (!isQuoteLine(items[i].text)) {
+                if (items[i].keep || !isQuoteLine(items[i].text)) {
                     i += 1;
                     continue;
                 }
                 let j = i;
                 let solids = 0;
                 while (j < items.length) {
+                    if (items[j].keep) break;
                     const t = items[j].text.trim();
                     if (isQuoteLine(t)) {
                         if (stripMarkdownQuotePrefix(t).trim()) solids += 1;
@@ -20629,7 +21000,7 @@
                     }
                     break;
                 }
-                if (solids >= 2) runs.push({ start: i, end: j });
+                if (solids >= 1) runs.push({ start: i, end: j });
                 i = Math.max(j, i + 1);
             }
 
@@ -20638,12 +21009,11 @@
             for (let r = runs.length - 1; r >= 0; r -= 1) {
                 const { start, end } = runs[r];
                 const frag = document.createDocumentFragment();
-                for (let k = start; k < end; k += 1) {
-                    const p = italicParaFromQuoteText(items[k].text);
-                    if (p) frag.appendChild(p);
-                }
+                const rowTexts = [];
+                for (let k = start; k < end; k += 1) rowTexts.push(items[k].text);
+                appendRenderedQuoteRun(frag, rowTexts);
                 const first = items[start].node;
-                if (!first.parentNode) continue;
+                if (!first.parentNode || !frag.childNodes.length) continue;
                 first.parentNode.insertBefore(frag, first);
                 const removed = new Set();
                 for (let k = start; k < end; k += 1) {
@@ -20709,15 +21079,25 @@
                     bodies.push(b.body);
                     j += 1;
                 }
-                if (bodies.length >= 2) runs.push({ start: i, end: j, bodies });
+                if (bodies.length >= 2) {
+                    if (bodies.every(looksLikeFootnoteProse)) {
+                        runs.push({ start: i, end: j, bodies, asFootnotes: true });
+                    } else {
+                        runs.push({ start: i, end: j, bodies, asFootnotes: false });
+                    }
+                } else if (bodies.length === 1 && looksLikeFootnoteProse(bodies[0])) {
+                    runs.push({ start: i, end: j, bodies, asFootnotes: true });
+                }
                 i = Math.max(j, i + 1);
             }
             if (!runs.length) return root.innerHTML;
 
             for (let r = runs.length - 1; r >= 0; r -= 1) {
-                const { start, end, bodies } = runs[r];
+                const { start, end, bodies, asFootnotes } = runs[r];
                 const wrap = document.createElement('div');
-                wrap.innerHTML = buildMarkdownListHtml(bodies);
+                wrap.innerHTML = asFootnotes
+                    ? bodies.map((b) => buildMarkdownFootnoteHtml(b)).join('')
+                    : buildMarkdownListHtml(bodies);
                 const frag = document.createDocumentFragment();
                 while (wrap.firstChild) frag.appendChild(wrap.firstChild);
                 const firstNode = items[start].node;
@@ -20733,10 +21113,31 @@
             }
             return root.innerHTML;
         }
+        function normalizeInlineFootnoteMarksInMaterialHtml(html) {
+            const root = document.createElement('div');
+            root.innerHTML = String(html || '');
+            if (!root.innerHTML) return '';
+            const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+            const nodes = [];
+            while (walk.nextNode()) nodes.push(walk.currentNode);
+            nodes.forEach((n) => {
+                const parentEl = n.parentElement;
+                if (parentEl && parentEl.closest('sup, .md-footnote, .md-fn-ref, .md-fn-mark')) return;
+                const raw = String(n.nodeValue || '');
+                if (!/([.!?…"”'»)\]])\*/.test(raw)) return;
+                const wrap = document.createElement('span');
+                wrap.innerHTML = escapeHtmlText(raw).replace(/([.!?…"”'»)\]])\*/g, '$1<sup class="md-fn-ref">∗</sup>');
+                const parent = n.parentNode;
+                if (!parent) return;
+                while (wrap.firstChild) parent.insertBefore(wrap.firstChild, n);
+                parent.removeChild(n);
+            });
+            return root.innerHTML;
+        }
         function sanitizeMaterialHtml(html) {
             const allowed = {
-                B: 1, STRONG: 1, I: 1, EM: 1, U: 1, MARK: 1,
-                H1: 1, H2: 1, H3: 1, P: 1, BR: 1, DIV: 1,
+                B: 1, STRONG: 1, I: 1, EM: 1, U: 1, MARK: 1, SUP: 1,
+                H1: 1, H2: 1, H3: 1, P: 1, BR: 1, DIV: 1, BLOCKQUOTE: 1,
                 TABLE: 1, THEAD: 1, TBODY: 1, TR: 1, TH: 1, TD: 1,
                 UL: 1, OL: 1, LI: 1
             };
@@ -20790,6 +21191,14 @@
                     el.className = 'md-table';
                 } else if (node.tagName === 'UL' && /md-list/i.test(cls)) {
                     el.className = 'md-list';
+                } else if (node.tagName === 'BLOCKQUOTE') {
+                    if (/md-quote--verse/i.test(cls)) el.className = 'md-quote md-quote--verse';
+                    else el.className = 'md-quote';
+                } else if (node.tagName === 'P' && /md-footnote/i.test(cls)) {
+                    el.className = 'md-footnote';
+                } else if (node.tagName === 'SUP') {
+                    if (/md-fn-mark/i.test(cls)) el.className = 'md-fn-mark';
+                    else if (/md-fn-ref/i.test(cls)) el.className = 'md-fn-ref';
                 }
                 appendKids(el, kids);
                 return el;
@@ -20807,9 +21216,11 @@
             if (!s) return '';
             const html = looksLikeMaterialHtml(s) ? sanitizeMaterialHtml(s) : markdownToHtml(s);
             return normalizeLatexSymbolsInMaterialHtml(
-                normalizeMarkdownListsInMaterialHtml(
-                    normalizeMarkdownTablesInMaterialHtml(
-                        normalizeMarkdownQuotesInMaterialHtml(html)
+                normalizeInlineFootnoteMarksInMaterialHtml(
+                    normalizeMarkdownListsInMaterialHtml(
+                        normalizeMarkdownTablesInMaterialHtml(
+                            normalizeMarkdownQuotesInMaterialHtml(html)
+                        )
                     )
                 )
             );
@@ -20827,9 +21238,11 @@
             const el = document.getElementById(id);
             if (!el) return '';
             const html = normalizeLatexSymbolsInMaterialHtml(
-                normalizeMarkdownListsInMaterialHtml(
-                    normalizeMarkdownTablesInMaterialHtml(
-                        normalizeMarkdownQuotesInMaterialHtml(sanitizeMaterialHtml(el.innerHTML))
+                normalizeInlineFootnoteMarksInMaterialHtml(
+                    normalizeMarkdownListsInMaterialHtml(
+                        normalizeMarkdownTablesInMaterialHtml(
+                            normalizeMarkdownQuotesInMaterialHtml(sanitizeMaterialHtml(el.innerHTML))
+                        )
                     )
                 )
             ).trim();
@@ -22093,6 +22506,90 @@
             }); return subs;
         }
 
+        const FIRESTORE_DOC_SOFT_LIMIT = 900000; // under 1 MiB hard cap
+
+        function estimateMaterialDocBytes(content) {
+            try {
+                return new TextEncoder().encode(String(content || '')).length + 256;
+            } catch (_) {
+                return String(content || '').length * 2 + 256;
+            }
+        }
+
+        function splitMaterialHtmlIntoChunks(html, maxBytes = FIRESTORE_DOC_SOFT_LIMIT) {
+            const raw = String(html || '').trim();
+            if (!raw) return [];
+            if (estimateMaterialDocBytes(raw) <= maxBytes) return [raw];
+
+            const tmp = document.createElement('div');
+            tmp.innerHTML = raw;
+            const blocks = [...tmp.childNodes].filter((n) => {
+                if (n.nodeType === 3) return String(n.textContent || '').trim().length > 0;
+                return n.nodeType === 1;
+            });
+            if (!blocks.length) return [raw];
+
+            const pieces = blocks.map((n) => (n.nodeType === 3
+                ? `<p>${escapeHtmlText(n.textContent)}</p>`
+                : n.outerHTML));
+
+            const chunks = [];
+            let cur = '';
+            pieces.forEach((piece) => {
+                const next = cur + piece;
+                if (cur && estimateMaterialDocBytes(next) > maxBytes) {
+                    chunks.push(cur);
+                    cur = piece;
+                    // Oversized single block: hard-split by characters as last resort
+                    while (estimateMaterialDocBytes(cur) > maxBytes) {
+                        const keep = Math.max(20000, Math.floor(cur.length * 0.6));
+                        chunks.push(cur.slice(0, keep));
+                        cur = cur.slice(keep);
+                    }
+                } else {
+                    cur = next;
+                }
+            });
+            if (cur.trim()) chunks.push(cur);
+            return chunks.length ? chunks : [raw];
+        }
+
+        function materialPartBridgeHtml(partIndex, totalParts, direction) {
+            if (totalParts <= 1) return '';
+            if (direction === 'end' && partIndex < totalParts) {
+                return `<p class="md-footnote"><sup class="md-fn-mark">∗</sup>${escapeHtmlText(t('msg.matPartContinues', { n: partIndex + 1, total: totalParts }))}</p>`;
+            }
+            if (direction === 'start' && partIndex > 1) {
+                return `<p class="md-footnote"><sup class="md-fn-mark">∗</sup>${escapeHtmlText(t('msg.matPartContinuesFrom', { n: partIndex - 1, total: totalParts }))}</p>`;
+            }
+            return '';
+        }
+
+        async function saveMaterialChunksToFirebase(baseTitle, chunks, { ytId = '', subtitles = null, coverUrl = '' } = {}) {
+            const total = chunks.length;
+            const groupId = `split_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+            for (let i = 0; i < total; i += 1) {
+                const part = i + 1;
+                const title = total > 1 ? `${baseTitle} (${part}/${total})` : baseTitle;
+                let body = chunks[i];
+                if (total > 1) {
+                    body = materialPartBridgeHtml(part, total, 'start') + body + materialPartBridgeHtml(part, total, 'end');
+                }
+                const payload = {
+                    title,
+                    content: body,
+                    ytId: ytId || '',
+                    subtitles: subtitles || null,
+                    createdAt: serverTimestamp(),
+                    splitGroupId: groupId,
+                    splitIndex: part,
+                    splitTotal: total
+                };
+                if (coverUrl && part === 1) payload.coverUrl = coverUrl;
+                await addDoc(colRef('materials'), payload);
+            }
+        }
+
         window.saveMaterial = async () => {
             const title = document.getElementById('material-title').value.trim() || "Матеріал";
             let content = getMaterialEditorContent('material-content');
@@ -22107,17 +22604,65 @@
             }
             if(!content && !currentYtId) return window.showModal(t('msg.needContent'));
             if(!activeUid) return;
+
+            const coverUrl = (pendingMaterialCoverUrl && wordHasRealImage(pendingMaterialCoverUrl)) ? pendingMaterialCoverUrl : '';
+            const ytId = addMaterialMode === 'yt' ? currentYtId : '';
+            const subtitles = parsedSubs.length > 0 ? JSON.stringify(parsedSubs) : null;
+
+            // YouTube/subs stay as one doc; only split oversized text materials
+            if (!ytId && !subtitles && content && estimateMaterialDocBytes(content) > FIRESTORE_DOC_SOFT_LIMIT) {
+                const chunks = splitMaterialHtmlIntoChunks(content, FIRESTORE_DOC_SOFT_LIMIT);
+                if (chunks.length > 1) {
+                    const mb = Math.max(1, Math.round(estimateMaterialDocBytes(content) / (1024 * 1024)));
+                    return window.showModal(
+                        t('msg.matTooLarge', { mb, n: chunks.length }),
+                        true,
+                        async () => {
+                            try {
+                                await saveMaterialChunksToFirebase(title, chunks, { ytId: '', subtitles: null, coverUrl });
+                                cancelAddMaterial();
+                                switchTab('library');
+                                window.showModal(t('msg.matSavedSplit', { n: chunks.length }));
+                            } catch (err) {
+                                console.error(err);
+                                window.showModal(t('msg.saveError'));
+                            }
+                        }
+                    );
+                }
+            }
             
             try {
                 const matPayload = { 
-                    title, content, ytId: addMaterialMode === 'yt' ? currentYtId : "", subtitles: parsedSubs.length > 0 ? JSON.stringify(parsedSubs) : null, createdAt: serverTimestamp() 
+                    title, content, ytId, subtitles, createdAt: serverTimestamp() 
                 };
-                if (pendingMaterialCoverUrl && wordHasRealImage(pendingMaterialCoverUrl)) {
-                    matPayload.coverUrl = pendingMaterialCoverUrl;
-                }
+                if (coverUrl) matPayload.coverUrl = coverUrl;
                 await addDoc(colRef('materials'), matPayload);
                 cancelAddMaterial(); switchTab('library'); window.showModal(t('msg.matSaved'));
-            } catch (err) { window.showModal(t('msg.saveError')); }
+            } catch (err) {
+                // Auto-offer split if Firestore rejected an oversized text doc
+                if (!ytId && !subtitles && content && /invalid|exceed|size|larger|too big|RESOURCE_EXHAUSTED/i.test(String(err?.message || err || ''))) {
+                    const chunks = splitMaterialHtmlIntoChunks(content, FIRESTORE_DOC_SOFT_LIMIT);
+                    if (chunks.length > 1) {
+                        return window.showModal(
+                            t('msg.matTooLarge', { mb: 1, n: chunks.length }),
+                            true,
+                            async () => {
+                                try {
+                                    await saveMaterialChunksToFirebase(title, chunks, { ytId: '', subtitles: null, coverUrl });
+                                    cancelAddMaterial();
+                                    switchTab('library');
+                                    window.showModal(t('msg.matSavedSplit', { n: chunks.length }));
+                                } catch (e2) {
+                                    console.error(e2);
+                                    window.showModal(t('msg.saveError'));
+                                }
+                            }
+                        );
+                    }
+                }
+                window.showModal(t('msg.saveError'));
+            }
         };
 
         window.changeLibraryPage = (direction) => {
@@ -22774,16 +23319,26 @@
             }
         };
 
+        window.toggleReaderHighlightsOnly = () => setReaderHighlightsOnly(!readerHighlightsOnly);
+
         function syncReaderHighlightsOnlyUi() {
-            const cb = document.getElementById('reader-hl-only-toggle');
-            if (cb) cb.checked = !!readerHighlightsOnly;
+            const btn = document.getElementById('reader-hl-only-btn');
+            if (btn) {
+                btn.classList.toggle('is-active', !!readerHighlightsOnly);
+                btn.setAttribute('aria-pressed', readerHighlightsOnly ? 'true' : 'false');
+                const label = t('reader.hlOnly');
+                btn.setAttribute('title', label);
+                btn.setAttribute('aria-label', label);
+            }
             document.getElementById('library-read-view')?.classList.toggle('reader-hl-only', !!readerHighlightsOnly);
+            syncReaderTocUi();
         }
 
         function rebuildReaderPageHeadingIndex() {
             readerPageHeadingStarts = [];
             if (!readerPages.length || currentMaterial?.subtitles) {
                 readerPageHeadingStarts = readerPages.map(() => ({ h1: '', h2: '', h3: '' }));
+                rebuildReaderTocEntries();
                 return;
             }
             let h1 = '', h2 = '', h3 = '';
@@ -22799,7 +23354,129 @@
                     else { h3 = text; }
                 });
             });
+            rebuildReaderTocEntries();
         }
+
+        function classifyReaderHeadingKind(text, level) {
+            const s = String(text || '').trim();
+            if (/\bparts?\b/i.test(s) || /\bчастини?\b/i.test(s) || /\bчасть\b/i.test(s) || /\bparte?s?\b/i.test(s)) return 'part';
+            if (/\bchapters?\b/i.test(s) || /\bгл\.?\b/i.test(s) || /\bрозділ\b/i.test(s) || /\bглава\b/i.test(s) || /\bcap[ií]tulos?\b/i.test(s)) return 'chapter';
+            if (/^(part|chapter|розділ|глава|часть|parte|capítulo)\b/i.test(s)) return /part|част|parte/i.test(s) ? 'part' : 'chapter';
+            if (level === 1 && /^\s*(?:\d+|[IVXLCDM]+)(?:[.:)\s-]|$)/i.test(s)) return 'chapter';
+            return 'heading';
+        }
+
+        function rebuildReaderTocEntries() {
+            readerTocEntries = [];
+            if (!readerPages.length || currentMaterial?.subtitles) {
+                syncReaderTocUi();
+                return;
+            }
+            const seen = new Set();
+            readerPages.forEach((pageHtml, pageIdx) => {
+                const root = document.createElement('div');
+                root.innerHTML = String(pageHtml || '');
+                root.querySelectorAll('h1, h2, h3').forEach((el) => {
+                    const text = (el.textContent || '').replace(/\s+/g, ' ').trim();
+                    if (!text || text.length > 160) return;
+                    const level = el.tagName === 'H1' ? 1 : el.tagName === 'H2' ? 2 : 3;
+                    const key = `${level}|${text.toLowerCase()}`;
+                    if (seen.has(key)) return;
+                    seen.add(key);
+                    const kind = classifyReaderHeadingKind(text, level);
+                    readerTocEntries.push({
+                        id: `toc_${readerTocEntries.length}`,
+                        text,
+                        level,
+                        kind,
+                        page: pageIdx + 1
+                    });
+                });
+            });
+            syncReaderTocUi();
+        }
+
+        function readerTocHasEntries() {
+            return Array.isArray(readerTocEntries) && readerTocEntries.length > 0;
+        }
+
+        function getActiveReaderTocId(activePage) {
+            let activeId = null;
+            const page = Number(activePage) || 1;
+            for (const entry of readerTocEntries) {
+                if (entry.page <= page) activeId = entry.id;
+                else break;
+            }
+            return activeId;
+        }
+
+        function renderReaderTocListHtml(activePage) {
+            if (!readerTocHasEntries()) {
+                return `<div class="reader-toc-empty">${escapeHtmlText(t('reader.tocEmpty'))}</div>`;
+            }
+            const activeId = getActiveReaderTocId(activePage);
+            let html = '<ul class="reader-toc-list">';
+            readerTocEntries.forEach((entry) => {
+                const active = entry.id === activeId ? ' is-active' : '';
+                const kindCls = entry.kind === 'part' ? ' is-part' : entry.kind === 'chapter' ? ' is-chapter' : '';
+                const lvlCls = entry.level === 2 ? ' is-h2' : entry.level === 3 ? ' is-h3' : '';
+                html += `<li><button type="button" class="reader-toc-item${kindCls}${lvlCls}${active}" onclick="jumpReaderToc(${entry.page})">${escapeHtmlText(entry.text)}</button></li>`;
+            });
+            html += '</ul>';
+            return html;
+        }
+
+        function syncReaderTocUi() {
+            const has = readerTocHasEntries();
+            const on = !!readerTocEnabled && has && !readerHighlightsOnly;
+            const view = document.getElementById('library-read-view');
+            view?.classList.toggle('reader-toc-on', on);
+
+            const btn = document.getElementById('reader-toc-btn');
+            if (btn) {
+                btn.classList.toggle('is-active', !!readerTocEnabled && has);
+                btn.disabled = !has;
+                btn.setAttribute('aria-pressed', readerTocEnabled && has ? 'true' : 'false');
+                const label = t('reader.toc');
+                btn.setAttribute('title', label);
+                btn.setAttribute('aria-label', label);
+                btn.style.opacity = has ? '' : '0.4';
+            }
+
+            const rail = document.getElementById('reader-toc-rail');
+            const mobilePanel = document.getElementById('reader-toc-mobile-panel');
+            const listHtml = renderReaderTocListHtml(readerCurrentPage);
+            if (rail) {
+                rail.innerHTML = listHtml;
+                rail.setAttribute('aria-label', t('reader.toc'));
+            }
+            if (mobilePanel) {
+                mobilePanel.innerHTML = listHtml;
+                mobilePanel.classList.toggle('hidden', !readerTocMobileOpen);
+            }
+            const chev = document.getElementById('reader-toc-mobile-chevron');
+            if (chev) chev.textContent = readerTocMobileOpen ? '▴' : '▾';
+        }
+
+        window.setReaderTocEnabled = (on) => {
+            readerTocEnabled = !!on;
+            try { localStorage.setItem(READER_TOC_KEY, readerTocEnabled ? '1' : '0'); } catch (_) {}
+            if (!readerTocEnabled) readerTocMobileOpen = false;
+            syncReaderTocUi();
+        };
+
+        window.toggleReaderToc = () => setReaderTocEnabled(!readerTocEnabled);
+
+        window.toggleReaderTocMobilePanel = () => {
+            if (!readerTocEnabled || !readerTocHasEntries() || readerHighlightsOnly) return;
+            readerTocMobileOpen = !readerTocMobileOpen;
+            syncReaderTocUi();
+        };
+
+        window.jumpReaderToc = (pageNum) => {
+            readerTocMobileOpen = false;
+            goToReaderPage(pageNum, { force: true });
+        };
 
         function resolveReaderHeadingsAtOffset(pageNum, offset) {
             const idx = Math.max(0, (pageNum || 1) - 1);
@@ -22916,6 +23593,7 @@
             if (topPrev) topPrev.disabled = atFirst;
             if (topNext) topNext.disabled = atLast;
             fillReaderPageInfoEl(document.getElementById('reader-page-info-top'));
+            syncReaderTocUi();
         }
 
         window.goToReaderPage = (pageNum, opts = {}) => {
@@ -23970,6 +24648,7 @@
             syncReaderQuickMatchUi();
             syncReaderParaIndentUi();
             syncReaderHighlightsOnlyUi();
+            readerTocMobileOpen = false;
             readerAudioStore = {};
             readerAudioSeq = 0;
             stopReaderAudioPlayback();
