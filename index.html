@@ -23564,7 +23564,6 @@
 
         function fillReaderPageInfoEl(el) {
             if (!el) return;
-            if (el.querySelector('.reader-page-jump-input')) return;
             el.innerHTML = `<span class="reader-page-info-inner">
                 <span class="reader-page-label">${escapeHtmlText(t('reader.pageWord'))}</span>
                 <button type="button" class="reader-page-num" onclick="startReaderPageJump(event, this)" title="${escapeHtmlText(t('reader.jumpPage'))}" aria-label="${escapeHtmlText(t('reader.jumpPage'))}">${readerCurrentPage}</button>
@@ -23627,6 +23626,10 @@
             if (!btn || readerTotalPages <= 1 || readerHighlightsOnly) return;
             const host = btn.closest('.reader-page-info') || btn.parentElement;
             if (!host) return;
+            // Close any other open jump field first
+            document.querySelectorAll('.reader-page-info').forEach((el) => {
+                if (el !== host) fillReaderPageInfoEl(el);
+            });
             const input = document.createElement('input');
             input.type = 'text';
             input.inputMode = 'numeric';
@@ -23634,12 +23637,22 @@
             input.className = 'reader-page-jump-input';
             input.value = String(readerCurrentPage);
             input.setAttribute('aria-label', t('reader.jumpPage'));
+            let settled = false;
+            const finish = (fn) => {
+                if (settled) return;
+                settled = true;
+                fn();
+            };
             const cancel = () => {
-                fillReaderPageInfoEl(host);
+                finish(() => fillReaderPageInfoEl(host));
             };
             const commit = () => {
                 const n = parseInt(String(input.value || '').trim(), 10);
-                if (!goToReaderPage(n)) fillReaderPageInfoEl(host);
+                finish(() => {
+                    // Drop the input before navigation so both top/bottom chrome can refresh
+                    fillReaderPageInfoEl(host);
+                    if (!goToReaderPage(n, { force: true })) fillReaderPageInfoEl(host);
+                });
             };
             input.addEventListener('keydown', (ev) => {
                 if (ev.key === 'Enter') {
@@ -23651,9 +23664,8 @@
                 }
             });
             input.addEventListener('blur', () => {
-                // Blur without Enter cancels — avoids accidental jumps
                 setTimeout(() => {
-                    if (host.contains(input)) cancel();
+                    if (!settled && host.contains(input)) cancel();
                 }, 0);
             });
             host.innerHTML = '';
