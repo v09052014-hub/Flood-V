@@ -16144,6 +16144,8 @@
             document.documentElement.style.setProperty('--tex-bank-sticky-top', `${getRestoreBankStickyTop()}px`);
             syncRestoreMobileBankPad();
         }
+
+        window.changeTextExerciseWidth = (delta) => {
             currentReaderWidthStep = Math.max(0, Math.min(READER_LAYOUT_WIDTHS.length - 1, currentReaderWidthStep + delta));
             try { localStorage.setItem('linguaspace_reader_width', String(currentReaderWidthStep)); } catch (_) {}
             syncTextExerciseLayout();
