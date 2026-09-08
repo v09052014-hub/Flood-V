@@ -5780,17 +5780,38 @@
         @media (max-width: 767px) {
             body.restore-session #bs-workspace-layout {
                 flex-direction: column;
+                padding-bottom: var(--tex-bank-mobile-pad, 8.5rem);
             }
             body.restore-session #bs-main-card {
                 flex: 1 1 auto;
                 width: 100%;
                 max-width: 100%;
             }
+            /* Sticky word bank at bottom while scrolling text on phone */
             body.restore-session #bs-external-clues.restore-bank-panel {
-                position: static;
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                top: auto;
+                z-index: 45;
                 max-width: none;
                 width: 100%;
                 flex: 0 0 auto;
+                padding: 0;
+                margin: 0;
+                align-self: stretch;
+            }
+            body.restore-session #bs-external-clues.restore-bank-panel .restore-bank-wrap {
+                max-height: min(38vh, 12.5rem);
+                margin: 0;
+                border-radius: 0.95rem 0.95rem 0 0;
+                border-left: none;
+                border-right: none;
+                border-bottom: none;
+                box-shadow: 0 -6px 22px rgba(15, 23, 42, 0.12);
+                padding: 0.55rem 0.7rem calc(0.55rem + env(safe-area-inset-bottom, 0px));
+                background: #fff;
             }
         }
         body.order-session #bs-main-card {
@@ -7270,24 +7291,29 @@
             transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease;
         }
         .restore-slot.is-selected {
-            border-color: #312e81;
+            border-color: #4338ca;
             border-style: solid;
-            background: #e0e7ff;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.28);
+            border-width: 3px;
+            background: #c7d2fe;
+            box-shadow:
+                0 0 0 3px rgba(67, 56, 202, 0.38),
+                inset 0 0 0 1px rgba(49, 46, 129, 0.35);
         }
         .restore-slot.is-over {
-            border-color: #312e81;
+            border-color: #3730a3;
             border-style: solid;
-            background: #c7d2fe;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.32);
-            transform: scale(1.03);
+            border-width: 3px;
+            background: #a5b4fc;
+            box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.42);
+            transform: scale(1.02);
         }
         .restore-slot.is-filled {
             border-style: solid;
+            border-width: 2px;
             border-color: #16a34a;
             background: #ecfdf5;
             box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.2);
-            animation: restoreBrickIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+            animation: restoreBrickIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
         .restore-slot.is-wrong {
             border-color: #dc2626;
@@ -7300,9 +7326,14 @@
             display: block;
             width: 100%;
             text-align: center;
-            font-weight: 700;
+            font-weight: 600;
+            font-size: 1em;
             color: #15803d;
             line-height: 1.2;
+        }
+        .restore-slot.is-filled .restore-slot-inner {
+            font-weight: 700;
+            font-size: 1.04em;
         }
         body.restore-session.reader-theme-warm .restore-slot {
             border-color: #5b4a37;
@@ -7310,6 +7341,15 @@
             box-shadow:
                 0 0 0 1px rgba(91, 74, 55, 0.18),
                 inset 0 -2px 0 rgba(91, 74, 55, 0.14);
+        }
+        body.restore-session.reader-theme-warm .restore-slot.is-selected,
+        body.restore-session.reader-theme-warm .restore-slot.is-over {
+            border-color: #4338ca;
+            border-width: 3px;
+            background: #c7d2fe;
+            box-shadow:
+                0 0 0 3px rgba(67, 56, 202, 0.35),
+                inset 0 0 0 1px rgba(49, 46, 129, 0.3);
         }
         body.restore-session.reader-theme-dark .restore-slot {
             border-color: #c7d2fe;
@@ -7321,8 +7361,12 @@
         }
         body.restore-session.reader-theme-dark .restore-slot.is-selected,
         body.restore-session.reader-theme-dark .restore-slot.is-over {
-            background: rgba(165, 180, 252, 0.38);
-            border-color: #e0e7ff;
+            background: rgba(129, 140, 248, 0.55);
+            border-color: #c7d2fe;
+            border-width: 3px;
+            box-shadow:
+                0 0 0 3px rgba(165, 180, 252, 0.35),
+                inset 0 0 0 1px rgba(224, 231, 255, 0.4);
         }
         body.restore-session.reader-theme-dark .restore-slot.is-filled {
             border-color: #4ade80;
@@ -7333,9 +7377,26 @@
             color: #86efac;
         }
         @keyframes restoreBrickIn {
-            0% { transform: scale(0.85); opacity: 0.4; filter: brightness(1.2); }
-            60% { transform: scale(1.04); }
-            100% { transform: scale(1); opacity: 1; filter: none; }
+            0% { transform: scale(0.97); opacity: 0.55; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .time-lbd-main {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.1rem;
+            min-width: 0;
+        }
+        .time-lbd-time {
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1.15;
+        }
+        .time-lbd-rate {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #94a3b8;
+            line-height: 1.1;
         }
         @keyframes restoreShake {
             0%, 100% { transform: translateX(0); }
@@ -10514,6 +10575,7 @@
                 'train.orderDone': 'Порядок відновлено',
                 'train.yourTime': 'Ваш час: {time}',
                 'train.yourTimeRate': 'Ваш час: {time}',
+                'train.secPerWord': '{n}/слово',
                 'train.timeRecordLine': '{total}',
                 'train.secUnit': 'сек',
                 'train.noTimeRecords': 'Ще немає записів',
@@ -11213,6 +11275,7 @@
                 'train.orderDone': 'Order restored',
                 'train.yourTime': 'Your time: {time}',
                 'train.yourTimeRate': 'Your time: {time}',
+                'train.secPerWord': '{n}/word',
                 'train.timeRecordLine': '{total}',
                 'train.secUnit': 'sec',
                 'train.noTimeRecords': 'No records yet',
@@ -11905,6 +11968,7 @@
                 'train.orderDone': 'Orden restaurado',
                 'train.yourTime': 'Tu tiempo: {time}',
                 'train.yourTimeRate': 'Tu tiempo: {time}',
+                'train.secPerWord': '{n}/palabra',
                 'train.timeRecordLine': '{total}',
                 'train.secUnit': 's',
                 'train.noTimeRecords': 'Aún no hay récords',
@@ -15207,6 +15271,7 @@
 
         let vocabulary = [], materials = [], folders = [], currentMaterial = null;
         let unsubscribeWords = null, unsubscribeMaterials = null, unsubscribeFolders = null;
+        let unsubscribeSprintStats = null;
         let isGlobalAudioMuted = false;
 
         let currentDictFilter = 'all';
@@ -15937,8 +16002,17 @@
             return `${formatExerciseSecNumber(rate)} ${unit}`;
         }
 
+        function formatSecPerWordLabel(entryOrRate) {
+            const rate = (entryOrRate && typeof entryOrRate === 'object')
+                ? exerciseSecPerCorrect(entryOrRate)
+                : Number(entryOrRate) || 0;
+            return t('train.secPerWord', { n: formatExerciseRate(rate) });
+        }
+
         function formatTimeRecordLine(entry) {
-            return formatExerciseTime(entry?.elapsedSec);
+            const time = formatExerciseTime(entry?.elapsedSec);
+            const rate = formatSecPerWordLabel(entry);
+            return `<span class="time-lbd-main"><span class="time-lbd-time">${time}</span><span class="time-lbd-rate">${rate}</span></span>`;
         }
 
         function renderTimeLeaderboard(statsArr, currentEntry) {
@@ -15949,9 +16023,15 @@
                 .filter((e) => e && e.elapsedSec != null && e.success !== false)
                 .map((e) => ({
                     elapsedSec: Number(e.elapsedSec),
+                    correct: exerciseCorrectCount(e),
+                    secPerCorrect: exerciseSecPerCorrect(e),
                     date: e.date || 0
                 }))
-                .sort((a, b) => a.elapsedSec - b.elapsedSec || b.date - a.date);
+                .sort((a, b) =>
+                    a.secPerCorrect - b.secPerCorrect
+                    || a.elapsedSec - b.elapsedSec
+                    || b.date - a.date
+                );
             const top = sorted.slice(0, 3);
             let html = top.map((s, idx) => `
                 <li class="flex justify-between items-center py-1.5 border-b border-indigo-100 last:border-0 gap-2">
@@ -15959,11 +16039,14 @@
                     <span class="text-xs text-slate-400 font-medium flex-shrink-0">${new Date(s.date).toLocaleDateString(uiLocale())}</span>
                 </li>
             `).join('');
-            const curSec = currentEntry ? Number(currentEntry.elapsedSec) : NaN;
+            const curRate = currentEntry ? exerciseSecPerCorrect(currentEntry) : NaN;
             const curIdx = currentEntry
-                ? sorted.findIndex((s) => Math.abs(s.elapsedSec - curSec) < 0.5 && s.date >= Date.now() - 5000)
+                ? sorted.findIndex((s) =>
+                    Math.abs(s.secPerCorrect - curRate) < 0.05
+                    && Math.abs(s.elapsedSec - Number(currentEntry.elapsedSec)) < 0.5
+                    && s.date >= Date.now() - 5000)
                 : -1;
-            if ((curIdx === -1 || curIdx >= 3) && sorted.length >= 3 && currentEntry && Number.isFinite(curSec)) {
+            if ((curIdx === -1 || curIdx >= 3) && sorted.length >= 3 && currentEntry && Number.isFinite(curRate)) {
                 const displayIndex = curIdx !== -1 ? curIdx + 1 : '-';
                 html += `
                     <li class="text-center text-slate-300 font-black py-0.5 leading-none mt-1">...</li>
@@ -16059,9 +16142,8 @@
             syncReaderThemeUi();
             syncReaderParaIndentUi();
             document.documentElement.style.setProperty('--tex-bank-sticky-top', `${getRestoreBankStickyTop()}px`);
+            syncRestoreMobileBankPad();
         }
-
-        window.changeTextExerciseWidth = (delta) => {
             currentReaderWidthStep = Math.max(0, Math.min(READER_LAYOUT_WIDTHS.length - 1, currentReaderWidthStep + delta));
             try { localStorage.setItem('linguaspace_reader_width', String(currentReaderWidthStep)); } catch (_) {}
             syncTextExerciseLayout();
@@ -16156,6 +16238,18 @@
                 <div class="restore-bank">${bankHtml}</div>
             </div>`;
             document.documentElement.style.setProperty('--tex-bank-sticky-top', `${getRestoreBankStickyTop()}px`);
+            syncRestoreMobileBankPad();
+        }
+
+        function syncRestoreMobileBankPad() {
+            const panel = document.getElementById('bs-external-clues');
+            const wrap = panel?.querySelector('.restore-bank-wrap');
+            if (!document.body.classList.contains('restore-session') || !wrap || window.innerWidth >= 768) {
+                document.documentElement.style.removeProperty('--tex-bank-mobile-pad');
+                return;
+            }
+            const h = Math.ceil(wrap.getBoundingClientRect().height || 0);
+            document.documentElement.style.setProperty('--tex-bank-mobile-pad', `${Math.max(120, h + 12)}px`);
         }
 
         function clearRestoreBankPanel() {
@@ -16191,6 +16285,7 @@
             }
             document.documentElement.style.removeProperty('--tex-reader-col-w');
             document.documentElement.style.removeProperty('--tex-bank-sticky-top');
+            document.documentElement.style.removeProperty('--tex-bank-mobile-pad');
             document.documentElement.classList.remove('restore-session', 'text-exercise-session');
             document.body.classList.remove('reader-ex-para-indent', 'restore-squeeze-active', 'tex-width-step-0', 'tex-width-step-1', 'tex-width-step-2');
             applyReaderThemeClasses(document.body, '');
@@ -16366,6 +16461,7 @@
             if (unsubscribeWords) unsubscribeWords();
             if (unsubscribeMaterials) unsubscribeMaterials();
             if (unsubscribeFolders) unsubscribeFolders();
+            if (unsubscribeSprintStats) unsubscribeSprintStats();
 
             const wordsPath = colRef('words');
             const materialsPath = colRef('materials');
@@ -16419,13 +16515,19 @@
             });
 
             const statsDocRef = docRef('stats', getSprintStatsDocId());
-            onSnapshot(statsDocRef, (docSnap) => {
+            unsubscribeSprintStats = onSnapshot(statsDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     sprintHighScores = docSnap.data().topScores || [];
                 } else {
                     sprintHighScores = [];
+                    // Legacy global doc only for the original EN track — don't pollute other languages
+                    const isPrimaryEnTrack = (activeTrackId || '').startsWith('en-')
+                        || learningLanguage === 'en';
+                    if (!isPrimaryEnTrack) return;
                     getDoc(docRef('stats', 'sprint')).then((legacy) => {
                         if (legacy.exists() && legacy.data()?.topScores?.length) {
+                            // Ignore if user already switched track while this fetch was in flight
+                            if (!(activeTrackId || '').startsWith('en-') && learningLanguage !== 'en') return;
                             sprintHighScores = legacy.data().topScores;
                         }
                     }).catch(() => {});
@@ -25082,6 +25184,13 @@
 
         const READER_PHRASE_MAX_TOKENS = 4;
 
+        function countReaderSelectionLines(text) {
+            return String(text || '')
+                .split(/\r\n|\n|\r/)
+                .map((l) => l.trim())
+                .filter(Boolean).length;
+        }
+
         function countReaderSelectionTokens(text) {
             const s = String(text || '').replace(/\s+/g, ' ').trim();
             if (!s) return 0;
@@ -26804,7 +26913,9 @@
                 return;
             }
 
-            if (text.length > 150 || text.includes('\n\n')) {
+            const selLineCount = countReaderSelectionLines(text);
+            const selMaxChars = selLineCount > 1 ? 420 : 150;
+            if (text.length > selMaxChars || text.includes('\n\n') || selLineCount > 4) {
                 setInlinePopupSelectionAdjusting(false);
                 return;
             }
@@ -26819,7 +26930,9 @@
                 const latest = getReaderSelectionRangeRect();
                 if (!latest) return;
                 const stableText = latest.text;
-                if (stableText.length === 0 || stableText.length > 150 || stableText.includes('\n\n')) return;
+                const lines = countReaderSelectionLines(stableText);
+                const maxChars = lines > 1 ? 420 : 150;
+                if (stableText.length === 0 || stableText.length > maxChars || stableText.includes('\n\n') || lines > 4) return;
                 if (stableText === lastSelectedText) {
                     scheduleInlinePopupReposition(latest.rect);
                     return;
@@ -26828,9 +26941,17 @@
                 lastSelectedText = stableText;
                 scheduleInlinePopupReposition(latest.rect);
                 const textOffset = getPlainTextOffsetInReader(latest.range);
-                const lineContext = getLineContextFromNode(latest.range?.commonAncestorContainer, stableText);
+                const multiLineSelection = lines >= 2;
+                // Multi-line verse/selection: keep full selection — don't collapse to one line
+                const lineContext = multiLineSelection
+                    ? ''
+                    : getLineContextFromNode(latest.range?.commonAncestorContainer, stableText);
                 if (readerReviewMode) handleReviewWordReveal(null, stableText);
-                processInlineTranslationRequest(stableText, currentMaterial ? currentMaterial.content : '', { textOffset, lineContext });
+                processInlineTranslationRequest(stableText, currentMaterial ? currentMaterial.content : '', {
+                    textOffset,
+                    lineContext,
+                    multiLineSelection
+                });
             }, 450);
         });
 
@@ -29253,6 +29374,10 @@
             leftAnchors: new Set([
                 'beyond', 'above', 'under', 'beneath', 'without', 'past', 'beside', 'across', 'amid', 'amidst'
             ]),
+            andBinomialLeft: new Set([
+                'by', 'now', 'over', 'up', 'back', 'to', 'out', 'in', 'on', 'here', 'there',
+                'again', 'more', 'less', 'bits', 'odds', 'trial', 'time', 'day', 'black', 'safe'
+            ]),
             idiomFrameVerbs: new Set([
                 'jump', 'hit', 'break', 'spill', 'bite', 'kick', 'bury', 'cross', 'call', 'face', 'let',
                 'burn', 'cost', 'drop', 'beat', 'catch', 'cut', 'draw', 'drive', 'hang',
@@ -29444,6 +29569,12 @@
                 // Reflexive / stance
                 ['by', 'myself'], ['by', 'yourself'], ['by', 'himself'], ['by', 'herself'],
                 ['by', 'itself'], ['by', 'ourselves'], ['by', 'themselves'],
+                ['by', 'and', 'large'], ['now', 'and', 'then'], ['over', 'and', 'over'],
+                ['over', 'and', 'over', 'again'], ['up', 'and', 'down'], ['back', 'and', 'forth'],
+                ['to', 'and', 'fro'], ['out', 'and', 'about'], ['here', 'and', 'there'],
+                ['now', 'and', 'again'], ['again', 'and', 'again'], ['more', 'and', 'more'],
+                ['less', 'and', 'less'], ['on', 'and', 'off'], ['on', 'and', 'on'],
+                ['trial', 'and', 'error'], ['bits', 'and', 'pieces'], ['odds', 'and', 'ends'],
                 ['on', 'my', 'own'], ['on', 'your', 'own'], ['on', 'his', 'own'], ['on', 'her', 'own'],
                 ['on', 'our', 'own'], ['on', 'their', 'own'],
                 ['in', 'my', 'opinion'], ['in', 'your', 'opinion'],
@@ -29827,6 +29958,23 @@
             }
             if (tokenIdx + 1 < tokens.length && rules.leftAnchors.has(tokens[tokenIdx].lower)) {
                 return buildSpan(tokenIdx, tokenIdx + 1, 'idiom');
+            }
+
+            // Binomials: by and large / now and then / up and down
+            if (rules.andBinomialLeft) {
+                const tryAndBinom = (leftIdx) => {
+                    if (leftIdx < 0 || leftIdx + 2 >= tokens.length) return null;
+                    if (tokens[leftIdx + 1].lower !== 'and') return null;
+                    if (!rules.andBinomialLeft.has(tokens[leftIdx].lower)) return null;
+                    const right = tokens[leftIdx + 2].lower;
+                    if (right.length < 2) return null;
+                    return buildSpan(leftIdx, leftIdx + 2, 'idiom');
+                };
+                const hit =
+                    tryAndBinom(tokenIdx - 2)
+                    || tryAndBinom(tokenIdx - 1)
+                    || tryAndBinom(tokenIdx);
+                if (hit) return hit;
             }
 
             // EN separable phrasals: tear me apart
@@ -30882,7 +31030,45 @@
 
             let fullSentence = "";
             let clipSource = getReaderContextText() || plainContextFromMaterialText(fullText) || '';
+            let contextClip = '';
+            let wordMatch = null;
 
+            // Multi-line verse/selection: translate the whole selection (don't cap at \n)
+            if (opts.multiLineSelection) {
+                const multiRaw = String(queryStr || displayWord || '').trim();
+                const multiFlat = multiRaw.replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim();
+                document.getElementById('inline-popup-word').textContent = multiRaw;
+                fullSentence = multiFlat;
+                contextClip = multiFlat;
+                wordMatch = { index: 0, length: multiFlat.length, matchedText: multiFlat };
+                const ctxBtnMulti = document.getElementById('inline-context-trans-btn');
+                if (ctxBtnMulti) {
+                    ctxBtnMulti.classList.add('hidden');
+                    ctxBtnMulti.disabled = true;
+                }
+                pendingInlineSaveData = {
+                    word: multiFlat,
+                    clickedWord: multiFlat,
+                    context: fullSentence,
+                    contextClip,
+                    wordMatch,
+                    anchorWordMatch: wordMatch,
+                    occurrenceIndex: 0,
+                    textOffset: Number.isFinite(opts.textOffset) ? opts.textOffset : null,
+                    contextReady: false,
+                    contextActive: false,
+                    phraseExpanded: false,
+                    phraseKind: null,
+                    hadTranslationOptions: false,
+                    contextWordTrans: null,
+                    sentenceTrans: null,
+                    literalTrans: null,
+                    saveKind: parsed.saveKind === 'phrase' || countReaderSelectionTokens(multiFlat) >= 2
+                        ? 'phrase'
+                        : parsed.saveKind,
+                    saveHint: parsed.saveHint || (countReaderSelectionTokens(multiFlat) >= 2 ? 'phrase' : null)
+                };
+            } else {
             // Lyrics / subtitle cues / Enter-separated material lines: prefer the tapped line
             const lineContext = String(opts.lineContext || '').replace(/\s+/g, ' ').trim();
             if (lineContext) {
@@ -30913,8 +31099,8 @@
             const clipResult = wordOccurrence
                 ? extractMinimalContextClip(clipSource, wordOccurrence)
                 : { clip: fullSentence, wordMatch: wordOccurrence };
-            const contextClip = clipResult.clip || fullSentence;
-            const wordMatch = contextClip ? (clipResult.wordMatch || wordOccurrence) : null;
+            contextClip = clipResult.clip || fullSentence;
+            wordMatch = contextClip ? (clipResult.wordMatch || wordOccurrence) : null;
 
             const ctxBtn = document.getElementById('inline-context-trans-btn');
             if (ctxBtn) {
@@ -30943,18 +31129,22 @@
                 saveKind: parsed.saveKind,
                 saveHint: parsed.saveHint
             };
+            }
 
             syncInlineSaveKindHint(pendingInlineSaveData);
 
-            const existing = parsed.saveKind === 'phrase'
+            const translateQuery = opts.multiLineSelection
+                ? String(pendingInlineSaveData?.word || query).toLowerCase()
+                : query;
+            const existing = (opts.multiLineSelection || pendingInlineSaveData?.saveKind === 'phrase' || parsed.saveKind === 'phrase')
                 ? null
-                : vocabulary.find(v => v.word.toLowerCase() === query);
+                : vocabulary.find(v => v.word.toLowerCase() === translateQuery);
             syncInlineDupRow(existing);
             let transText = '';
             if (existing) {
                 transText = existing.translation;
             } else {
-                const options = await fetchTranslationOptions(query);
+                const options = await fetchTranslationOptions(translateQuery);
                 if (options && options.length > 0) {
                     transText = options[0].text;
                 }
@@ -30966,11 +31156,17 @@
             document.getElementById('inline-popup-save-btn').classList.remove('hidden');
             syncInlineDupRowUi();
             if (!existing) {
-                const saveLabel = parsed.saveKind === 'phrase' ? t('inline.savePhrase') : t('inline.save');
+                const saveLabel = (pendingInlineSaveData?.saveKind === 'phrase' || parsed.saveKind === 'phrase')
+                    ? t('inline.savePhrase')
+                    : t('inline.save');
                 document.getElementById('inline-popup-save-btn').innerHTML = withEnterHint(saveLabel);
             }
 
-            loadInlineMerriamDict(displayWord, dictSection, dictContent, { expand: !!opts.keepDictOpen });
+            if (!opts.multiLineSelection) {
+                loadInlineMerriamDict(displayWord, dictSection, dictContent, { expand: !!opts.keepDictOpen });
+            } else {
+                dictSection?.classList.add('hidden');
+            }
             repositionInlinePopupSoon();
         }
 
@@ -32922,17 +33118,38 @@
             renderScoreLeaderboard(getContextMatScores(materialId), currentScore);
         }
 
+        function restoreStatsStorageKey() {
+            return `${RESTORE_STATS_KEY}_${activeTrackId || learningLanguage || 'default'}`;
+        }
+
         function loadRestoreStats() {
-            try { return JSON.parse(localStorage.getItem(RESTORE_STATS_KEY) || '{}'); } catch (_) { return {}; }
+            try {
+                const trackRaw = localStorage.getItem(restoreStatsStorageKey());
+                const track = trackRaw ? JSON.parse(trackRaw) : {};
+                if (track && typeof track === 'object' && Object.keys(track).length) return track;
+                // Legacy unscoped blob (pre track-key) — safe: keyed by materialId
+                return JSON.parse(localStorage.getItem(RESTORE_STATS_KEY) || '{}');
+            } catch (_) { return {}; }
         }
 
         function saveRestoreStats(materialId, data) {
             if (!materialId) return;
-            const all = loadRestoreStats();
+            const key = restoreStatsStorageKey();
+            let all = {};
+            try { all = JSON.parse(localStorage.getItem(key) || '{}'); } catch (_) { all = {}; }
+            if (!all[materialId]?.length) {
+                // Seed from legacy/global if this track key is new
+                try {
+                    const legacy = JSON.parse(localStorage.getItem(RESTORE_STATS_KEY) || '{}');
+                    if (Array.isArray(legacy[materialId]) && legacy[materialId].length) {
+                        all[materialId] = legacy[materialId].slice();
+                    }
+                } catch (_) {}
+            }
             const arr = all[materialId] || [];
             arr.push({ ...data, date: Date.now() });
             all[materialId] = arr.slice(-40);
-            try { localStorage.setItem(RESTORE_STATS_KEY, JSON.stringify(all)); } catch (_) {}
+            try { localStorage.setItem(key, JSON.stringify(all)); } catch (_) {}
         }
 
         function loadOrderStats() {
@@ -35752,7 +35969,7 @@
                 const pool = getWordsForMaterial(mat).filter((w) => wordHasTrainPair(w));
                 const built = buildRestoreGaps(mat, pool);
                 if (!built.gaps.length) return window.showModal(t('msg.noTrainWords'));
-                const allGaps = built.gaps;
+                const allGaps = sortRestoreGapsByText(built.gaps);
                 const batch10Eligible = allGaps.length >= 11;
                 const batch10 = batch10Eligible && loadRestoreBatch10Pref();
                 const activeGaps = resolveRestoreSessionGaps(allGaps, mat.id, batch10);
@@ -36617,7 +36834,8 @@
                 resultsIcon = "⚡";
                 resultsTitle = t('train.sprintDone');
                 resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100">${t('train.yourScore', { n: sprintScore })}</div>`;
-                lbdSection.classList.add('hidden');
+                lbdSection?.classList.remove('hidden');
+                renderSprintLeaderboard();
             } else if (sessionMode === 'context') {
                 resultsIcon = "📖";
                 resultsTitle = t('train.contextDone');
@@ -36639,8 +36857,8 @@
                         : Math.max(1, restoreSnap.timeLimit || 0))
                     : 0;
                 const correct = Math.max(1, restoreSnap?.filled || 0);
-                const curEntry = { elapsedSec, correct, date: Date.now() };
-                resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100">${t('train.yourTime', { time: formatExerciseTime(elapsedSec) })}</div>`;
+                const curEntry = { elapsedSec, correct, secPerCorrect: elapsedSec / correct, date: Date.now() };
+                resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100"><div>${t('train.yourTime', { time: formatExerciseTime(elapsedSec) })}</div><div class="text-xs font-semibold text-slate-400 mt-1">${formatSecPerWordLabel(curEntry)}</div></div>`;
                 lbdSection?.classList.remove('hidden');
                 lbdSection?.classList.add('bs-lbd-wide');
                 resultsDiv?.classList.add('bs-results--text-exercise');
@@ -36654,8 +36872,8 @@
                 const elapsedSec = orderSnap?.elapsedSec || 0;
                 if (orderSnap?.checked) {
                     const correct = Math.max(1, orderSnap.segments || 1);
-                    const curEntry = { elapsedSec, correct, date: Date.now() };
-                    resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100">${t('train.yourTime', { time: formatExerciseTime(elapsedSec) })}</div>`;
+                    const curEntry = { elapsedSec, correct, secPerCorrect: elapsedSec / correct, date: Date.now() };
+                    resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100"><div>${t('train.yourTime', { time: formatExerciseTime(elapsedSec) })}</div><div class="text-xs font-semibold text-slate-400 mt-1">${formatSecPerWordLabel(curEntry)}</div></div>`;
                     lbdSection?.classList.remove('hidden');
                     lbdSection?.classList.add('bs-lbd-wide');
                     resultsDiv?.classList.add('bs-results--text-exercise');
@@ -37422,7 +37640,6 @@
             const count = inBs && bsHardMcq ? 6 : 4;
             const opts = getOptions(word, { count, hard, field: 'translation' });
             const grid = count >= 6 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-4';
-            const hintHtml = buildTransAmbiguityHintHtml(word);
             area.innerHTML = `${buildTrainWordHeadHtml(word.word)}<div class="${grid}" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-base sm:text-lg shadow-sm flex justify-between items-center"><span>${o.translation}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
             bindTestButtons(word, feedback);
         }
@@ -37433,8 +37650,7 @@
             const count = inBs && bsHardMcq ? 6 : 4;
             const opts = getOptions(word, { count, hard, field: 'word' });
             const grid = count >= 6 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-4';
-            const hintHtml = buildTransAmbiguityHintHtml(word);
-            area.innerHTML = `<h3 class="text-2xl font-bold text-indigo-700 uppercase ${hintHtml ? 'mb-3' : 'mb-6'} tracking-wider">${escapeHtmlText(word.translation)}</h3>${hintHtml}<div class="${grid}" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-xl shadow-sm flex justify-between items-center"><span>${escapeHtmlText(o.word)}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
+            area.innerHTML = `<h3 class="text-2xl font-bold text-indigo-700 uppercase mb-6 tracking-wider">${escapeHtmlText(word.translation)}</h3><div class="${grid}" id="bs-test-opts">${opts.map((o, idx) => `<button data-id="${o.id}" class="p-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition active:scale-95 text-xl shadow-sm flex justify-between items-center"><span>${escapeHtmlText(o.word)}</span><span class="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded shadow-inner">[${idx+1}]</span></button>`).join('')}</div>`;
             bindTestButtons(word, feedback);
         }
 
@@ -37583,11 +37799,10 @@
             let ctorFreeUsed = false;
             let ctorBusy = false;
             window._bsCtorBusy = false;
-            const ambigHint = isTranslationAmbiguous(word) ? buildTransAmbiguityHintHtml(word) : '';
             const promptHtml = blind
                 ? `<p class="text-sm text-slate-400 font-bold mb-6 uppercase tracking-wider">${t('stage.2')}</p>`
                 : `<p class="text-xl text-indigo-600 font-bold mb-6 uppercase tracking-wider">${escapeHtmlText(word.translation)}</p>`;
-            area.innerHTML = `${promptHtml}${ambigHint}<div id="bs-c-slots" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 min-h-[3.5rem]"></div><div id="bs-c-pool" class="flex flex-wrap justify-center gap-2 sm:gap-2.5 min-h-[3.5rem]"></div>`;
+            area.innerHTML = `${promptHtml}<div id="bs-c-slots" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 min-h-[3.5rem]"></div><div id="bs-c-pool" class="flex flex-wrap justify-center gap-2 sm:gap-2.5 min-h-[3.5rem]"></div>`;
             document.addEventListener('keydown', handleConstructorKeyboard);
 
             const markMismatchSlots = (slots) => {
@@ -39273,7 +39488,12 @@
             return restoreState.paras.map((para, pi) => {
                 if (restoreState.squeeze && !gapParaSet.has(pi)) return '';
                 let html = para;
-                (gapByPara[pi] || []).forEach((g) => {
+                const paraGaps = (gapByPara[pi] || []).slice().sort((a, b) => {
+                    const ia = para.toLowerCase().indexOf(String(a.word || '').toLowerCase());
+                    const ib = para.toLowerCase().indexOf(String(b.word || '').toLowerCase());
+                    return (ia < 0 ? 1e9 : ia) - (ib < 0 ? 1e9 : ib) || ((a.ord ?? 0) - (b.ord ?? 0));
+                });
+                paraGaps.forEach((g) => {
                     html = blankWordForRestoreSlot(html, g.word, g.id);
                 });
                 if (!html.trim()) return '';
@@ -39395,7 +39615,7 @@
                 chip.onclick = () => {
                     if (restoreState.usedBank.has(gid)) return;
                     const targetId = restoreState.selectedGapId
-                        || restoreState.gaps.find((g) => !restoreState.filled[g.id])?.id;
+                        || getNextRestoreGapId(null);
                     if (!targetId) return;
                     placeRestoreWord(area, targetId, gid);
                 };
@@ -39404,13 +39624,19 @@
 
         function getNextRestoreGapId(afterGapId) {
             if (!restoreState) return null;
-            const gaps = restoreState.gaps;
-            const startIdx = afterGapId ? gaps.findIndex((g) => g.id === afterGapId) + 1 : 0;
-            for (let i = startIdx; i < gaps.length; i++) {
-                if (!restoreState.filled[gaps[i].id]) return gaps[i].id;
+            // Prefer visual/DOM reading order — gaps array may follow word-pool order
+            const area = document.getElementById('bs-interactive-area');
+            const domIds = area
+                ? [...area.querySelectorAll('.restore-slot')].map((s) => s.dataset.gapId).filter(Boolean)
+                : [];
+            const order = domIds.length ? domIds : restoreState.gaps.map((g) => g.id);
+            const startIdx = afterGapId ? order.indexOf(afterGapId) + 1 : 0;
+            const start = startIdx >= 0 ? startIdx : 0;
+            for (let i = start; i < order.length; i++) {
+                if (!restoreState.filled[order[i]]) return order[i];
             }
-            for (let i = 0; i < startIdx; i++) {
-                if (!restoreState.filled[gaps[i].id]) return gaps[i].id;
+            for (let i = 0; i < start; i++) {
+                if (!restoreState.filled[order[i]]) return order[i];
             }
             return null;
         }
@@ -39419,6 +39645,12 @@
             if (!restoreState || !area || !gapId) return;
             restoreState.selectedGapId = gapId;
             syncRestoreUi(area);
+            const slot = area.querySelector(`.restore-slot[data-gap-id="${gapId}"]`);
+            if (slot && typeof slot.scrollIntoView === 'function') {
+                try {
+                    slot.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+                } catch (_) {}
+            }
         }
 
         function placeRestoreWord(area, slotGapId, bankGapId) {
@@ -39484,8 +39716,13 @@
             document.body.classList.toggle('restore-squeeze-active', !!restoreState.squeeze);
             bindRestoreInteractions(area);
             syncRestoreUi(area);
+            if (!restoreState.selectedGapId) {
+                const firstId = getNextRestoreGapId(null);
+                if (firstId) selectRestoreGap(area, firstId);
+            }
             startRestoreTimer(area);
             syncTextExerciseLayout();
+            syncRestoreMobileBankPad();
         }
 
         function markOrderSegmentActive(area, idx) {
