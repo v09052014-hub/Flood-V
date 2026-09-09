@@ -602,71 +602,6 @@
             padding: 0.15rem 0.25rem;
             background: #fff;
         }
-        .reader-hl-digest {
-            display: flex;
-            flex-direction: column;
-            gap: 0.85rem;
-            font-family: inherit;
-        }
-        .reader-hl-digest-empty {
-            text-align: center;
-            color: #94a3b8;
-            font-weight: 700;
-            padding: 2rem 1rem;
-            font-family: system-ui, sans-serif;
-            font-size: 0.95rem;
-        }
-        .reader-hl-digest-ctx {
-            margin-top: 0.65rem;
-            padding-top: 0.35rem;
-        }
-        .reader-hl-digest-h {
-            color: #94a3b8;
-            font-weight: 600;
-            font-size: 0.82em;
-            line-height: 1.35;
-            letter-spacing: 0.01em;
-            font-family: system-ui, sans-serif;
-        }
-        .reader-hl-digest-h + .reader-hl-digest-h {
-            margin-top: 0.1rem;
-            font-size: 0.78em;
-            color: #a8b3c2;
-        }
-        .reader-hl-digest-item {
-            margin: 0;
-            padding: 0;
-        }
-        .reader-hl-digest-quote {
-            margin: 0;
-            padding: 0;
-            font-style: normal;
-        }
-        .reader-hl-digest-quote mark.reader-hl {
-            background: rgba(253, 224, 71, 0.45);
-            color: inherit;
-            border-radius: 2px;
-            padding: 0.05em 0.12em;
-            box-decoration-break: clone;
-            -webkit-box-decoration-break: clone;
-        }
-        .reader-hl-digest-page {
-            display: inline-block;
-            margin-top: 0.35rem;
-            border: none;
-            background: transparent;
-            color: #94a3b8;
-            font-size: 0.72rem;
-            font-weight: 700;
-            font-family: system-ui, sans-serif;
-            cursor: pointer;
-            padding: 0;
-            text-decoration: underline;
-            text-underline-offset: 2px;
-        }
-        .reader-hl-digest-page:hover { color: #64748b; }
-        #library-read-view.reader-hl-only #reader-pagination-top { display: none !important; }
-        #library-read-view.reader-hl-only #reader-pagination { display: none !important; }
         .reader-settings-icon-row {
             display: flex;
             align-items: center;
@@ -955,6 +890,223 @@
             margin: 0 0.1em;
             opacity: 0.9;
         }
+        .text-reader mark.reader-hl-book::after {
+            content: none;
+        }
+        .text-reader mark.reader-hl-flash,
+        #reader-hl-peek-body mark.reader-hl-flash,
+        .text-reader h1.reader-hl-flash,
+        .text-reader h2.reader-hl-flash,
+        .text-reader h3.reader-hl-flash {
+            animation: readerHlFlash 1.15s ease-in-out 2;
+            background: rgba(253, 224, 71, 0.72) !important;
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.55);
+            border-radius: 3px;
+        }
+        @keyframes readerHlFlash {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.18); }
+        }
+        .reader-hl-digest {
+            display: flex;
+            flex-direction: column;
+            gap: 1.15rem;
+            font-family: inherit;
+            padding-bottom: 1rem;
+        }
+        .reader-hl-digest-empty {
+            text-align: center;
+            color: #94a3b8;
+            font-weight: 700;
+            padding: 2rem 1rem;
+            font-family: system-ui, sans-serif;
+            font-size: 0.95rem;
+        }
+        .reader-hl-digest-block {
+            margin: 0;
+            padding: 0.85rem 0.9rem 0.75rem;
+            border: 1px solid #e8edf3;
+            border-radius: 0.85rem;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+        }
+        .reader-hl-digest-ctx {
+            margin: 0 0 0.55rem;
+            padding: 0 0 0.45rem;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .reader-hl-digest-h {
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 0.78rem;
+            line-height: 1.35;
+            letter-spacing: 0.01em;
+            font-family: system-ui, sans-serif;
+            cursor: pointer;
+            padding: 0.15rem 0;
+        }
+        .reader-hl-digest-h:hover { color: #64748b; }
+        .reader-hl-digest-h + .reader-hl-digest-h {
+            margin-top: 0.08rem;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: #a8b3c2;
+        }
+        .reader-hl-digest-item {
+            margin: 0;
+            padding: 0;
+        }
+        .reader-hl-digest-item + .reader-hl-digest-item {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f1f5f9;
+        }
+        .reader-hl-digest-quote {
+            margin: 0;
+            padding: 0;
+            font-style: normal;
+            cursor: pointer;
+        }
+        .reader-hl-digest-quote mark.reader-hl {
+            background: rgba(253, 224, 71, 0.45);
+            color: inherit;
+            border-radius: 2px;
+            padding: 0.05em 0.12em;
+            white-space: pre-wrap;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+        .reader-hl-digest-quote mark.reader-hl-book::before,
+        .reader-hl-digest-quote mark.reader-hl-book::after {
+            content: none;
+        }
+        .reader-hl-digest-page {
+            display: inline-block;
+            margin-top: 0.4rem;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.72rem;
+            font-weight: 700;
+            font-family: system-ui, sans-serif;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .reader-hl-digest-page:hover { color: #64748b; }
+        .reader-hl-rail {
+            display: none;
+        }
+        .reader-hl-peek {
+            display: none;
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 80;
+            height: min(52vh, 28rem);
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -8px 28px rgba(15, 23, 42, 0.14);
+            flex-direction: column;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        #library-read-view.reader-hl-peek-open .reader-hl-peek {
+            display: flex;
+        }
+        #library-read-view.reader-hl-peek-open #reader-content-wrapper {
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+        .reader-hl-peek-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.55rem 0.85rem;
+            border-bottom: 1px solid #eef2f7;
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+        .reader-hl-peek-label {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #64748b;
+            font-family: system-ui, sans-serif;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .reader-hl-peek-close {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #64748b;
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .reader-hl-peek-body {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: 0.85rem 1rem 1.25rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        @media (min-width: 960px) {
+            #library-read-view.reader-hl-only .reader-layout {
+                display: grid;
+                grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+                gap: 1rem;
+                align-items: start;
+            }
+            #library-read-view.reader-hl-only .reader-hl-rail {
+                display: block;
+                position: sticky;
+                top: 4.5rem;
+                max-height: calc(100vh - 5.5rem);
+                overflow-y: auto;
+                padding: 0.65rem 0.45rem;
+                border-radius: 0.85rem;
+                background: rgba(248, 250, 252, 0.95);
+                border: 1px solid #eef2f7;
+            }
+            #library-read-view.reader-hl-only .reader-hl-rail .reader-hl-digest {
+                gap: 0.75rem;
+            }
+            #library-read-view.reader-hl-only .reader-hl-rail .reader-hl-digest-block {
+                padding: 0.65rem 0.7rem 0.55rem;
+            }
+            #library-read-view.reader-hl-only .reader-hl-rail .reader-hl-digest-quote {
+                font-size: 0.92em;
+            }
+            #library-read-view.reader-hl-only #reader-content .reader-hl-digest {
+                display: none;
+            }
+            #library-read-view.reader-hl-peek-open .reader-hl-peek {
+                display: none;
+            }
+            #library-read-view.reader-hl-peek-open #reader-content-wrapper {
+                max-height: none;
+            }
+            #library-read-view.reader-hl-only #reader-pagination {
+                display: flex !important;
+            }
+            #library-read-view.reader-hl-only #reader-pagination-top {
+                display: flex !important;
+            }
+        }
+        #library-read-view.reader-hl-only #reader-pagination-top { display: none !important; }
+        #library-read-view.reader-hl-only #reader-pagination { display: none !important; }
         #library-read-view[data-hl-color="mint"] .text-reader mark.reader-hl:not(.reader-hl-book) {
             background: rgba(94, 234, 212, 0.45);
             color: inherit;
@@ -966,7 +1118,6 @@
         ::highlight(reader-hl) {
             background-color: rgba(253, 224, 71, 0.55);
         }
-        /* Reader words: no box padding — keeps sentence highlights continuous (marker on or off) */
         #library-read-view .text-reader .word-clickable {
             padding: 0;
             margin: 0;
@@ -1853,6 +2004,17 @@
         body.train-osk-open.train-osk-numbers-open #bs-workspace {
             padding-bottom: calc(var(--train-osk-pad, 11.75rem) + 3.35rem);
         }
+        body.train-osk-open.train-osk-accent-open #bs-workspace {
+            padding-bottom: calc(var(--train-osk-pad, 11.75rem) + 2.85rem);
+        }
+        body.train-osk-open.train-osk-numbers-open.train-osk-accent-open #bs-workspace {
+            padding-bottom: calc(var(--train-osk-pad, 11.75rem) + 6.05rem);
+        }
+        .train-osk-accents {
+            margin-bottom: 0.28rem;
+            padding-bottom: 0.28rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        }
         .train-osk-floats {
             position: relative;
             top: auto;
@@ -1925,15 +2087,6 @@
         .train-osk-preview.is-hiding {
             opacity: 0;
             transform: translate(-50%, calc(-100% - 0.72rem)) scale(0.94);
-        }
-        .train-osk-row--es-accent {
-            display: none;
-        }
-        body.train-osk-accent-open .train-osk-row--es-accent {
-            display: flex;
-        }
-        body.train-osk-open.train-osk-accent-open #bs-workspace {
-            padding-bottom: calc(var(--train-osk-pad, 11.75rem) + 2.85rem);
         }
         .train-ctx-gap {
             color: #4338ca;
@@ -3354,6 +3507,24 @@
             transition: opacity 0.15s ease, background 0.15s ease;
             line-height: 0;
         }
+        .dict-listen-badge {
+            position: absolute;
+            right: 0.35rem;
+            bottom: 0.35rem;
+            z-index: 8;
+            width: 1.35rem;
+            height: 1.35rem;
+            border-radius: 0.4rem;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            line-height: 1;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+            pointer-events: none;
+        }
         .dict-word-delete svg,
         .dict-word-speak svg {
             width: 0.72rem;
@@ -3367,8 +3538,19 @@
                 opacity: 1;
             }
         }
+        /* Touch: listen is useful on the grid; keep delete hidden until select mode */
+        @media (hover: none), (pointer: coarse) {
+            .dict-word-speak {
+                opacity: 0.78;
+            }
+        }
         .dict-word-delete:hover { background: #fff1f2; }
         .dict-word-speak:hover { background: #eef2ff; }
+        #inline-popup-tts.is-listen-queued {
+            background: #ecfdf5;
+            color: #15803d;
+            border-color: #86efac;
+        }
 
         .header-right-tools {
             display: inline-flex;
@@ -9600,6 +9782,7 @@
                 <button type="button" id="reader-yt-jump" onclick="jumpToActiveSubtitle()" aria-label="Current line" data-i18n-title="lib.jumpToLine" title="До поточного рядка">↓</button>
 
                 <div id="reader-layout" class="reader-layout">
+                    <nav id="reader-hl-rail" class="reader-hl-rail" aria-label="Highlights"></nav>
                     <nav id="reader-toc-rail" class="reader-toc-rail" aria-label="Sections"></nav>
                     <div id="reader-main-col" class="reader-main-col">
                         <div id="reader-toc-mobile" class="reader-toc-mobile">
@@ -9618,6 +9801,14 @@
                         
                         <div id="reader-content-wrapper" class="bg-white px-3 py-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 relative mb-4 overflow-hidden">
                             <div id="reader-content" class="text-reader" style="font-size: 18px; font-family: 'Georgia', serif;"></div>
+                        </div>
+
+                        <div id="reader-hl-peek" class="reader-hl-peek" aria-hidden="true">
+                            <div class="reader-hl-peek-bar">
+                                <span id="reader-hl-peek-label" class="reader-hl-peek-label"></span>
+                                <button type="button" class="reader-hl-peek-close" onclick="closeReaderHlPeek()" aria-label="Close">×</button>
+                            </div>
+                            <div id="reader-hl-peek-body" class="reader-hl-peek-body text-reader"></div>
                         </div>
 
                         <div id="reader-pagination" class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
@@ -10068,7 +10259,7 @@
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
                 <button type="button" id="inline-popup-back" onclick="inlinePopupGoBack()" class="hidden flex-shrink-0 w-8 h-8 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 font-bold text-sm transition" title="Back" data-i18n-title="inline.back">←</button>
                 <strong id="inline-popup-word" class="text-indigo-700 font-bold break-words min-w-0"></strong>
-                <button type="button" id="inline-popup-tts" onclick="playInlineWordAudio()" class="flex-shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 transition" title="Listen" data-i18n-title="inline.listen" aria-label="Listen">🔊</button>
+                <button type="button" id="inline-popup-tts" class="flex-shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 transition" title="Listen · long-press → listening practice" data-i18n-title="inline.listenHold" aria-label="Listen">🔊</button>
             </div>
             <div class="flex items-center gap-1 flex-shrink-0">
                 <button type="button" id="inline-context-trans-btn" onclick="fetchInlineContextTranslation()" class="hidden w-8 h-8 inline-flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 transition text-base leading-none disabled:opacity-40 disabled:pointer-events-none" title="Exact translation in sentence" data-i18n-title="inline.contextTrans" aria-label="Context translation">🎯</button>
@@ -10752,6 +10943,7 @@
                 'reader.hlOnlyHint': 'Усі маркери з книги + сірі заголовки для контексту',
                 'reader.hlOnlyEmpty': 'Поки немає виділеного тексту',
                 'reader.hlOnlyPage': 'стор. {n}',
+                'reader.hlPeek': 'Сторінка {n}',
                 'reader.toc': 'Розділи',
                 'reader.tocEmpty': 'Немає заголовків розділів',
                 'lib.tabText': 'Текст', 'lib.tabUrl': 'Стаття (URL)', 'lib.tabYt': 'YouTube',
@@ -10825,6 +11017,9 @@
                 'inline.phraseSaved': 'Фразу додано до тренування «Порядок»',
                 'inline.phraseNeedMaterial': 'Збережіть фразу під час читання матеріалу',
                 'inline.back': 'Назад', 'inline.listen': 'Прослухати',
+                'inline.listenHold': 'Прослухати · утримання → у аудіювання',
+                'inline.listenQueued': 'Додано до аудіювання',
+                'inline.listenNeedTrans': 'Спочатку потрібен переклад',
                 'inline.dict': 'Тлумачення',
                 'inline.noDefs': 'Визначень не знайдено.',
                 'inline.dictLoading': 'Завантаження словника...',
@@ -11450,6 +11645,7 @@
                 'reader.hlOnlyHint': 'All book highlights with gray headings for context',
                 'reader.hlOnlyEmpty': 'No highlights yet',
                 'reader.hlOnlyPage': 'p. {n}',
+                'reader.hlPeek': 'Page {n}',
                 'reader.toc': 'Sections',
                 'reader.tocEmpty': 'No section headings',
                 'lib.tabText': 'Text', 'lib.tabUrl': 'Article (URL)', 'lib.tabYt': 'YouTube',
@@ -11523,6 +11719,9 @@
                 'inline.phraseSaved': 'Phrase added to Order training',
                 'inline.phraseNeedMaterial': 'Save phrases while reading a material',
                 'inline.back': 'Back', 'inline.listen': 'Listen',
+                'inline.listenHold': 'Listen · hold → listening practice',
+                'inline.listenQueued': 'Added to listening practice',
+                'inline.listenNeedTrans': 'Add a translation first',
                 'inline.dict': 'Definition',
                 'inline.noDefs': 'No definitions found.',
                 'inline.dictLoading': 'Loading dictionary...',
@@ -12143,6 +12342,7 @@
                 'reader.hlOnlyHint': 'Todos los resaltados del libro con títulos grises de contexto',
                 'reader.hlOnlyEmpty': 'Aún no hay resaltados',
                 'reader.hlOnlyPage': 'pág. {n}',
+                'reader.hlPeek': 'Página {n}',
                 'reader.toc': 'Secciones',
                 'reader.tocEmpty': 'No hay encabezados de sección',
                 'lib.tabText': 'Texto', 'lib.tabUrl': 'Artículo (URL)', 'lib.tabYt': 'YouTube',
@@ -12216,6 +12416,9 @@
                 'inline.phraseSaved': 'Frase añadida al entrenamiento Orden',
                 'inline.phraseNeedMaterial': 'Guarda frases mientras lees un material',
                 'inline.back': 'Atrás', 'inline.listen': 'Escuchar',
+                'inline.listenHold': 'Escuchar · mantener → práctica de escucha',
+                'inline.listenQueued': 'Añadido a la práctica de escucha',
+                'inline.listenNeedTrans': 'Primero hace falta la traducción',
                 'inline.dict': 'Definición',
                 'inline.noDefs': 'No se encontraron definiciones.',
                 'inline.dictLoading': 'Cargando el diccionario...',
@@ -15843,6 +16046,9 @@
                 [`srs_${modeKey}_NextTime`]: w.failed ? Date.now() + DAY_MS : getNextReviewTime(newLevel),
                 bsHistory: appendTrainingHistory(w, activeSessionMode, w.failed ? currentLevel : newLevel, w.failed)
             };
+            if (modeKey === 'listening' && !w.failed && newLevel >= MAX_SRS_LEVEL) {
+                patch.listenFocus = false;
+            }
             return patch;
         }
 
@@ -20227,6 +20433,7 @@
                         <strong class="text-indigo-700 text-base sm:text-lg leading-tight truncate font-bold">${formatWordWithArticleHtml(item.word, learningLanguage)}</strong>
                         <span class="text-slate-800 text-xs sm:text-sm font-semibold truncate">${item.translation}</span>
                     </div>
+                    ${item.listenFocus ? `<span class="dict-listen-badge" title="${escapeHtmlText(t('mode.listening'))}" aria-hidden="true">🔊</span>` : ''}
                     ${dictSelectMode
                         ? `<label class="absolute top-2 left-2 z-10 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center border cursor-pointer" onclick="event.stopPropagation();">
                             <input type="checkbox" class="w-4 h-4 accent-indigo-600 cursor-pointer" ${selected ? 'checked' : ''} onchange="toggleDictWordSelect('${item.id}', event)">
@@ -23435,7 +23642,9 @@
                 btn.setAttribute('aria-label', label);
             }
             document.getElementById('library-read-view')?.classList.toggle('reader-hl-only', !!readerHighlightsOnly);
+            if (!readerHighlightsOnly) closeReaderHlPeek();
             syncReaderTocUi();
+            syncReaderHlRail();
         }
 
         function rebuildReaderPageHeadingIndex() {
@@ -23524,7 +23733,7 @@
                 const active = entry.id === activeId ? ' is-active' : '';
                 const kindCls = entry.kind === 'part' ? ' is-part' : entry.kind === 'chapter' ? ' is-chapter' : '';
                 const lvlCls = entry.level === 2 ? ' is-h2' : entry.level === 3 ? ' is-h3' : '';
-                html += `<li><button type="button" class="reader-toc-item${kindCls}${lvlCls}${active}" onclick="jumpReaderToc(${entry.page})">${escapeHtmlText(entry.text)}</button></li>`;
+                html += `<li><button type="button" class="reader-toc-item${kindCls}${lvlCls}${active}" onclick="jumpReaderToc(${entry.page}, decodeURIComponent('${encodeURIComponent(entry.text)}'))">${escapeHtmlText(entry.text)}</button></li>`;
             });
             html += '</ul>';
             return html;
@@ -23577,9 +23786,133 @@
             syncReaderTocUi();
         };
 
-        window.jumpReaderToc = (pageNum) => {
+        window.jumpReaderToc = (pageNum, headingText) => {
             readerTocMobileOpen = false;
-            goToReaderPage(pageNum, { force: true });
+            closeReaderHlPeek();
+            goToReaderPage(pageNum, { force: true, noScroll: true });
+            requestAnimationFrame(() => {
+                scrollReaderToHeadingFlash(headingText);
+            });
+        };
+
+        function isReaderHlDesktopLayout() {
+            return !!readerHighlightsOnly && window.matchMedia('(min-width: 960px)').matches;
+        }
+
+        function scrollReaderToHeadingFlash(headingText) {
+            const needle = String(headingText || '').replace(/\s+/g, ' ').trim().toLowerCase();
+            const root = document.getElementById('reader-content');
+            if (!root || !needle) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            const heads = [...root.querySelectorAll('h1, h2, h3')];
+            const hit = heads.find((el) => (el.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase() === needle)
+                || heads.find((el) => (el.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase().includes(needle));
+            if (!hit) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            try { hit.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
+            hit.classList.add('reader-hl-flash');
+            setTimeout(() => hit.classList.remove('reader-hl-flash'), 2400);
+        }
+
+        function flashReaderHighlightAt(start, end, rootEl) {
+            const root = rootEl || document.getElementById('reader-content');
+            if (!root || !Number.isFinite(start) || !Number.isFinite(end) || end <= start) return;
+            root.querySelectorAll('mark.reader-hl-flash').forEach((m) => m.classList.remove('reader-hl-flash'));
+            let mark = [...root.querySelectorAll('mark.reader-hl')].find((m) =>
+                Number(m.dataset.hlStart) === start && Number(m.dataset.hlEnd) === end
+            );
+            if (!mark) {
+                applyReaderHighlightRangeDom(root, start, end);
+                mark = [...root.querySelectorAll('mark.reader-hl')].find((m) =>
+                    Number(m.dataset.hlStart) === start && Number(m.dataset.hlEnd) === end
+                );
+            }
+            if (!mark) return;
+            try { mark.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
+            mark.classList.add('reader-hl-flash');
+            setTimeout(() => {
+                mark.classList.remove('reader-hl-flash');
+                if (rootEl) return;
+                if (root === document.getElementById('reader-content') && readerHighlightUsesCssApi()) {
+                    applyStoredHighlightsToReader();
+                }
+            }, 2400);
+        }
+
+        function buildReaderPageHtmlForPeek(pageNum) {
+            const idx = Math.max(0, (pageNum || 1) - 1);
+            const savedLexicon = buildReaderSavedLexicon(vocabulary, currentMaterial?.id);
+            const wordOccMap = new Map();
+            if (currentMaterial?.subtitles) {
+                const subs = readerPages[idx] || [];
+                return isLyricsLikeSubtitles(subs)
+                    ? renderLyricsSubtitlesHtml(subs, savedLexicon, wordOccMap)
+                    : renderProseSubtitlesHtml(subs, savedLexicon, wordOccMap);
+            }
+            return wrapHtmlWords(String(readerPages[idx] || ''), savedLexicon, wordOccMap);
+        }
+
+        function applyHighlightsToRoot(root, pageNum) {
+            if (!root) return;
+            root.querySelectorAll('mark.reader-hl').forEach((mark) => {
+                const parent = mark.parentNode;
+                if (!parent) return;
+                while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+                parent.removeChild(mark);
+                parent.normalize?.();
+            });
+            const list = getReaderHighlightsForPage(pageNum)
+                .filter((h) => h && Number.isFinite(h.start) && Number.isFinite(h.end) && h.end > h.start)
+                .sort((a, b) => a.start - b.start);
+            list.forEach((h) => applyReaderHighlightRangeDom(root, h.start, h.end));
+        }
+
+        window.closeReaderHlPeek = () => {
+            const view = document.getElementById('library-read-view');
+            view?.classList.remove('reader-hl-peek-open');
+            const peek = document.getElementById('reader-hl-peek');
+            if (peek) peek.setAttribute('aria-hidden', 'true');
+            const body = document.getElementById('reader-hl-peek-body');
+            if (body) body.innerHTML = '';
+        };
+
+        window.openReaderHlPeek = (pageNum, start, end) => {
+            if (isReaderHlDesktopLayout()) {
+                goToReaderHighlightFromDigest(pageNum, start, end, { desktop: true });
+                return;
+            }
+            const body = document.getElementById('reader-hl-peek-body');
+            const label = document.getElementById('reader-hl-peek-label');
+            const view = document.getElementById('library-read-view');
+            if (!body || !view) return;
+            body.innerHTML = buildReaderPageHtmlForPeek(pageNum);
+            try {
+                body.style.fontSize = `${currentReaderFontSize}px`;
+                body.style.fontFamily = currentReaderFontFamily;
+            } catch (_) {}
+            applyHighlightsToRoot(body, pageNum);
+            if (label) label.textContent = t('reader.hlPeek', { n: pageNum });
+            view.classList.add('reader-hl-peek-open');
+            document.getElementById('reader-hl-peek')?.setAttribute('aria-hidden', 'false');
+            requestAnimationFrame(() => flashReaderHighlightAt(start, end, body));
+        };
+
+        window.goToReaderHighlightFromDigest = (pageNum, start, end, opts = {}) => {
+            const desktop = opts.desktop || isReaderHlDesktopLayout();
+            if (!desktop && readerHighlightsOnly) {
+                openReaderHlPeek(pageNum, start, end);
+                return;
+            }
+            closeReaderHlPeek();
+            goToReaderPage(pageNum, { force: true, noScroll: true });
+            requestAnimationFrame(() => {
+                applyStoredHighlightsToReader();
+                flashReaderHighlightAt(start, end);
+            });
         };
 
         function resolveReaderHeadingsAtOffset(pageNum, offset) {
@@ -23629,7 +23962,10 @@
                     const text = String(h?.text || '').trim();
                     if (!text) return;
                     items.push({
+                        id: h.id || `p${p}_${h.start}_${h.end}`,
                         page: p,
+                        start: Number(h.start) || 0,
+                        end: Number(h.end) || 0,
                         text,
                         headings: resolveReaderHeadingsAtOffset(p, h.start || 0)
                     });
@@ -23638,32 +23974,52 @@
             return items;
         }
 
-        function renderHighlightsOnlyHtml() {
+        function renderHighlightsOnlyHtml(opts = {}) {
+            const compact = !!opts.compact;
             const items = collectReaderHighlightDigestItems();
             if (!items.length) {
                 return `<div class="reader-hl-digest-empty" data-reader-ui="1">${escapeHtmlText(t('reader.hlOnlyEmpty'))}</div>`;
             }
-            let lastHeadKey = null;
-            let html = '<div class="reader-hl-digest" data-reader-ui="1">';
-            items.forEach((it) => {
-                const headKey = it.headings.join('\0');
-                if (headKey && headKey !== lastHeadKey) {
+            let html = `<div class="reader-hl-digest${compact ? ' is-compact' : ''}" data-reader-ui="1">`;
+            let i = 0;
+            while (i < items.length) {
+                const headKey = items[i].headings.join('\0');
+                const blockItems = [];
+                while (i < items.length && items[i].headings.join('\0') === headKey) {
+                    blockItems.push(items[i]);
+                    i += 1;
+                }
+                const first = blockItems[0];
+                html += '<section class="reader-hl-digest-block">';
+                if (first.headings.length) {
                     html += '<div class="reader-hl-digest-ctx">';
-                    it.headings.forEach((h) => {
-                        html += `<div class="reader-hl-digest-h">${escapeHtmlText(h)}</div>`;
+                    first.headings.forEach((h) => {
+                        html += `<button type="button" class="reader-hl-digest-h" onclick="goToReaderHighlightFromDigest(${first.page}, ${first.start}, ${first.end})">${escapeHtmlText(h)}</button>`;
                     });
                     html += '</div>';
-                    lastHeadKey = headKey;
-                } else if (!headKey) {
-                    lastHeadKey = '';
                 }
-                html += `<figure class="reader-hl-digest-item">
-                    <blockquote class="reader-hl-digest-quote"><mark class="reader-hl reader-hl-book">${escapeHtmlText(it.text)}</mark></blockquote>
-                    <button type="button" class="reader-hl-digest-page" onclick="goToReaderPageFromDigest(${it.page})">${escapeHtmlText(t('reader.hlOnlyPage', { n: it.page }))}</button>
-                </figure>`;
-            });
+                blockItems.forEach((it) => {
+                    const safeText = escapeHtmlText(it.text);
+                    html += `<figure class="reader-hl-digest-item">
+                        <blockquote class="reader-hl-digest-quote" onclick="goToReaderHighlightFromDigest(${it.page}, ${it.start}, ${it.end})"><mark class="reader-hl">${safeText}</mark></blockquote>
+                        <button type="button" class="reader-hl-digest-page" onclick="event.stopPropagation(); goToReaderHighlightFromDigest(${it.page}, ${it.start}, ${it.end})">${escapeHtmlText(t('reader.hlOnlyPage', { n: it.page }))}</button>
+                    </figure>`;
+                });
+                html += '</section>';
+            }
             html += '</div>';
             return html;
+        }
+
+        function syncReaderHlRail() {
+            const rail = document.getElementById('reader-hl-rail');
+            if (!rail) return;
+            if (!readerHighlightsOnly || !isReaderHlDesktopLayout()) {
+                rail.innerHTML = '';
+                return;
+            }
+            rail.innerHTML = renderHighlightsOnlyHtml({ compact: true });
+            rail.setAttribute('aria-label', t('reader.hlOnly'));
         }
 
         function fillReaderPageInfoEl(el) {
@@ -23679,7 +24035,7 @@
         function syncReaderPageChrome() {
             const atFirst = readerCurrentPage === 1;
             const atLast = readerCurrentPage === readerTotalPages;
-            const multiPage = readerTotalPages > 1 && !readerHighlightsOnly;
+            const multiPage = readerTotalPages > 1 && (!readerHighlightsOnly || isReaderHlDesktopLayout());
 
             const bot = document.getElementById('reader-pagination');
             const prev = document.getElementById('btn-reader-prev');
@@ -23719,6 +24075,11 @@
         };
 
         window.goToReaderPageFromDigest = (pageNum) => {
+            closeReaderHlPeek();
+            if (isReaderHlDesktopLayout()) {
+                goToReaderPage(pageNum, { force: true });
+                return;
+            }
             readerHighlightsOnly = false;
             try { localStorage.setItem(READER_HL_ONLY_KEY, '0'); } catch (_) {}
             syncReaderHighlightsOnlyUi();
@@ -24662,6 +25023,17 @@
                 if (panel && !panel.classList.contains('hidden') && readerSettingsAnchor) {
                     positionReaderSettingsPanel(readerSettingsAnchor);
                 }
+                if (readerHighlightsOnly) {
+                    syncReaderHlRail();
+                    if (isReaderHlDesktopLayout()) closeReaderHlPeek();
+                    // Crossing mobile/desktop breakpoint: re-render digest vs page layout
+                    if (!window._readerHlLayoutWasDesktop) window._readerHlLayoutWasDesktop = false;
+                    const nowDesktop = isReaderHlDesktopLayout();
+                    if (nowDesktop !== window._readerHlLayoutWasDesktop) {
+                        window._readerHlLayoutWasDesktop = nowDesktop;
+                        renderReaderContent();
+                    }
+                }
             });
             window.addEventListener('scroll', () => {
                 const panel = document.getElementById('reader-settings-panel');
@@ -24858,6 +25230,8 @@
             unbindReaderToolsDock();
             clearReaderHighlightPaint();
             document.getElementById('library-read-view')?.classList.remove('reader-hl-mode');
+            document.getElementById('library-read-view')?.classList.remove('reader-hl-peek-open');
+            closeReaderHlPeek();
             clearTimeout(readerHighlightSaveTimer);
             clearTimeout(readerHighlightSelectTimer);
             saveReaderHighlightsToFirebase().catch(() => {});
@@ -26645,13 +27019,14 @@
             const savedLexicon = buildReaderSavedLexicon(vocabulary, currentMaterial?.id);
             const wordOccMap = new Map();
 
-            if (readerHighlightsOnly) {
+            if (readerHighlightsOnly && !isReaderHlDesktopLayout()) {
                 currentSubtitlesLyricMode = false;
                 container.innerHTML = renderHighlightsOnlyHtml();
+                syncReaderHlRail();
                 syncReaderPageChrome();
                 return;
             }
-            
+
             const currentPageData = readerPages[readerCurrentPage - 1];
 
             if (currentMaterial.subtitles) {
@@ -26667,13 +27042,14 @@
                 hydrateReaderAudioBlocks(container);
             }
 
-            if (readerCurrentPage === readerTotalPages) {
+            if (readerCurrentPage === readerTotalPages && !readerHighlightsOnly) {
                 const uiWrap = document.createElement('div');
                 uiWrap.innerHTML = renderMarkAsReadBtn();
                 while (uiWrap.firstChild) container.appendChild(uiWrap.firstChild);
             }
 
             applyStoredHighlightsToReader();
+            syncReaderHlRail();
             syncReaderPageChrome();
         }
 
@@ -26911,7 +27287,7 @@
                     const stable = latest.text.replace(/\s+/g, ' ').trim();
                     if (!stable || stable.length > 600) return;
                     handleReaderHighlightSelection(latest.range);
-                }, 380);
+                }, 720);
                 return;
             }
 
@@ -26927,6 +27303,7 @@
             scheduleInlinePopupReposition(rect);
 
             clearTimeout(selectionFetchTimeout);
+            const commitMs = selLineCount >= 2 ? 950 : 780;
             selectionFetchTimeout = setTimeout(() => {
                 setInlinePopupSelectionAdjusting(false);
                 const latest = getReaderSelectionRangeRect();
@@ -26954,7 +27331,7 @@
                     lineContext,
                     multiLineSelection
                 });
-            }, 450);
+            }, commitMs);
         });
 
         document.addEventListener('click', (e) => { 
@@ -26975,6 +27352,9 @@
         window.closeInlinePopup = () => {
             clearTimeout(selectionFetchTimeout);
             setInlinePopupSelectionAdjusting(false);
+            clearInlineTtsHold?.();
+            inlineTtsHoldFired = false;
+            document.getElementById('inline-popup-tts')?.classList.remove('is-listen-queued');
             inlinePopup.classList.add('hidden');
             inlinePopup.classList.remove('inline-popup--dock-mobile');
             applyReaderThemeClasses(inlinePopup, '');
@@ -31173,6 +31553,84 @@
         }
 
         let inlineTtsAudio = null;
+        const INLINE_TTS_HOLD_MS = 480;
+        let inlineTtsHoldTimer = null;
+        let inlineTtsHoldFired = false;
+
+        function clearInlineTtsHold() {
+            if (inlineTtsHoldTimer) clearTimeout(inlineTtsHoldTimer);
+            inlineTtsHoldTimer = null;
+        }
+
+        function listeningQueuePatch() {
+            return {
+                listenFocus: true,
+                srs_listening_Level: 0,
+                srs_listening_NextTime: 0
+            };
+        }
+
+        async function queueWordForListeningPractice(opts = {}) {
+            if (!activeUid || !db) {
+                window.showModal?.(t('persist.login'));
+                return false;
+            }
+            const word = String(opts.word || '').trim();
+            const translation = String(opts.translation || '').trim();
+            if (!word) return false;
+            if (!translation) {
+                window.showModal?.(t('inline.listenNeedTrans'));
+                return false;
+            }
+            const existing = vocabulary.find((v) => v.word.toLowerCase() === word.toLowerCase());
+            const listenPatch = listeningQueuePatch();
+            try {
+                if (existing) {
+                    const patch = {
+                        ...listenPatch,
+                        translation: translation || existing.translation,
+                        context: opts.context
+                            ? mergeWordContext(existing.context, opts.context)
+                            : existing.context
+                    };
+                    if (opts.materialId) patch.materialId = opts.materialId;
+                    else if (currentMaterial) patch.materialId = currentMaterial.id;
+                    if (opts.source) patch.source = opts.source;
+                    await updateDoc(docRef('words', existing.id), patch);
+                    patchLocalWord(existing.id, patch);
+                } else {
+                    const imgUrl = opts.imageUrl || await getImageUrl(word, translation);
+                    const saveData = {
+                        word,
+                        translation,
+                        context: opts.context || '',
+                        imageUrl: imgUrl,
+                        source: opts.source || getSaveSource(),
+                        createdAt: serverTimestamp(),
+                        srsLevel: 0,
+                        nextReviewTime: 0,
+                        bsHistory: [],
+                        ...listenPatch
+                    };
+                    if (opts.materialId) saveData.materialId = opts.materialId;
+                    else if (currentMaterial) saveData.materialId = currentMaterial.id;
+                    const ref = await addDoc(colRef('words'), saveData);
+                    try { recordWordsAdded(1); } catch (_) {}
+                    onReaderNewWordSaved?.(ref.id, saveData);
+                }
+                const btn = document.getElementById('inline-popup-tts');
+                btn?.classList.add('is-listen-queued');
+                window.showModal?.(t('inline.listenQueued'));
+                try { renderDictionary(); } catch (_) {}
+                try { updateTrainSources(); } catch (_) {}
+                return true;
+            } catch (e) {
+                console.error('queueWordForListeningPractice', e);
+                window.showModal?.(t('msg.saveError'));
+                return false;
+            }
+        }
+
         window.playInlineWordAudio = async () => {
             const word = (document.getElementById('inline-popup-word')?.textContent || '').trim();
             if (!word || isGlobalAudioMuted) return;
@@ -31185,6 +31643,61 @@
                 if (btn) btn.disabled = false;
             }
         };
+
+        window.queueInlineWordForListening = async () => {
+            const word = String(
+                pendingInlineSaveData?.word
+                || document.getElementById('inline-popup-word')?.textContent
+                || ''
+            ).replace(/\s+/g, ' ').trim();
+            const translation = String(
+                document.getElementById('inline-popup-trans-input')?.value
+                || ''
+            ).trim();
+            return queueWordForListeningPractice({
+                word,
+                translation,
+                context: pendingInlineSaveData?.context || '',
+                source: getSaveSource(),
+                materialId: currentMaterial?.id || null
+            });
+        };
+
+        (function wireInlinePopupTtsHold() {
+            const btn = document.getElementById('inline-popup-tts');
+            if (!btn || btn._listenHoldWired) return;
+            btn._listenHoldWired = true;
+            const onDown = (e) => {
+                if (e.button != null && e.button !== 0) return;
+                inlineTtsHoldFired = false;
+                clearInlineTtsHold();
+                try { btn.setPointerCapture?.(e.pointerId); } catch (_) {}
+                inlineTtsHoldTimer = setTimeout(async () => {
+                    inlineTtsHoldFired = true;
+                    inlineTtsHoldTimer = null;
+                    await window.queueInlineWordForListening();
+                }, INLINE_TTS_HOLD_MS);
+            };
+            const onUp = (e) => {
+                const wasHold = inlineTtsHoldFired;
+                clearInlineTtsHold();
+                try { btn.releasePointerCapture?.(e.pointerId); } catch (_) {}
+                if (wasHold) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+                window.playInlineWordAudio();
+            };
+            const onCancel = () => {
+                clearInlineTtsHold();
+                inlineTtsHoldFired = false;
+            };
+            btn.addEventListener('pointerdown', onDown);
+            btn.addEventListener('pointerup', onUp);
+            btn.addEventListener('pointercancel', onCancel);
+            btn.addEventListener('contextmenu', (e) => e.preventDefault());
+        })();
 
         function renderSrsProgressDots(level, maxLevel = MAX_SRS_LEVEL) {
             const display = clampSrsLevel(level);
@@ -38352,7 +38865,7 @@
             const numsActive = trainOskNumbersOpen ? ' is-active' : '';
             const accentActive = trainOskAccentOpen ? ' is-active' : '';
             const accentBtn = lang === 'es'
-                ? `<button type="button" class="train-osk-float${accentActive}" data-action="toggle-accent" aria-label="Accents">á</button>`
+                ? `<button type="button" class="train-osk-float${accentActive}" data-action="toggle-accent" aria-label="Accents" aria-pressed="${trainOskAccentOpen ? 'true' : 'false'}">áñ</button>`
                 : '';
             return `<div class="train-osk-floats">
                 <button type="button" class="train-osk-float${numsActive}" data-action="toggle-numbers" aria-label="Numbers">123</button>
@@ -38375,11 +38888,22 @@
             return html;
         }
 
+        function renderTrainOskAccentRow(lang) {
+            if (lang !== 'es' || !trainOskAccentOpen) return '';
+            let html = '<div class="train-osk-accents"><div class="train-osk-row">';
+            ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'].forEach((key) => {
+                html += `<button type="button" class="train-osk-key" data-key="${key}">${key}</button>`;
+            });
+            html += '</div></div>';
+            return html;
+        }
+
         function renderTrainOsk(lang) {
             const osk = ensureTrainOsk();
             let html = renderTrainOskFloats(lang);
             html += '<div class="train-osk-keys">';
             html += renderTrainOskNumbersRow();
+            html += renderTrainOskAccentRow(lang);
 
             if (lang === 'uk') {
                 html = appendTrainOskKeyRow(html, ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ї'], { dense: true, extraClass: 'train-osk-row--uk-top' });
@@ -38403,13 +38927,6 @@
                         html += '</div>';
                     }
                 });
-                if (lang === 'es') {
-                    html += '<div class="train-osk-row train-osk-row--es-accent">';
-                    ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü'].forEach((key) => {
-                        html += `<button type="button" class="train-osk-key" data-key="${key}">${key}</button>`;
-                    });
-                    html += '</div>';
-                }
             }
 
             html += renderTrainOskBottomRow();
