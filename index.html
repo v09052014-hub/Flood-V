@@ -15111,7 +15111,14 @@
                     return clean.length >= 2 && clean.length <= 15;
                 }).length;
             }
-            let pool = getTrainWordPool();
+            let pool;
+            if (mode === 'listening') {
+                pool = getVocabWordPool();
+            } else if (usesVocabPool(mode)) {
+                pool = excludeListeningOnlyWords(getVocabWordPool());
+            } else {
+                pool = getTrainWordPool();
+            }
             if (mode === 'context') {
                 pool = pool.filter((w) => {
                     const ctx = resolveWordContextForDisplay(w.context, w.word);
@@ -32356,7 +32363,8 @@
         const CONTEXT_MAT_SCORES_KEY = 'linguaspace_context_mat_scores_v1';
         const RESTORE_STATS_KEY = 'linguaspace_restore_stats_v1';
         const ORDER_STATS_KEY = 'linguaspace_order_stats_v1';
-        const ECHO_LAST_KEY = 'linguaspace_echo_last_v1';
+        const ECHO_STATS_KEY = 'linguaspace_echo_stats_v1';
+        const ECHO_LAST_KEY = 'linguaspace_echo_last_v1'; // legacy single-result blob
         const ECHO_ARROW_TIP_KEY = 'linguaspace_echo_arrow_tip_seen_v1';
         const ECHO_HINT_BURST_MS = 5000;
         const ECHO_HINT_MAX_USES = 3;
@@ -33861,6 +33869,24 @@
             return 'ALL';
         }
 
+        function isListeningOnlyWord(w) {
+            return !!(w && w.listenFocus);
+        }
+
+        function excludeListeningOnlyWords(pool) {
+            return (pool || []).filter((w) => !isListeningOnlyWord(w));
+        }
+
+        function prioritizeListenFocusWords(words) {
+            const focus = [];
+            const rest = [];
+            (words || []).forEach((w) => {
+                if (isListeningOnlyWord(w)) focus.push(w);
+                else rest.push(w);
+            });
+            return focus.concat(rest);
+        }
+
         function getVocabWordPool() {
             const scope = getVocabSourceScope();
             return scope === 'ALL' ? vocabulary.slice() : getWordsForFolderName(scope);
@@ -33896,29 +33922,39 @@
             renderScoreLeaderboard(getContextMatScores(materialId), currentScore);
         }
 
-        function restoreStatsStorageKey() {
-            return `${RESTORE_STATS_KEY}_${activeTrackId || learningLanguage || 'default'}`;
+        function textExerciseStatsTrackSuffix() {
+            return activeTrackId || learningLanguage || 'default';
         }
 
-        function loadRestoreStats() {
+        function restoreStatsStorageKey() {
+            return `${RESTORE_STATS_KEY}_${textExerciseStatsTrackSuffix()}`;
+        }
+
+        function orderStatsStorageKey() {
+            return `${ORDER_STATS_KEY}_${textExerciseStatsTrackSuffix()}`;
+        }
+
+        function echoStatsStorageKey() {
+            return `${ECHO_STATS_KEY}_${textExerciseStatsTrackSuffix()}`;
+        }
+
+        function loadTrackScopedStats(trackKey, legacyKey) {
             try {
-                const trackRaw = localStorage.getItem(restoreStatsStorageKey());
+                const trackRaw = localStorage.getItem(trackKey);
                 const track = trackRaw ? JSON.parse(trackRaw) : {};
                 if (track && typeof track === 'object' && Object.keys(track).length) return track;
-                // Legacy unscoped blob (pre track-key) — safe: keyed by materialId
-                return JSON.parse(localStorage.getItem(RESTORE_STATS_KEY) || '{}');
+                // Legacy unscoped blob (pre track-key) — keyed by materialId
+                return JSON.parse(localStorage.getItem(legacyKey) || '{}');
             } catch (_) { return {}; }
         }
 
-        function saveRestoreStats(materialId, data) {
+        function saveTrackScopedStat(trackKey, legacyKey, materialId, data) {
             if (!materialId) return;
-            const key = restoreStatsStorageKey();
             let all = {};
-            try { all = JSON.parse(localStorage.getItem(key) || '{}'); } catch (_) { all = {}; }
+            try { all = JSON.parse(localStorage.getItem(trackKey) || '{}'); } catch (_) { all = {}; }
             if (!all[materialId]?.length) {
-                // Seed from legacy/global if this track key is new
                 try {
-                    const legacy = JSON.parse(localStorage.getItem(RESTORE_STATS_KEY) || '{}');
+                    const legacy = JSON.parse(localStorage.getItem(legacyKey) || '{}');
                     if (Array.isArray(legacy[materialId]) && legacy[materialId].length) {
                         all[materialId] = legacy[materialId].slice();
                     }
@@ -33927,31 +33963,75 @@
             const arr = all[materialId] || [];
             arr.push({ ...data, date: Date.now() });
             all[materialId] = arr.slice(-40);
-            try { localStorage.setItem(key, JSON.stringify(all)); } catch (_) {}
+            try { localStorage.setItem(trackKey, JSON.stringify(all)); } catch (_) {}
+        }
+
+        function loadRestoreStats() {
+            return loadTrackScopedStats(restoreStatsStorageKey(), RESTORE_STATS_KEY);
+        }
+
+        function saveRestoreStats(materialId, data) {
+            saveTrackScopedStat(restoreStatsStorageKey(), RESTORE_STATS_KEY, materialId, data);
         }
 
         function loadOrderStats() {
-            try { return JSON.parse(localStorage.getItem(ORDER_STATS_KEY) || '{}'); } catch (_) { return {}; }
+            return loadTrackScopedStats(orderStatsStorageKey(), ORDER_STATS_KEY);
         }
 
         function saveOrderStats(materialId, data) {
-            if (!materialId) return;
-            const all = loadOrderStats();
-            const arr = all[materialId] || [];
-            arr.push({ ...data, date: Date.now() });
-            all[materialId] = arr.slice(-40);
-            try { localStorage.setItem(ORDER_STATS_KEY, JSON.stringify(all)); } catch (_) {}
+            saveTrackScopedStat(orderStatsStorageKey(), ORDER_STATS_KEY, materialId, data);
         }
 
+        function migrateEchoLegacyLastToStats(all) {
+            const out = (all && typeof all === 'object') ? { ...all } : {};
+            try {
+                const legacyLast = JSON.parse(localStorage.getItem(ECHO_LAST_KEY) || '{}');
+                Object.keys(legacyLast || {}).forEach((mid) => {
+                    if (out[mid]?.length) return;
+                    const row = legacyLast[mid];
+                    if (!row || row.elapsedSec == null) return;
+                    out[mid] = [{
+                        elapsedSec: Number(row.elapsedSec) || 0,
+                        correct: Math.max(1, Number(row.sentences) || 1),
+                        secPerCorrect: (Number(row.elapsedSec) || 0) / Math.max(1, Number(row.sentences) || 1),
+                        success: true,
+                        date: Number(row.date) || Date.now()
+                    }];
+                });
+            } catch (_) {}
+            return out;
+        }
+
+        function loadEchoStats() {
+            try {
+                const trackRaw = localStorage.getItem(echoStatsStorageKey());
+                let track = trackRaw ? JSON.parse(trackRaw) : {};
+                if (!track || typeof track !== 'object') track = {};
+                if (!Object.keys(track).length) {
+                    try { track = JSON.parse(localStorage.getItem(ECHO_STATS_KEY) || '{}') || {}; } catch (_) { track = {}; }
+                }
+                return migrateEchoLegacyLastToStats(track);
+            } catch (_) { return migrateEchoLegacyLastToStats({}); }
+        }
+
+        function saveEchoStats(materialId, data) {
+            saveTrackScopedStat(echoStatsStorageKey(), ECHO_STATS_KEY, materialId, data);
+        }
+
+        /** @deprecated use loadEchoStats — kept for call sites that only need last train timestamp */
         function loadEchoLastResults() {
-            try { return JSON.parse(localStorage.getItem(ECHO_LAST_KEY) || '{}'); } catch (_) { return {}; }
-        }
-
-        function saveEchoLastResult(materialId, data) {
-            if (!materialId) return;
-            const all = loadEchoLastResults();
-            all[materialId] = { elapsedSec: data.elapsedSec || 0, date: Date.now() };
-            try { localStorage.setItem(ECHO_LAST_KEY, JSON.stringify(all)); } catch (_) {}
+            const stats = loadEchoStats();
+            const last = {};
+            Object.keys(stats).forEach((mid) => {
+                const arr = stats[mid] || [];
+                let best = null;
+                arr.forEach((s) => {
+                    if (!s || s.success === false) return;
+                    if (!best || (Number(s.date) || 0) > (Number(best.date) || 0)) best = s;
+                });
+                if (best) last[mid] = { elapsedSec: best.elapsedSec || 0, date: best.date || 0 };
+            });
+            return last;
         }
 
         function advanceTextSourceAfterTraining(materialId) {
@@ -36557,18 +36637,18 @@
             return !!(String(w?.word || '').trim() && String(w?.translation || '').trim());
         }
 
-        /** Full scope pool for sprint/crossword — ignores per-session word pick checkboxes. */
         function getLooseTrainPool() {
             const scope = getTrainSourceScope();
-            return scope === 'ALL' ? vocabulary.slice() : getWordsForFolderName(scope);
+            const pool = scope === 'ALL' ? vocabulary.slice() : getWordsForFolderName(scope);
+            return excludeListeningOnlyWords(pool);
         }
 
         function getTrainWordPool() {
             ensureTrainWordPickIncluded();
             const scope = getTrainSourceScope();
             let pool = scope === 'ALL' ? vocabulary.slice() : getWordsForFolderName(scope);
-            if (!trainWordPickIncluded) return pool;
-            return pool.filter((w) => trainWordPickIncluded.has(w.id));
+            if (trainWordPickIncluded) pool = pool.filter((w) => trainWordPickIncluded.has(w.id));
+            return excludeListeningOnlyWords(pool);
         }
 
         function syncTrainWordPickSummary() {
@@ -37027,6 +37107,10 @@
             } else {
                 pool = getTrainWordPool();
             }
+            // Hold-to-listen queue words stay in Listening only (not Brainstorm / typing / sprint / …)
+            if (mode !== 'listening') {
+                pool = excludeListeningOnlyWords(pool);
+            }
             if (mode === 'context') {
                 pool = pool.filter((w) => {
                     const ctx = resolveWordContextForDisplay(w.context, w.word);
@@ -37135,7 +37219,10 @@
                         const ctxCount = contextMaterialFocus ? Math.min(reqCount, dueWords.length) : reqCount;
                         bsWords = pickContextWords(dueWords, ctxCount);
                     } else {
-                        bsWords = dueWords.slice(0, reqCount).map((w) => ({ ...w, failed: false }));
+                        const ordered = mode === 'listening'
+                            ? prioritizeListenFocusWords(dueWords)
+                            : dueWords;
+                        bsWords = ordered.slice(0, reqCount).map((w) => ({ ...w, failed: false }));
                     }
                 }
                 
@@ -37564,6 +37651,18 @@
                 });
                 advanceTextSourceAfterTraining(orderSnap.materialId);
             }
+            if (echoSnap?.materialId) {
+                const correct = Math.max(1, echoSnap.sentences || 1);
+                const elapsedSec = echoSnap.elapsedSec || 1;
+                saveEchoStats(echoSnap.materialId, {
+                    sentences: echoSnap.sentences,
+                    correct,
+                    success: true,
+                    elapsedSec,
+                    secPerCorrect: elapsedSec / correct
+                });
+                advanceTextSourceAfterTraining(echoSnap.materialId);
+            }
 
             clearTextExerciseLayout();
 
@@ -37666,12 +37765,15 @@
                 resultsIcon = "🎧";
                 resultsTitle = t('train.echoDone');
                 const elapsedSec = echoSnap?.elapsedSec || 0;
-                resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100">${t('train.yourTime', { time: formatExerciseTime(elapsedSec) })}</div>`;
-                lbdSection?.classList.add('hidden');
+                const correct = Math.max(1, echoSnap?.sentences || 1);
+                const curEntry = { elapsedSec, correct, secPerCorrect: elapsedSec / correct, date: Date.now() };
+                resultsSubtitle = `<div class="text-lg font-extrabold text-indigo-600 mb-4 bg-indigo-50 py-2 px-4 rounded-xl inline-block shadow-inner border border-indigo-100"><div>${t('train.yourTime', { time: formatExerciseTime(elapsedSec) })}</div><div class="text-xs font-semibold text-slate-400 mt-1">${formatSecPerWordLabel(curEntry)}</div></div>`;
+                lbdSection?.classList.remove('hidden');
+                lbdSection?.classList.add('bs-lbd-wide');
                 resultsDiv?.classList.add('bs-results--text-exercise');
                 if (echoSnap?.materialId) {
-                    saveEchoLastResult(echoSnap.materialId, { elapsedSec });
-                    advanceTextSourceAfterTraining(echoSnap.materialId);
+                    const stats = (loadEchoStats()[echoSnap.materialId] || []).filter((s) => s.success !== false);
+                    renderTimeLeaderboard(stats, curEntry);
                 }
             } else if (sessionMode === 'story' && storySnap) {
                 resultsIcon = "📜";
@@ -38253,11 +38355,66 @@
         function tryEnglishCompoundMorph(raw) {
             if (learningLanguage !== 'en') return null;
             const lower = String(raw || '').toLowerCase();
-            const tails = ['after', 'before', 'under', 'over', 'with', 'out', 'some', 'where', 'self', 'less', 'like', 'wise'];
-            for (const tail of tails) {
-                if (!lower.endsWith(tail) || lower.length <= tail.length + 2) continue;
+            // Longer tails first. Short particles (up/off) need a plausible head to avoid cup/group etc.
+            const longTails = [
+                'after', 'before', 'under', 'over', 'through', 'around', 'about', 'along', 'across', 'apart', 'aside',
+                'with', 'down', 'away', 'back', 'out', 'some', 'where', 'self', 'less', 'like', 'wise'
+            ];
+            const shortParticles = [
+                { text: 'off', minHead: 3 },
+                { text: 'up', minHead: 3 }
+            ];
+            const vocabHeads = new Set(
+                vocabulary
+                    .map((v) => String(v.word || '').trim().toLowerCase())
+                    .filter((w) => w && !/\s/.test(w) && w.length >= 3)
+            );
+            // Frequent compound heads when the head isn't already in the user's vocab
+            const commonHeads = new Set([
+                'make', 'back', 'set', 'check', 'warm', 'clean', 'grown', 'grow', 'look', 'meet', 'break', 'build',
+                'close', 'follow', 'hang', 'sign', 'start', 'wake', 'wind', 'wrap', 'call', 'cover', 'fill', 'give',
+                'hold', 'keep', 'line', 'lock', 'mark', 'mix', 'pick', 'pull', 'put', 'ring', 'round', 'show', 'shut',
+                'stand', 'take', 'tie', 'turn', 'write', 'act', 'add', 'beat', 'blow', 'bring', 'brush', 'catch',
+                'cheer', 'come', 'crack', 'dress', 'dry', 'end', 'get', 'head', 'heat', 'hurry', 'join', 'jump',
+                'kick', 'knock', 'let', 'light', 'live', 'move', 'open', 'pass', 'pay', 'pop', 'push', 'run', 'save',
+                'screw', 'send', 'settle', 'sit', 'speak', 'speed', 'spring', 'stay', 'step', 'stick', 'stock', 'sum',
+                'think', 'throw', 'touch', 'use', 'wait', 'walk', 'wash', 'work', 'cut', 'lay', 'play', 'drop', 'fall',
+                'hand', 'log', 'rip', 'sell', 'shake', 'spin', 'tip', 'trade', 'count', 'lie', 'melt', 'note', 'slow',
+                'splash', 'with', 'sun', 'carry', 'clear', 'draw', 'drive', 'figure', 'find', 'print', 'read', 'roll',
+                'root', 'seal', 'sort', 'spell', 'split', 'spread', 'stir', 'strike', 'sweep', 'switch', 'talk', 'tear',
+                'try', 'wear', 'wipe'
+            ]);
+            const isPlausibleHead = (head) => {
+                const h = String(head || '').toLowerCase();
+                if (h.length < 3) return false;
+                if (vocabHeads.has(h)) return true;
+                if (commonHeads.has(h)) return true;
+                return false;
+            };
+            const tryTail = (tail, requirePlausibleHead) => {
+                if (!lower.endsWith(tail) || lower.length <= tail.length + 2) return null;
                 const head = raw.slice(0, raw.length - tail.length);
-                if (head.length < 3) continue;
+                if (head.length < 3) return null;
+                if (requirePlausibleHead && !isPlausibleHead(head)) return null;
+                return {
+                    parts: [
+                        { text: head, type: 'chunk' },
+                        { text: raw.slice(raw.length - tail.length), type: 'chunk' }
+                    ],
+                    hints: []
+                };
+            };
+            for (const tail of longTails) {
+                // Short-ish "out" still needs a plausible head (avoids shout/scout-style accidents when head ≥3)
+                const needCheck = tail.length <= 3;
+                const hit = tryTail(tail, needCheck);
+                if (hit) return hit;
+            }
+            for (const { text: tail, minHead } of shortParticles) {
+                if (!lower.endsWith(tail) || lower.length <= tail.length + minHead - 1) continue;
+                const head = raw.slice(0, raw.length - tail.length);
+                if (head.length < minHead) continue;
+                if (!isPlausibleHead(head)) continue;
                 return {
                     parts: [
                         { text: head, type: 'chunk' },
@@ -41918,7 +42075,7 @@
         }
 
         function pickWordsForDailyStory(count = STORY_WORD_COUNT) {
-            const pool = getVocabWordPool().filter(wordHasTrainPair);
+            const pool = excludeListeningOnlyWords(getVocabWordPool()).filter(wordHasTrainPair);
             const sorted = pool.slice().sort((a, b) => {
                 const ta = historyTimestamp(getWordAddedAt(a));
                 const tb = historyTimestamp(getWordAddedAt(b));
