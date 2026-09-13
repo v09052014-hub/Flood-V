@@ -1149,6 +1149,22 @@
             -webkit-user-select: text;
             user-select: text;
         }
+        #library-read-view.reader-copy-mode #reader-content {
+            cursor: text;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        #library-read-view.reader-copy-mode .word-clickable {
+            cursor: text;
+        }
+        #library-read-view.reader-copy-mode .word-clickable:hover {
+            background: transparent;
+        }
+        #reader-copy-mode-btn.is-active {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+            color: #4338ca;
+        }
         #library-read-view.reader-hl-mode .word-clickable {
             cursor: text;
         }
@@ -8906,6 +8922,132 @@
             overflow: hidden;
             transition: max-height 0.45s ease, padding 0.45s ease, opacity 0.45s ease, transform 0.45s ease;
         }
+
+        /* ── Auth landing / Google gate (non-breaking; #/login) ── */
+        #auth-gate {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            align-items: stretch;
+            justify-content: center;
+            padding: max(1rem, env(safe-area-inset-top)) 1.1rem max(1.25rem, env(safe-area-inset-bottom));
+            background:
+                radial-gradient(1200px 600px at 12% -10%, rgba(99, 102, 241, 0.18), transparent 55%),
+                radial-gradient(900px 500px at 100% 0%, rgba(14, 165, 233, 0.12), transparent 50%),
+                linear-gradient(165deg, #f8fafc 0%, #eef2ff 48%, #f1f5f9 100%);
+        }
+        body.auth-gate-open #auth-gate { display: flex; }
+        body.auth-gate-open #main-app-header,
+        body.auth-gate-open #main-tabs-nav,
+        body.auth-gate-open > main,
+        body.auth-gate-open #system-status { display: none !important; }
+        .auth-gate-card {
+            margin: auto;
+            width: min(100%, 26rem);
+            background: rgba(255,255,255,0.92);
+            border: 1px solid #e2e8f0;
+            border-radius: 1.35rem;
+            box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+            padding: 1.75rem 1.4rem 1.35rem;
+            text-align: center;
+            backdrop-filter: blur(8px);
+        }
+        .auth-gate-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-weight: 800;
+            font-size: 1.55rem;
+            color: #4f46e5;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.85rem;
+        }
+        .auth-gate-brand span[aria-hidden] { font-size: 1.7rem; line-height: 1; }
+        .auth-gate-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 0.35rem;
+        }
+        .auth-gate-sub {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.45;
+            margin-bottom: 1.35rem;
+        }
+        .auth-google-btn {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 0.85rem 1rem;
+            border-radius: 0.9rem;
+            transition: background 0.15s, border-color 0.15s, transform 0.12s;
+        }
+        .auth-google-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+        .auth-google-btn:active { transform: scale(0.98); }
+        .auth-google-btn:disabled { opacity: 0.55; pointer-events: none; }
+        .auth-google-icon { width: 1.15rem; height: 1.15rem; flex-shrink: 0; }
+        .auth-gate-divider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 1rem 0 0.85rem;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .auth-gate-divider::before,
+        .auth-gate-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        .auth-guest-btn {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #475569;
+            font-weight: 700;
+            font-size: 0.875rem;
+            padding: 0.65rem;
+            border-radius: 0.75rem;
+            transition: background 0.15s, color 0.15s;
+        }
+        .auth-guest-btn:hover { background: #f1f5f9; color: #0f172a; }
+        .auth-gate-status {
+            min-height: 1.25rem;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #e11d48;
+        }
+        .auth-gate-hint {
+            margin-top: 1rem;
+            font-size: 0.72rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+        .auth-account-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 0.9rem 1rem;
+            background: #f8fafc;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        .auth-account-email { font-weight: 700; color: #0f172a; font-size: 0.9rem; word-break: break-all; }
+        .auth-account-meta { font-size: 0.75rem; color: #64748b; margin-top: 0.2rem; }
         #system-status.is-dismissed {
             max-height: 0;
             padding-top: 0 !important;
@@ -8918,6 +9060,21 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased font-sans">
+    <div id="auth-gate" aria-hidden="true">
+        <div class="auth-gate-card" role="dialog" aria-labelledby="auth-gate-title">
+            <div class="auth-gate-brand"><span aria-hidden="true">🌌</span> LinguaSpace</div>
+            <h2 id="auth-gate-title" class="auth-gate-title" data-i18n="auth.welcomeTitle">Вітаємо</h2>
+            <p class="auth-gate-sub" data-i18n="auth.welcomeSub">Увійдіть, щоб зберегти свій словник і прогрес на будь-якому пристрої.</p>
+            <button type="button" id="btn-auth-google" class="auth-google-btn" onclick="signInWithGoogle()">
+                <svg class="auth-google-icon" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.1 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.1 29.4 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 10-2 13.6-5.2l-6.3-5.2C29.3 35.3 26.8 36 24 36c-5.3 0-9.7-3.3-11.3-8H6.2C9.6 38.3 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l.1.1 6.3 5.2C39.4 37.3 44 31.5 44 24c0-1.3-.1-2.5-.4-3.5z"/></svg>
+                <span data-i18n="auth.google">Увійти через Google</span>
+            </button>
+            <div class="auth-gate-divider"><span data-i18n="auth.or">або</span></div>
+            <button type="button" id="btn-auth-guest" class="auth-guest-btn" onclick="continueAsGuest()" data-i18n="auth.guest">Продовжити без акаунта</button>
+            <p id="auth-gate-status" class="auth-gate-status" role="status" aria-live="polite"></p>
+            <p class="auth-gate-hint" data-i18n="auth.consoleHint">Якщо Google не відкривається — у Firebase Console увімкніть провайдер Google і додайте домен сайту в Authorized domains.</p>
+        </div>
+    </div>
     <div id="mat-actions-scrim" onclick="closeMatCardActions()" aria-hidden="true"></div>
     <div id="system-status" class="bg-blue-500 text-white text-center py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-500 shadow-md z-[100] relative" data-i18n="status.connecting">Підключення...</div>
     <script>
@@ -9400,7 +9557,24 @@
                     </div>
 
                     <div id="settings-pane-account" class="settings-pane hidden">
-                        <div class="settings-panel">
+                        <div class="settings-panel mb-4">
+                            <p class="settings-panel-label mb-2" data-i18n="auth.accountTitle">Акаунт</p>
+                            <div id="auth-account-signed" class="hidden">
+                                <div class="auth-account-card">
+                                    <div class="auth-account-email" id="auth-account-email">—</div>
+                                    <div class="auth-account-meta" id="auth-account-meta" data-i18n="auth.signedGoogle">Увійшли через Google</div>
+                                </div>
+                                <button type="button" onclick="openAuthLanding()" class="w-full mb-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.openLogin">Екран входу</button>
+                                <button type="button" onclick="signOutAccount()" class="w-full mb-2 bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.signOut">Вийти</button>
+                                <button type="button" onclick="deleteAccountWithData()" class="w-full text-rose-500 hover:text-rose-600 font-bold text-sm py-2 transition" data-i18n="auth.deleteAccount">Видалити акаунт і всі дані</button>
+                            </div>
+                            <div id="auth-account-guest">
+                                <p class="text-xs text-slate-500 mb-3 leading-relaxed" data-i18n="auth.guestHint">Зараз ви без Google-акаунта. Дані зберігаються за локальним ID (як раніше).</p>
+                                <button type="button" onclick="openAuthLanding()" class="w-full mb-2 auth-google-btn"><span data-i18n="auth.google">Увійти через Google</span></button>
+                                <button type="button" onclick="openAuthLanding()" class="w-full text-indigo-600 hover:text-indigo-700 font-bold text-sm py-2 transition" data-i18n="auth.openLogin">Відкрити екран входу</button>
+                            </div>
+                        </div>
+                        <div class="settings-panel" id="auth-legacy-sync-panel">
                             <p class="settings-panel-label mb-2" data-i18n="profile.sync">Синхронізація словника</p>
                             <p class="text-xs text-slate-500 mb-4 leading-relaxed" data-i18n="profile.hint">Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.</p>
                             <div class="mb-4">
@@ -9410,12 +9584,12 @@
                                     <button onclick="copyUid()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-r-xl font-bold text-sm transition" data-i18n="profile.copy">Копіювати</button>
                                 </div>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3" id="auth-legacy-uid-edit">
                                 <label class="text-xs font-bold text-slate-500 uppercase block mb-1" data-i18n="profile.changeId">Змінити ID (для іншого словника):</label>
                                 <input type="text" id="sync-input-uid" placeholder="Вставте інший ID..." class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-mono text-xs mb-3" data-i18n-placeholder="profile.pasteId">
                                 <button onclick="applyUid()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold shadow-sm transition" data-i18n="profile.applyId">Застосувати ID</button>
                             </div>
-                            <button onclick="resetUid()" class="w-full text-rose-500 hover:text-rose-600 font-bold text-sm py-2 transition" data-i18n="profile.resetId">Повернутись до спільного ID</button>
+                            <button onclick="resetUid()" id="auth-legacy-reset-btn" class="w-full text-rose-500 hover:text-rose-600 font-bold text-sm py-2 transition" data-i18n="profile.resetId">Повернутись до спільного ID</button>
                         </div>
                     </div>
                 </div>
@@ -9866,6 +10040,8 @@
                         <button type="button" id="reader-comfort-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); cycleReaderTheme()" data-i18n-title="reader.themeNormal" title="Звичайний вигляд" aria-pressed="false" aria-label="Reading comfort">📖</button>
                         <button type="button" id="reader-hl-only-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderHighlightsOnly()" data-i18n-title="reader.hlOnly" title="Лише виділення" aria-pressed="false" aria-label="Highlights only"><span class="reader-hl-only-glyph" aria-hidden="true">A<span class="hl-b">B</span>C</span></button>
                         <button type="button" id="reader-toc-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderToc()" data-i18n-title="reader.toc" title="Розділи" aria-pressed="false" aria-label="Chapters"><span class="reader-toc-glyph" aria-hidden="true">§</span></button>
+                        <button type="button" id="reader-copy-mode-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderCopyMode()" data-i18n-title="reader.copyMode" title="Режим копіювання" aria-pressed="false" aria-label="Copy mode">📋</button>
+                        <button type="button" id="reader-copy-page-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); copyReaderPageText()" data-i18n-title="reader.copyPage" title="Копіювати сторінку" aria-label="Copy page">📄</button>
                     </div>
                     <div class="reader-settings-qm-wrap" onmouseleave="hideReaderQuickMatchTip()">
                         <label class="reader-settings-toggle reader-settings-toggle--qm" onclick="event.stopPropagation()">
@@ -10495,7 +10671,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, updateDoc, setDoc, getDoc, getDocs, writeBatch, arrayUnion, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -10506,6 +10682,17 @@
             messagingSenderId: "398593728951",
             appId: "1:398593728951:web:d566edfbbcb92a5be9c832"
         };
+
+        // Auth v2: Google landing is available, but the old anonymous + profile-ID flow still works.
+        // Flip AUTH_REQUIRE_LOGIN to true later when you want the gate for everyone.
+        const AUTH_LANDING_ENABLED = true;
+        const AUTH_REQUIRE_LOGIN = false;
+        const AUTH_MODE_KEY = 'linguaspace_auth_mode_v1';
+        const googleAuthProvider = new GoogleAuthProvider();
+        googleAuthProvider.setCustomParameters({ prompt: 'select_account' });
+        let authUser = null;
+        let authBootstrapped = false;
+        let authGateVisible = false;
         const UNSPLASH_PROXY = "https://unsplash-myown.v09052014.workers.dev";
         const UNSPLASH_FALLBACK = "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&auto=format&fit=crop&q=60";
         const PLACEHOLDER_IMAGE_ID = 'photo-1456513080510-7bf3a84b82f8';
@@ -10633,6 +10820,24 @@
                 'header.profile': 'Профіль',
                 'header.settings': 'Налаштування',
                 'header.cycleTrack': 'Змінити пару мов',
+                'auth.welcomeTitle': 'Вітаємо',
+                'auth.welcomeSub': 'Увійдіть, щоб зберегти свій словник і прогрес на будь-якому пристрої.',
+                'auth.google': 'Увійти через Google',
+                'auth.or': 'або',
+                'auth.guest': 'Продовжити без акаунта',
+                'auth.consoleHint': 'Якщо Google не відкривається — у Firebase Console увімкніть провайдер Google і додайте домен сайту в Authorized domains.',
+                'auth.accountTitle': 'Акаунт',
+                'auth.signedGoogle': 'Увійшли через Google',
+                'auth.guestHint': 'Зараз ви без Google-акаунта. Дані зберігаються за локальним ID (як раніше).',
+                'auth.openLogin': 'Екран входу',
+                'auth.signOut': 'Вийти',
+                'auth.deleteAccount': 'Видалити акаунт і всі дані',
+                'auth.deleteConfirm': 'Видалити акаунт і всі слова, матеріали та прогрес безповоротно?',
+                'auth.deleted': 'Акаунт видалено.',
+                'auth.signedOut': 'Ви вийшли з акаунта.',
+                'auth.googleError': 'Не вдалося увійти через Google. Перевірте, чи увімкнено провайдер у Firebase.',
+                'auth.popupBlocked': 'Вікно Google заблоковано браузером. Дозвольте спливаючі вікна.',
+                'auth.working': 'Зачекайте…',
                 'tabs.dictionary': 'Словник', 'tabs.library': 'Бібліотека', 'tabs.training': 'Тренування',
                 'profile.title': 'Профіль / Налаштування',
                 'profile.hint': 'Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.',
@@ -11050,6 +11255,13 @@
                 'reader.hlOnlyEmpty': 'Поки немає виділеного тексту',
                 'reader.hlOnlyPage': 'стор. {n}',
                 'reader.hlPeek': 'Сторінка {n}',
+                'reader.copyMode': 'Режим копіювання',
+                'reader.copyModeOn': 'Копіювання увімкнено — виділяйте текст без перекладу',
+                'reader.copyModeOff': 'Режим копіювання вимкнено',
+                'reader.copyPage': 'Копіювати сторінку',
+                'reader.copyPageOk': 'Текст сторінки скопійовано',
+                'reader.copyPageFail': 'Не вдалося скопіювати в буфер. Спробуйте HTTPS або Ctrl+C у режимі копіювання.',
+                'reader.copySelOk': 'Фрагмент скопійовано',
                 'reader.toc': 'Розділи',
                 'reader.tocEmpty': 'Немає заголовків розділів',
                 'lib.tabText': 'Текст', 'lib.tabUrl': 'Стаття (URL)', 'lib.tabYt': 'YouTube',
@@ -11341,6 +11553,24 @@
                 'header.profile': 'Profile',
                 'header.settings': 'Settings',
                 'header.cycleTrack': 'Switch language pair',
+                'auth.welcomeTitle': 'Welcome',
+                'auth.welcomeSub': 'Sign in to keep your dictionary and progress on any device.',
+                'auth.google': 'Continue with Google',
+                'auth.or': 'or',
+                'auth.guest': 'Continue without an account',
+                'auth.consoleHint': 'If Google fails to open, enable the Google provider in Firebase Console and add this site domain under Authorized domains.',
+                'auth.accountTitle': 'Account',
+                'auth.signedGoogle': 'Signed in with Google',
+                'auth.guestHint': 'You are not using a Google account. Data is stored under the local profile ID (as before).',
+                'auth.openLogin': 'Open login screen',
+                'auth.signOut': 'Sign out',
+                'auth.deleteAccount': 'Delete account and all data',
+                'auth.deleteConfirm': 'Delete this account and all words, materials, and progress permanently?',
+                'auth.deleted': 'Account deleted.',
+                'auth.signedOut': 'Signed out.',
+                'auth.googleError': 'Google sign-in failed. Check that the Google provider is enabled in Firebase.',
+                'auth.popupBlocked': 'The Google popup was blocked. Allow pop-ups for this site.',
+                'auth.working': 'Please wait…',
                 'tabs.dictionary': 'Dictionary', 'tabs.library': 'Library', 'tabs.training': 'Training',
                 'profile.title': 'Profile / Settings',
                 'profile.hint': 'Your dictionary is tied to this account ID. Most users can leave it unchanged.',
@@ -11754,6 +11984,13 @@
                 'reader.hlOnlyEmpty': 'No highlights yet',
                 'reader.hlOnlyPage': 'p. {n}',
                 'reader.hlPeek': 'Page {n}',
+                'reader.copyMode': 'Copy mode',
+                'reader.copyModeOn': 'Copy mode on — select text without translation',
+                'reader.copyModeOff': 'Copy mode off',
+                'reader.copyPage': 'Copy page',
+                'reader.copyPageOk': 'Page text copied',
+                'reader.copyPageFail': 'Could not copy to clipboard. Try HTTPS or Ctrl+C in copy mode.',
+                'reader.copySelOk': 'Selection copied',
                 'reader.toc': 'Sections',
                 'reader.tocEmpty': 'No section headings',
                 'lib.tabText': 'Text', 'lib.tabUrl': 'Article (URL)', 'lib.tabYt': 'YouTube',
@@ -12040,6 +12277,24 @@
                 'header.profile': 'Perfil',
                 'header.settings': 'Ajustes',
                 'header.cycleTrack': 'Cambiar pareja de idiomas',
+                'auth.welcomeTitle': 'Bienvenido',
+                'auth.welcomeSub': 'Inicia sesión para guardar tu diccionario y progreso en cualquier dispositivo.',
+                'auth.google': 'Continuar con Google',
+                'auth.or': 'o',
+                'auth.guest': 'Continuar sin cuenta',
+                'auth.consoleHint': 'Si Google no abre, activa el proveedor Google en Firebase Console y añade el dominio del sitio en Authorized domains.',
+                'auth.accountTitle': 'Cuenta',
+                'auth.signedGoogle': 'Sesión iniciada con Google',
+                'auth.guestHint': 'No estás usando una cuenta de Google. Los datos se guardan con el ID de perfil local (como antes).',
+                'auth.openLogin': 'Pantalla de inicio',
+                'auth.signOut': 'Cerrar sesión',
+                'auth.deleteAccount': 'Eliminar cuenta y todos los datos',
+                'auth.deleteConfirm': '¿Eliminar esta cuenta y todas las palabras, materiales y el progreso de forma permanente?',
+                'auth.deleted': 'Cuenta eliminada.',
+                'auth.signedOut': 'Sesión cerrada.',
+                'auth.googleError': 'No se pudo iniciar sesión con Google. Comprueba que el proveedor esté activo en Firebase.',
+                'auth.popupBlocked': 'El navegador bloqueó la ventana de Google. Permite ventanas emergentes.',
+                'auth.working': 'Espera…',
                 'tabs.dictionary': 'Diccionario', 'tabs.library': 'Biblioteca', 'tabs.training': 'Entrenamiento',
                 'profile.title': 'Perfil / Ajustes',
                 'profile.hint': 'Tu diccionario está vinculado a este ID de cuenta. La mayoría puede dejarlo como está.',
@@ -12453,6 +12708,13 @@
                 'reader.hlOnlyEmpty': 'Aún no hay resaltados',
                 'reader.hlOnlyPage': 'pág. {n}',
                 'reader.hlPeek': 'Página {n}',
+                'reader.copyMode': 'Modo copiar',
+                'reader.copyModeOn': 'Modo copiar activo — selecciona texto sin traducción',
+                'reader.copyModeOff': 'Modo copiar desactivado',
+                'reader.copyPage': 'Copiar página',
+                'reader.copyPageOk': 'Texto de la página copiado',
+                'reader.copyPageFail': 'No se pudo copiar. Prueba HTTPS o Ctrl+C en modo copiar.',
+                'reader.copySelOk': 'Selección copiada',
                 'reader.toc': 'Secciones',
                 'reader.tocEmpty': 'No hay encabezados de sección',
                 'lib.tabText': 'Texto', 'lib.tabUrl': 'Artículo (URL)', 'lib.tabYt': 'YouTube',
@@ -15430,9 +15692,14 @@
             return fromTimestamp + (SRS_INTERVALS[newLevel] || 0);
         }
 
+        function isBrainstormHistoryMode(mode) {
+            const m = mode || 'brainstorm';
+            return m === 'brainstorm' || m === 'all' || m === 'sprint';
+        }
+
         function getLastTrainingAtLevel(w, level) {
             return (w.bsHistory || [])
-                .filter(h => h.ok !== false && h.at && h.level === level)
+                .filter(h => isBrainstormHistoryMode(h.mode) && h.ok !== false && h.at && h.level === level)
                 .sort((a, b) => historyTimestamp(b.at) - historyTimestamp(a.at))[0] || null;
         }
 
@@ -15445,7 +15712,7 @@
             if (atLevel) return getNextReviewTime(level, atLevel.at);
 
             const lastSuccess = (w.bsHistory || [])
-                .filter(h => h.ok !== false && h.at)
+                .filter(h => isBrainstormHistoryMode(h.mode) && h.ok !== false && h.at)
                 .sort((a, b) => historyTimestamp(b.at) - historyTimestamp(a.at))[0];
             if (lastSuccess) return getNextReviewTime(level, lastSuccess.at);
 
@@ -15454,8 +15721,12 @@
 
         function needsSrsTimerRepair(w, level, computedReview) {
             if (isSrsMastered(level)) return (w.nextReviewTime || 0) !== 0;
-            const hist = (w.bsHistory || []).filter(h => h.ok !== false && h.at);
-            if (hist.length === 0) return false;
+            const hist = (w.bsHistory || []).filter(h => isBrainstormHistoryMode(h.mode) && h.ok !== false && h.at);
+            if (hist.length === 0) {
+                // Inflated by other modes: level>0 but no brainstorm history → due now
+                if (level > 0) return (w.nextReviewTime || 0) !== 0;
+                return false;
+            }
             const stored = w.nextReviewTime || 0;
             const tolerance = 2 * 3600000;
             if (!stored) return computedReview > Date.now();
@@ -16757,22 +17028,280 @@
             }
         }
 
+        function isGoogleSignedIn() {
+            return !!(authUser && !authUser.isAnonymous);
+        }
+
+        function getAuthMode() {
+            try { return localStorage.getItem(AUTH_MODE_KEY) || 'legacy'; } catch (_) { return 'legacy'; }
+        }
+
+        function setAuthMode(mode) {
+            try { localStorage.setItem(AUTH_MODE_KEY, mode); } catch (_) {}
+        }
+
+        function normalizeAuthPathToHash() {
+            try {
+                const path = String(location.pathname || '');
+                if (/\/login\/?$/i.test(path) || /\/welcome\/?$/i.test(path)) {
+                    const base = path.replace(/\/(login|welcome)\/?$/i, '/') || '/';
+                    const next = `${base.replace(/\/?$/, '/')}`.replace(/\/+/g, '/');
+                    // Keep site root; put route in hash so Netlify static hosting stays simple
+                    history.replaceState(null, '', `${next === '/' ? '/' : next}#/login`);
+                    return;
+                }
+                if (/\/account\/?$/i.test(path)) {
+                    const base = path.replace(/\/account\/?$/i, '/') || '/';
+                    history.replaceState(null, '', `${base}#/account`);
+                }
+            } catch (_) {}
+        }
+
+        function parseAppAuthRoute() {
+            normalizeAuthPathToHash();
+            const hash = String(location.hash || '');
+            if (/^#\/?(login|welcome)\/?$/i.test(hash)) return 'login';
+            if (/^#\/?account\/?$/i.test(hash)) return 'account';
+            return 'app';
+        }
+
+        function setAuthGateStatus(msg) {
+            const el = document.getElementById('auth-gate-status');
+            if (el) el.textContent = msg || '';
+        }
+
+        function showAuthGate() {
+            authGateVisible = true;
+            document.body.classList.add('auth-gate-open');
+            const gate = document.getElementById('auth-gate');
+            if (gate) gate.setAttribute('aria-hidden', 'false');
+            setAuthGateStatus('');
+            try { applyI18n(); } catch (_) {}
+        }
+
+        function hideAuthGate() {
+            authGateVisible = false;
+            document.body.classList.remove('auth-gate-open');
+            const gate = document.getElementById('auth-gate');
+            if (gate) gate.setAttribute('aria-hidden', 'true');
+            setAuthGateStatus('');
+        }
+
+        function syncAuthAccountSettingsUi() {
+            const signed = document.getElementById('auth-account-signed');
+            const guest = document.getElementById('auth-account-guest');
+            const emailEl = document.getElementById('auth-account-email');
+            const legacyEdit = document.getElementById('auth-legacy-uid-edit');
+            const legacyReset = document.getElementById('auth-legacy-reset-btn');
+            const google = isGoogleSignedIn();
+            if (signed) signed.classList.toggle('hidden', !google);
+            if (guest) guest.classList.toggle('hidden', !!google);
+            if (emailEl) {
+                emailEl.textContent = google
+                    ? (authUser.email || authUser.displayName || authUser.uid)
+                    : '—';
+            }
+            // Keep legacy ID tools available for migration / teacher linking, but quieter when Google is on
+            if (legacyEdit) legacyEdit.classList.toggle('opacity-60', !!google);
+            if (legacyReset) legacyReset.classList.toggle('hidden', !!google);
+        }
+
+        function shouldShowAuthLanding() {
+            if (!AUTH_LANDING_ENABLED) return false;
+            const route = parseAppAuthRoute();
+            if (isGoogleSignedIn()) return false;
+            if (route === 'login') return true;
+            if (AUTH_REQUIRE_LOGIN && getAuthMode() !== 'guest') return true;
+            return false;
+        }
+
+        function resolveActiveUidFromAuth(user) {
+            if (user && !user.isAnonymous) {
+                setAuthMode('google');
+                return user.uid;
+            }
+            const savedUid = localStorage.getItem(LOCAL_UID_KEY);
+            return savedUid ? savedUid : DEFAULT_SHARED_UID;
+        }
+
+        async function enterAppWithUid(uid, { reload = true } = {}) {
+            activeUid = uid;
+            localStorage.setItem(LOCAL_UID_KEY, activeUid);
+            hideAuthGate();
+            if (parseAppAuthRoute() === 'login' || parseAppAuthRoute() === 'account') {
+                history.replaceState(null, '', `${location.pathname}${location.search}`);
+            }
+            setSystemStatus(t('status.connected'), 'success');
+            syncAuthAccountSettingsUi();
+            if (reload) {
+                await loadUserPrefs();
+                loadData();
+            }
+        }
+
+        window.openAuthLanding = () => {
+            if (!AUTH_LANDING_ENABLED) return;
+            try { closeSyncModal(); } catch (_) {}
+            history.replaceState(null, '', `${location.pathname}${location.search}#/login`);
+            showAuthGate();
+        };
+
+        window.continueAsGuest = async () => {
+            setAuthMode('guest');
+            setAuthGateStatus(t('auth.working'));
+            try {
+                if (!auth?.currentUser) await signInAnonymously(auth);
+                const uid = resolveActiveUidFromAuth(auth.currentUser);
+                await enterAppWithUid(uid);
+            } catch (e) {
+                console.error(e);
+                setAuthGateStatus(t('status.authError'));
+            }
+        };
+
+        window.signInWithGoogle = async () => {
+            if (!auth) return;
+            const btn = document.getElementById('btn-auth-google');
+            if (btn) btn.disabled = true;
+            setAuthGateStatus(t('auth.working'));
+            try {
+                const result = await signInWithPopup(auth, googleAuthProvider);
+                authUser = result.user;
+                setAuthMode('google');
+                await enterAppWithUid(result.user.uid);
+                try {
+                    await setDoc(doc(db, 'users', result.user.uid), {
+                        authProvider: 'google',
+                        email: result.user.email || '',
+                        displayName: result.user.displayName || '',
+                        photoURL: result.user.photoURL || '',
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                } catch (_) {}
+            } catch (e) {
+                console.error('signInWithGoogle', e);
+                const code = e?.code || '';
+                if (code === 'auth/popup-blocked') setAuthGateStatus(t('auth.popupBlocked'));
+                else if (code === 'auth/popup-closed-by-user') setAuthGateStatus('');
+                else setAuthGateStatus(t('auth.googleError'));
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        };
+
+        window.signOutAccount = () => {
+            window.showModal(t('auth.signOut') + '?', true, async () => {
+                try {
+                    setAuthMode('guest');
+                    localStorage.setItem(LOCAL_UID_KEY, DEFAULT_SHARED_UID);
+                    activeUid = DEFAULT_SHARED_UID;
+                    await signOut(auth);
+                    window.showModal(t('auth.signedOut'));
+                } catch (e) {
+                    console.error(e);
+                    window.showModal(t('status.authError'));
+                }
+            });
+        };
+
+        async function deleteCollectionDocs(colPathParts) {
+            if (!db || !activeUid) return;
+            const snap = await getDocs(collection(db, ...colPathParts));
+            const docs = [];
+            snap.forEach((d) => docs.push(d));
+            for (let i = 0; i < docs.length; i += 400) {
+                const batch = writeBatch(db);
+                docs.slice(i, i + 400).forEach((d) => batch.delete(d.ref));
+                await batch.commit();
+            }
+        }
+
+        async function deleteCurrentUserFirestoreData() {
+            if (!db || !activeUid) return;
+            // Top-level user collections used by the app
+            await deleteCollectionDocs(['users', activeUid, 'words']);
+            await deleteCollectionDocs(['users', activeUid, 'materials']);
+            await deleteCollectionDocs(['users', activeUid, 'folders']);
+            await deleteCollectionDocs(['users', activeUid, 'stats']);
+            // Track subtrees (best-effort)
+            try {
+                const tracksSnap = await getDocs(collection(db, 'users', activeUid, 'tracks'));
+                for (const trackDoc of tracksSnap.docs) {
+                    const tid = trackDoc.id;
+                    await deleteCollectionDocs(['users', activeUid, 'tracks', tid, 'words']);
+                    await deleteCollectionDocs(['users', activeUid, 'tracks', tid, 'materials']);
+                    await deleteCollectionDocs(['users', activeUid, 'tracks', tid, 'folders']);
+                    await deleteCollectionDocs(['users', activeUid, 'tracks', tid, 'stats']);
+                    await deleteDoc(trackDoc.ref);
+                }
+            } catch (_) {}
+            try { await deleteDoc(doc(db, 'users', activeUid)); } catch (_) {}
+        }
+
+        window.deleteAccountWithData = () => {
+            if (!isGoogleSignedIn()) {
+                return window.showModal(t('auth.googleError'));
+            }
+            window.showModal(t('auth.deleteConfirm'), true, async () => {
+                try {
+                    setAuthGateStatus(t('auth.working'));
+                    const user = auth.currentUser;
+                    await deleteCurrentUserFirestoreData();
+                    setAuthMode('guest');
+                    localStorage.setItem(LOCAL_UID_KEY, DEFAULT_SHARED_UID);
+                    if (user) await deleteUser(user);
+                    window.showModal(t('auth.deleted'));
+                    history.replaceState(null, '', `${location.pathname}${location.search}#/login`);
+                    showAuthGate();
+                } catch (e) {
+                    console.error('deleteAccountWithData', e);
+                    // Requires recent login sometimes
+                    window.showModal(t('auth.googleError'));
+                }
+            });
+        };
+
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
             setSystemStatus(t('status.connecting'), 'info');
+            normalizeAuthPathToHash();
 
             onAuthStateChanged(auth, async (user) => {
+                authUser = user || null;
                 if (user) {
-                    const savedUid = localStorage.getItem(LOCAL_UID_KEY);
-                    activeUid = savedUid ? savedUid : DEFAULT_SHARED_UID; 
+                    const uid = resolveActiveUidFromAuth(user);
+                    activeUid = uid;
                     localStorage.setItem(LOCAL_UID_KEY, activeUid);
-                    setSystemStatus(t('status.connected'), "success");
+                    syncAuthAccountSettingsUi();
+
+                    if (shouldShowAuthLanding()) {
+                        showAuthGate();
+                        authBootstrapped = true;
+                        return;
+                    }
+
+                    hideAuthGate();
+                    setSystemStatus(t('status.connected'), 'success');
                     await loadUserPrefs();
                     loadData();
+                    if (parseAppAuthRoute() === 'account') {
+                        try { openSyncModal(); switchSettingsTab('account'); } catch (_) {}
+                    }
+                    authBootstrapped = true;
                 } else {
+                    // Keep Firestore rules happy; anonymous is still the guest transport
                     signInAnonymously(auth).catch((err) => { setSystemStatus(t('status.authError'), "error"); });
+                }
+            });
+
+            window.addEventListener('hashchange', () => {
+                if (!AUTH_LANDING_ENABLED) return;
+                if (shouldShowAuthLanding()) showAuthGate();
+                else if (authGateVisible && parseAppAuthRoute() === 'app') hideAuthGate();
+                if (parseAppAuthRoute() === 'account') {
+                    try { openSyncModal(); switchSettingsTab('account'); } catch (_) {}
                 }
             });
         } catch (e) { setSystemStatus(t('status.firebaseError'), "error"); }
@@ -16875,6 +17404,7 @@
             settingsActiveTab = 'languages';
             renderLanguagePickers();
             syncSettingsPanelUi();
+            syncAuthAccountSettingsUi();
             applyI18n();
             refreshYearRingUI();
             document.getElementById('sync-modal').classList.remove('hidden');
@@ -19342,13 +19872,17 @@
         }
 
         function inferSrsLevelFromHistory(w) {
-            const hist = normalizeBsHistory(w.bsHistory).slice().sort((a, b) => b.at - a.at);
-            if (hist.length === 0) return null;
+            // Brainstorm SRS must ignore word↔trans / typing / listening history
+            const hist = normalizeBsHistory(w.bsHistory)
+                .filter((h) => isBrainstormHistoryMode(h.mode) || h.mode === 'review-peek')
+                .slice()
+                .sort((a, b) => b.at - a.at);
+            if (hist.length === 0) return 0; // no brainstorm runs → level 0 (may deflate)
             const current = w.srsLevel || 0;
             const successes = hist.filter(h => h.ok !== false && h.mode !== 'review-peek');
             const successLevels = successes.map(h => (typeof h.level === 'number' ? h.level : 0));
             let inferred = successLevels.length ? Math.max(...successLevels) : 0;
-            if (inferred === 0 && successes.length > 0) inferred = successes.length;
+            if (inferred === 0 && successes.length > 0) inferred = Math.min(successes.length, MAX_SRS_LEVEL);
 
             if (current === 0) {
                 const lastBrainFail = hist.find(h =>
@@ -19372,14 +19906,18 @@
                 }
             }
 
-            if (inferred > current) return Math.min(inferred, MAX_SRS_LEVEL);
-            return null;
+            return Math.min(Math.max(0, inferred), MAX_SRS_LEVEL);
+        }
+
+        function wordHasNonBrainstormHistory(w) {
+            return (w.bsHistory || []).some((h) => h && h.mode && !isBrainstormHistoryMode(h.mode) && h.mode !== 'review-peek');
         }
 
         async function repairSrsState() {
             if (suppressAutoRepair || !activeUid || srsMigrationRunning || vocabulary.length === 0) return;
             const updates = [];
             vocabulary.forEach(w => {
+                if (isListeningOnlyWord?.(w)) return;
                 const patch = {};
                 const histFixed = repairBsHistoryLevels(w.bsHistory);
                 if (histFixed) patch.bsHistory = histFixed;
@@ -19388,8 +19926,14 @@
                 const inferred = inferSrsLevelFromHistory(wordForInfer);
                 const currentLevel = w.srsLevel || 0;
                 let newLevel = currentLevel;
-                if (inferred != null && inferred > currentLevel) {
-                    newLevel = Math.min(inferred, MAX_SRS_LEVEL);
+                if (inferred > currentLevel) {
+                    newLevel = inferred;
+                } else if (
+                    inferred < currentLevel
+                    && (wordHasNonBrainstormHistory(wordForInfer) || inferred === 0)
+                ) {
+                    // Deflate levels wrongly raised by other trainings
+                    newLevel = inferred;
                 }
                 const wordAtLevel = { ...wordForInfer, srsLevel: newLevel };
                 const computedReview = computeNextReviewTimeFromWord(wordAtLevel);
@@ -19397,9 +19941,9 @@
                 const reviewWrong = needsSrsTimerRepair(wordAtLevel, newLevel, computedReview);
                 if (levelChanged) {
                     patch.srsLevel = newLevel;
-                    patch.nextReviewTime = computedReview;
+                    patch.nextReviewTime = newLevel === 0 ? 0 : computedReview;
                 } else if (reviewWrong) {
-                    patch.nextReviewTime = computedReview;
+                    patch.nextReviewTime = newLevel === 0 ? 0 : computedReview;
                 }
                 if (Object.keys(patch).length) updates.push({ id: w.id, ...patch });
             });
@@ -19416,6 +19960,7 @@
                     const { id, ...fields } = u;
                     patchLocalWord(id, fields);
                 });
+                try { updateTrainDueBadges?.(); } catch (_) {}
             } catch (e) { console.error('repairSrsState', e); } finally { srsMigrationRunning = false; }
         }
 
@@ -20950,11 +21495,24 @@
         }
         function matchMarkdownBulletLine(line) {
             // Require marker + whitespace so "*note" / "**bold**" stay untouched
-            const m = /^ {0,3}([*+-])[ \t]+(.+)$/.exec(String(line || '').replace(/\u00a0/g, ' '));
-            if (!m) return null;
-            const body = String(m[2] || '').trim();
-            if (!body) return null;
-            return { marker: m[1], body };
+            const raw = String(line || '').replace(/\u00a0/g, ' ');
+            const m = /^ {0,3}([*+-])[ \t]+(.+)$/.exec(raw);
+            if (m) {
+                const body = String(m[2] || '').trim();
+                if (!body) return null;
+                return { marker: m[1], body };
+            }
+            // Glued bullet from paste/OCR: "*The fourth factor…" (not "*emphasis*")
+            const glued = /^ {0,3}\*([^*].+)$/.exec(raw);
+            if (glued) {
+                const body = String(glued[1] || '').trim();
+                if (!body || body.length < 28) return null;
+                if (/^(the\s+)?(first|second|third|fourth|fifth|sixth|seventh|a\s+second|another)\b/i.test(body)) {
+                    return { marker: '*', body };
+                }
+                if (/\bfactor\b/i.test(body) && body.length >= 40) return { marker: '*', body };
+            }
+            return null;
         }
         function matchMarkdownFootnoteBody(text) {
             const m = /^[*∗]\s+(.+)$/.exec(String(text || '').replace(/\u00a0/g, ' ').trim());
@@ -20962,12 +21520,30 @@
             const body = String(m[1] || '').trim();
             return body || null;
         }
+        function looksLikeEnumeratedListProse(body) {
+            const s = String(body || '').trim();
+            if (!s) return false;
+            if (/^(the\s+)?(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|a\s+second|another)\s+factor\b/i.test(s)) return true;
+            if (/^(first|second|third|fourth|fifth|sixth)ly\b/i.test(s)) return true;
+            if (/^\(?\d{1,2}[\).]\s+\S/.test(s)) return true;
+            if (/^[A-Za-zА-Яа-яЁёІіЇїЄєÀ-ÿ]\.\s+\S/.test(s) && s.length >= 40) return true;
+            return false;
+        }
+        function looksLikeBibliographicFootnote(body) {
+            const s = String(body || '').trim();
+            if (!s) return false;
+            if (/\b(ed\.|eds\.|ibid|op\.\s*cit|et al|vol\.|trans\.|publishe|quotation|passage|translation|first published|sketched|following)\b/i.test(s)) return true;
+            if (/\(\s*19\d{2}|20\d{2}\s*\)/.test(s) && s.length < 180) return true;
+            return false;
+        }
         function looksLikeFootnoteProse(body) {
             const s = String(body || '').trim();
             if (!s) return false;
-            if (s.length >= 55) return true;
-            if (/\b(ed\.|eds\.|ibid|op\.\s*cit|et al|vol\.|trans\.|publishe|quotation|passage|translation|first published|sketched|following)\b/i.test(s)) return true;
-            if (/[.!?]$/.test(s) && s.length >= 35) return true;
+            // Never treat clear list / "factor N" prose as a footnote box
+            if (looksLikeEnumeratedListProse(s)) return false;
+            if (looksLikeBibliographicFootnote(s)) return true;
+            // Long standalone asterisk notes without list cues — keep as footnote
+            if (s.length >= 55 && /[.!?]$/.test(s)) return true;
             return false;
         }
         function buildMarkdownFootnoteHtml(body) {
@@ -20995,7 +21571,7 @@
             return false;
         }
         function buildMarkdownListHtml(items) {
-            if (!items || items.length < 2) return '';
+            if (!items || items.length < 1) return '';
             let html = '<ul class="md-list">';
             items.forEach((body) => {
                 html += `<li>${formatInlineMarkdown(body)}</li>`;
@@ -21272,11 +21848,18 @@
                         j += 1;
                     }
                     if (items.length >= 2) {
-                        if (items.every(looksLikeFootnoteProse)) {
+                        // Only bibliographic-looking runs become footnote boxes; long essay bullets stay a list
+                        if (items.every(looksLikeBibliographicFootnote)) {
                             items.forEach((body) => out.push(buildMarkdownFootnoteHtml(body)));
                         } else {
                             out.push(buildMarkdownListHtml(items));
                         }
+                        i = j;
+                        continue;
+                    }
+                    // Single glued/long bullet that is clearly an enumeration item — keep as 1-item list
+                    if (items.length === 1 && looksLikeEnumeratedListProse(items[0])) {
+                        out.push(buildMarkdownListHtml(items));
                         i = j;
                         continue;
                     }
@@ -21592,6 +22175,68 @@
             }
             return root.innerHTML;
         }
+        /** Footnote boxes that are really list items (e.g. "The fifth factor…") → restore as a list. */
+        function normalizeMisclassifiedFootnotesInMaterialHtml(html) {
+            const root = document.createElement('div');
+            root.innerHTML = String(html || '');
+            if (!root.innerHTML.trim()) return '';
+            const nodes = [...root.childNodes];
+            let i = 0;
+            while (i < nodes.length) {
+                const n = nodes[i];
+                if (!(n.nodeType === 1 && n.classList?.contains('md-footnote'))) {
+                    i += 1;
+                    continue;
+                }
+                const run = [];
+                let j = i;
+                while (j < nodes.length) {
+                    const el = nodes[j];
+                    if (!(el.nodeType === 1 && el.classList?.contains('md-footnote'))) break;
+                    const text = String(el.textContent || '').replace(/^[∗*]\s*/, '').trim();
+                    if (!looksLikeEnumeratedListProse(text) && !looksLikeFootnoteProse(text)) break;
+                    if (looksLikeBibliographicFootnote(text) && !looksLikeEnumeratedListProse(text)) break;
+                    run.push({ el, text });
+                    j += 1;
+                }
+                const listable = run.filter((r) => looksLikeEnumeratedListProse(r.text) || (r.text.length >= 40 && !looksLikeBibliographicFootnote(r.text)));
+                if (listable.length >= 1 && listable.length === run.length) {
+                    const ul = document.createElement('ul');
+                    ul.className = 'md-list';
+                    listable.forEach((r) => {
+                        const li = document.createElement('li');
+                        // Keep inner HTML minus the ∗ mark
+                        const clone = r.el.cloneNode(true);
+                        clone.querySelectorAll('.md-fn-mark').forEach((m) => m.remove());
+                        li.innerHTML = clone.innerHTML.replace(/^[∗*]\s*/, '');
+                        ul.appendChild(li);
+                    });
+                    const first = run[0].el;
+                    first.parentNode?.insertBefore(ul, first);
+                    run.forEach((r) => r.el.remove());
+                    nodes.splice(i, run.length, ul);
+                    i += 1;
+                    continue;
+                }
+                i = Math.max(j, i + 1);
+            }
+            // Em-wrapped full paragraphs that start with glued "*The…" after bad italic parse
+            root.querySelectorAll('p').forEach((p) => {
+                if (p.querySelector('ul, ol, blockquote, table')) return;
+                const onlyEm = p.childNodes.length === 1 && p.firstChild?.nodeType === 1 && /^(EM|I)$/i.test(p.firstChild.tagName);
+                if (!onlyEm) return;
+                const text = String(p.textContent || '').trim();
+                if (!looksLikeEnumeratedListProse(text)) return;
+                const liBody = text;
+                const ul = document.createElement('ul');
+                ul.className = 'md-list';
+                const li = document.createElement('li');
+                li.textContent = liBody;
+                ul.appendChild(li);
+                p.replaceWith(ul);
+            });
+            return root.innerHTML;
+        }
         function normalizeInlineFootnoteMarksInMaterialHtml(html) {
             const root = document.createElement('div');
             root.innerHTML = String(html || '');
@@ -21696,9 +22341,11 @@
             const html = looksLikeMaterialHtml(s) ? sanitizeMaterialHtml(s) : markdownToHtml(s);
             return normalizeLatexSymbolsInMaterialHtml(
                 normalizeInlineFootnoteMarksInMaterialHtml(
-                    normalizeMarkdownListsInMaterialHtml(
-                        normalizeMarkdownTablesInMaterialHtml(
-                            normalizeMarkdownQuotesInMaterialHtml(html)
+                    normalizeMisclassifiedFootnotesInMaterialHtml(
+                        normalizeMarkdownListsInMaterialHtml(
+                            normalizeMarkdownTablesInMaterialHtml(
+                                normalizeMarkdownQuotesInMaterialHtml(html)
+                            )
                         )
                     )
                 )
@@ -23313,20 +23960,76 @@
 
         async function writeTextToClipboard(text) {
             const value = String(text ?? '');
-            if (navigator.clipboard?.writeText) {
-                await navigator.clipboard.writeText(value);
-                return;
-            }
+            if (!value) throw new Error('clipboard-empty');
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(value);
+                    return true;
+                }
+            } catch (_) { /* fall through */ }
             const ta = document.createElement('textarea');
             ta.value = value;
             ta.setAttribute('readonly', '');
             ta.style.position = 'fixed';
             ta.style.left = '-9999px';
             document.body.appendChild(ta);
+            ta.focus();
             ta.select();
-            document.execCommand('copy');
+            let ok = false;
+            try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
             document.body.removeChild(ta);
+            if (!ok) throw new Error('clipboard-failed');
+            return true;
         }
+
+        function getReaderPagePlainText() {
+            const root = document.getElementById('reader-content');
+            if (!root) return '';
+            const clone = root.cloneNode(true);
+            clone.querySelectorAll(
+                '#inline-popup, .inline-popup, .reader-qm-panel, script, style, .yt-sub-line, [aria-hidden="true"]'
+            ).forEach((el) => el.remove());
+            return String(clone.innerText || clone.textContent || '')
+                .replace(/\u00a0/g, ' ')
+                .replace(/[ \t]+\n/g, '\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+        }
+
+        function syncReaderCopyModeUi() {
+            const btn = document.getElementById('reader-copy-mode-btn');
+            if (btn) {
+                btn.classList.toggle('is-active', !!readerCopyMode);
+                btn.setAttribute('aria-pressed', readerCopyMode ? 'true' : 'false');
+            }
+            document.getElementById('library-read-view')?.classList.toggle('reader-copy-mode', !!readerCopyMode);
+        }
+
+        window.toggleReaderCopyMode = () => {
+            readerCopyMode = !readerCopyMode;
+            if (readerCopyMode) {
+                if (readerHighlightMode) {
+                    readerHighlightMode = false;
+                    try { localStorage.setItem(READER_HL_MODE_KEY, '0'); } catch (_) {}
+                    try { syncReaderHighlightUi(); } catch (_) {}
+                }
+                try { closeInlinePopup(); } catch (_) {}
+            }
+            syncReaderCopyModeUi();
+            showAppToast(readerCopyMode ? t('reader.copyModeOn') : t('reader.copyModeOff'));
+        };
+
+        window.copyReaderPageText = async () => {
+            try {
+                const text = getReaderPagePlainText();
+                if (!text) throw new Error('empty');
+                await writeTextToClipboard(text);
+                showAppToast(t('reader.copyPageOk'));
+            } catch (e) {
+                console.error('copyReaderPageText', e);
+                showAppToast(t('reader.copyPageFail'), 3200);
+            }
+        };
 
         function formatWordsColumn(words) {
             const seen = new Set();
@@ -23758,6 +24461,7 @@
         };
 
         let readerHighlightMode = false;
+        let readerCopyMode = false;
         let readerReviewMode = false;
         let readerReviewRevealed = new Set();
         let readerReviewPeeked = new Set();
@@ -24938,6 +25642,10 @@
             if (e) e.stopPropagation();
             readerHighlightMode = !readerHighlightMode;
             try { localStorage.setItem(READER_HL_MODE_KEY, readerHighlightMode ? '1' : '0'); } catch (_) {}
+            if (readerHighlightMode && readerCopyMode) {
+                readerCopyMode = false;
+                syncReaderCopyModeUi();
+            }
             syncReaderHighlightUi();
             if (readerHighlightMode) closeInlinePopup();
             else releaseReaderFloatToolsFocus();
@@ -27408,6 +28116,10 @@
                 } catch (_) {}
                 return;
             }
+            if (readerCopyMode) {
+                // Native selection / Ctrl+C only — no translation popup
+                return;
+            }
             if (e.target.classList.contains('word-clickable') && window.getSelection().toString().trim().length === 0) {
                 e.stopPropagation();
                 const word = e.target.getAttribute('data-word');
@@ -27456,6 +28168,13 @@
                     if (!stable || stable.length > 600) return;
                     handleReaderHighlightSelection(latest.range);
                 }, 720);
+                return;
+            }
+
+            if (readerCopyMode) {
+                setInlinePopupSelectionAdjusting(false);
+                clearTimeout(selectionFetchTimeout);
+                closeInlinePopup();
                 return;
             }
 
