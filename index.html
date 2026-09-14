@@ -2485,12 +2485,10 @@
         }
         #inline-popup-word[contenteditable="true"] {
             outline: none;
-            border-bottom: 1.5px dashed #a5b4fc;
-            padding-bottom: 0.1rem;
             cursor: text;
         }
         #inline-popup-word[contenteditable="true"]:focus {
-            border-bottom-color: #6366f1;
+            outline: none;
         }
         #inline-save-kind-hint.is-action {
             cursor: pointer;
@@ -11456,7 +11454,7 @@
                 'inline.dupNewHint': 'Окрема картка. Змініть переклад, якщо значення інше.',
                 'inline.savePhrase': 'Зберегти фразу',
                 'inline.phraseSaveHint': 'Збережеться як фраза',
-                'inline.semicolonPhraseHint': 'Щоб зберегти як фразу, додайте ; в кінці виділення (символ не збережеться)',
+                'inline.semicolonPhraseHint': 'Щоб зберегти як фразу, додайте ; в кінці перекладу (символ не збережеться)',
                 'inline.phraseSaved': 'Фразу додано до тренування «Порядок»',
                 'inline.phraseNeedMaterial': 'Збережіть фразу під час читання матеріалу',
                 'inline.back': 'Назад', 'inline.listen': 'Прослухати',
@@ -12186,7 +12184,7 @@
                 'inline.dupNewHint': 'A separate card. Change the translation if the meaning is different.',
                 'inline.savePhrase': 'Save phrase',
                 'inline.phraseSaveHint': 'Will be saved as a phrase',
-                'inline.semicolonPhraseHint': 'To save as a phrase, add ; at the end of the selection (it won’t be saved)',
+                'inline.semicolonPhraseHint': 'To save as a phrase, add ; at the end of the translation (it won’t be saved)',
                 'inline.phraseSaved': 'Phrase added to Order training',
                 'inline.phraseNeedMaterial': 'Save phrases while reading a material',
                 'inline.back': 'Back', 'inline.listen': 'Listen',
@@ -12911,7 +12909,7 @@
                 'inline.dupNewHint': 'Una tarjeta aparte. Cambia la traducción si el significado es distinto.',
                 'inline.savePhrase': 'Guardar frase',
                 'inline.phraseSaveHint': 'Se guardará como frase',
-                'inline.semicolonPhraseHint': 'Para guardar como frase, añade ; al final de la selección (no se guardará)',
+                'inline.semicolonPhraseHint': 'Para guardar como frase, añade ; al final de la traducción (no se guardará)',
                 'inline.phraseSaved': 'Frase añadida al entrenamiento Orden',
                 'inline.phraseNeedMaterial': 'Guarda frases mientras lees un material',
                 'inline.back': 'Atrás', 'inline.listen': 'Escuchar',
@@ -18440,7 +18438,10 @@
         inputWord.addEventListener('focus', syncHomeFieldChrome);
         inputWord.addEventListener('blur', () => setTimeout(syncHomeFieldChrome, 0));
         inputTrans.addEventListener('focus', syncHomeFieldChrome);
-        inputTrans.addEventListener('input', syncHomeFieldChrome);
+        inputTrans.addEventListener('input', () => {
+            syncHomeFieldChrome();
+            if (typeof syncManualPhraseHint === 'function') syncManualPhraseHint();
+        });
         inputTrans.addEventListener('blur', () => setTimeout(syncHomeFieldChrome, 120));
         syncHomeFieldChrome();
 
@@ -20152,7 +20153,7 @@
                 return;
             }
             if (currentDictFilter === 'phrases') {
-                const n = listPhraseCollections().length;
+                const n = listPhraseCollections().reduce((sum, m) => sum + getPhraseTextsFromCollection(m).length, 0);
                 if (countEl) countEl.textContent = n;
                 if (labelEl) labelEl.textContent = t('filter.phrases');
                 if (contextBtn) contextBtn.title = t('filter.phrases');
@@ -20491,11 +20492,14 @@
                     return;
                 }
                 if(!trans || trans === t('searching') || trans === 'Шукаємо...') return;
+                const transParsed = stripTrailingForcePhraseMarker(trans);
+                const transClean = transParsed.text;
+                if (!transClean) return;
                 const parsed = parseReaderSelectionForSave(rawWord);
                 const word = parsed.text || rawWord;
                 if (!word) return;
-                if (parsed.saveKind === 'phrase') {
-                    await savePhraseManual(word, trans, (inputContext?.value || '').trim());
+                if (parsed.saveKind === 'phrase' || transParsed.forced) {
+                    await savePhraseManual(word, transClean, (inputContext?.value || '').trim());
                     inputWord.value = ''; inputTrans.value = ''; if (inputContext) inputContext.value = '';
                     resetHomeManualContextPanel();
                     manualContextSaveData = null;
@@ -20507,9 +20511,9 @@
                     if (typeof closeHomeMerriamDict === 'function') closeHomeMerriamDict();
                     return;
                 }
-                const imgUrl = await getImageUrl(word, trans);
+                const imgUrl = await getImageUrl(word, transClean);
                 const ctx = (inputContext?.value || '').trim();
-                const savePayload = { word, translation: trans, imageUrl: imgUrl, context: ctx, source: getSaveSource(), createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0, bsHistory: [] };
+                const savePayload = { word, translation: transClean, imageUrl: imgUrl, context: ctx, source: getSaveSource(), createdAt: serverTimestamp(), srsLevel: 0, nextReviewTime: 0, bsHistory: [] };
                 if (activeMaterialId) savePayload.materialId = activeMaterialId;
                 const ref = await addDoc(colRef('words'), savePayload);
                 pushAppUndo(async () => {
@@ -21268,7 +21272,7 @@
                 <div class="dict-word-card bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group h-40 sm:h-48 ${selected ? 'word-card-selected' : ''}">
                     <div class="dict-word-img">
                         <img src="${item.imageUrl}" class="w-full h-20 sm:h-24 object-cover bg-slate-50 border-b border-slate-100 cursor-pointer" onclick="${cardClick}" onerror="imgError(this)">
-                        ${(item.listenFocus || wordCardLooksLikePhrase(item)) ? `<div class="dict-card-badges">${item.listenFocus ? `<button type="button" class="dict-listen-badge" onclick="revealDictListenBadge(event)" title="${escapeHtmlText(t('mode.listening'))}" aria-label="${escapeHtmlText(t('mode.listening'))}">${dictListeningQueueIconSvg()}</button>` : ''}${wordCardLooksLikePhrase(item) ? `<span class="dict-phrase-badge" onclick="revealDictListenBadge(event)" title="${escapeHtmlText(t('filter.phrases'))}" aria-label="${escapeHtmlText(t('filter.phrases'))}">💬</span>` : ''}</div>` : ''}
+                        ${item.listenFocus ? `<div class="dict-card-badges"><button type="button" class="dict-listen-badge" onclick="revealDictListenBadge(event)" title="${escapeHtmlText(t('mode.listening'))}" aria-label="${escapeHtmlText(t('mode.listening'))}">${dictListeningQueueIconSvg()}</button></div>` : ''}
                     </div>
                     <div class="p-2 sm:p-3 flex-1 flex flex-col justify-center min-w-0 bg-white cursor-pointer" onclick="${cardClick}">
                         <strong class="text-indigo-700 text-base sm:text-lg leading-tight truncate font-bold">${formatWordWithArticleHtml(item.word, learningLanguage)}</strong>
@@ -26686,50 +26690,98 @@
             return false;
         }
 
+        function stripTrailingForcePhraseMarker(raw) {
+            const text = String(raw || '').trim();
+            if (!text) return { text: '', forced: false };
+            const semi = text.match(/^([\s\S]+?)[;；]\s*$/);
+            if (semi) return { text: semi[1].trim(), forced: true };
+            return { text, forced: false };
+        }
+
         function parseReaderSelectionForSave(raw) {
             let text = String(raw || '').replace(/\s+/g, ' ').trim();
             if (!text) {
                 return { text: '', saveKind: 'word', saveHint: null, tokenCount: 0, forcedPhrase: false };
             }
-            let forcedPhrase = false;
-            const semi = text.match(/^(.+?)[;；]\s*$/);
-            if (semi) {
-                forcedPhrase = true;
-                text = semi[1].trim();
-            }
+            // Force-phrase marker (;) lives in the translation field, not in the word.
             const tokenCount = countReaderSelectionTokens(text);
             const isPhraseForm = isReaderSelectionPhraseByForm(text);
             let saveKind = 'word';
-            if (forcedPhrase || isPhraseForm) saveKind = 'phrase';
+            if (isPhraseForm) saveKind = 'phrase';
             let saveHint = null;
             if (saveKind === 'phrase') saveHint = 'phrase';
             else if (tokenCount >= 3) saveHint = 'semicolon';
-            return { text, saveKind, saveHint, tokenCount, forcedPhrase };
+            return { text, saveKind, saveHint, tokenCount, forcedPhrase: false };
         }
 
-        function wordCardLooksLikePhrase(item) {
-            const w = String(item?.word || '').trim();
-            if (!w) return false;
-            if (countReaderSelectionTokens(w) >= 2) return true;
-            return isReaderSelectionPhraseByForm(w);
+        function getPhraseTextsFromCollection(m) {
+            if (!m) return [];
+            const clean = (arr) => (arr || [])
+                .map((p) => String(p || '').trim())
+                .filter(Boolean);
+            if (Array.isArray(m.orderPhrases) && m.orderPhrases.length) {
+                const fromPhrases = clean(m.orderPhrases);
+                if (fromPhrases.length) return fromPhrases;
+            }
+            if (m.orderSplit === 'phrases' && Array.isArray(m.orderSegments) && m.orderSegments.length) {
+                const fromSeg = clean(m.orderSegments);
+                if (fromSeg.length) return fromSeg;
+            }
+            if (Array.isArray(m.orderPhraseMeta) && m.orderPhraseMeta.length) {
+                return m.orderPhraseMeta
+                    .map((x) => String(x?.text || '').trim())
+                    .filter(Boolean);
+            }
+            return [];
+        }
+
+        function getPhraseMetaList(mat) {
+            if (!mat) return [];
+            const texts = getPhraseTextsFromCollection(mat);
+            const rawMeta = Array.isArray(mat.orderPhraseMeta) ? mat.orderPhraseMeta : [];
+            if (!texts.length) {
+                return rawMeta
+                    .map((m) => ({
+                        text: String(m?.text || '').trim(),
+                        translation: String(m?.translation || '').trim()
+                    }))
+                    .filter((m) => m.text);
+            }
+            return texts.map((text) => {
+                const key = text.toLowerCase();
+                const hit = rawMeta.find((m) => String(m?.text || '').trim().toLowerCase() === key);
+                return {
+                    text,
+                    translation: String(hit?.translation || '').trim()
+                };
+            });
         }
 
         function findPhraseCollectionForParent(parentId) {
             if (!parentId) return null;
             return materials.find((m) =>
-                m.restoreParentId === parentId && m.phraseCollection && materialIsOrderOnly(m)
+                m.restoreParentId === parentId
+                && m.phraseCollection
+                && (materialIsOrderOnly(m) || getPhraseTextsFromCollection(m).length > 0)
             ) || null;
         }
 
         function findStandalonePhraseCollection() {
             return materials.find((m) =>
-                m.phraseCollection && materialIsOrderOnly(m) && !m.restoreParentId
+                m.phraseCollection
+                && !m.restoreParentId
+                && (materialIsOrderOnly(m) || getPhraseTextsFromCollection(m).length > 0)
             ) || null;
         }
 
         function listPhraseCollections() {
             let list = materials
-                .filter((m) => m?.phraseCollection && materialIsOrderOnly(m))
+                .filter((m) => {
+                    if (!m?.phraseCollection) return false;
+                    if (materialIsOrderOnly(m)) return true;
+                    // Recover collections that lost orderOnly but still hold phrases
+                    return getPhraseTextsFromCollection(m).length > 0;
+                })
                 .sort((a, b) => {
                     const emptyA = getPhraseTextsFromCollection(a).length === 0 ? 1 : 0;
                     const emptyB = getPhraseTextsFromCollection(b).length === 0 ? 1 : 0;
@@ -26756,15 +26808,6 @@
             return m.title || t('filter.phrases');
         }
 
-        function getPhraseTextsFromCollection(m) {
-            if (!m) return [];
-            if (Array.isArray(m.orderPhrases) && m.orderPhrases.length) return m.orderPhrases.slice();
-            if (m.orderSplit === 'phrases' && Array.isArray(m.orderSegments) && m.orderSegments.length) {
-                return m.orderSegments.slice();
-            }
-            return [];
-        }
-
         function isReaderHighlightPhrase(text) {
             const s = String(text || '').trim();
             if (!s || !/\s/.test(s)) return false;
@@ -26776,6 +26819,7 @@
 
         function buildReaderSavedLexicon(vocabulary, materialId) {
             const words = new Set();
+            const surfaces = new Set();
             const phrases = [];
             (vocabulary || []).forEach((v) => {
                 const raw = String(v.word || '').trim();
@@ -26783,6 +26827,10 @@
                 const key = raw.toLowerCase();
                 if (isReaderHighlightPhrase(raw)) phrases.push(key);
                 else words.add(key);
+                (Array.isArray(v.surfaceForms) ? v.surfaceForms : []).forEach((form) => {
+                    const sk = String(form || '').trim().toLowerCase();
+                    if (sk && sk !== key && !words.has(sk)) surfaces.add(sk);
+                });
             });
             if (materialId) {
                 const phraseMat = findPhraseCollectionForParent(materialId);
@@ -26792,7 +26840,7 @@
                 });
             }
             phrases.sort((a, b) => b.split(/\s+/).length - a.split(/\s+/).length);
-            return { words, phrases };
+            return { words, phrases, surfaces };
         }
 
         function tokenizeReaderText(text) {
@@ -26877,8 +26925,9 @@
             return `<span class="${css}" data-word="${attrWord}" data-phrase="1"${occAttr}>${esc}</span>`;
         }
 
-        function wrapWordsTokens(text, savedWords, wordOccMap = null) {
+        function wrapWordsTokens(text, savedWords, wordOccMap = null, savedSurfaces = null) {
             const regex = /([\p{L}\p{M}'’\-]+)|([^\p{L}\p{M}'’\-]+)/gu;
+            const surfaces = savedSurfaces || new Set();
             let match, html = '';
             while ((match = regex.exec(text)) !== null) {
                 if (match[1]) {
@@ -26886,9 +26935,16 @@
                     const cleanWord = raw.toLowerCase();
                     let css = 'word-clickable';
                     if (readerReviewMode) {
-                        if (readerReviewRevealed.has(cleanWord)) css = 'word-clickable word-saved';
+                        if (readerReviewRevealed.has(cleanWord)) {
+                            css = surfaces.has(cleanWord)
+                                ? 'word-clickable word-saved-phrase'
+                                : 'word-clickable word-saved';
+                        }
                     } else if (savedWords.has(cleanWord)) {
                         css = 'word-clickable word-saved';
+                    } else if (surfaces.has(cleanWord)) {
+                        // Edited citation form still visible in text (e.g. gerund → lemma)
+                        css = 'word-clickable word-saved-phrase';
                     }
                     const esc = escapeReaderHtml(raw);
                     let occAttr = '';
@@ -26908,16 +26964,16 @@
         function wrapWords(text, savedLexicon, wordOccMap = null) {
             const lex = savedLexicon && savedLexicon.words ? savedLexicon : buildReaderSavedLexicon(vocabulary, currentMaterial?.id);
             const ranges = findReaderPhraseRanges(text, lex.phrases);
-            if (!ranges.length) return wrapWordsTokens(text, lex.words, wordOccMap);
+            if (!ranges.length) return wrapWordsTokens(text, lex.words, wordOccMap, lex.surfaces);
 
             let html = '';
             let pos = 0;
             for (const r of ranges) {
-                if (r.start > pos) html += wrapWordsTokens(text.slice(pos, r.start), lex.words, wordOccMap);
+                if (r.start > pos) html += wrapWordsTokens(text.slice(pos, r.start), lex.words, wordOccMap, lex.surfaces);
                 html += wrapPhraseSpan(r.raw, r.phraseKey, wordOccMap);
                 pos = r.end;
             }
-            if (pos < text.length) html += wrapWordsTokens(text.slice(pos), lex.words, wordOccMap);
+            if (pos < text.length) html += wrapWordsTokens(text.slice(pos), lex.words, wordOccMap, lex.surfaces);
             return html;
         }
 
@@ -28499,44 +28555,98 @@
             repositionInlinePopupSoon();
         };
 
+        function normalizeSurfaceFormList(forms) {
+            const out = [];
+            const seen = new Set();
+            (forms || []).forEach((f) => {
+                const s = String(f || '').trim();
+                if (!s) return;
+                const key = s.toLowerCase();
+                if (seen.has(key)) return;
+                seen.add(key);
+                out.push(s);
+            });
+            return out;
+        }
+
+        function collectSurfaceFormsForLemma(lemma, data, existingForms) {
+            const lemmaKey = String(lemma || '').trim().toLowerCase();
+            const merged = normalizeSurfaceFormList([
+                ...(Array.isArray(existingForms) ? existingForms : []),
+                data?.clickedWord,
+                data?.originalWord
+            ]).filter((f) => f.toLowerCase() !== lemmaKey);
+            return merged;
+        }
+
+        function findVocabularyMatchForInline(lemma, data) {
+            if (inlineDupExistingId) {
+                const byId = vocabulary.find((v) => v.id === inlineDupExistingId);
+                if (byId) return byId;
+            }
+            const lemmaKey = String(lemma || '').trim().toLowerCase();
+            const clickedKey = String(data?.clickedWord || '').trim().toLowerCase();
+            return vocabulary.find((v) => {
+                const w = String(v.word || '').trim().toLowerCase();
+                if (w && (w === lemmaKey || (clickedKey && w === clickedKey))) return true;
+                const forms = Array.isArray(v.surfaceForms) ? v.surfaceForms : [];
+                return forms.some((f) => {
+                    const sk = String(f || '').trim().toLowerCase();
+                    return sk && (sk === lemmaKey || (clickedKey && sk === clickedKey));
+                });
+            }) || null;
+        }
+
         window.saveWordFromInlinePopup = async () => {
-            refreshInlineSaveKindFromWordEl({ stripForced: true });
+            refreshInlineSaveKindFromWordEl({ stripForced: true, allowEmptyWord: true });
             if (pendingInlineSaveData?.saveKind === 'phrase') {
                 return savePhraseFromInlinePopup();
             }
             if(!activeUid || !pendingInlineSaveData) return;
-            const trans = document.getElementById('inline-popup-trans-input').value.trim(); if(!trans) return;
+            const trans = stripTrailingForcePhraseMarker(
+                document.getElementById('inline-popup-trans-input')?.value || ''
+            ).text;
+            if (!trans) return;
             const btn = document.getElementById('inline-popup-save-btn'); const orig = btn.innerHTML; btn.disabled = true; btn.textContent = "...";
             try {
-                const imgUrl = await getImageUrl(pendingInlineSaveData.word, trans);
-                const existing = inlineDupExistingId
-                    ? vocabulary.find((v) => v.id === inlineDupExistingId)
-                    : vocabulary.find(v => v.word.toLowerCase() === pendingInlineSaveData.word.toLowerCase());
+                const lemma = String(pendingInlineSaveData.word || '').trim();
+                if (!lemma) return;
+                const imgUrl = await getImageUrl(lemma, trans);
+                const existing = findVocabularyMatchForInline(lemma, pendingInlineSaveData);
                 const shouldUpdate = !!(existing && inlineDupMode === 'update');
+                const surfaceForms = collectSurfaceFormsForLemma(
+                    lemma,
+                    pendingInlineSaveData,
+                    existing?.surfaceForms
+                );
 
                 if (shouldUpdate) {
-                    const before = { ...existing };
+                    const before = { ...existing, surfaceForms: Array.isArray(existing.surfaceForms) ? existing.surfaceForms.slice() : [] };
                     const patch = {
+                        word: lemma,
                         translation: trans,
                         context: mergeWordContext(existing.context, pendingInlineSaveData.context),
                         imageUrl: imgUrl || existing.imageUrl,
-                        source: getSaveSource()
+                        source: getSaveSource(),
+                        surfaceForms
                     };
                     if (currentMaterial) patch.materialId = currentMaterial.id;
                     await updateDoc(docRef('words', existing.id), patch);
                     pushAppUndo(async () => {
                         await updateDoc(docRef('words', existing.id), {
+                            word: before.word,
                             translation: before.translation,
                             context: before.context,
                             imageUrl: before.imageUrl,
                             source: before.source,
-                            materialId: before.materialId ?? null
+                            materialId: before.materialId ?? null,
+                            surfaceForms: before.surfaceForms || []
                         });
                     });
                     patchLocalWord(existing.id, patch);
                 } else {
                     const saveData = {
-                        word: pendingInlineSaveData.word,
+                        word: lemma,
                         translation: trans,
                         context: pendingInlineSaveData.context,
                         imageUrl: imgUrl,
@@ -28544,7 +28654,8 @@
                         createdAt: serverTimestamp(),
                         srsLevel: 0,
                         nextReviewTime: 0,
-                        bsHistory: []
+                        bsHistory: [],
+                        surfaceForms
                     };
                     if (currentMaterial) saveData.materialId = currentMaterial.id;
                     const ref = await addDoc(colRef('words'), saveData);
@@ -30193,7 +30304,7 @@
                 el.onclick = null;
                 return;
             }
-            // Existing vocab card: no “convert to phrase” coaching — user can add ; themselves.
+            // Existing vocab card: no coaching — user can add ; in the translation themselves.
             const updatingExisting = !!(inlineDupExistingId || document.getElementById('inline-dup-row')?.classList.contains('is-visible'));
             if (data.saveKind === 'phrase') {
                 el.textContent = t('inline.phraseSaveHint');
@@ -30230,17 +30341,30 @@
         function refreshInlineSaveKindFromWordEl(opts = {}) {
             if (!pendingInlineSaveData) return pendingInlineSaveData;
             const wordEl = document.getElementById('inline-popup-word');
-            const raw = (wordEl?.textContent || '').replace(/\u00a0/g, ' ').trim();
-            if (!raw) return pendingInlineSaveData;
-            const parsed = parseReaderSelectionForSave(raw);
-            const nextWord = parsed.text || raw;
+            const transEl = document.getElementById('inline-popup-trans-input');
+            const rawWord = (wordEl?.textContent || '').replace(/\u00a0/g, ' ').trim();
+            if (!rawWord && !opts.allowEmptyWord) return pendingInlineSaveData;
+            const parsed = parseReaderSelectionForSave(rawWord || pendingInlineSaveData.word || '');
+            const nextWord = parsed.text || rawWord || pendingInlineSaveData.word || '';
             pendingInlineSaveData.word = nextWord;
-            pendingInlineSaveData.saveKind = parsed.saveKind;
-            pendingInlineSaveData.saveHint = parsed.saveHint;
-            pendingInlineSaveData.forcedPhrase = !!parsed.forcedPhrase;
-            if (opts.stripForced && parsed.forcedPhrase && wordEl && wordEl.textContent.trim() !== nextWord) {
-                wordEl.textContent = nextWord;
+
+            const transParsed = stripTrailingForcePhraseMarker(transEl?.value || '');
+            if (opts.stripForced && transParsed.forced && transEl && transEl.value.trim() !== transParsed.text) {
+                transEl.value = transParsed.text;
             }
+
+            let saveKind = parsed.saveKind;
+            let saveHint = parsed.saveHint;
+            let forcedPhrase = false;
+            if (transParsed.forced) {
+                saveKind = 'phrase';
+                saveHint = 'phrase';
+                forcedPhrase = true;
+            }
+            pendingInlineSaveData.saveKind = saveKind;
+            pendingInlineSaveData.saveHint = saveHint;
+            pendingInlineSaveData.forcedPhrase = forcedPhrase;
+
             const existing = pendingInlineSaveData.saveKind === 'phrase'
                 ? null
                 : vocabulary.find((v) => v.word.toLowerCase() === nextWord.toLowerCase());
@@ -30256,21 +30380,32 @@
 
         (function bindInlinePopupWordEditing() {
             const wordEl = document.getElementById('inline-popup-word');
-            if (!wordEl || wordEl.dataset.phraseEditBound === '1') return;
-            wordEl.dataset.phraseEditBound = '1';
-            wordEl.addEventListener('input', () => {
-                refreshInlineSaveKindFromWordEl();
-                repositionInlinePopupSoon?.();
-            });
-            wordEl.addEventListener('blur', () => {
-                refreshInlineSaveKindFromWordEl({ stripForced: true });
-            });
-            wordEl.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    saveWordFromInlinePopup();
-                }
-            });
+            const transEl = document.getElementById('inline-popup-trans-input');
+            if (wordEl && wordEl.dataset.phraseEditBound !== '1') {
+                wordEl.dataset.phraseEditBound = '1';
+                wordEl.addEventListener('input', () => {
+                    refreshInlineSaveKindFromWordEl();
+                    repositionInlinePopupSoon?.();
+                });
+                wordEl.addEventListener('blur', () => {
+                    refreshInlineSaveKindFromWordEl({ stripForced: true });
+                });
+                wordEl.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        saveWordFromInlinePopup();
+                    }
+                });
+            }
+            if (transEl && transEl.dataset.phraseSemiBound !== '1') {
+                transEl.dataset.phraseSemiBound = '1';
+                transEl.addEventListener('input', () => {
+                    refreshInlineSaveKindFromWordEl({ allowEmptyWord: true });
+                });
+                transEl.addEventListener('blur', () => {
+                    refreshInlineSaveKindFromWordEl({ stripForced: true, allowEmptyWord: true });
+                });
+            }
         })();
 
         async function removeVocabWordsMatchingPhrase(phrase) {
@@ -30296,12 +30431,6 @@
                 });
             }
             return matches;
-        }
-
-        function getPhraseMetaList(mat) {
-            if (!mat) return [];
-            if (Array.isArray(mat.orderPhraseMeta)) return mat.orderPhraseMeta.slice();
-            return getPhraseTextsFromCollection(mat).map((text) => ({ text, translation: '' }));
         }
 
         async function ensurePhraseCollectionForParent(parent) {
@@ -30436,19 +30565,35 @@
         }
 
         function buildPhraseCollectionTrainingPayload(phrases, meta) {
-            const segments = phrases.length >= 2 ? phrases.slice() : [];
-            const content = phrases.length
-                ? phrases.map((p) => `<p>${escapeHtmlText(p)}</p>`).join('')
+            const cleanPhrases = (phrases || []).map((p) => String(p || '').trim()).filter(Boolean);
+            const cleanMeta = (meta || [])
+                .map((m) => ({
+                    text: String(m?.text || '').trim(),
+                    translation: String(m?.translation || '').trim()
+                }))
+                .filter((m) => m.text);
+            // Keep meta aligned 1:1 with phrase texts
+            const alignedMeta = cleanPhrases.map((text) => {
+                const key = text.toLowerCase();
+                const hit = cleanMeta.find((m) => m.text.toLowerCase() === key);
+                return { text, translation: hit?.translation || '' };
+            });
+            const segments = cleanPhrases.length >= 2 ? cleanPhrases.slice() : [];
+            const content = cleanPhrases.length
+                ? cleanPhrases.map((p) => `<p>${escapeHtmlText(p)}</p>`).join('')
                 : '<p></p>';
-            const echoFragments = phrases.filter((p) => echoCountWords(p) >= ECHO_MIN_WORDS);
+            const echoFragments = cleanPhrases.filter((p) => echoCountWords(p) >= ECHO_MIN_WORDS);
             return {
-                orderPhrases: phrases,
-                orderPhraseMeta: meta,
+                phraseCollection: true,
+                orderOnly: true,
+                orderMode: true,
+                orderPhrases: cleanPhrases,
+                orderPhraseMeta: alignedMeta,
                 orderSegments: segments,
                 orderSplit: 'phrases',
                 content,
                 // Whole phrases as restore targets when ≥1; enables Restore / Echo alongside Order
-                restoreWords: phrases.slice(),
+                restoreWords: cleanPhrases.slice(),
                 echoFragments,
                 updatedAt: Date.now()
             };
@@ -30528,8 +30673,9 @@
                 if (btn && !btn.disabled) btn.textContent = t('inline.savePhrasePack', { n: pack.length });
                 return;
             }
+            const transForced = stripTrailingForcePhraseMarker(inputTrans?.value || '').forced;
             const parsed = parseReaderSelectionForSave(raw);
-            if (parsed.saveKind === 'phrase') {
+            if (parsed.saveKind === 'phrase' || transForced) {
                 el.textContent = t('inline.phraseSaveHint');
                 el.classList.remove('hidden');
                 if (btn && !btn.disabled) btn.textContent = t('inline.savePhrase') || t('dict.add');
@@ -30547,9 +30693,12 @@
         }
 
         async function savePhraseFromInlinePopup() {
-            refreshInlineSaveKindFromWordEl({ stripForced: true });
+            refreshInlineSaveKindFromWordEl({ stripForced: true, allowEmptyWord: true });
             if (!activeUid || !pendingInlineSaveData) return;
-            const trans = document.getElementById('inline-popup-trans-input')?.value?.trim();
+            const transParsed = stripTrailingForcePhraseMarker(
+                document.getElementById('inline-popup-trans-input')?.value || ''
+            );
+            const trans = transParsed.text;
             if (!trans) return;
             const parent = currentMaterial;
             if (!parent?.id) {
@@ -32825,7 +32974,12 @@
                 : query;
             const existing = (opts.multiLineSelection || pendingInlineSaveData?.saveKind === 'phrase' || parsed.saveKind === 'phrase')
                 ? null
-                : vocabulary.find(v => v.word.toLowerCase() === translateQuery);
+                : vocabulary.find((v) => {
+                    const w = String(v.word || '').toLowerCase();
+                    if (w === translateQuery) return true;
+                    return (Array.isArray(v.surfaceForms) ? v.surfaceForms : [])
+                        .some((f) => String(f || '').trim().toLowerCase() === translateQuery);
+                });
             syncInlineDupRow(existing);
             syncInlineSaveKindHint(pendingInlineSaveData);
             let transText = '';
