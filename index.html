@@ -604,13 +604,67 @@
         }
         .reader-settings-icon-row {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             gap: 0.4rem;
+        }
+        .reader-settings-icon-row + .reader-settings-icon-row {
+            margin-top: 0.4rem;
+        }
+        .reader-settings-icon-stack {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .reader-settings-icon-mark {
+            position: absolute;
+            right: -0.42rem;
+            bottom: -0.38rem;
+            min-width: 0.85rem;
+            height: 0.85rem;
+            padding: 0 0.14rem;
+            border-radius: 0.22rem;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #475569;
+            font-size: 0.52rem;
+            font-weight: 800;
+            line-height: 0.85rem;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+            pointer-events: none;
+        }
+        .reader-settings-icon-mark--select {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.06rem;
+            min-width: 1.05rem;
+            padding: 0 0.12rem;
+            font-size: 0.42rem;
+            letter-spacing: -0.06em;
+        }
+        .reader-settings-icon-mark--select .rcm-bar {
+            width: 0.08rem;
+            height: 0.55rem;
+            border-radius: 1px;
+            background: currentColor;
+            opacity: 0.9;
+        }
+        .reader-settings-icon-btn.is-active .reader-settings-icon-mark {
+            border-color: #a5b4fc;
+            color: #4f46e5;
+            background: #eef2ff;
         }
         .reader-settings-icon-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: visible;
             min-width: 2.5rem;
             height: 2.25rem;
             padding: 0 0.65rem;
@@ -868,6 +922,23 @@
         #reader-settings-panel .reader-settings-font-btn {
             padding-top: 0.5rem;
             padding-bottom: 0.5rem;
+        }
+        #reader-settings-panel .reader-settings-font-row {
+            display: flex;
+            gap: 0.35rem;
+        }
+        #reader-settings-panel .reader-settings-font-row .reader-settings-font-btn {
+            flex: 1;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            border-radius: 0.55rem;
+            min-width: 0;
+        }
+        #reader-settings-panel .reader-settings-font-row .reader-settings-font-btn:hover {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+            color: #4338ca;
         }
         .text-reader mark.reader-hl {
             display: inline;
@@ -2412,6 +2483,20 @@
             border-radius: 0.9rem;
             padding: 0.85rem 0.9rem;
         }
+        #inline-popup-word[contenteditable="true"] {
+            outline: none;
+            border-bottom: 1.5px dashed #a5b4fc;
+            padding-bottom: 0.1rem;
+            cursor: text;
+        }
+        #inline-popup-word[contenteditable="true"]:focus {
+            border-bottom-color: #6366f1;
+        }
+        #inline-save-kind-hint.is-action {
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
         #inline-context-phrase-hint {
             font-size: 0.8125rem;
             line-height: 1.35;
@@ -3621,6 +3706,40 @@
             line-height: 0;
             cursor: default;
         }
+        .dict-card-badges {
+            position: absolute;
+            right: 0.35rem;
+            bottom: 0.35rem;
+            z-index: 8;
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            gap: 0.28rem;
+            pointer-events: none;
+        }
+        .dict-card-badges .dict-listen-badge,
+        .dict-card-badges .dict-phrase-badge {
+            position: static;
+            pointer-events: auto;
+            flex-shrink: 0;
+        }
+        .dict-phrase-badge {
+            width: 1.45rem;
+            height: 1.45rem;
+            padding: 0;
+            margin: 0;
+            border-radius: 0.4rem;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4f46e5;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+            line-height: 1;
+            cursor: default;
+            font-size: 0.78rem;
+        }
         .dict-listen-badge svg {
             width: 0.78rem;
             height: 0.78rem;
@@ -3644,13 +3763,15 @@
             .dict-word-speak {
                 opacity: 0.78;
             }
-            .dict-listen-badge {
+            .dict-listen-badge,
+            .dict-phrase-badge {
                 opacity: 0;
                 width: 2.25rem;
                 height: 2.25rem;
                 pointer-events: auto;
             }
-            .dict-word-card.dict-listen-revealed .dict-listen-badge {
+            .dict-word-card.dict-listen-revealed .dict-listen-badge,
+            .dict-word-card.dict-listen-revealed .dict-phrase-badge {
                 opacity: 1;
                 width: 1.45rem;
                 height: 1.45rem;
@@ -10030,18 +10151,21 @@
                         <button onclick="event.stopPropagation(); changeReaderWidth(1)" id="btn-reader-widen" class="px-3 py-1.5 text-base leading-none hover:bg-white rounded shadow-sm transition border border-transparent hover:border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed" data-i18n-title="reader.wide" title="Ширше">⬅️➡️</button>
                     </div>
                     <p class="text-xs font-bold text-slate-400 uppercase reader-settings-label" data-i18n="reader.font">Шрифт</p>
-                    <div class="flex flex-col gap-1 reader-settings-row">
-                        <button onclick="event.stopPropagation(); changeFontFamily('\'Georgia\', serif')" class="reader-settings-font-btn text-left text-sm px-3 rounded-lg hover:bg-indigo-50 font-serif font-bold text-slate-700 border border-transparent hover:border-indigo-100 transition" data-i18n="reader.georgia">Georgia (Із засічками)</button>
-                        <button onclick="event.stopPropagation(); changeFontFamily('\'Inter\', sans-serif')" class="reader-settings-font-btn text-left text-sm px-3 rounded-lg hover:bg-indigo-50 font-sans font-bold text-slate-700 border border-transparent hover:border-indigo-100 transition" data-i18n="reader.inter">Inter (Без засічок)</button>
+                    <div class="reader-settings-font-row reader-settings-row" onclick="event.stopPropagation()">
+                        <button type="button" onclick="event.stopPropagation(); changeFontFamily('\'Georgia\', serif')" class="reader-settings-font-btn text-sm px-3 font-serif font-bold text-slate-700 transition" data-i18n="reader.georgia">Georgia</button>
+                        <button type="button" onclick="event.stopPropagation(); changeFontFamily('\'Inter\', sans-serif')" class="reader-settings-font-btn text-sm px-3 font-sans font-bold text-slate-700 transition" data-i18n="reader.inter">Inter</button>
                     </div>
                     <p class="text-xs font-bold text-slate-400 uppercase reader-settings-label" data-i18n="reader.display">Вигляд тексту</p>
                     <div class="reader-settings-icon-row reader-settings-row" onclick="event.stopPropagation()">
                         <button type="button" id="reader-para-indent-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderParaIndent()" data-i18n-title="reader.paraIndent" title="Відступ першого рядка" aria-pressed="false" aria-label="Paragraph indent">¶</button>
                         <button type="button" id="reader-comfort-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); cycleReaderTheme()" data-i18n-title="reader.themeNormal" title="Звичайний вигляд" aria-pressed="false" aria-label="Reading comfort">📖</button>
-                        <button type="button" id="reader-hl-only-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderHighlightsOnly()" data-i18n-title="reader.hlOnly" title="Лише виділення" aria-pressed="false" aria-label="Highlights only"><span class="reader-hl-only-glyph" aria-hidden="true">A<span class="hl-b">B</span>C</span></button>
+                    </div>
+                    <p class="text-xs font-bold text-slate-400 uppercase reader-settings-label" data-i18n="reader.extras">Додаткові</p>
+                    <div class="reader-settings-icon-row reader-settings-row" onclick="event.stopPropagation()">
                         <button type="button" id="reader-toc-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderToc()" data-i18n-title="reader.toc" title="Розділи" aria-pressed="false" aria-label="Chapters"><span class="reader-toc-glyph" aria-hidden="true">§</span></button>
-                        <button type="button" id="reader-copy-mode-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderCopyMode()" data-i18n-title="reader.copyMode" title="Режим копіювання" aria-pressed="false" aria-label="Copy mode">📋</button>
-                        <button type="button" id="reader-copy-page-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); copyReaderPageText()" data-i18n-title="reader.copyPage" title="Копіювати сторінку" aria-label="Copy page">📄</button>
+                        <button type="button" id="reader-hl-only-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderHighlightsOnly()" data-i18n-title="reader.hlOnly" title="Лише виділені фрагменти" aria-pressed="false" aria-label="Highlighted fragments only"><span class="reader-hl-only-glyph" aria-hidden="true">A<span class="hl-b">B</span>C</span></button>
+                        <button type="button" id="reader-copy-mode-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderCopyMode()" data-i18n-title="reader.copyMode" title="Режим копіювання" aria-pressed="false" aria-label="Copy mode"><span class="reader-settings-icon-stack" aria-hidden="true">📋<span class="reader-settings-icon-mark reader-settings-icon-mark--select"><span class="rcm-bar"></span>···<span class="rcm-bar"></span></span></span></button>
+                        <button type="button" id="reader-copy-page-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); copyReaderPageText()" data-i18n-title="reader.copyPage" title="Копіювати поточну сторінку" aria-label="Copy current page"><span class="reader-settings-icon-stack" aria-hidden="true">📄<span class="reader-settings-icon-mark">1</span></span></button>
                     </div>
                     <div class="reader-settings-qm-wrap" onmouseleave="hideReaderQuickMatchTip()">
                         <label class="reader-settings-toggle reader-settings-toggle--qm" onclick="event.stopPropagation()">
@@ -10538,7 +10662,7 @@
         <div class="flex justify-between items-center gap-2 mb-2.5">
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
                 <button type="button" id="inline-popup-back" onclick="inlinePopupGoBack()" class="hidden flex-shrink-0 w-8 h-8 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 font-bold text-sm transition" title="Back" data-i18n-title="inline.back">←</button>
-                <strong id="inline-popup-word" class="text-indigo-700 font-bold break-words min-w-0"></strong>
+                <strong id="inline-popup-word" class="text-indigo-700 font-bold break-words min-w-0" spellcheck="false" contenteditable="true" role="textbox" aria-multiline="false"></strong>
                 <button type="button" id="inline-popup-tts" class="flex-shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 transition" title="Listen · long-press → listening practice" data-i18n-title="inline.listenHold" aria-label="Listen">🔊</button>
             </div>
             <div class="flex items-center gap-1 flex-shrink-0">
@@ -11250,7 +11374,7 @@
                 'reader.pageWord': 'Сторінка',
                 'reader.pageOf': 'з',
                 'reader.jumpPage': 'Натисніть, щоб перейти на сторінку · Enter підтверджує',
-                'reader.hlOnly': 'Лише виділення',
+                'reader.hlOnly': 'Лише виділені фрагменти',
                 'reader.hlOnlyHint': 'Усі маркери з книги + сірі заголовки для контексту',
                 'reader.hlOnlyEmpty': 'Поки немає виділеного тексту',
                 'reader.hlOnlyPage': 'стор. {n}',
@@ -11258,7 +11382,7 @@
                 'reader.copyMode': 'Режим копіювання',
                 'reader.copyModeOn': 'Копіювання увімкнено — виділяйте текст без перекладу',
                 'reader.copyModeOff': 'Режим копіювання вимкнено',
-                'reader.copyPage': 'Копіювати сторінку',
+                'reader.copyPage': 'Копіювати поточну сторінку',
                 'reader.copyPageOk': 'Текст сторінки скопійовано',
                 'reader.copyPageFail': 'Не вдалося скопіювати в буфер. Спробуйте HTTPS або Ctrl+C у режимі копіювання.',
                 'reader.copySelOk': 'Фрагмент скопійовано',
@@ -11286,7 +11410,7 @@
                 'reader.highlightOn': 'Маркер увімкнено — торкніться слова або виділіть текст', 'reader.highlightOff': 'Маркер вимкнено',
                 'reader.prevPage': 'Попередня сторінка', 'reader.nextPage': 'Наступна сторінка',
                 'reader.narrow': 'Вужче', 'reader.wide': 'Ширше',
-                'reader.georgia': 'Georgia (із засічками)', 'reader.inter': 'Inter (без засічок)',
+                'reader.georgia': 'Georgia', 'reader.inter': 'Inter',
                 'reader.voiceDefault': 'Авто',
                 'reader.audioPlay': 'Слухати',
                 'reader.audioStop': 'Стоп',
@@ -11298,6 +11422,7 @@
                 'reader.audioReady': 'Готово до прослуховування',
                 'reader.audioSeek': 'Позиція відтворення',
                 'reader.display': 'Вигляд тексту',
+                'reader.extras': 'Додаткові',
                 'reader.paraIndent': 'Відступ першого рядка',
                 'reader.themeNormal': 'Звичайний вигляд',
                 'reader.themeWarm': 'Теплий режим для очей',
@@ -11979,7 +12104,7 @@
                 'reader.pageWord': 'Page',
                 'reader.pageOf': 'of',
                 'reader.jumpPage': 'Click to jump to a page · Enter confirms',
-                'reader.hlOnly': 'Highlights only',
+                'reader.hlOnly': 'Highlighted fragments only',
                 'reader.hlOnlyHint': 'All book highlights with gray headings for context',
                 'reader.hlOnlyEmpty': 'No highlights yet',
                 'reader.hlOnlyPage': 'p. {n}',
@@ -11987,7 +12112,7 @@
                 'reader.copyMode': 'Copy mode',
                 'reader.copyModeOn': 'Copy mode on — select text without translation',
                 'reader.copyModeOff': 'Copy mode off',
-                'reader.copyPage': 'Copy page',
+                'reader.copyPage': 'Copy current page',
                 'reader.copyPageOk': 'Page text copied',
                 'reader.copyPageFail': 'Could not copy to clipboard. Try HTTPS or Ctrl+C in copy mode.',
                 'reader.copySelOk': 'Selection copied',
@@ -12015,7 +12140,7 @@
                 'reader.highlightOn': 'Highlighter on — tap a word or select text', 'reader.highlightOff': 'Highlighter off',
                 'reader.prevPage': 'Previous page', 'reader.nextPage': 'Next page',
                 'reader.narrow': 'Narrower', 'reader.wide': 'Wider',
-                'reader.georgia': 'Georgia (serif)', 'reader.inter': 'Inter (sans-serif)',
+                'reader.georgia': 'Georgia', 'reader.inter': 'Inter',
                 'reader.voiceDefault': 'Auto',
                 'reader.audioPlay': 'Listen',
                 'reader.audioStop': 'Stop',
@@ -12027,6 +12152,7 @@
                 'reader.audioReady': 'Ready to play',
                 'reader.audioSeek': 'Playback position',
                 'reader.display': 'Text layout',
+                'reader.extras': 'Extras',
                 'reader.quickMatch': 'Quick match',
                 'reader.paraIndent': 'First-line indent',
                 'reader.themeNormal': 'Default appearance',
@@ -12703,7 +12829,7 @@
                 'reader.pageWord': 'Página',
                 'reader.pageOf': 'de',
                 'reader.jumpPage': 'Pulsa para ir a una página · Enter confirma',
-                'reader.hlOnly': 'Solo resaltados',
+                'reader.hlOnly': 'Solo fragmentos resaltados',
                 'reader.hlOnlyHint': 'Todos los resaltados del libro con títulos grises de contexto',
                 'reader.hlOnlyEmpty': 'Aún no hay resaltados',
                 'reader.hlOnlyPage': 'pág. {n}',
@@ -12711,7 +12837,7 @@
                 'reader.copyMode': 'Modo copiar',
                 'reader.copyModeOn': 'Modo copiar activo — selecciona texto sin traducción',
                 'reader.copyModeOff': 'Modo copiar desactivado',
-                'reader.copyPage': 'Copiar página',
+                'reader.copyPage': 'Copiar página actual',
                 'reader.copyPageOk': 'Texto de la página copiado',
                 'reader.copyPageFail': 'No se pudo copiar. Prueba HTTPS o Ctrl+C en modo copiar.',
                 'reader.copySelOk': 'Selección copiada',
@@ -12739,7 +12865,7 @@
                 'reader.highlightOn': 'Subrayador activo — toca una palabra o selecciona texto', 'reader.highlightOff': 'Subrayador desactivado',
                 'reader.prevPage': 'Página anterior', 'reader.nextPage': 'Página siguiente',
                 'reader.narrow': 'Más estrecho', 'reader.wide': 'Más ancho',
-                'reader.georgia': 'Georgia (con serifa)', 'reader.inter': 'Inter (sin serifa)',
+                'reader.georgia': 'Georgia', 'reader.inter': 'Inter',
                 'reader.voiceDefault': 'Auto',
                 'reader.audioPlay': 'Escuchar',
                 'reader.audioStop': 'Parar',
@@ -12751,6 +12877,7 @@
                 'reader.audioReady': 'Listo para escuchar',
                 'reader.audioSeek': 'Posición de reproducción',
                 'reader.display': 'Aspecto del texto',
+                'reader.extras': 'Extras',
                 'reader.quickMatch': 'Match rápido',
                 'reader.paraIndent': 'Sangría de primera línea',
                 'reader.themeNormal': 'Aspecto normal',
@@ -21141,7 +21268,7 @@
                 <div class="dict-word-card bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group h-40 sm:h-48 ${selected ? 'word-card-selected' : ''}">
                     <div class="dict-word-img">
                         <img src="${item.imageUrl}" class="w-full h-20 sm:h-24 object-cover bg-slate-50 border-b border-slate-100 cursor-pointer" onclick="${cardClick}" onerror="imgError(this)">
-                        ${item.listenFocus ? `<button type="button" class="dict-listen-badge" onclick="revealDictListenBadge(event)" title="${escapeHtmlText(t('mode.listening'))}" aria-label="${escapeHtmlText(t('mode.listening'))}">${dictListeningQueueIconSvg()}</button>` : ''}
+                        ${(item.listenFocus || wordCardLooksLikePhrase(item)) ? `<div class="dict-card-badges">${item.listenFocus ? `<button type="button" class="dict-listen-badge" onclick="revealDictListenBadge(event)" title="${escapeHtmlText(t('mode.listening'))}" aria-label="${escapeHtmlText(t('mode.listening'))}">${dictListeningQueueIconSvg()}</button>` : ''}${wordCardLooksLikePhrase(item) ? `<span class="dict-phrase-badge" onclick="revealDictListenBadge(event)" title="${escapeHtmlText(t('filter.phrases'))}" aria-label="${escapeHtmlText(t('filter.phrases'))}">💬</span>` : ''}</div>` : ''}
                     </div>
                     <div class="p-2 sm:p-3 flex-1 flex flex-col justify-center min-w-0 bg-white cursor-pointer" onclick="${cardClick}">
                         <strong class="text-indigo-700 text-base sm:text-lg leading-tight truncate font-bold">${formatWordWithArticleHtml(item.word, learningLanguage)}</strong>
@@ -23958,9 +24085,23 @@
             }
         };
 
-        async function writeTextToClipboard(text) {
+        async function writeTextToClipboard(text, html) {
             const value = String(text ?? '');
             if (!value) throw new Error('clipboard-empty');
+            const htmlValue = html != null && String(html) !== ''
+                ? String(html)
+                : plainTextToCopyHtml(value);
+            try {
+                if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({
+                            'text/plain': new Blob([value], { type: 'text/plain' }),
+                            'text/html': new Blob([htmlValue], { type: 'text/html' })
+                        })
+                    ]);
+                    return true;
+                }
+            } catch (_) { /* fall through */ }
             try {
                 if (navigator.clipboard?.writeText) {
                     await navigator.clipboard.writeText(value);
@@ -23982,18 +24123,80 @@
             return true;
         }
 
+        function plainTextToCopyHtml(plain) {
+            return String(plain || '')
+                .split(/\n\n+/)
+                .map((para) => para.trim())
+                .filter(Boolean)
+                .map((para) => `<p>${escapeHtmlText(para).replace(/\n/g, '<br>\n')}</p>`)
+                .join('');
+        }
+
+        function elementToCopyPlainText(sourceEl) {
+            if (!sourceEl) return '';
+            const root = sourceEl.cloneNode(true);
+            root.querySelectorAll(
+                'script, style, button, [aria-hidden="true"], [data-reader-ui], #inline-popup, .inline-popup, .reader-qm-panel'
+            ).forEach((el) => el.remove());
+
+            // Keep lyric lines as separate lines inside a stanza
+            root.querySelectorAll('.yt-lyric-line').forEach((el) => {
+                const line = String(el.textContent || '').replace(/\s+/g, ' ').trim();
+                el.replaceWith(document.createTextNode(line ? `${line}\n` : ''));
+            });
+            root.querySelectorAll('br').forEach((br) => {
+                br.replaceWith(document.createTextNode('\n'));
+            });
+
+            const blockSel = 'p, h1, h2, h3, h4, h5, h6, li, blockquote, tr, .yt-lyric-stanza';
+            const blocks = Array.from(root.querySelectorAll(blockSel)).filter((el) => {
+                const parentBlock = el.parentElement?.closest?.(blockSel);
+                return !(parentBlock && parentBlock !== el && root.contains(parentBlock));
+            });
+
+            const parts = [];
+            if (blocks.length) {
+                blocks.forEach((el) => {
+                    let t = String(el.textContent || '').replace(/\u00a0/g, ' ');
+                    t = t
+                        .split('\n')
+                        .map((line) => line.replace(/[ \t\f\v]+/g, ' ').trim())
+                        .filter(Boolean)
+                        .join('\n');
+                    if (t) parts.push(t);
+                });
+            } else {
+                let t = String(root.innerText || root.textContent || '').replace(/\u00a0/g, ' ');
+                t = t
+                    .replace(/[ \t\f\v]+\n/g, '\n')
+                    .replace(/\n[ \t\f\v]+/g, '\n')
+                    .replace(/[ \t\f\v]{2,}/g, ' ')
+                    .trim();
+                if (t) {
+                    // Promote single newlines between chunks into paragraph breaks when possible
+                    parts.push(...t.split(/\n+/).map((s) => s.trim()).filter(Boolean));
+                }
+            }
+
+            return parts.join('\n\n').replace(/\n{3,}/g, '\n\n').trim();
+        }
+
         function getReaderPagePlainText() {
             const root = document.getElementById('reader-content');
             if (!root) return '';
-            const clone = root.cloneNode(true);
-            clone.querySelectorAll(
-                '#inline-popup, .inline-popup, .reader-qm-panel, script, style, .yt-sub-line, [aria-hidden="true"]'
-            ).forEach((el) => el.remove());
-            return String(clone.innerText || clone.textContent || '')
-                .replace(/\u00a0/g, ' ')
-                .replace(/[ \t]+\n/g, '\n')
-                .replace(/\n{3,}/g, '\n\n')
-                .trim();
+            return elementToCopyPlainText(root);
+        }
+
+        function getReaderSelectionCopyPlainText() {
+            const sel = window.getSelection?.();
+            if (!sel || sel.isCollapsed || !sel.rangeCount) return '';
+            const root = document.getElementById('reader-content');
+            if (!root) return '';
+            const range = sel.getRangeAt(0);
+            if (!root.contains(range.commonAncestorContainer)) return '';
+            const wrap = document.createElement('div');
+            wrap.appendChild(range.cloneContents());
+            return elementToCopyPlainText(wrap);
         }
 
         function syncReaderCopyModeUi() {
@@ -24030,6 +24233,22 @@
                 showAppToast(t('reader.copyPageFail'), 3200);
             }
         };
+
+        if (!window._readerCopyFormatBound) {
+            window._readerCopyFormatBound = true;
+            document.addEventListener('copy', (e) => {
+                if (!readerCopyMode) return;
+                const readView = document.getElementById('library-read-view');
+                if (!readView || readView.classList.contains('hidden')) return;
+                const plain = getReaderSelectionCopyPlainText();
+                if (!plain) return;
+                try {
+                    e.clipboardData.setData('text/plain', plain);
+                    e.clipboardData.setData('text/html', plainTextToCopyHtml(plain));
+                    e.preventDefault();
+                } catch (_) { /* native copy fallback */ }
+            });
+        }
 
         function formatWordsColumn(words) {
             const seen = new Set();
@@ -25930,7 +26149,6 @@
         window.changeFontFamily = (font) => {
             currentReaderFontFamily = font;
             applyReaderStyles();
-            document.getElementById('reader-settings-panel').classList.add('hidden');
         };
 
         function applyReaderLayoutWidth() {
@@ -26487,6 +26705,13 @@
             if (saveKind === 'phrase') saveHint = 'phrase';
             else if (tokenCount >= 3) saveHint = 'semicolon';
             return { text, saveKind, saveHint, tokenCount, forcedPhrase };
+        }
+
+        function wordCardLooksLikePhrase(item) {
+            const w = String(item?.word || '').trim();
+            if (!w) return false;
+            if (countReaderSelectionTokens(w) >= 2) return true;
+            return isReaderSelectionPhraseByForm(w);
         }
 
         function findPhraseCollectionForParent(parentId) {
@@ -28275,6 +28500,7 @@
         };
 
         window.saveWordFromInlinePopup = async () => {
+            refreshInlineSaveKindFromWordEl({ stripForced: true });
             if (pendingInlineSaveData?.saveKind === 'phrase') {
                 return savePhraseFromInlinePopup();
             }
@@ -29962,25 +30188,114 @@
             if (!el) return;
             if (!data) {
                 el.classList.add('hidden');
+                el.classList.remove('is-action');
                 el.textContent = '';
+                el.onclick = null;
                 return;
             }
+            // Existing vocab card: no “convert to phrase” coaching — user can add ; themselves.
+            const updatingExisting = !!(inlineDupExistingId || document.getElementById('inline-dup-row')?.classList.contains('is-visible'));
             if (data.saveKind === 'phrase') {
                 el.textContent = t('inline.phraseSaveHint');
-                el.classList.remove('hidden');
+                el.classList.remove('hidden', 'is-action');
+                el.onclick = null;
                 return;
             }
-            if (data.saveHint === 'semicolon') {
+            if (data.saveHint === 'semicolon' && !updatingExisting) {
                 el.textContent = t('inline.semicolonPhraseHint');
-                el.classList.remove('hidden');
+                el.classList.remove('hidden', 'is-action');
+                el.onclick = null;
                 return;
             }
             el.classList.add('hidden');
+            el.classList.remove('is-action');
             el.textContent = '';
+            el.onclick = null;
+        }
+
+        function updateInlineSaveBtnForKind() {
+            const saveBtn = document.getElementById('inline-popup-save-btn');
+            if (!saveBtn || saveBtn.classList.contains('hidden')) return;
+            if (pendingInlineSaveData?.saveKind === 'phrase') {
+                saveBtn.innerHTML = withEnterHint(t('inline.savePhrase'));
+                return;
+            }
+            const dupVisible = document.getElementById('inline-dup-row')?.classList.contains('is-visible');
+            const label = dupVisible
+                ? (inlineDupMode === 'new' ? t('inline.save') : t('inline.update'))
+                : t('inline.save');
+            saveBtn.innerHTML = withEnterHint(label);
+        }
+
+        function refreshInlineSaveKindFromWordEl(opts = {}) {
+            if (!pendingInlineSaveData) return pendingInlineSaveData;
+            const wordEl = document.getElementById('inline-popup-word');
+            const raw = (wordEl?.textContent || '').replace(/\u00a0/g, ' ').trim();
+            if (!raw) return pendingInlineSaveData;
+            const parsed = parseReaderSelectionForSave(raw);
+            const nextWord = parsed.text || raw;
+            pendingInlineSaveData.word = nextWord;
+            pendingInlineSaveData.saveKind = parsed.saveKind;
+            pendingInlineSaveData.saveHint = parsed.saveHint;
+            pendingInlineSaveData.forcedPhrase = !!parsed.forcedPhrase;
+            if (opts.stripForced && parsed.forcedPhrase && wordEl && wordEl.textContent.trim() !== nextWord) {
+                wordEl.textContent = nextWord;
+            }
+            const existing = pendingInlineSaveData.saveKind === 'phrase'
+                ? null
+                : vocabulary.find((v) => v.word.toLowerCase() === nextWord.toLowerCase());
+            syncInlineDupRow(existing);
+            syncInlineSaveKindHint(pendingInlineSaveData);
+            updateInlineSaveBtnForKind();
+            return pendingInlineSaveData;
         }
 
         function hideInlineSaveKindHint() {
             syncInlineSaveKindHint(null);
+        }
+
+        (function bindInlinePopupWordEditing() {
+            const wordEl = document.getElementById('inline-popup-word');
+            if (!wordEl || wordEl.dataset.phraseEditBound === '1') return;
+            wordEl.dataset.phraseEditBound = '1';
+            wordEl.addEventListener('input', () => {
+                refreshInlineSaveKindFromWordEl();
+                repositionInlinePopupSoon?.();
+            });
+            wordEl.addEventListener('blur', () => {
+                refreshInlineSaveKindFromWordEl({ stripForced: true });
+            });
+            wordEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveWordFromInlinePopup();
+                }
+            });
+        })();
+
+        async function removeVocabWordsMatchingPhrase(phrase) {
+            const key = String(phrase || '').trim().toLowerCase();
+            if (!key || !activeUid || !db) return [];
+            const matches = vocabulary.filter((v) => String(v.word || '').trim().toLowerCase() === key);
+            if (!matches.length) return [];
+            const snapshots = matches
+                .map((w) => ({ id: w.id, data: firestoreWordFields(w) }))
+                .filter((s) => s.id && s.data);
+            for (const w of matches) {
+                try {
+                    await deleteDoc(docRef('words', w.id));
+                } catch (e) {
+                    console.error('removeVocabWordsMatchingPhrase', e);
+                }
+            }
+            if (snapshots.length) {
+                pushAppUndo(async () => {
+                    for (const s of snapshots) {
+                        await setDoc(docRef('words', s.id), s.data);
+                    }
+                });
+            }
+            return matches;
         }
 
         function getPhraseMetaList(mat) {
@@ -30157,6 +30472,7 @@
             const fork = await resolvePhraseCollectionForManualSave();
             if (!fork) throw new Error('phrase fork');
             await upsertPhraseInCollection(fork, phrase, translation);
+            await removeVocabWordsMatchingPhrase(phrase);
             if (currentDictFilter === 'phrases' || currentDictFilter === 'phrase_specific') {
                 if (currentDictFilter === 'phrases') renderDictionary();
                 else if (activePhraseCollectionId === fork.id) {
@@ -30231,6 +30547,7 @@
         }
 
         async function savePhraseFromInlinePopup() {
+            refreshInlineSaveKindFromWordEl({ stripForced: true });
             if (!activeUid || !pendingInlineSaveData) return;
             const trans = document.getElementById('inline-popup-trans-input')?.value?.trim();
             if (!trans) return;
@@ -30248,6 +30565,7 @@
                 let fork = await ensurePhraseCollectionForParent(parent);
                 if (!fork) throw new Error('phrase fork');
                 await upsertPhraseInCollection(fork, phrase, trans);
+                await removeVocabWordsMatchingPhrase(phrase);
                 closeInlinePopup();
                 if (!document.getElementById('library-read-view')?.classList.contains('hidden')) {
                     renderReaderContent();
@@ -32502,8 +32820,6 @@
             };
             }
 
-            syncInlineSaveKindHint(pendingInlineSaveData);
-
             const translateQuery = opts.multiLineSelection
                 ? String(pendingInlineSaveData?.word || query).toLowerCase()
                 : query;
@@ -32511,6 +32827,7 @@
                 ? null
                 : vocabulary.find(v => v.word.toLowerCase() === translateQuery);
             syncInlineDupRow(existing);
+            syncInlineSaveKindHint(pendingInlineSaveData);
             let transText = '';
             if (existing) {
                 transText = existing.translation;
@@ -32526,6 +32843,7 @@
             document.getElementById('inline-trans-dropdown').classList.add('hidden');
             document.getElementById('inline-popup-save-btn').classList.remove('hidden');
             syncInlineDupRowUi();
+            syncInlineSaveKindHint(pendingInlineSaveData);
             if (!existing) {
                 const saveLabel = (pendingInlineSaveData?.saveKind === 'phrase' || parsed.saveKind === 'phrase')
                     ? t('inline.savePhrase')
@@ -38940,7 +39258,7 @@
         if (!window._dictListenRevealDismissBound) {
             window._dictListenRevealDismissBound = true;
             document.addEventListener('click', (e) => {
-                if (e.target.closest('.dict-listen-badge')) return;
+                if (e.target.closest('.dict-listen-badge, .dict-phrase-badge, .dict-card-badges')) return;
                 document.querySelectorAll('.dict-word-card.dict-listen-revealed').forEach((c) => {
                     c.classList.remove('dict-listen-revealed');
                 });
