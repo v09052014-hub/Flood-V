@@ -726,6 +726,54 @@
             letter-spacing: -0.02em;
             line-height: 1;
         }
+        .reader-global-words-glyph {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.08em 0.28em;
+            border-radius: 0.28em;
+            background: rgba(209, 250, 229, 0.95);
+            color: #065f46;
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            line-height: 1.1;
+            text-transform: lowercase;
+        }
+        #reader-global-words-btn:not(.is-active) .reader-global-words-glyph {
+            background: #f1f5f9;
+            color: #94a3b8;
+            text-decoration: line-through;
+            text-decoration-thickness: 1.5px;
+        }
+        #reader-content-wrapper.reader-paging {
+            position: relative;
+        }
+        #reader-content-wrapper.reader-paging #reader-content {
+            opacity: 0.28;
+            filter: saturate(0.7);
+            pointer-events: none;
+            transition: opacity 0.12s ease;
+        }
+        #reader-content-wrapper.reader-paging::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 2.5rem;
+            width: 1.35rem;
+            height: 1.35rem;
+            margin-left: -0.675rem;
+            border-radius: 9999px;
+            border: 2.5px solid #c7d2fe;
+            border-top-color: #4f46e5;
+            animation: reader-page-spin 0.7s linear infinite;
+            z-index: 5;
+            pointer-events: none;
+        }
+        @keyframes reader-page-spin {
+            to { transform: rotate(360deg); }
+        }
         .reader-layout {
             display: block;
             width: 100%;
@@ -3781,6 +3829,18 @@
             background: #ecfdf5;
             color: #15803d;
             border-color: #86efac;
+        }
+        @keyframes listen-hold-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.55); }
+            70% { box-shadow: 0 0 0 11px rgba(14, 165, 233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+        }
+        #inline-popup-tts.is-listen-hold,
+        .dict-word-speak.is-listen-hold {
+            background: #e0f2fe !important;
+            color: #0284c7 !important;
+            border-color: #7dd3fc !important;
+            animation: listen-hold-pulse 0.85s ease-out infinite;
         }
 
         .header-right-tools {
@@ -9530,7 +9590,7 @@
                                 <input type="checkbox" id="settings-show-ipa" onchange="setShowTrainingPronunciation(this.checked)">
                                 <span>
                                     <span class="settings-toggle-title" data-i18n="settings.showIpa">🔤 Показувати вимову (IPA)</span>
-                                    <span class="settings-toggle-hint block" data-i18n="settings.showIpaHint">Транскрипція під словами під час тренувань.</span>
+                                    <span class="settings-toggle-hint block" data-i18n="settings.showIpaHint">У тренуваннях і для слів аудіювання на головній сторінці.</span>
                                     <span id="settings-show-ipa-en-only" class="settings-toggle-hint block mt-1 hidden" data-i18n="settings.showIpaEnOnly">Доступно для англійської мови навчання.</span>
                                 </span>
                             </label>
@@ -9672,6 +9732,8 @@
                                 </div>
                                 <div class="ctx-chip-box" id="settings-ctx-chips-characters" data-ctx-key="characters"></div>
                             </div>
+                            <p class="settings-toggle-hint mt-3 mb-2" data-i18n="settings.personalizationCloudHint">Рівень і контекст зберігаються в акаунті (синхрон між пристроями), окремо для кожної пари мов.</p>
+                            <button type="button" id="btn-save-personalization" onclick="savePersonalizationToCloud()" class="w-full mt-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-sm transition shadow-sm active:scale-[0.99]" data-i18n="settings.savePersonalization">Зберегти персоналізацію</button>
                         </div>
                     </div>
 
@@ -10157,6 +10219,7 @@
                     <div class="reader-settings-icon-row reader-settings-row" onclick="event.stopPropagation()">
                         <button type="button" id="reader-para-indent-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); toggleReaderParaIndent()" data-i18n-title="reader.paraIndent" title="Відступ першого рядка" aria-pressed="false" aria-label="Paragraph indent">¶</button>
                         <button type="button" id="reader-comfort-btn" class="reader-settings-icon-btn" onclick="event.stopPropagation(); cycleReaderTheme()" data-i18n-title="reader.themeNormal" title="Звичайний вигляд" aria-pressed="false" aria-label="Reading comfort">📖</button>
+                        <button type="button" id="reader-global-words-btn" class="reader-settings-icon-btn is-active" onclick="event.stopPropagation(); toggleReaderGlobalWordHighlight()" data-i18n-title="reader.globalWords" title="Підсвічувати слова з усіх матеріалів" aria-pressed="true" aria-label="Highlight words from all materials"><span class="reader-global-words-glyph" aria-hidden="true">word</span></button>
                     </div>
                     <p class="text-xs font-bold text-slate-400 uppercase reader-settings-label" data-i18n="reader.extras">Додаткові</p>
                     <div class="reader-settings-icon-row reader-settings-row" onclick="event.stopPropagation()">
@@ -10991,7 +11054,7 @@
                 'settings.tabAccount': 'Обліковий запис',
                 'settings.learningTitle': 'Параметри',
                 'settings.showIpa': '🔤 Показувати вимову (IPA)',
-                'settings.showIpaHint': 'Транскрипція під словами під час тренувань.',
+                'settings.showIpaHint': 'У тренуваннях і для слів аудіювання на головній сторінці.',
                 'settings.showIpaEnOnly': 'Доступно для англійської мови навчання.',
                 'settings.showIpaSource': 'ℹ️ Джерело транскрипції',
                 'settings.showIpaSourceHint': 'При наведенні показує, звідки взята вимова.',
@@ -11017,6 +11080,10 @@
                 'settings.learnerCefrAuto': 'Авто (за словами)',
                 'settings.storyUseContext': 'Враховувати контекст у історіях',
                 'settings.storyLearnerContext': 'Контекст',
+                'settings.savePersonalization': 'Зберегти персоналізацію',
+                'settings.personalizationSaved': 'Персоналізацію збережено в акаунті',
+                'settings.personalizationSaveFail': 'Не вдалося зберегти в акаунт. Перевірте інтернет.',
+                'settings.personalizationCloudHint': 'Рівень і контекст зберігаються в акаунті (синхрон між пристроями), окремо для кожної пари мов.',
                 'settings.storyTtsPipeline': 'Озвучення: OpenRouter (Fish) → Google TTS, якщо не встигне.',
                 'train.bsCapReached': 'Ліміт на сьогодні досягнуто ({n} з {cap}). Спробуйте інші вправи',
                 'train.bsCapSettings': 'або змінити ліміт у налаштуваннях',
@@ -11069,7 +11136,7 @@
                 'dict.transPlaceholder': 'Переклад',
                 'dict.add': 'Додати до словника', 'dict.search': 'Пошук слів чи перекладу...',
                 'dict.select': 'Вибрати слова', 'dict.selectDone': 'Вийти з режиму вибору (Esc)',
-                'dict.allWords': 'Усі слова', 'folder.import': 'Імпорт', 'filter.all': 'Усі слова',
+                'dict.allWords': 'Усі слова', 'folder.import': 'Імпорт', 'folder.listening': 'Аудіювання', 'filter.all': 'Усі слова',
                 'filter.import': 'Імпорт', 'filter.phrases': 'Фрази', 'filter.materials': 'Матеріали',
                 'dict.foldersSection': 'Папки',
                 'dict.myPhrases': 'Мої фрази',
@@ -11336,6 +11403,7 @@
                 'msg.deleteWord': 'Видалити слово?', 'msg.emptyDict': 'Словник порожній!',
                 'msg.importDone': 'Імпорт успішно завершено! ({folder})',
                 'msg.noTrainWords': 'Немає слів для тренування в цій категорії.',
+                'msg.listenFolderOnly': 'Вибрані слова можна тренувати лише в режимі «Аудіювання».',
                 'msg.noDueWords': 'Немає слів, готових до тренування зараз. Зачекайте до наступного інтервалу.',
                 'msg.textExercisesLocked': 'Щоб отримати доступ до текстових тренувань сьогодні, спочатку потренуйте слова.',
                 'msg.noLearned': 'Немає повністю вивчених слів у цій категорії.',
@@ -11421,6 +11489,9 @@
                 'reader.audioSeek': 'Позиція відтворення',
                 'reader.display': 'Вигляд тексту',
                 'reader.extras': 'Додаткові',
+                'reader.globalWords': 'Підсвічувати слова з усіх матеріалів',
+                'reader.globalWordsOn': 'Підсвітка з усіх матеріалів увімкнена',
+                'reader.globalWordsOff': 'Лише слова з цього матеріалу',
                 'reader.paraIndent': 'Відступ першого рядка',
                 'reader.themeNormal': 'Звичайний вигляд',
                 'reader.themeWarm': 'Теплий режим для очей',
@@ -11725,7 +11796,7 @@
                 'settings.tabAccount': 'Account',
                 'settings.learningTitle': 'Options',
                 'settings.showIpa': '🔤 Show pronunciation (IPA)',
-                'settings.showIpaHint': 'Phonetic transcription shown during training.',
+                'settings.showIpaHint': 'In training, and for Listening words on the home page.',
                 'settings.showIpaEnOnly': 'Available when learning English.',
                 'settings.showIpaSource': 'ℹ️ Transcription source',
                 'settings.showIpaSourceHint': 'Shows where the pronunciation was looked up when you hover.',
@@ -11751,6 +11822,10 @@
                 'settings.learnerCefrAuto': 'Auto (from vocabulary)',
                 'settings.storyUseContext': 'Use context in stories',
                 'settings.storyLearnerContext': 'Context',
+                'settings.savePersonalization': 'Save personalization',
+                'settings.personalizationSaved': 'Personalization saved to your account',
+                'settings.personalizationSaveFail': 'Couldn’t save to your account. Check your connection.',
+                'settings.personalizationCloudHint': 'Level and context are saved to your account (sync across devices), separately for each language pair.',
                 'settings.storyTtsPipeline': 'Audio: OpenRouter (Fish) → Google TTS if it times out.',
                 'train.bsCapReached': 'Today\'s limit reached ({n} of {cap}). Try other exercises',
                 'train.bsCapSettings': 'or change the limit in settings',
@@ -11803,7 +11878,7 @@
                 'dict.transPlaceholder': 'Translation',
                 'dict.add': 'Add to dictionary', 'dict.search': 'Search words or translations...',
                 'dict.select': 'Select words', 'dict.selectDone': 'Exit selection (Esc)',
-                'dict.allWords': 'All words', 'folder.import': 'Import', 'filter.all': 'All words',
+                'dict.allWords': 'All words', 'folder.import': 'Import', 'folder.listening': 'Listening', 'filter.all': 'All words',
                 'filter.import': 'Import', 'filter.phrases': 'Phrases', 'filter.materials': 'Materials',
                 'dict.foldersSection': 'Folders',
                 'dict.myPhrases': 'My phrases',
@@ -12066,6 +12141,7 @@
                 'msg.deleteWord': 'Delete this word?', 'msg.emptyDict': 'The dictionary is empty!',
                 'msg.importDone': 'Import finished! ({folder})',
                 'msg.noTrainWords': 'No words to train in this category.',
+                'msg.listenFolderOnly': 'These words can only be trained in Listening mode.',
                 'msg.noDueWords': 'No words are due for training right now. Wait until the next interval.',
                 'msg.textExercisesLocked': 'To unlock text training today, practice your words first.',
                 'msg.noLearned': 'No fully learned words in this category.',
@@ -12151,6 +12227,9 @@
                 'reader.audioSeek': 'Playback position',
                 'reader.display': 'Text layout',
                 'reader.extras': 'Extras',
+                'reader.globalWords': 'Highlight words from all materials',
+                'reader.globalWordsOn': 'Highlighting words from all materials',
+                'reader.globalWordsOff': 'Only words from this material',
                 'reader.quickMatch': 'Quick match',
                 'reader.paraIndent': 'First-line indent',
                 'reader.themeNormal': 'Default appearance',
@@ -12450,7 +12529,7 @@
                 'settings.tabAccount': 'Cuenta',
                 'settings.learningTitle': 'Opciones',
                 'settings.showIpa': '🔤 Mostrar pronunciación (IPA)',
-                'settings.showIpaHint': 'Transcripción fonética durante el entrenamiento.',
+                'settings.showIpaHint': 'En entrenamientos y para palabras de Escucha en la página principal.',
                 'settings.showIpaEnOnly': 'Disponible al aprender inglés.',
                 'settings.showIpaSource': 'ℹ️ Fuente de la transcripción',
                 'settings.showIpaSourceHint': 'Al pasar el cursor, muestra de dónde proviene la pronunciación.',
@@ -12476,6 +12555,10 @@
                 'settings.learnerCefrAuto': 'Auto (según vocabulario)',
                 'settings.storyUseContext': 'Usar contexto en historias',
                 'settings.storyLearnerContext': 'Contexto',
+                'settings.savePersonalization': 'Guardar personalización',
+                'settings.personalizationSaved': 'Personalización guardada en tu cuenta',
+                'settings.personalizationSaveFail': 'No se pudo guardar en la cuenta. Revisa la conexión.',
+                'settings.personalizationCloudHint': 'Nivel y contexto se guardan en tu cuenta (sincronización entre dispositivos), por cada par de idiomas.',
                 'settings.storyTtsPipeline': 'Audio: OpenRouter (Fish) → Google TTS si tarda demasiado.',
                 'train.bsCapReached': 'Límite de hoy alcanzado ({n} de {cap}). Prueba otras actividades',
                 'train.bsCapSettings': 'o cambia el límite en ajustes',
@@ -12528,7 +12611,7 @@
                 'dict.transPlaceholder': 'Traducción',
                 'dict.add': 'Añadir al diccionario', 'dict.search': 'Buscar palabras o traducciones...',
                 'dict.select': 'Seleccionar palabras', 'dict.selectDone': 'Salir de la selección (Esc)',
-                'dict.allWords': 'Todas las palabras', 'folder.import': 'Importar', 'filter.all': 'Todas las palabras',
+                'dict.allWords': 'Todas las palabras', 'folder.import': 'Importar', 'folder.listening': 'Escucha', 'filter.all': 'Todas las palabras',
                 'filter.import': 'Importar', 'filter.phrases': 'Frases', 'filter.materials': 'Materiales',
                 'dict.foldersSection': 'Carpetas',
                 'dict.myPhrases': 'Mis frases',
@@ -12791,6 +12874,7 @@
                 'msg.deleteWord': '¿Eliminar esta palabra?', 'msg.emptyDict': '¡El diccionario está vacío!',
                 'msg.importDone': '¡Importación lista! ({folder})',
                 'msg.noTrainWords': 'No hay palabras para entrenar en esta categoría.',
+                'msg.listenFolderOnly': 'Estas palabras solo se pueden entrenar en el modo Escucha.',
                 'msg.noDueWords': 'No hay palabras listas para entrenar ahora. Espera al siguiente intervalo.',
                 'msg.textExercisesLocked': 'Para desbloquear los entrenamientos de texto hoy, practica primero las palabras.',
                 'msg.noLearned': 'No hay palabras totalmente aprendidas en esta categoría.',
@@ -12876,6 +12960,9 @@
                 'reader.audioSeek': 'Posición de reproducción',
                 'reader.display': 'Aspecto del texto',
                 'reader.extras': 'Extras',
+                'reader.globalWords': 'Resaltar palabras de todos los materiales',
+                'reader.globalWordsOn': 'Resaltado de todos los materiales activado',
+                'reader.globalWordsOff': 'Solo palabras de este material',
                 'reader.quickMatch': 'Match rápido',
                 'reader.paraIndent': 'Sangría de primera línea',
                 'reader.themeNormal': 'Aspecto normal',
@@ -13149,6 +13236,7 @@
         const READER_QUICK_MATCH_LOG_KEY = 'linguaspace_reader_quick_match_log_v1';
         const READER_HL_ONLY_KEY = 'linguaspace_reader_hl_only_v1';
         const READER_TOC_KEY = 'linguaspace_reader_toc_v1';
+        const READER_GLOBAL_WORDS_KEY = 'linguaspace_reader_global_words_v1';
         const TRAIN_OSK_EXPANDED_KEY = 'linguaspace_train_osk_expanded_v1';
         const SHOW_TRAIN_DUE_BADGES_KEY = 'linguaspace_show_train_due_badges_v1';
         const TRAIN_DUE_INDICATOR_KEY = 'linguaspace_train_due_indicator_v1';
@@ -13542,8 +13630,11 @@
             localStorage.setItem(DICT_GRID_COLS_KEY, String(dictGridCols));
             localStorage.setItem(READER_HL_COLOR_KEY, readerHighlightColor);
             activeTrackId = `${learningLanguage}-${translationLanguage}`;
-            if (!activeUid || !db) return;
+            if (!activeUid || !db) return false;
             try {
+                if (typeof stashLearnerProfileForTrack === 'function') {
+                    stashLearnerProfileForTrack(activeTrackId);
+                }
                 const prefs = {
                     interfaceLanguage, learningLanguage, translationLanguage, activeTrackId, knownTracks,
                     showTrainingPronunciation, showIpaSourceOnHover, trainingSoundEffects, showIntroMorphHints, trainDueIndicator, brainstormDailyCap,
@@ -13556,7 +13647,23 @@
                     Object.assign(prefs, collectExtraCloudPrefs());
                 }
                 await setDoc(doc(db, 'users', activeUid), prefs, { merge: true });
-            } catch (e) { console.error(e); }
+                // Patch active-track personalization without wiping other tracks on concurrent devices
+                try {
+                    const tid = typeof currentLearnerTrackId === 'function' ? currentLearnerTrackId() : activeTrackId;
+                    const snap = (typeof learnerProfilesByTrack === 'object' && tid && learnerProfilesByTrack[tid])
+                        ? learnerProfilesByTrack[tid]
+                        : null;
+                    if (tid && snap) {
+                        await updateDoc(doc(db, 'users', activeUid), {
+                            [`learnerProfilesByTrack.${tid}`]: snap
+                        });
+                    }
+                } catch (_) {}
+                return true;
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
         }
         function renderLanguagePickers() {
             const chip = (code, selected, handler, disabled, compact = false) => {
@@ -13649,6 +13756,10 @@
         };
         async function applyTrackChange(opts = {}) {
             const fromDeepLink = !!opts.fromDeepLink;
+            const prevTrackId = activeTrackId || `${learningLanguage}-${translationLanguage}`;
+            if (typeof stashLearnerProfileForTrack === 'function') {
+                stashLearnerProfileForTrack(prevTrackId);
+            }
             activeTrackId = `${learningLanguage}-${translationLanguage}`;
             reloadLearnerProfileFromStorage();
             persistLangLocal();
@@ -13858,6 +13969,7 @@
             applyReaderHighlightColor();
             syncReaderQuickMatchUi();
             syncReaderParaIndentUi();
+            syncReaderGlobalWordHighlightUi();
             syncReaderThemeUi();
             try { syncTextExerciseLockUi(); } catch (_) {}
         }
@@ -14121,6 +14233,7 @@
             localStorage.setItem(SHOW_IPA_KEY, showTrainingPronunciation ? '1' : '0');
             await saveUserPrefs();
             syncSettingsPanelUi();
+            try { renderDictionary(); } catch (_) {}
         };
 
         window.setShowIntroMorphHints = async (on) => {
@@ -16003,6 +16116,10 @@
         let readerParaIndent = localStorage.getItem(READER_PARA_INDENT_KEY) === '1';
         let readerHighlightsOnly = localStorage.getItem(READER_HL_ONLY_KEY) === '1';
         let readerTocEnabled = localStorage.getItem(READER_TOC_KEY) !== '0';
+        // Default ON: highlight learned words from every material (legacy behavior)
+        let readerGlobalWordHighlight = localStorage.getItem(READER_GLOBAL_WORDS_KEY) !== '0';
+        let readerLexiconCache = { key: '', lex: null };
+        let readerRenderToken = 0;
         let readerPageHeadingStarts = [];
         let readerTocEntries = [];
         let readerTocMobileOpen = false;
@@ -17450,6 +17567,7 @@
                 vocabulary = [];
                 snap.forEach(d => vocabulary.push(normalizeWordFromFirestore(d.id, d.data())));
                 vocabulary.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                readerLexiconCache = { key: '', lex: null };
                 seedIpaCacheFromVocabulary();
                 updateDictContextUI();
                 renderDictContextDropdown();
@@ -18516,6 +18634,7 @@
 
         const BUILTIN_FOLDERS = ['Імпорт'];
         const LEGACY_SOURCES = ['Словник', 'Читання'];
+        const LISTENING_SOURCE = '__listening__';
         const DUOCARDS_SOURCE = 'DuoCards';
         const DUOCARDS_LOGO_URL = 'https://files.catbox.moe/ac2k6p.webp';
         const QUIZLET_SOURCE = 'Quizlet';
@@ -19432,6 +19551,7 @@
             const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
             let filtered = vocabulary;
             if (currentDictFilter === 'import') filtered = vocabulary.filter(v => v.source === 'Імпорт');
+            else if (currentDictFilter === 'listening') filtered = vocabulary.filter((v) => v.listenFocus);
             else if (currentDictFilter === 'material_specific') {
                 const m = getMaterialForSource(specificMaterialName);
                 if (m) {
@@ -19456,6 +19576,9 @@
         }
 
         function getWordsForFolderName(name) {
+            if (name === LISTENING_SOURCE) {
+                return vocabulary.filter((v) => v.listenFocus);
+            }
             const m = getMaterialForSource(name);
             if (m) {
                 const aliases = getMaterialAliases(m);
@@ -19514,7 +19637,7 @@
         }
 
         function canManageFolderSource(source) {
-            return !!source && source !== 'Імпорт' && source !== ALL_WORDS_SOURCE;
+            return !!source && source !== 'Імпорт' && source !== ALL_WORDS_SOURCE && source !== LISTENING_SOURCE;
         }
 
         function syncDictFolderToolbar() {
@@ -19946,6 +20069,7 @@
 
         function countWordsForSource(source) {
             if (!source) return vocabulary.length;
+            if (source === LISTENING_SOURCE) return vocabulary.filter((v) => v.listenFocus).length;
             const m = getMaterialForSource(source);
             if (m) return countWordsForMaterial(m);
             return vocabulary.filter(v => v.source === source).length;
@@ -20161,6 +20285,15 @@
                 syncDictFolderToolbar();
                 return;
             }
+            if (currentDictFilter === 'listening') {
+                const n = countWordsForSource(LISTENING_SOURCE);
+                if (countEl) countEl.textContent = n;
+                if (labelEl) labelEl.textContent = t('folder.listening');
+                if (contextBtn) contextBtn.title = t('folder.listening');
+                if (addFolderBtn) addFolderBtn.classList.add('hidden');
+                syncDictFolderToolbar();
+                return;
+            }
             if (currentDictFilter === 'phrase_specific') {
                 const fork = materials.find((m) => m.id === activePhraseCollectionId);
                 const title = phraseCollectionDisplayTitle(fork);
@@ -20174,7 +20307,8 @@
             }
             if (countEl) countEl.textContent = countWordsForSource(activeDictSource);
             let fullLabel = t('dict.allWords');
-            if (activeDictSource === 'Імпорт') fullLabel = '📥 ' + t('folder.import');
+            if (activeDictSource === LISTENING_SOURCE || currentDictFilter === 'listening') fullLabel = '🎧 ' + t('folder.listening');
+            else if (activeDictSource === 'Імпорт') fullLabel = '📥 ' + t('folder.import');
             else if (isPresetImportSource(activeDictSource)) fullLabel = activeDictSource;
             else if (activeDictSource) fullLabel = activeDictSource;
             if (labelEl) {
@@ -20266,6 +20400,9 @@
 
             html += `<button onclick="selectPhrasesContext()" class="dict-context-item w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2${currentDictFilter === 'phrases' || currentDictFilter === 'phrase_specific' ? ' active' : ''}"><span>💬 ${t('filter.phrases')}</span><span class="text-slate-400 font-normal">${phraseN}</span></button>`;
 
+            const listenN = countWordsForSource(LISTENING_SOURCE);
+            html += `<button onclick="selectListeningContext()" class="dict-context-item w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 flex justify-between gap-2${currentDictFilter === 'listening' || activeDictSource === LISTENING_SOURCE ? ' active' : ''}"><span>🎧 ${t('folder.listening')}</span><span class="text-slate-400 font-normal">${listenN}</span></button>`;
+
             html += `<div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-t border-slate-100 mt-1">${t('dict.foldersSection')}</div>`;
             BUILTIN_FOLDERS.forEach(name => {
                 const n = countWordsForSource(name);
@@ -20289,6 +20426,23 @@
         window.selectPhrasesContext = () => {
             document.getElementById('dict-context-dropdown')?.classList.add('hidden');
             setDictFilter('phrases');
+        };
+
+        window.selectListeningContext = () => {
+            document.getElementById('dict-context-dropdown')?.classList.add('hidden');
+            activeDictSource = LISTENING_SOURCE;
+            activeMaterialId = null;
+            specificMaterialName = '';
+            activePhraseCollectionId = null;
+            currentDictFilter = 'listening';
+            selectedWordIds.clear();
+            selectedFolderNames.clear();
+            dictSelectMode = false;
+            syncFilterButtons('_none');
+            updateDictContextUI();
+            updateDictSelectUI();
+            renderDictContextDropdown();
+            renderDictionary();
         };
 
         window.selectDictContext = (source) => {
@@ -20970,11 +21124,27 @@
             const context = document.getElementById('edit-word-ctx').value.trim();
             const imageUrl = editWordPendingImageUrl || '';
             if(!word || !translation || !activeUid) return;
+            const transParsed = stripTrailingForcePhraseMarker(translation);
+            const transClean = transParsed.text;
+            if (!transClean) return;
+            const parsed = parseReaderSelectionForSave(word);
+            const wordClean = parsed.text || word;
+            if (!wordClean) return;
+            if (parsed.saveKind === 'phrase' || transParsed.forced) {
+                try {
+                    await savePhraseManual(wordClean, transClean, context);
+                    closeEditModal();
+                } catch (e) {
+                    console.error('saveEditedWord→phrase', e);
+                    window.showModal?.(t('msg.saveError'));
+                }
+                return;
+            }
             const prev = vocabulary.find((v) => v.id === id);
             const before = prev ? firestoreWordFields(prev) : null;
             try {
-                await updateDoc(docRef('words', id), { word, translation, context, imageUrl });
-                if (before && (before.word !== word || before.translation !== translation || before.context !== context || before.imageUrl !== imageUrl)) {
+                await updateDoc(docRef('words', id), { word: wordClean, translation: transClean, context, imageUrl });
+                if (before && (before.word !== wordClean || before.translation !== transClean || before.context !== context || before.imageUrl !== imageUrl)) {
                     pushAppUndo(async () => {
                         await updateDoc(docRef('words', id), before);
                     });
@@ -21247,6 +21417,9 @@
             }
 
             if(currentDictFilter === 'import') filtered = vocabulary.filter(v => v.source === 'Імпорт');
+            else if (currentDictFilter === 'listening') {
+                filtered = vocabulary.filter((v) => v.listenFocus);
+            }
             else if(currentDictFilter === 'material_specific') {
                 const m = getMaterialForSource(specificMaterialName);
                 if (m) {
@@ -21268,6 +21441,7 @@
                 const cardClick = dictSelectMode
                     ? `toggleDictWordSelect('${item.id}', event)`
                     : `openEditModal('${item.id}')`;
+                const showIpa = !!(item.listenFocus && showTrainingPronunciation && learningLanguage === 'en');
                 return `
                 <div class="dict-word-card bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative group h-40 sm:h-48 ${selected ? 'word-card-selected' : ''}">
                     <div class="dict-word-img">
@@ -21276,6 +21450,7 @@
                     </div>
                     <div class="p-2 sm:p-3 flex-1 flex flex-col justify-center min-w-0 bg-white cursor-pointer" onclick="${cardClick}">
                         <strong class="text-indigo-700 text-base sm:text-lg leading-tight truncate font-bold">${formatWordWithArticleHtml(item.word, learningLanguage)}</strong>
+                        ${showIpa ? `<span class="dict-word-ipa train-word-ipa text-[10px] sm:text-xs text-slate-400 font-normal truncate leading-tight" data-word-id="${item.id}"></span>` : ''}
                         <span class="text-slate-800 text-xs sm:text-sm font-semibold truncate">${item.translation}</span>
                     </div>
                     ${dictSelectMode
@@ -21285,11 +21460,19 @@
                         : `<div class="absolute top-2 left-2 z-10 bg-white rounded-full shadow-md p-1 cursor-pointer" data-srs-id="${item.id}" onclick="event.stopPropagation(); showSrsStatus('${item.id}')">
                         ${getSrsSvg(item.srsLevel, true, false)}
                     </div>
-                    <button type="button" onclick="speakDictWord('${item.id}', event)" class="dict-word-speak absolute top-2 left-10 z-10" title="${escapeHtmlText(t('inline.listen'))}" aria-label="${escapeHtmlText(t('inline.listen'))}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06z"/><path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z"/></svg></button>
+                    <button type="button" data-dict-speak-id="${item.id}" class="dict-word-speak absolute top-2 left-10 z-10" title="${escapeHtmlText(t('inline.listenHold'))}" aria-label="${escapeHtmlText(t('inline.listen'))}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06z"/><path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z"/></svg></button>
                     <button type="button" onclick="deleteWord('${item.id}', event)" class="dict-word-delete absolute top-2 right-2 z-10" aria-label="Delete"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l6 6M9 3L3 9"/></svg></button>`}
                 </div>`;
             }).join('');
             updateDictSelectUI();
+            if (showTrainingPronunciation && learningLanguage === 'en') {
+                grid.querySelectorAll('.dict-word-ipa').forEach((el) => {
+                    const wid = el.getAttribute('data-word-id');
+                    const item = vocabulary.find((v) => v.id === wid);
+                    if (item?.word) fillTrainingPronunciationEl(el, item.word, item.id);
+                });
+            }
+            try { wireDictSpeakHoldButtons(grid); } catch (_) {}
         }
 
         window.openBulkModal = () => {
@@ -24676,6 +24859,13 @@
             panel.classList.toggle('hidden');
             if (!willOpen) hideReaderQuickMatchTip();
             if (willOpen && e?.currentTarget) positionReaderSettingsPanel(e.currentTarget);
+            if (willOpen) {
+                syncReaderParaIndentUi();
+                syncReaderGlobalWordHighlightUi();
+                syncReaderThemeUi();
+                syncReaderHighlightsOnlyUi();
+                syncReaderCopyModeUi?.();
+            }
             syncReaderFloatDockLook();
             releaseReaderFloatToolsFocus();
             if (e?.currentTarget && typeof e.currentTarget.blur === 'function') {
@@ -24706,6 +24896,7 @@
             try { localStorage.setItem(READER_QUICK_MATCH_KEY, readerQuickMatchEnabled ? '1' : '0'); } catch (_) {}
             syncReaderQuickMatchUi();
             syncReaderParaIndentUi();
+            syncReaderGlobalWordHighlightUi();
             if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
@@ -24715,6 +24906,37 @@
             syncReaderParaIndentUi();
             if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
+
+        window.setReaderGlobalWordHighlight = (on) => {
+            readerGlobalWordHighlight = !!on;
+            try { localStorage.setItem(READER_GLOBAL_WORDS_KEY, readerGlobalWordHighlight ? '1' : '0'); } catch (_) {}
+            readerLexiconCache = { key: '', lex: null };
+            syncReaderGlobalWordHighlightUi();
+            try {
+                if (document.getElementById('library-read-view')
+                    && !document.getElementById('library-read-view').classList.contains('hidden')) {
+                    renderReaderContent({ immediate: true });
+                }
+            } catch (_) {}
+            if (typeof saveUserPrefs === 'function') saveUserPrefs();
+            try {
+                showAppToast(readerGlobalWordHighlight ? t('reader.globalWordsOn') : t('reader.globalWordsOff'));
+            } catch (_) {}
+        };
+
+        window.toggleReaderGlobalWordHighlight = () => {
+            setReaderGlobalWordHighlight(!readerGlobalWordHighlight);
+        };
+
+        function syncReaderGlobalWordHighlightUi() {
+            const btn = document.getElementById('reader-global-words-btn');
+            if (!btn) return;
+            btn.classList.toggle('is-active', !!readerGlobalWordHighlight);
+            btn.setAttribute('aria-pressed', readerGlobalWordHighlight ? 'true' : 'false');
+            const label = t('reader.globalWords');
+            btn.setAttribute('title', label);
+            btn.setAttribute('aria-label', label);
+        }
 
         window.setReaderHighlightsOnly = (on) => {
             readerHighlightsOnly = !!on;
@@ -25164,8 +25386,11 @@
                 currentMaterial.lastPage = n;
             }
             readerCurrentPage = n;
+            // Instant jump — smooth scroll + heavy re-wrap feels like multi-second lag on phones
+            if (!opts.noScroll) {
+                try { window.scrollTo(0, 0); } catch (_) {}
+            }
             renderReaderContent();
-            if (!opts.noScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
             return true;
         };
 
@@ -26233,6 +26458,7 @@
             resetReaderSessionWords();
             syncReaderQuickMatchUi();
             syncReaderParaIndentUi();
+            syncReaderGlobalWordHighlightUi();
             syncReaderHighlightsOnlyUi();
             readerTocMobileOpen = false;
             readerAudioStore = {};
@@ -26817,11 +27043,40 @@
             return true;
         }
 
+        function wordBelongsToReaderMaterial(v, material) {
+            if (!v || !material) return false;
+            if (v.materialId && v.materialId === material.id) return true;
+            try {
+                const aliases = getMaterialAliases(material);
+                return aliases.includes(v.source);
+            } catch (_) {
+                return v.source === material.title;
+            }
+        }
+
         function buildReaderSavedLexicon(vocabulary, materialId) {
+            const scope = readerGlobalWordHighlight ? 'all' : 'local';
+            const cacheKey = [
+                materialId || '',
+                scope,
+                (vocabulary || []).length,
+                // cheap fingerprint so edits/adds invalidate the cache
+                (vocabulary || []).reduce((s, v) => s + String(v.id || '').length + String(v.word || '').length, 0)
+            ].join('|');
+            if (readerLexiconCache.key === cacheKey && readerLexiconCache.lex) {
+                return readerLexiconCache.lex;
+            }
+
+            const material = materialId
+                ? (materials.find((m) => m.id === materialId) || currentMaterial)
+                : currentMaterial;
             const words = new Set();
             const surfaces = new Set();
             const phrases = [];
             (vocabulary || []).forEach((v) => {
+                if (!readerGlobalWordHighlight && material && !wordBelongsToReaderMaterial(v, material)) {
+                    return;
+                }
                 const raw = String(v.word || '').trim();
                 if (!raw) return;
                 const key = raw.toLowerCase();
@@ -26840,7 +27095,9 @@
                 });
             }
             phrases.sort((a, b) => b.split(/\s+/).length - a.split(/\s+/).length);
-            return { words, phrases, surfaces };
+            const lex = { words, phrases, surfaces };
+            readerLexiconCache = { key: cacheKey, lex };
+            return lex;
         }
 
         function tokenizeReaderText(text) {
@@ -28170,44 +28427,75 @@
             return finalHtml;
         }
 
-        function renderReaderContent() {
-            if(!currentMaterial) return; 
-            const container = document.getElementById('reader-content'); 
-            const savedLexicon = buildReaderSavedLexicon(vocabulary, currentMaterial?.id);
-            const wordOccMap = new Map();
+        function renderReaderContent(opts = {}) {
+            if (!currentMaterial) return;
+            const container = document.getElementById('reader-content');
+            const wrap = document.getElementById('reader-content-wrapper');
+            if (!container) return;
 
-            if (readerHighlightsOnly && !isReaderHlDesktopLayout()) {
-                currentSubtitlesLyricMode = false;
-                container.innerHTML = renderHighlightsOnlyHtml();
+            const token = ++readerRenderToken;
+            const material = currentMaterial;
+            const pageNum = readerCurrentPage;
+            const immediate = !!opts.immediate;
+
+            const paint = () => {
+                if (token !== readerRenderToken) return;
+                if (currentMaterial !== material || readerCurrentPage !== pageNum) return;
+
+                const savedLexicon = buildReaderSavedLexicon(vocabulary, material?.id);
+                const wordOccMap = new Map();
+
+                if (readerHighlightsOnly && !isReaderHlDesktopLayout()) {
+                    currentSubtitlesLyricMode = false;
+                    container.innerHTML = renderHighlightsOnlyHtml();
+                    syncReaderHlRail();
+                    syncReaderPageChrome();
+                    wrap?.classList.remove('reader-paging');
+                    return;
+                }
+
+                const currentPageData = readerPages[pageNum - 1];
+
+                if (material.subtitles) {
+                    const subs = currentPageData || [];
+                    currentSubtitlesLyricMode = isLyricsLikeSubtitles(subs);
+                    container.innerHTML = currentSubtitlesLyricMode
+                        ? renderLyricsSubtitlesHtml(subs, savedLexicon, wordOccMap)
+                        : renderProseSubtitlesHtml(subs, savedLexicon, wordOccMap);
+                } else {
+                    currentSubtitlesLyricMode = false;
+                    const pageHtml = currentPageData || '';
+                    container.innerHTML = wrapHtmlWords(pageHtml, savedLexicon, wordOccMap);
+                    hydrateReaderAudioBlocks(container);
+                }
+
+                if (pageNum === readerTotalPages && !readerHighlightsOnly) {
+                    const uiWrap = document.createElement('div');
+                    uiWrap.innerHTML = renderMarkAsReadBtn();
+                    while (uiWrap.firstChild) container.appendChild(uiWrap.firstChild);
+                }
+
+                applyStoredHighlightsToReader();
                 syncReaderHlRail();
                 syncReaderPageChrome();
+                wrap?.classList.remove('reader-paging');
+            };
+
+            // Update page chrome immediately so the user sees the new page number
+            try { syncReaderPageChrome(); } catch (_) {}
+
+            if (immediate) {
+                wrap?.classList.remove('reader-paging');
+                paint();
                 return;
             }
 
-            const currentPageData = readerPages[readerCurrentPage - 1];
-
-            if (currentMaterial.subtitles) {
-                const subs = currentPageData || [];
-                currentSubtitlesLyricMode = isLyricsLikeSubtitles(subs);
-                container.innerHTML = currentSubtitlesLyricMode
-                    ? renderLyricsSubtitlesHtml(subs, savedLexicon, wordOccMap)
-                    : renderProseSubtitlesHtml(subs, savedLexicon, wordOccMap);
-            } else {
-                currentSubtitlesLyricMode = false;
-                const pageHtml = currentPageData || '';
-                container.innerHTML = wrapHtmlWords(pageHtml, savedLexicon, wordOccMap);
-                hydrateReaderAudioBlocks(container);
-            }
-
-            if (readerCurrentPage === readerTotalPages && !readerHighlightsOnly) {
-                const uiWrap = document.createElement('div');
-                uiWrap.innerHTML = renderMarkAsReadBtn();
-                while (uiWrap.firstChild) container.appendChild(uiWrap.firstChild);
-            }
-
-            applyStoredHighlightsToReader();
-            syncReaderHlRail();
-            syncReaderPageChrome();
+            // Let the browser paint a dimmed/spinner frame before the heavy word-wrap
+            wrap?.classList.add('reader-paging');
+            const schedule = (typeof requestAnimationFrame === 'function')
+                ? (fn) => requestAnimationFrame(() => setTimeout(fn, 0))
+                : (fn) => setTimeout(fn, 0);
+            schedule(paint);
         }
 
         const inlinePopup = document.getElementById('inline-popup');
@@ -33016,11 +33304,16 @@
         let inlineTtsAudio = null;
         const INLINE_TTS_HOLD_MS = 480;
         let inlineTtsHoldTimer = null;
+        let inlineTtsPulseTimer = null;
         let inlineTtsHoldFired = false;
 
-        function clearInlineTtsHold() {
+        function clearInlineTtsHold(btn) {
             if (inlineTtsHoldTimer) clearTimeout(inlineTtsHoldTimer);
+            if (inlineTtsPulseTimer) clearTimeout(inlineTtsPulseTimer);
             inlineTtsHoldTimer = null;
+            inlineTtsPulseTimer = null;
+            const el = btn || document.getElementById('inline-popup-tts');
+            el?.classList.remove('is-listen-hold');
         }
 
         function listeningQueuePatch() {
@@ -33033,14 +33326,14 @@
 
         async function queueWordForListeningPractice(opts = {}) {
             if (!activeUid || !db) {
-                window.showModal?.(t('persist.login'));
+                showAppToast(t('persist.login'), 2600);
                 return false;
             }
             const word = String(opts.word || '').trim();
             const translation = String(opts.translation || '').trim();
             if (!word) return false;
             if (!translation) {
-                window.showModal?.(t('inline.listenNeedTrans'));
+                showAppToast(t('inline.listenNeedTrans'), 2600);
                 return false;
             }
             const existing = vocabulary.find((v) => v.word.toLowerCase() === word.toLowerCase());
@@ -33079,15 +33372,16 @@
                     try { recordWordsAdded(1); } catch (_) {}
                     onReaderNewWordSaved?.(ref.id, saveData);
                 }
-                const btn = document.getElementById('inline-popup-tts');
+                const btn = opts.holdBtn || document.getElementById('inline-popup-tts');
                 btn?.classList.add('is-listen-queued');
-                window.showModal?.(t('inline.listenQueued', { mode: t('mode.listening') }));
+                btn?.classList.remove('is-listen-hold');
+                showAppToast(t('inline.listenQueued', { mode: t('mode.listening') }), 2800);
                 try { renderDictionary(); } catch (_) {}
                 try { updateTrainSources(); } catch (_) {}
                 return true;
             } catch (e) {
                 console.error('queueWordForListeningPractice', e);
-                window.showModal?.(t('msg.saveError'));
+                showAppToast(t('msg.saveError'), 2800);
                 return false;
             }
         }
@@ -33120,7 +33414,8 @@
                 translation,
                 context: pendingInlineSaveData?.context || '',
                 source: getSaveSource(),
-                materialId: currentMaterial?.id || null
+                materialId: currentMaterial?.id || null,
+                holdBtn: document.getElementById('inline-popup-tts')
             });
         };
 
@@ -33131,17 +33426,25 @@
             const onDown = (e) => {
                 if (e.button != null && e.button !== 0) return;
                 inlineTtsHoldFired = false;
-                clearInlineTtsHold();
+                clearInlineTtsHold(btn);
                 try { btn.setPointerCapture?.(e.pointerId); } catch (_) {}
-                inlineTtsHoldTimer = setTimeout(async () => {
+                const pulseAt = Math.max(160, INLINE_TTS_HOLD_MS - 200);
+                inlineTtsPulseTimer = setTimeout(() => {
+                    btn.classList.add('is-listen-hold');
+                }, pulseAt);
+                inlineTtsHoldTimer = setTimeout(() => {
                     inlineTtsHoldFired = true;
                     inlineTtsHoldTimer = null;
-                    await window.queueInlineWordForListening();
+                    btn.classList.add('is-listen-hold');
+                    // Fire-and-forget so the popup can close while the queue saves
+                    window.queueInlineWordForListening().finally(() => {
+                        btn.classList.remove('is-listen-hold');
+                    });
                 }, INLINE_TTS_HOLD_MS);
             };
             const onUp = (e) => {
                 const wasHold = inlineTtsHoldFired;
-                clearInlineTtsHold();
+                clearInlineTtsHold(btn);
                 try { btn.releasePointerCapture?.(e.pointerId); } catch (_) {}
                 if (wasHold) {
                     e.preventDefault();
@@ -33151,14 +33454,84 @@
                 window.playInlineWordAudio();
             };
             const onCancel = () => {
-                clearInlineTtsHold();
+                clearInlineTtsHold(btn);
                 inlineTtsHoldFired = false;
             };
             btn.addEventListener('pointerdown', onDown);
             btn.addEventListener('pointerup', onUp);
             btn.addEventListener('pointercancel', onCancel);
+            btn.addEventListener('lostpointercapture', onCancel);
             btn.addEventListener('contextmenu', (e) => e.preventDefault());
         })();
+
+        function clearDictSpeakHold(btn) {
+            if (!btn) return;
+            if (btn._dictHoldTimer) clearTimeout(btn._dictHoldTimer);
+            if (btn._dictPulseTimer) clearTimeout(btn._dictPulseTimer);
+            btn._dictHoldTimer = null;
+            btn._dictPulseTimer = null;
+            btn.classList.remove('is-listen-hold');
+        }
+
+        function wireDictSpeakHoldButtons(root) {
+            const scope = root || document;
+            scope.querySelectorAll('.dict-word-speak[data-dict-speak-id]').forEach((btn) => {
+                if (btn._listenHoldWired) return;
+                btn._listenHoldWired = true;
+                btn.addEventListener('pointerdown', (e) => {
+                    if (e.button != null && e.button !== 0) return;
+                    e.stopPropagation();
+                    btn._dictHoldFired = false;
+                    clearDictSpeakHold(btn);
+                    try { btn.setPointerCapture?.(e.pointerId); } catch (_) {}
+                    const pulseAt = Math.max(160, INLINE_TTS_HOLD_MS - 200);
+                    btn._dictPulseTimer = setTimeout(() => {
+                        btn.classList.add('is-listen-hold');
+                    }, pulseAt);
+                    btn._dictHoldTimer = setTimeout(() => {
+                        btn._dictHoldFired = true;
+                        btn._dictHoldTimer = null;
+                        btn.classList.add('is-listen-hold');
+                        const id = btn.getAttribute('data-dict-speak-id');
+                        const item = vocabulary.find((v) => v.id === id);
+                        if (!item?.word) {
+                            clearDictSpeakHold(btn);
+                            return;
+                        }
+                        queueWordForListeningPractice({
+                            word: item.word,
+                            translation: item.translation || '',
+                            context: item.context || '',
+                            source: item.source,
+                            materialId: item.materialId || null,
+                            imageUrl: item.imageUrl || '',
+                            holdBtn: btn
+                        }).finally(() => {
+                            btn.classList.remove('is-listen-hold');
+                        });
+                    }, INLINE_TTS_HOLD_MS);
+                });
+                btn.addEventListener('pointerup', (e) => {
+                    e.stopPropagation();
+                    const wasHold = !!btn._dictHoldFired;
+                    clearDictSpeakHold(btn);
+                    try { btn.releasePointerCapture?.(e.pointerId); } catch (_) {}
+                    if (wasHold) {
+                        e.preventDefault();
+                        return;
+                    }
+                    window.speakDictWord(btn.getAttribute('data-dict-speak-id'), e);
+                });
+                btn.addEventListener('pointercancel', () => {
+                    clearDictSpeakHold(btn);
+                    btn._dictHoldFired = false;
+                });
+                btn.addEventListener('lostpointercapture', () => {
+                    if (!btn._dictHoldFired) clearDictSpeakHold(btn);
+                });
+                btn.addEventListener('contextmenu', (e) => e.preventDefault());
+            });
+        }
 
         function renderSrsProgressDots(level, maxLevel = MAX_SRS_LEVEL) {
             const display = clampSrsLevel(level);
@@ -33690,6 +34063,82 @@
         let learnerGrammarCefrLevel = '';
         let storyLearnerContextParts = emptyStoryLearnerContextParts();
         let storyUseLearnerContext = false;
+        /** In-memory map of personalization per language track — source of truth for cloud sync. */
+        let learnerProfilesByTrack = {};
+
+        function currentLearnerTrackId() {
+            return activeTrackId || `${learningLanguage}-${translationLanguage}` || 'en-uk';
+        }
+
+        function snapshotCurrentLearnerProfile() {
+            const ctx = {};
+            STORY_CTX_CHIP_KEYS.forEach((k) => {
+                ctx[k] = normalizeContextChipList(storyLearnerContextParts?.[k]);
+            });
+            return {
+                learnerCefrLevel: learnerCefrLevel || '',
+                learnerGrammarCefrLevel: learnerGrammarCefrLevel || '',
+                storyUseLearnerContext: !!storyUseLearnerContext,
+                storyLearnerContextParts: ctx
+            };
+        }
+
+        function normalizeLearnerProfileSnap(raw) {
+            if (!raw || typeof raw !== 'object') return null;
+            const cefr = String(raw.learnerCefrLevel || '').trim().toUpperCase();
+            const grammar = String(raw.learnerGrammarCefrLevel || '').trim().toUpperCase();
+            const parts = raw.storyLearnerContextParts && typeof raw.storyLearnerContextParts === 'object'
+                ? parseStoryLearnerContextParts(JSON.stringify(raw.storyLearnerContextParts))
+                : emptyStoryLearnerContextParts();
+            const ctx = {};
+            STORY_CTX_CHIP_KEYS.forEach((k) => {
+                ctx[k] = normalizeContextChipList(parts[k]);
+            });
+            return {
+                learnerCefrLevel: CEFR_LEVELS.includes(cefr) ? cefr : '',
+                learnerGrammarCefrLevel: CEFR_LEVELS.includes(grammar) ? grammar : '',
+                storyUseLearnerContext: !!raw.storyUseLearnerContext,
+                storyLearnerContextParts: ctx
+            };
+        }
+
+        function persistLearnerProfileLocal(snap) {
+            const s = snap || snapshotCurrentLearnerProfile();
+            try {
+                localStorage.setItem(learnerProfileStorageKey(LEARNER_CEFR_LS_KEY), s.learnerCefrLevel || '');
+                localStorage.setItem(learnerProfileStorageKey(LEARNER_GRAMMAR_CEFR_LS_KEY), s.learnerGrammarCefrLevel || '');
+                localStorage.setItem(learnerProfileStorageKey(STORY_USE_CTX_LS_KEY), s.storyUseLearnerContext ? '1' : '0');
+                const payload = {};
+                STORY_CTX_CHIP_KEYS.forEach((k) => {
+                    payload[k] = normalizeContextChipList(s.storyLearnerContextParts?.[k]);
+                });
+                localStorage.setItem(learnerProfileStorageKey(STORY_LEARNER_CTX_PARTS_LS_KEY), JSON.stringify(payload));
+            } catch (_) {}
+        }
+
+        function applyLearnerProfileSnapshot(snap) {
+            const s = normalizeLearnerProfileSnap(snap) || {
+                learnerCefrLevel: '',
+                learnerGrammarCefrLevel: '',
+                storyUseLearnerContext: false,
+                storyLearnerContextParts: emptyStoryLearnerContextParts()
+            };
+            learnerCefrLevel = s.learnerCefrLevel;
+            learnerGrammarCefrLevel = s.learnerGrammarCefrLevel;
+            storyUseLearnerContext = !!s.storyUseLearnerContext;
+            storyLearnerContextParts = {
+                ...emptyStoryLearnerContextParts(),
+                ...s.storyLearnerContextParts
+            };
+            persistLearnerProfileLocal(s);
+        }
+
+        function stashLearnerProfileForTrack(trackId) {
+            const tid = String(trackId || currentLearnerTrackId()).trim();
+            if (!tid) return;
+            learnerProfilesByTrack[tid] = snapshotCurrentLearnerProfile();
+            persistLearnerProfileLocal(learnerProfilesByTrack[tid]);
+        }
 
         function parseStoryLearnerContextParts(raw) {
             const empty = emptyStoryLearnerContextParts();
@@ -33734,55 +34183,61 @@
         }
 
         function saveStoryLearnerContextParts() {
-            try {
-                const payload = {};
-                STORY_CTX_CHIP_KEYS.forEach((k) => {
-                    payload[k] = normalizeContextChipList(storyLearnerContextParts[k]);
-                });
-                localStorage.setItem(learnerProfileStorageKey(STORY_LEARNER_CTX_PARTS_LS_KEY), JSON.stringify(payload));
-            } catch (_) {}
+            stashLearnerProfileForTrack(currentLearnerTrackId());
             renderStoryContextChipBoxes();
             if (typeof saveUserPrefs === 'function') saveUserPrefs();
         }
 
         function collectLearnerProfileCloudPrefs() {
-            const ctx = {};
-            STORY_CTX_CHIP_KEYS.forEach((k) => {
-                ctx[k] = normalizeContextChipList(storyLearnerContextParts?.[k]);
-            });
+            const tid = currentLearnerTrackId();
+            stashLearnerProfileForTrack(tid);
+            const current = learnerProfilesByTrack[tid] || snapshotCurrentLearnerProfile();
             return {
-                learnerCefrLevel: learnerCefrLevel || '',
-                learnerGrammarCefrLevel: learnerGrammarCefrLevel || '',
-                storyUseLearnerContext: !!storyUseLearnerContext,
-                storyLearnerContextParts: ctx
+                // Full map kept for first write / older clients; updateDoc also patches active track
+                learnerProfilesByTrack: { ...learnerProfilesByTrack },
+                learnerCefrLevel: current.learnerCefrLevel || '',
+                learnerGrammarCefrLevel: current.learnerGrammarCefrLevel || '',
+                storyUseLearnerContext: !!current.storyUseLearnerContext,
+                storyLearnerContextParts: current.storyLearnerContextParts || emptyStoryLearnerContextParts()
             };
+        }
+
+        function learnerProfileSnapIsEmpty(s) {
+            if (!s || typeof s !== 'object') return true;
+            const hasChips = STORY_CTX_CHIP_KEYS.some((k) => normalizeContextChipList(s.storyLearnerContextParts?.[k]).length > 0);
+            return !s.learnerCefrLevel && !s.learnerGrammarCefrLevel && !s.storyUseLearnerContext && !hasChips;
         }
 
         function applyLearnerProfileFromCloud(d) {
             if (!d || typeof d !== 'object') return;
-            if (typeof d.learnerCefrLevel === 'string') {
-                const v = d.learnerCefrLevel.trim().toUpperCase();
-                learnerCefrLevel = CEFR_LEVELS.includes(v) ? v : '';
-                try { localStorage.setItem(learnerProfileStorageKey(LEARNER_CEFR_LS_KEY), learnerCefrLevel); } catch (_) {}
+            if (d.learnerProfilesByTrack && typeof d.learnerProfilesByTrack === 'object') {
+                Object.entries(d.learnerProfilesByTrack).forEach(([tid, raw]) => {
+                    const snap = normalizeLearnerProfileSnap(raw);
+                    if (snap && tid) learnerProfilesByTrack[tid] = snap;
+                });
             }
-            if (typeof d.learnerGrammarCefrLevel === 'string') {
-                const v = d.learnerGrammarCefrLevel.trim().toUpperCase();
-                learnerGrammarCefrLevel = CEFR_LEVELS.includes(v) ? v : '';
-                try { localStorage.setItem(learnerProfileStorageKey(LEARNER_GRAMMAR_CEFR_LS_KEY), learnerGrammarCefrLevel); } catch (_) {}
+            const tid = currentLearnerTrackId();
+            const hasLegacyFlat = (
+                typeof d.learnerCefrLevel === 'string'
+                || typeof d.learnerGrammarCefrLevel === 'string'
+                || typeof d.storyUseLearnerContext === 'boolean'
+                || (d.storyLearnerContextParts && typeof d.storyLearnerContextParts === 'object')
+            );
+            if (hasLegacyFlat) {
+                const legacy = normalizeLearnerProfileSnap({
+                    learnerCefrLevel: d.learnerCefrLevel || '',
+                    learnerGrammarCefrLevel: d.learnerGrammarCefrLevel || '',
+                    storyUseLearnerContext: !!d.storyUseLearnerContext,
+                    storyLearnerContextParts: d.storyLearnerContextParts || emptyStoryLearnerContextParts()
+                });
+                // Prefer non-empty legacy when track slot is missing or empty (old wipe / first migrate)
+                if (legacy && !learnerProfileSnapIsEmpty(legacy)
+                    && (!learnerProfilesByTrack[tid] || learnerProfileSnapIsEmpty(learnerProfilesByTrack[tid]))) {
+                    learnerProfilesByTrack[tid] = legacy;
+                }
             }
-            if (typeof d.storyUseLearnerContext === 'boolean') {
-                storyUseLearnerContext = d.storyUseLearnerContext;
-                try { localStorage.setItem(learnerProfileStorageKey(STORY_USE_CTX_LS_KEY), storyUseLearnerContext ? '1' : '0'); } catch (_) {}
-            }
-            if (d.storyLearnerContextParts && typeof d.storyLearnerContextParts === 'object') {
-                storyLearnerContextParts = parseStoryLearnerContextParts(JSON.stringify(d.storyLearnerContextParts));
-                try {
-                    const payload = {};
-                    STORY_CTX_CHIP_KEYS.forEach((k) => {
-                        payload[k] = normalizeContextChipList(storyLearnerContextParts[k]);
-                    });
-                    localStorage.setItem(learnerProfileStorageKey(STORY_LEARNER_CTX_PARTS_LS_KEY), JSON.stringify(payload));
-                } catch (_) {}
+            if (learnerProfilesByTrack[tid]) {
+                applyLearnerProfileSnapshot(learnerProfilesByTrack[tid]);
             }
         }
 
@@ -33792,6 +34247,7 @@
             try {
                 if (typeof readerQuickMatchEnabled === 'boolean') out.readerQuickMatchEnabled = readerQuickMatchEnabled;
                 if (typeof readerParaIndent === 'boolean') out.readerParaIndent = readerParaIndent;
+                if (typeof readerGlobalWordHighlight === 'boolean') out.readerGlobalWordHighlight = readerGlobalWordHighlight;
                 if (typeof readerTheme === 'string') out.readerTheme = readerTheme;
                 if (typeof brainstormOrderPref === 'string') out.brainstormOrderPref = brainstormOrderPref;
                 if (typeof bsPrioritizeFullSets === 'boolean') out.bsPrioritizeFullSets = bsPrioritizeFullSets;
@@ -33812,6 +34268,11 @@
             if (typeof d.readerParaIndent === 'boolean') {
                 readerParaIndent = d.readerParaIndent;
                 try { localStorage.setItem(READER_PARA_INDENT_KEY, readerParaIndent ? '1' : '0'); } catch (_) {}
+            }
+            if (typeof d.readerGlobalWordHighlight === 'boolean') {
+                readerGlobalWordHighlight = d.readerGlobalWordHighlight;
+                try { localStorage.setItem(READER_GLOBAL_WORDS_KEY, readerGlobalWordHighlight ? '1' : '0'); } catch (_) {}
+                readerLexiconCache = { key: '', lex: null };
             }
             if (d.readerTheme === '' || d.readerTheme === 'warm' || d.readerTheme === 'dark') {
                 readerTheme = d.readerTheme;
@@ -33846,6 +34307,11 @@
         }
 
         function reloadLearnerProfileFromStorage() {
+            const tid = currentLearnerTrackId();
+            if (learnerProfilesByTrack[tid]) {
+                applyLearnerProfileSnapshot(learnerProfilesByTrack[tid]);
+                return;
+            }
             try {
                 learnerCefrLevel = localStorage.getItem(learnerProfileStorageKey(LEARNER_CEFR_LS_KEY)) || '';
                 learnerGrammarCefrLevel = localStorage.getItem(learnerProfileStorageKey(LEARNER_GRAMMAR_CEFR_LS_KEY)) || '';
@@ -33862,7 +34328,27 @@
                 }
                 storyUseLearnerContext = localStorage.getItem(learnerProfileStorageKey(STORY_USE_CTX_LS_KEY)) === '1';
             } catch (_) {}
+            learnerProfilesByTrack[tid] = snapshotCurrentLearnerProfile();
         }
+
+        window.savePersonalizationToCloud = async () => {
+            const btn = document.getElementById('btn-save-personalization');
+            const orig = btn?.textContent;
+            if (btn) { btn.disabled = true; btn.textContent = '…'; }
+            try {
+                stashLearnerProfileForTrack(currentLearnerTrackId());
+                const ok = await saveUserPrefs();
+                if (ok) showAppToast(t('settings.personalizationSaved'), 2600);
+                else showAppToast(t('settings.personalizationSaveFail'), 3200);
+            } catch (_) {
+                showAppToast(t('settings.personalizationSaveFail'), 3200);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = orig || t('settings.savePersonalization');
+                }
+            }
+        };
 
         function cefrBarsMarkup(levelIdx) {
             const heights = [4, 6, 8, 10, 12];
@@ -33967,7 +34453,7 @@
         window.setLearnerCefrLevel = (val) => {
             const v = String(val || '').trim().toUpperCase();
             learnerCefrLevel = CEFR_LEVELS.includes(v) ? v : '';
-            try { localStorage.setItem(learnerProfileStorageKey(LEARNER_CEFR_LS_KEY), learnerCefrLevel); } catch (_) {}
+            stashLearnerProfileForTrack(currentLearnerTrackId());
             renderCefrBarPicker('settings-vocab-cefr-bars', learnerCefrLevel, (lv) => setLearnerCefrLevel(lv));
             if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
@@ -33975,14 +34461,14 @@
         window.setLearnerGrammarCefrLevel = (val) => {
             const v = String(val || '').trim().toUpperCase();
             learnerGrammarCefrLevel = CEFR_LEVELS.includes(v) ? v : '';
-            try { localStorage.setItem(learnerProfileStorageKey(LEARNER_GRAMMAR_CEFR_LS_KEY), learnerGrammarCefrLevel); } catch (_) {}
+            stashLearnerProfileForTrack(currentLearnerTrackId());
             renderCefrBarPicker('settings-grammar-cefr-bars', learnerGrammarCefrLevel, (lv) => setLearnerGrammarCefrLevel(lv));
             if (typeof saveUserPrefs === 'function') saveUserPrefs();
         };
 
         window.setStoryUseLearnerContext = (on) => {
             storyUseLearnerContext = !!on;
-            try { localStorage.setItem(learnerProfileStorageKey(STORY_USE_CTX_LS_KEY), storyUseLearnerContext ? '1' : '0'); } catch (_) {}
+            stashLearnerProfileForTrack(currentLearnerTrackId());
             const cb = document.getElementById('settings-story-use-context');
             if (cb) cb.checked = storyUseLearnerContext;
             if (typeof saveUserPrefs === 'function') saveUserPrefs();
@@ -37264,7 +37750,9 @@
             if (!select) return;
             const prev = getVocabSourceScope();
             const sources = [...new Set(vocabulary.map((v) => v.source).filter((s) => s && s !== ALL_WORDS_SOURCE))];
+            const listenN = countWordsForSource(LISTENING_SOURCE);
             select.innerHTML = `<option value="ALL">${trainSourceOptionLabel('ALL')}</option>`
+                + (listenN > 0 ? `<option value="${LISTENING_SOURCE}">${trainSourceOptionLabel(LISTENING_SOURCE)}</option>` : '')
                 + sources.map((s) => {
                     const esc = s.replace(/"/g, '&quot;');
                     return `<option value="${esc}">${trainSourceOptionLabel(s)}</option>`;
@@ -37796,6 +38284,7 @@
 
         function trainSourceOptionLabel(scope) {
             if (scope === 'ALL') return `🌐 ${t('dict.allWords')}`;
+            if (scope === LISTENING_SOURCE) return `🎧 ${t('folder.listening')}`;
             if (isPresetImportSource(scope)) return `${presetImportLogo(scope)} ${scope}`;
             if (scope === 'Імпорт') return `📥 ${t('folder.import')}`;
             return `📂 ${scope}`;
@@ -37809,6 +38298,10 @@
         function buildTrainFolderEntries() {
             const entries = [{ key: 'ALL', label: `🌐 ${t('dict.allWords')}` }];
             const seen = new Set(['ALL']);
+            if (countWordsForSource(LISTENING_SOURCE) > 0) {
+                entries.push({ key: LISTENING_SOURCE, label: trainSourceOptionLabel(LISTENING_SOURCE) });
+                seen.add(LISTENING_SOURCE);
+            }
             const srcs = [...new Set(vocabulary.map((v) => v.source).filter(Boolean))]
                 .sort((a, b) => a.localeCompare(b, uiLocale()));
             srcs.forEach((s) => {
@@ -37831,6 +38324,7 @@
         function getLooseTrainPool() {
             const scope = getTrainSourceScope();
             const pool = scope === 'ALL' ? vocabulary.slice() : getWordsForFolderName(scope);
+            if (scope === LISTENING_SOURCE) return pool;
             return excludeListeningOnlyWords(pool);
         }
 
@@ -37839,6 +38333,7 @@
             const scope = getTrainSourceScope();
             let pool = scope === 'ALL' ? vocabulary.slice() : getWordsForFolderName(scope);
             if (trainWordPickIncluded) pool = pool.filter((w) => trainWordPickIncluded.has(w.id));
+            if (scope === LISTENING_SOURCE) return pool;
             return excludeListeningOnlyWords(pool);
         }
 
@@ -37974,7 +38469,9 @@
             if (!select) return;
             const prev = select.value || 'ALL';
             const sources = [...new Set(vocabulary.map((v) => v.source).filter((s) => s && s !== ALL_WORDS_SOURCE))];
+            const listenN = countWordsForSource(LISTENING_SOURCE);
             select.innerHTML = `<option value="ALL">${trainSourceOptionLabel('ALL')}</option>`
+                + (listenN > 0 ? `<option value="${LISTENING_SOURCE}">${trainSourceOptionLabel(LISTENING_SOURCE)}</option>` : '')
                 + sources.map((s) => {
                     const esc = s.replace(/"/g, '&quot;');
                     return `<option value="${esc}">${trainSourceOptionLabel(s)}</option>`;
@@ -38002,6 +38499,10 @@
             stopStoryAudio();
             clearRestoreTimer();
             document.body.classList.remove('restore-session', 'order-session', 'context-material-session', 'story-session');
+            const activeTrainScope = usesVocabPool(mode) ? getVocabSourceScope() : getTrainSourceScope();
+            if (activeTrainScope === LISTENING_SOURCE && mode !== 'listening') {
+                return window.showModal(t('msg.listenFolderOnly'));
+            }
             if (mode === 'all' && isBrainstormDailyCapReached()) {
                 syncBrainstormCapUi();
                 return;
