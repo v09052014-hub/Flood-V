@@ -1260,6 +1260,24 @@
         #library-read-view .text-reader .word-saved-phrase {
             background-color: rgba(209, 250, 229, 0.52);
         }
+        /* Mark-as-read: no long-press copy / callout */
+        .reader-mark-read-btn,
+        .reader-mark-read-btn * {
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+        .reader-mark-read-btn {
+            -webkit-touch-callout: none;
+            touch-action: manipulation;
+        }
+        /* Default reading: suppress iOS/Android callout; selection still works for our popup */
+        #library-read-view:not(.reader-copy-mode):not(.reader-hl-mode) #reader-content {
+            -webkit-touch-callout: none;
+        }
+        #library-read-view:not(.reader-copy-mode):not(.reader-hl-mode) #reader-content .word-clickable {
+            -webkit-touch-callout: none;
+        }
         #library-read-view.reader-tools-floated #reader-pagination {
             margin-bottom: 5.25rem;
         }
@@ -9615,6 +9633,13 @@
                                     <span class="settings-toggle-hint block" data-i18n="settings.introMorphHint">На етапі ознайомлення Brainstorm: префікси, суфікси або частини довгих слів.</span>
                                 </span>
                             </label>
+                            <label class="settings-toggle-row mt-4">
+                                <input type="checkbox" id="settings-core-credit-bs" onchange="setCoreExercisesCreditBrainstorm(this.checked)">
+                                <span>
+                                    <span class="settings-toggle-title" data-i18n="settings.coreCreditBs">🧩 Вплив на Brainstorm</span>
+                                    <span class="settings-toggle-hint block" data-i18n="settings.coreCreditBsHint">Увімкнено: рівень у Слово→Переклад, Конструкторі, Написанні й Аудіюванні також піднімає Brainstorm. Вимкнено: Brainstorm лише зі своїх сесій.</span>
+                                </span>
+                            </label>
                             <div class="mt-4">
                                 <label class="settings-segment-label" for="settings-bs-daily-cap" data-i18n="settings.bsDailyCap">📊 Денний ліміт Brainstorm</label>
                                 <select id="settings-bs-daily-cap" class="settings-select mt-1.5 w-full max-w-xs" onchange="setBrainstormDailyCap(parseInt(this.value, 10))">
@@ -11062,6 +11087,9 @@
                 'settings.trainingSfxHint': 'Звуки відповідей, таймера та завершення сесії. Озвучення слів не змінюється.',
                 'settings.introMorph': '🧩 Підказки про будову слова',
                 'settings.introMorphHint': 'На етапі ознайомлення Brainstorm: префікси, суфікси або частини довгих слів.',
+                'settings.coreCreditBs': '🧩 Вплив на Brainstorm',
+                'settings.coreCreditBsHint': 'Увімкнено: рівень у Слово→Переклад, Конструкторі, Написанні й Аудіюванні також піднімає Brainstorm. Вимкнено: Brainstorm лише зі своїх сесій.',
+                'settings.coreCreditBsShort': 'Вплив на Brainstorm',
                 'settings.trainDueIndicator': '🌊 Слова до тренування на картках',
                 'settings.trainDueOff': 'Не показувати',
                 'settings.trainDueCount': 'Лише число',
@@ -11804,6 +11832,9 @@
                 'settings.trainingSfxHint': 'Sounds for answers, timers, and session completion. Word audio is unchanged.',
                 'settings.introMorph': '🧩 Word structure hints',
                 'settings.introMorphHint': 'During Brainstorm introduction: prefixes, suffixes, or chunks of long words.',
+                'settings.coreCreditBs': '🧩 Influence on Brainstorm',
+                'settings.coreCreditBsHint': 'On: progress in Word→Translation, Constructor, Typing and Listening also raises Brainstorm. Off: Brainstorm only from its own sessions.',
+                'settings.coreCreditBsShort': 'Influence on Brainstorm',
                 'settings.trainDueIndicator': '🌊 Words due on training cards',
                 'settings.trainDueOff': 'Hide',
                 'settings.trainDueCount': 'Count only',
@@ -12537,6 +12568,9 @@
                 'settings.trainingSfxHint': 'Sonidos de respuestas, temporizador y fin de sesión. El audio de palabras no cambia.',
                 'settings.introMorph': '🧩 Pistas de estructura de palabras',
                 'settings.introMorphHint': 'En la introducción de Brainstorm: prefijos, sufijos o partes de palabras largas.',
+                'settings.coreCreditBs': '🧩 Influencia en Brainstorm',
+                'settings.coreCreditBsHint': 'Activo: el progreso en Palabra→Traducción, Constructor, Escritura y Audición también sube Brainstorm. Off: Brainstorm solo en sus propias sesiones.',
+                'settings.coreCreditBsShort': 'Influencia en Brainstorm',
                 'settings.trainDueIndicator': '🌊 Palabras pendientes en las tarjetas',
                 'settings.trainDueOff': 'No mostrar',
                 'settings.trainDueCount': 'Solo el número',
@@ -13242,12 +13276,15 @@
         const TRAIN_DUE_INDICATOR_KEY = 'linguaspace_train_due_indicator_v1';
         const BS_DAILY_CAP_KEY = 'linguaspace_bs_daily_cap_v1';
         const BS_DAY_WORDS_KEY = 'linguaspace_bs_day_words_v1';
+        const CORE_CREDIT_BS_KEY = 'linguaspace_core_credit_brainstorm_v1';
         const READER_QUICK_MATCH_BATCH = 4;
         let settingsActiveTab = 'languages';
         let showTrainingPronunciation = localStorage.getItem(SHOW_IPA_KEY) === '1';
         let showIpaSourceOnHover = localStorage.getItem(SHOW_IPA_SOURCE_KEY) !== '0';
         let trainingSoundEffects = localStorage.getItem(TRAINING_SFX_KEY) !== '0';
         let showIntroMorphHints = localStorage.getItem(SHOW_INTRO_MORPH_KEY) === '1';
+        /** When on: min level across word-trans / constructor / typing / listening also raises Brainstorm srsLevel. */
+        let coreExercisesCreditBrainstorm = localStorage.getItem(CORE_CREDIT_BS_KEY) === '1';
         function resolveTrainDueIndicator() {
             const stored = localStorage.getItem(TRAIN_DUE_INDICATOR_KEY);
             if (stored === 'off' || stored === 'count' || stored === 'water') return stored;
@@ -13337,7 +13374,16 @@
             return s;
         }
         function withEnterHint(label) {
-            return `${String(label || '').trim()} <span class="font-normal">↵</span>`;
+            const base = String(label || '').trim();
+            // Physical Enter is for keyboard; hide the glyph on touch-first phones
+            if (!canShowPhysicalEnterHint()) return base;
+            return `${base} <span class="font-normal">↵</span>`;
+        }
+        function canShowPhysicalEnterHint() {
+            try {
+                if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return false;
+            } catch (_) {}
+            return true;
         }
         const ENTER_HINT_I18N_KEYS = new Set(['train.next', 'train.gotIt', 'inline.save', 'inline.update', 'inline.savePhrase']);
         function uiLocale() { return LANG_META[interfaceLanguage]?.locale || 'uk-UA'; }
@@ -13623,6 +13669,7 @@
             localStorage.setItem(SHOW_IPA_SOURCE_KEY, showIpaSourceOnHover ? '1' : '0');
             localStorage.setItem(TRAINING_SFX_KEY, trainingSoundEffects ? '1' : '0');
             localStorage.setItem(SHOW_INTRO_MORPH_KEY, showIntroMorphHints ? '1' : '0');
+            localStorage.setItem(CORE_CREDIT_BS_KEY, coreExercisesCreditBrainstorm ? '1' : '0');
             localStorage.setItem(TRAIN_DUE_INDICATOR_KEY, trainDueIndicator);
             localStorage.setItem(BS_DAILY_CAP_KEY, String(brainstormDailyCap));
             localStorage.setItem(HIDDEN_TRAIN_MODES_KEY, JSON.stringify(hiddenTrainModes));
@@ -13637,7 +13684,8 @@
                 }
                 const prefs = {
                     interfaceLanguage, learningLanguage, translationLanguage, activeTrackId, knownTracks,
-                    showTrainingPronunciation, showIpaSourceOnHover, trainingSoundEffects, showIntroMorphHints, trainDueIndicator, brainstormDailyCap,
+                    showTrainingPronunciation, showIpaSourceOnHover, trainingSoundEffects, showIntroMorphHints,
+                    coreExercisesCreditBrainstorm, trainDueIndicator, brainstormDailyCap,
                     hiddenTrainModes, textExercisesGate, dictGridCols, readerHighlightColor
                 };
                 if (typeof collectLearnerProfileCloudPrefs === 'function') {
@@ -13839,6 +13887,10 @@
                         showIntroMorphHints = d.showIntroMorphHints;
                         localStorage.setItem(SHOW_INTRO_MORPH_KEY, showIntroMorphHints ? '1' : '0');
                     }
+                    if (typeof d.coreExercisesCreditBrainstorm === 'boolean') {
+                        coreExercisesCreditBrainstorm = d.coreExercisesCreditBrainstorm;
+                        localStorage.setItem(CORE_CREDIT_BS_KEY, coreExercisesCreditBrainstorm ? '1' : '0');
+                    }
                     if (d.trainDueIndicator === 'off' || d.trainDueIndicator === 'count' || d.trainDueIndicator === 'water') {
                         trainDueIndicator = d.trainDueIndicator;
                         localStorage.setItem(TRAIN_DUE_INDICATOR_KEY, trainDueIndicator);
@@ -13937,6 +13989,8 @@
             if (sfxToggle) sfxToggle.checked = !!trainingSoundEffects;
             const morphToggle = document.getElementById('settings-intro-morph');
             if (morphToggle) morphToggle.checked = !!showIntroMorphHints;
+            const coreCreditToggle = document.getElementById('settings-core-credit-bs');
+            if (coreCreditToggle) coreCreditToggle.checked = !!coreExercisesCreditBrainstorm;
             const textGateToggle = document.getElementById('settings-text-exercises-gate');
             if (textGateToggle) textGateToggle.checked = !!textExercisesGate;
             const personalExtras = document.getElementById('settings-personal-extras');
@@ -14243,6 +14297,13 @@
             syncSettingsPanelUi();
         };
 
+        window.setCoreExercisesCreditBrainstorm = async (on) => {
+            coreExercisesCreditBrainstorm = !!on;
+            localStorage.setItem(CORE_CREDIT_BS_KEY, coreExercisesCreditBrainstorm ? '1' : '0');
+            await saveUserPrefs();
+            syncSettingsPanelUi();
+        };
+
         window.setTextExercisesGate = async (on) => {
             textExercisesGate = !!on;
             localStorage.setItem(TEXT_EXERCISES_GATE_KEY, textExercisesGate ? '1' : '0');
@@ -14257,7 +14318,7 @@
         const ACTIVITY_LEGACY_MIGRATE_FLAG = 'linguaspace_year_legacy_migrated_enuk_v1';
         const YEAR_ACTIVITY_TRACK_VERSION = 3; // v3: activity only on/after track word createdAt
         const YEAR_CYCLE_DAYS = 365;
-        const ACTIVITY_SESSION_GAP_MS = 45 * 60 * 1000;
+        const ACTIVITY_SESSION_GAP_MS = 3 * 60 * 1000; // same-session word saves are ms apart; keep separate Brainstorm runs apart
         let yearActivityStore = {}; // trackId → { days, cycleStart, seeded, v }
         let yearActivity = { days: {}, cycleStart: null, seeded: false, v: 0 };
         let yearCalCursor = null; // Date for calendar month
@@ -14422,12 +14483,15 @@
             combined.sort((a, b) => (a.at || 0) - (b.at || 0));
             for (const log of combined) {
                 if (!log || typeof log !== 'object') continue;
-                const key = `${log.at || 0}|${log.bucket || ''}|${(log.words || []).join(',')}`;
+                const mode = log.mode || '';
+                const bucket = resolveActivityBucket(log);
+                const key = `${log.at || 0}|${bucket}|${mode}|${(log.words || []).join(',')}`;
                 if (seen.has(key)) continue;
                 seen.add(key);
                 out.push({
                     at: log.at || 0,
-                    bucket: log.bucket || 'brainstorm',
+                    bucket,
+                    mode: mode || bucket,
                     words: Array.isArray(log.words) ? log.words.map(String) : []
                 });
             }
@@ -14559,27 +14623,37 @@
             return { done, total: YEAR_CYCLE_DAYS, pct: Math.round((done / YEAR_CYCLE_DAYS) * 100) };
         }
 
+        function resolveActivityBucket(log) {
+            if (!log || typeof log !== 'object') return 'other';
+            if (log.bucket === 'brainstorm' || log.bucket === 'review' || log.bucket === 'other') {
+                // Legacy: standalone sprint was wrongly stored as brainstorm
+                if (log.bucket === 'brainstorm' && log.mode === 'sprint') return 'other';
+                return log.bucket;
+            }
+            return activityModeBucket(log.mode);
+        }
+
         function recordTrainingSession(mode, wordIds = []) {
             bindYearActivityToTrack();
             const key = dayKeyFromDate(new Date());
             if (!key) return;
             const rec = ensureYearDayRec(key);
             const bucket = activityModeBucket(mode);
-            if (mode === 'all' || mode === 'sprint') {
-                rec.brainstorm = (rec.brainstorm || 0) + 1;
-                rec.heavy = (rec.heavy || 0) + 1;
-            } else if (mode === 'review') {
-                rec.review = (rec.review || 0) + 1;
-                rec.heavy = (rec.heavy || 0) + 1;
-            } else if (isHeavyTrainingMode(mode)) {
-                rec.brainstorm = (rec.brainstorm || 0) + 1;
-                rec.heavy = (rec.heavy || 0) + 1;
-            } else {
-                rec.other = (rec.other || 0) + 1;
-            }
             const ids = [...new Set((wordIds || []).filter(Boolean).map((id) => String(id)))];
             rec.sessionLog.push({ at: Date.now(), bucket, words: ids, mode: mode || bucket });
             if (rec.sessionLog.length > 40) rec.sessionLog = rec.sessionLog.slice(-40);
+            // Counters from sessionLog (legacy sprint was mis-bucketed as brainstorm)
+            let bs = 0, rv = 0, ot = 0;
+            for (const log of rec.sessionLog) {
+                const b = resolveActivityBucket(log);
+                if (b === 'brainstorm') bs++;
+                else if (b === 'review') rv++;
+                else ot++;
+            }
+            rec.brainstorm = bs;
+            rec.review = rv;
+            rec.other = ot;
+            rec.heavy = bs + rv;
             persistYearDayBump();
         }
 
@@ -14589,7 +14663,7 @@
             const rec = dayKey ? (yearActivity.days[dayKey] || {}) : {};
             const logs = Array.isArray(rec.sessionLog) ? rec.sessionLog : [];
             for (const log of logs) {
-                const bucket = log.bucket || 'brainstorm';
+                const bucket = resolveActivityBucket(log);
                 if (!out[bucket]) continue;
                 out[bucket].sessions++;
                 out[bucket].words += (log.words || []).length;
@@ -14600,7 +14674,8 @@
         function activityModeBucket(mode) {
             const m = mode || '';
             if (m === 'review' || m === 'review-peek') return 'review';
-            if (m === 'brainstorm' || m === 'all' || m === 'sprint') return 'brainstorm';
+            // Standalone sprint is a separate exercise — never count as Brainstorm
+            if (m === 'brainstorm' || m === 'all') return 'brainstorm';
             return 'other';
         }
 
@@ -14755,19 +14830,24 @@
             const logged = aggregateSessionLogs(dayKey);
             const wordsAdded = Math.max(stored.wordsAdded || 0, inferWordsAddedForDay(dayKey));
             const reading = Math.max(stored.reading || 0, inferReadingForDay(dayKey));
+            const hasSessionLog = Array.isArray(stored.sessionLog) && stored.sessionLog.length > 0;
+            // When sessionLog exists, trust it (after sprint→other fix). Counters alone can be inflated by legacy bugs.
+            const pickSessions = (loggedN, storedN) => hasSessionLog
+                ? Math.max(loggedN || 0, 0)
+                : Math.max(loggedN || 0, storedN || 0);
             return {
                 wordsAdded,
                 brainstorm: {
-                    sessions: logged.brainstorm.sessions || stored.brainstorm || 0,
-                    words: logged.brainstorm.words
+                    sessions: pickSessions(logged.brainstorm.sessions, stored.brainstorm),
+                    words: logged.brainstorm.words || 0
                 },
                 review: {
-                    sessions: logged.review.sessions || stored.review || 0,
-                    words: logged.review.words
+                    sessions: pickSessions(logged.review.sessions, stored.review),
+                    words: logged.review.words || 0
                 },
                 other: {
-                    sessions: logged.other.sessions || stored.other || 0,
-                    words: logged.other.words
+                    sessions: pickSessions(logged.other.sessions, stored.other),
+                    words: logged.other.words || 0
                 },
                 reading
             };
@@ -15066,8 +15146,12 @@
             }
 
             // After rebuild, days start empty then fill from THIS track's vocabulary only.
-            // Later calls (v already 2) still merge max() so live sessions aren't lost.
+            // If a day already has a live sessionLog, don't let history-seed inflate/deflate counters.
             for (const [k, v] of Object.entries(fromHist)) {
+                const existing = yearActivity.days[k];
+                if (existing && Array.isArray(existing.sessionLog) && existing.sessionLog.length > 0) {
+                    continue;
+                }
                 yearActivity.days[k] = mergeYearDayRecord(yearActivity.days[k], {
                     heavy: v.heavy || 0,
                     other: v.other || 0,
@@ -15410,6 +15494,7 @@
             { id: 'context', label: 'Контекст' },
             { id: 'definition', label: 'Визначення' },
             { id: 'crossword', label: 'Кросворд' },
+            { id: 'sprint', label: 'Спринт' },
             { id: 'picture', label: 'По фото' }
         ];
         const ALL_SEPARATE_MODES = [...CORE_TRAIN_MODES, ...EXTRA_TRAIN_MODES];
@@ -15746,17 +15831,17 @@
 
         function getWordModeLevel(w, modeId) {
             if (!w || !modeId) return 0;
-            if (modeId === 'brainstorm' || modeId === 'all' || modeId === 'sprint' || modeId === 'review') return w.srsLevel || 0;
+            if (modeId === 'brainstorm' || modeId === 'all' || modeId === 'review') return w.srsLevel || 0;
             return w[`srs_${modeId}_Level`] || 0;
         }
 
         function usesBrainstormSrs(modeId) {
-            return modeId === 'all' || modeId === 'brainstorm' || modeId === 'sprint';
+            return modeId === 'all' || modeId === 'brainstorm';
         }
 
         function normalizeSrsFocusMode(modeId) {
             if (!modeId || modeId === 'review') return 'brainstorm';
-            if (modeId === 'all' || modeId === 'sprint') return 'brainstorm';
+            if (modeId === 'all') return 'brainstorm';
             return modeId;
         }
 
@@ -15842,7 +15927,9 @@
                 })
                 .filter(h => h.at > 0)
                 .filter(h => {
-                    if (modeId === 'brainstorm') return h.mode === 'brainstorm' || h.mode === 'review-peek';
+                    if (modeId === 'brainstorm') {
+                        return h.mode === 'brainstorm' || h.mode === 'review-peek' || h.mode === 'core-credit';
+                    }
                     return h.mode === modeId;
                 })
                 .sort((a, b) => b.at - a.at);
@@ -15917,11 +16004,12 @@
         }
 
         function getTrainingModeLabel(mode) {
+            if (mode === 'core-credit') return t('settings.coreCreditBsShort') || t('mode.brainstorm');
             return t(`mode.${mode}`) || mode || 'Brainstorm';
         }
 
         function appendTrainingHistory(w, mode, newLevel, failed) {
-            const histMode = (mode === 'all' || mode === 'sprint') ? 'brainstorm' : mode;
+            const histMode = (mode === 'all') ? 'brainstorm' : mode;
             return normalizeBsHistory([...(w.bsHistory || []), { at: Date.now(), level: newLevel, ok: !failed, mode: histMode }]);
         }
 
@@ -15932,7 +16020,22 @@
 
         function isBrainstormHistoryMode(mode) {
             const m = mode || 'brainstorm';
-            return m === 'brainstorm' || m === 'all' || m === 'sprint';
+            return m === 'brainstorm' || m === 'all' || m === 'core-credit';
+        }
+
+        /** When setting is on: min(core 4 levels) can raise shared Brainstorm srsLevel. */
+        function brainstormCreditFromCoreLevels(w, mergedLevels) {
+            if (!coreExercisesCreditBrainstorm || !w) return null;
+            const minCore = Math.min(...CORE_TRAIN_MODES.map((m) => {
+                const key = `srs_${m.id}_Level`;
+                if (mergedLevels && Object.prototype.hasOwnProperty.call(mergedLevels, key)) {
+                    return mergedLevels[key] || 0;
+                }
+                return w[key] || 0;
+            }));
+            const current = w.srsLevel || 0;
+            if (minCore <= current) return null;
+            return Math.min(minCore, MAX_SRS_LEVEL);
         }
 
         function getLastTrainingAtLevel(w, level) {
@@ -16221,34 +16324,49 @@
 
         let sprintPlayPool = [];
 
+        /**
+         * Soft priority only — never exclude words (unlike other modes' due gates).
+         * Weighted random mix: fresher / lower level more often; high level rarer but still possible.
+         */
+        function sprintPoolWeight(w, now = Date.now()) {
+            const rawL = Number(w[`srs_sprint_Level`]) || 0;
+            const L = clampSrsLevel(rawL);
+            let weight = (MAX_SRS_LEVEL - L + 1) * 2.15;
+            if (rawL >= MAX_SRS_LEVEL) weight *= 0.35; // after “max” — rarer, not gone
+            const next = w[`srs_sprint_NextTime`] || 0;
+            if (next > now) weight *= 0.7; // soft push-back after a recent run
+            return Math.max(0.2, weight);
+        }
+
         function pickStandaloneSprintPool(allWords, cap = STANDALONE_SPRINT_POOL) {
             const eligible = (allWords || []).filter(wordHasTrainPair);
             if (!eligible.length) return [];
-            const limit = Math.min(cap, eligible.length);
-            const weighted = eligible.map((w) => {
-                const L = clampSrsLevel(w[`srs_sprint_Level`] || 0);
-                const freshWeight = (MAX_SRS_LEVEL - L + 1) * 2.15;
-                return { w, weight: freshWeight };
-            });
+            if (eligible.length <= cap) {
+                return shuffleWords(eligible).map((w) => ({ ...w, failed: false }));
+            }
+            const now = Date.now();
+            const weighted = eligible.map((w) => ({ w, weight: sprintPoolWeight(w, now) }));
             const picked = [];
             const used = new Set();
-            while (picked.length < limit) {
+            while (picked.length < cap) {
                 let total = 0;
                 weighted.forEach(({ w, weight }) => { if (!used.has(w.id)) total += weight; });
                 if (!total) break;
                 let r = Math.random() * total;
+                let chosen = null;
                 for (const { w, weight } of weighted) {
                     if (used.has(w.id)) continue;
                     r -= weight;
                     if (r <= 0) {
-                        picked.push({ ...w, failed: false });
-                        used.add(w.id);
+                        chosen = w;
                         break;
                     }
                 }
-                if (used.size >= eligible.length) break;
+                if (!chosen) break;
+                picked.push({ ...chosen, failed: false });
+                used.add(chosen.id);
             }
-            return picked;
+            return shuffleWords(picked);
         }
 
         function crosswordSrsLevel(w) {
@@ -16655,7 +16773,8 @@
             if (activeSessionMode === 'review') {
                 return buildMaintTrainingPatch(w);
             }
-            if (activeSessionMode === 'all' || activeSessionMode === 'sprint') {
+            // Only full Brainstorm advances shared srsLevel directly. Standalone sprint has its own SRS.
+            if (activeSessionMode === 'all') {
                 const currentLevel = w.srsLevel || 0;
                 const newLevel = w.failed ? currentLevel : Math.min(currentLevel + 1, MAX_SRS_LEVEL);
                 const patch = {
@@ -16678,6 +16797,19 @@
             };
             if (modeKey === 'listening' && !w.failed && newLevel >= MAX_SRS_LEVEL) {
                 patch.listenFocus = false;
+            }
+            // Optional: four core exercises can raise Brainstorm when they catch up
+            if (!w.failed && CORE_TRAIN_MODES.some((m) => m.id === modeKey)) {
+                const creditLevel = brainstormCreditFromCoreLevels(w, patch);
+                if (creditLevel != null) {
+                    const wAfterMode = { ...w, bsHistory: patch.bsHistory };
+                    patch.srsLevel = creditLevel;
+                    patch.nextReviewTime = getNextReviewTime(creditLevel);
+                    patch.bsHistory = appendTrainingHistory(wAfterMode, 'core-credit', creditLevel, false);
+                    if (creditLevel >= MAX_SRS_LEVEL) {
+                        Object.assign(patch, graduationMaintFields({ ...wAfterMode, srsLevel: creditLevel }));
+                    }
+                }
             }
             return patch;
         }
@@ -17562,8 +17694,21 @@
             const wordsPath = colRef('words');
             const materialsPath = colRef('materials');
             const foldersPath = colRef('folders');
+            if (!window.__lsDataLoadGen) window.__lsDataLoadGen = 0;
+            const loadGen = ++window.__lsDataLoadGen;
+            const trackAtSubscribe = activeTrackId;
+
+            // Drop previous track immediately so the UI doesn't show stale words
+            vocabulary = [];
+            try {
+                const grid = document.getElementById('words-grid');
+                if (grid) {
+                    grid.innerHTML = `<p class="text-slate-400 font-bold col-span-full text-center py-8 animate-pulse">${escapeHtmlText(t('status.connecting'))}</p>`;
+                }
+            } catch (_) {}
 
             unsubscribeWords = onSnapshot(wordsPath, (snap) => {
+                if (loadGen !== window.__lsDataLoadGen || activeTrackId !== trackAtSubscribe) return;
                 vocabulary = [];
                 snap.forEach(d => vocabulary.push(normalizeWordFromFirestore(d.id, d.data())));
                 vocabulary.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
@@ -17572,25 +17717,31 @@
                 updateDictContextUI();
                 renderDictContextDropdown();
                 renderDictionary();
-                scheduleWordMediaCache();
                 updateTrainSources();
                 rememberActiveTrackIfHasWords();
-                seedYearActivityFromVocabulary();
-                reconcileYearActivityFromSources();
-                if (!legacyMigrationChecked && vocabulary.length > 0) {
-                    legacyMigrationChecked = true;
-                    migrateLegacyDictionarySources();
-                }
                 if (currentMaterial && !document.getElementById('library-read-view').classList.contains('hidden')) {
-                    renderReaderContent();
+                    refreshReaderContentAfterVocabChange();
                 }
-                if (!srsInitialRepairDone && vocabulary.length > 0) {
-                    srsInitialRepairDone = true;
-                    repairSrsState().catch(() => {});
-                }
+                // Defer heavy sync so the dictionary paints first
+                setTimeout(() => {
+                    if (loadGen !== window.__lsDataLoadGen || activeTrackId !== trackAtSubscribe) return;
+                    try { scheduleWordMediaCache(); } catch (_) {}
+                    try { seedYearActivityFromVocabulary(); } catch (_) {}
+                    try { reconcileYearActivityFromSources(); } catch (_) {}
+                    if (!legacyMigrationChecked && vocabulary.length > 0) {
+                        legacyMigrationChecked = true;
+                        migrateLegacyDictionarySources();
+                    }
+                    if (!srsInitialRepairDone && vocabulary.length > 0) {
+                        srsInitialRepairDone = true;
+                        repairSrsState().catch(() => {});
+                    }
+                    try { updateTrainDueBadges?.(); } catch (_) {}
+                }, 0);
             }, (error) => { setSystemStatus(t('status.dbError'), "error"); });
 
             unsubscribeMaterials = onSnapshot(materialsPath, (snap) => {
+                if (loadGen !== window.__lsDataLoadGen || activeTrackId !== trackAtSubscribe) return;
                 materials = [];
                 snap.forEach(d => materials.push({ id: d.id, ...d.data() }));
                 materials.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
@@ -17604,6 +17755,7 @@
             });
 
             unsubscribeFolders = onSnapshot(foldersPath, (snap) => {
+                if (loadGen !== window.__lsDataLoadGen || activeTrackId !== trackAtSubscribe) return;
                 folders = [];
                 snap.forEach(d => folders.push({ id: d.id, ...d.data() }));
                 folders.sort((a, b) => (a.name || '').localeCompare(b.name || '', uiLocale()));
@@ -17613,6 +17765,7 @@
 
             const statsDocRef = docRef('stats', getSprintStatsDocId());
             unsubscribeSprintStats = onSnapshot(statsDocRef, (docSnap) => {
+                if (loadGen !== window.__lsDataLoadGen || activeTrackId !== trackAtSubscribe) return;
                 if (docSnap.exists()) {
                     sprintHighScores = docSnap.data().topScores || [];
                 } else {
@@ -25597,6 +25750,7 @@
             const fromMat = vocabulary.filter((v) => (
                 (v.materialId === currentMaterial.id || aliases.includes(v.source))
                 && wordHasTrainPair(v)
+                && !isListeningOnlyWord(v)
             ));
             const byId = new Map();
             fromMat.forEach((v) => {
@@ -25681,6 +25835,8 @@
 
         function onReaderNewWordSaved(wordId, data) {
             if (!currentMaterial || !wordId) return;
+            // listenFocus words train only in Listening — never quick-match / post-read drills
+            if (isListeningOnlyWord(data) || data?.listenFocus) return;
             const entry = {
                 id: wordId,
                 word: String(data.word || '').trim(),
@@ -27346,7 +27502,7 @@
             if (currentMaterial.isRead) {
                 return `<div data-reader-ui="1" class="mt-10 text-center p-4 bg-slate-100 rounded-xl border border-slate-200 text-slate-500 font-bold flex items-center justify-center gap-2 shadow-sm font-sans text-base"><span>✅</span> ${t('lib.readDone')}</div>`;
             }
-            return `<button data-reader-ui="1" onclick="markCurrentAsRead()" class="mt-10 w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold font-sans shadow-md text-base sm:text-lg transition flex justify-center items-center gap-2 active:scale-95"><span>✅ ${t('lib.markRead')}</span></button>`;
+            return `<button data-reader-ui="1" onclick="markCurrentAsRead()" class="reader-mark-read-btn mt-10 w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold font-sans shadow-md text-base sm:text-lg transition flex justify-center items-center gap-2 active:scale-95"><span>✅ ${t('lib.markRead')}</span></button>`;
         }
 
         function getReaderTtsLang(preferred) {
@@ -28086,10 +28242,12 @@
                     URL.revokeObjectURL(url);
                     readerGoogleTtsAudio = null;
                     detachReaderAudioSeek();
-                    markReaderAudioPlaying(id, playBtn, false);
+                    const liveBlock = getReaderAudioBlock(id) || block;
+                    const livePlay = liveBlock?.querySelector('.reader-audio-play') || playBtn;
+                    markReaderAudioPlaying(id, livePlay, false);
                     readerAudioActiveId = null;
                     readerAudioPaused = false;
-                    setReaderAudioStatus(block, '');
+                    setReaderAudioStatus(liveBlock, '');
                     if (typeof data.onComplete === 'function') {
                         try { data.onComplete(); } catch (_) {}
                     }
@@ -28098,9 +28256,11 @@
                     URL.revokeObjectURL(url);
                     readerGoogleTtsAudio = null;
                     detachReaderAudioSeek();
-                    setReaderAudioLoading(block, false);
-                    setReaderAudioStatus(block, '');
-                    markReaderAudioPlaying(id, playBtn, false);
+                    const liveBlock = getReaderAudioBlock(id) || block;
+                    const livePlay = liveBlock?.querySelector('.reader-audio-play') || playBtn;
+                    setReaderAudioLoading(liveBlock, false);
+                    setReaderAudioStatus(liveBlock, '');
+                    markReaderAudioPlaying(id, livePlay, false);
                     readerAudioActiveId = null;
                 };
                 await readerGoogleTtsAudio.play();
@@ -28427,6 +28587,30 @@
             return finalHtml;
         }
 
+        let readerVocabRefreshRaf = null;
+        let suppressReaderVocabRefreshUntil = 0;
+        /** Soft refresh after vocab save/snapshot — no paging dim flash, coalesces double paints. */
+        function refreshReaderContentAfterVocabChange() {
+            if (Date.now() < suppressReaderVocabRefreshUntil) return;
+            const view = document.getElementById('library-read-view');
+            if (!currentMaterial || !view || view.classList.contains('hidden')) return;
+            if (readerVocabRefreshRaf != null) return;
+            const schedule = (typeof requestAnimationFrame === 'function')
+                ? requestAnimationFrame
+                : (fn) => setTimeout(fn, 0);
+            readerVocabRefreshRaf = schedule(() => {
+                readerVocabRefreshRaf = null;
+                renderReaderContent({ immediate: true });
+            });
+        }
+
+        function clearNativeReaderSelection() {
+            try {
+                const sel = window.getSelection?.();
+                if (sel && !sel.isCollapsed) sel.removeAllRanges();
+            } catch (_) {}
+        }
+
         function renderReaderContent(opts = {}) {
             if (!currentMaterial) return;
             const container = document.getElementById('reader-content');
@@ -28701,6 +28885,12 @@
             }
         });
 
+        document.getElementById('reader-content').addEventListener('contextmenu', (e) => {
+            if (readerCopyMode || readerHighlightMode) return;
+            // Keep our translate popup; block OS "Copy / Translate" sheet
+            e.preventDefault();
+        });
+
         let lastSelectedText = "";
 
         document.addEventListener('selectionchange', () => {
@@ -28770,6 +28960,7 @@
                 if (stableText.length === 0 || stableText.length > maxChars || stableText.includes('\n\n') || lines > 4) return;
                 if (stableText === lastSelectedText) {
                     scheduleInlinePopupReposition(latest.rect);
+                    clearNativeReaderSelection();
                     return;
                 }
 
@@ -28787,6 +28978,8 @@
                     lineContext,
                     multiLineSelection
                 });
+                // Drop native selection so Android/iOS copy-translate toolbar doesn't cover our popup
+                clearNativeReaderSelection();
             }, commitMs);
         });
 
@@ -28955,7 +29148,7 @@
                 }
                 closeInlinePopup();
                 if (currentMaterial && !document.getElementById('library-read-view').classList.contains('hidden')) {
-                    renderReaderContent();
+                    refreshReaderContentAfterVocabChange();
                 }
             } catch(e) {} finally { btn.disabled = false; btn.innerHTML = orig; }
         };
@@ -31005,7 +31198,7 @@
                 await removeVocabWordsMatchingPhrase(phrase);
                 closeInlinePopup();
                 if (!document.getElementById('library-read-view')?.classList.contains('hidden')) {
-                    renderReaderContent();
+                    refreshReaderContentAfterVocabChange();
                 }
                 window.showModal?.(t('inline.phraseSaved'));
             } catch (e) {
@@ -33339,6 +33532,8 @@
             const existing = vocabulary.find((v) => v.word.toLowerCase() === word.toLowerCase());
             const listenPatch = listeningQueuePatch();
             try {
+                // listenFocus doesn't change reader highlights — skip snapshot re-paint (avoids flash/pulse)
+                suppressReaderVocabRefreshUntil = Date.now() + 2800;
                 if (existing) {
                     const patch = {
                         ...listenPatch,
@@ -33370,9 +33565,11 @@
                     else if (currentMaterial) saveData.materialId = currentMaterial.id;
                     const ref = await addDoc(colRef('words'), saveData);
                     try { recordWordsAdded(1); } catch (_) {}
-                    onReaderNewWordSaved?.(ref.id, saveData);
+                    // Do not call onReaderNewWordSaved — listenFocus stays out of quick match / Brainstorm
                 }
                 const btn = opts.holdBtn || document.getElementById('inline-popup-tts');
+                clearInlineTtsHold(btn);
+                try { clearDictSpeakHold?.(btn); } catch (_) {}
                 btn?.classList.add('is-listen-queued');
                 btn?.classList.remove('is-listen-hold');
                 showAppToast(t('inline.listenQueued', { mode: t('mode.listening') }), 2800);
@@ -33655,8 +33852,8 @@
             if (resetBrainstorm) {
                 modesToStrip.add('brainstorm');
                 modesToStrip.add('all');
-                modesToStrip.add('sprint');
                 modesToStrip.add('review');
+                modesToStrip.add('core-credit');
             }
 
             for (let i = 0; i < wordIds.length; i += 400) {
@@ -38495,10 +38692,16 @@
             contextMatFocusId = null;
             restoreState = null;
             orderState = null;
+            echoState = null;
             storyState = null;
             stopStoryAudio();
+            stopEchoAudio();
+            clearEchoHintTimer();
             clearRestoreTimer();
-            document.body.classList.remove('restore-session', 'order-session', 'context-material-session', 'story-session');
+            document.body.classList.remove('restore-session', 'order-session', 'context-material-session', 'story-session', 'echo-session');
+            document.documentElement.classList.remove('restore-session', 'text-exercise-session');
+            try { clearTextExerciseLayout(); } catch (_) {}
+            hideStorySessionChrome();
             const activeTrainScope = usesVocabPool(mode) ? getVocabSourceScope() : getTrainSourceScope();
             if (activeTrainScope === LISTENING_SOURCE && mode !== 'listening') {
                 return window.showModal(t('msg.listenFolderOnly'));
@@ -38945,6 +39148,7 @@
             
             document.getElementById('train-hub-screen').classList.add('hidden'); document.getElementById('bs-results').classList.add('hidden'); document.getElementById('bs-workspace').classList.remove('hidden');
             beginTrainingSession();
+            syncStorySessionArchiveSelect();
             syncCrosswordExpandButton();
             updateBsProgress(); renderBsStage();
         };
@@ -38993,6 +39197,7 @@
             document.getElementById('bs-results').classList.add('hidden');
             document.getElementById('bs-workspace').classList.remove('hidden');
             beginTrainingSession();
+            syncStorySessionArchiveSelect();
             syncCrosswordExpandButton();
             updateBsProgress();
             renderBsStage();
@@ -39042,8 +39247,10 @@
             closeReviewSetup();
             updateReviewDueBadge();
             syncBrainstormCapUi();
-            syncStorySessionArchiveSelect();
             activeSessionMode = null;
+            storyState = null;
+            hideStorySessionChrome();
+            syncStorySessionArchiveSelect();
             storySelectedArchiveKey = loadStorySelectedArchiveKey();
             try { syncStoryHeadlinerUi(); } catch (_) {}
         };
@@ -39162,11 +39369,12 @@
         }
 
         window.nextBrainstormStep = () => {
-            if (activeSessionMode === 'story') {
-                if (storyState?.phase === 'listen' && storyState.listenDone) storyAdvanceStep();
-                else if (storyState?.phase === 'tf' && storyState.tfLocked) storyAdvanceStep();
-                else if (storyState?.phase === 'fill' && storyState.fillLocked) storyAdvanceStep();
-                else if (storyState?.phase === 'done') finishBrainstorm();
+            // Require live storyState — leftover mode==='story' after teardown must not swallow Next
+            if (activeSessionMode === 'story' && storyState) {
+                if (storyState.phase === 'listen' && storyState.listenDone) storyAdvanceStep();
+                else if (storyState.phase === 'tf' && storyState.tfLocked) storyAdvanceStep();
+                else if (storyState.phase === 'fill' && storyState.fillLocked) storyAdvanceStep();
+                else if (storyState.phase === 'done') finishBrainstorm();
                 return;
             }
             if (activeSessionMode === 'restore' || activeSessionMode === 'order' || activeSessionMode === 'echo') return;
@@ -39357,6 +39565,7 @@
             }
 
             clearTextExerciseLayout();
+            hideStorySessionChrome();
 
             const saveResult = await persistTrainingToFirebase();
             let trainedIds = [];
@@ -43077,6 +43286,28 @@
             btn.classList.toggle('hidden', !has);
         }
 
+        /** Hide story-only toolbar chrome so it never leaks into other exercises. */
+        function hideStorySessionChrome() {
+            try { closeStoryArchiveMenu(); } catch (_) {}
+            document.getElementById('story-archive-wrap')?.classList.add('hidden');
+            document.getElementById('btn-story-prev-answers')?.classList.add('hidden');
+            document.getElementById('story-archive-menu')?.classList.add('hidden');
+            document.getElementById('story-prev-answers-modal')?.classList.add('hidden');
+        }
+
+        function syncStorySessionArchiveSelect() {
+            renderStoryArchiveMenu();
+            const wrap = document.getElementById('story-archive-wrap');
+            if (!wrap) return;
+            const hasArchive = getValidStoryArchiveEntries().length > 0;
+            const key = storyState?.meta?.dateKey || storySelectedArchiveKey || '';
+            const hasPrev = activeSessionMode === 'story' && !!getStoryArchiveLastAttempt(key);
+            const show = activeSessionMode === 'story' && !!storyState && (hasArchive || hasPrev);
+            wrap.classList.toggle('hidden', !show);
+            if (!show) hideStorySessionChrome();
+            else syncStoryPreviousAnswersBtn();
+        }
+
         window.showStoryPreviousAnswers = () => {
             const key = storyState?.meta?.dateKey || storySelectedArchiveKey || '';
             const attempt = getStoryArchiveLastAttempt(key);
@@ -43185,19 +43416,6 @@
                 return;
             }
             menu.innerHTML = html;
-        }
-
-        function syncStorySessionArchiveSelect() {
-            renderStoryArchiveMenu();
-            const wrap = document.getElementById('story-archive-wrap');
-            if (!wrap) return;
-            const hasArchive = getValidStoryArchiveEntries().length > 0;
-            const key = storyState?.meta?.dateKey || storySelectedArchiveKey || '';
-            const hasPrev = activeSessionMode === 'story' && !!getStoryArchiveLastAttempt(key);
-            const show = activeSessionMode === 'story' && (hasArchive || hasPrev);
-            wrap.classList.toggle('hidden', !show);
-            if (!show) closeStoryArchiveMenu();
-            syncStoryPreviousAnswersBtn();
         }
 
         window.toggleStoryArchiveMenu = (e) => {
@@ -44083,7 +44301,28 @@
                 wrap.innerHTML = `<div class="reader-audio-mount" data-audio-id="${STORY_AUDIO_ID}"></div>`;
                 hydrateReaderAudioBlocks(wrap);
             }
+            // renderBsStage wipes the area DOM; re-bind seek/time UI to the still-playing Audio
+            resyncStoryAudioPlayerUi();
             return wrap;
+        }
+
+        /** After story question re-render, reconnect player chrome to live TTS audio. */
+        function resyncStoryAudioPlayerUi() {
+            if (readerAudioActiveId !== STORY_AUDIO_ID) return;
+            const block = getReaderAudioBlock(STORY_AUDIO_ID);
+            if (!block) return;
+            const playBtn = block.querySelector('.reader-audio-play');
+            const audio = readerGoogleTtsAudio;
+            if (audio) {
+                markReaderAudioPlaying(STORY_AUDIO_ID, playBtn, true);
+                syncReaderAudioPauseUi(STORY_AUDIO_ID, !!(readerAudioPaused || audio.paused));
+                bindReaderAudioSeek(block, audio);
+                setReaderAudioLoading(block, false);
+                setReaderAudioStatus(block, '');
+                return;
+            }
+            // Browser TTS fallback (no seek bar) — still show Stop state
+            markReaderAudioPlaying(STORY_AUDIO_ID, playBtn, true);
         }
 
         function renderStoryStageShell(area, bodyHtml, withAudio) {
