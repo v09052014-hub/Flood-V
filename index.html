@@ -56,24 +56,23 @@
             --app-scroll-pad-bottom: 1rem;
         }
         html {
-            overflow-x: hidden;
+            overflow-x: clip;
+            overflow-y: auto;
             max-width: 100%;
             background-color: var(--app-bg);
             min-height: 100%;
             min-height: 100dvh;
-            /* Soften browser pull-to-refresh; JS confirms intentional reload */
-            overscroll-behavior-y: contain;
         }
         body {
             /* Clear Android gesture nav only (max inset). Do not invent a second "chin". */
             padding-bottom: calc(var(--app-scroll-pad-bottom) + var(--safe-area-max-inset-bottom));
             -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
-            max-width: 100vw;
+            overflow-x: clip;
+            overflow-y: visible;
+            max-width: 100%;
             background-color: var(--app-bg);
             min-height: 100%;
             min-height: 100dvh;
-            overscroll-behavior-y: contain;
         }
         main {
             padding-bottom: 0.75rem;
@@ -4736,6 +4735,297 @@
         .cefr-bar-btn.is-on .cefr-bars span.off { background: #e2e8f0; }
         .cefr-bar-lbl { font-size: 0.7rem; font-weight: 800; color: #64748b; line-height: 1; }
         .cefr-bar-btn.is-on .cefr-bar-lbl { color: #4338ca; }
+        /* ——— Exchange / shared library ——— */
+        .ex-entry-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.85rem;
+        }
+        .ex-entry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid #e8eef5;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            opacity: 0.55;
+            box-shadow: none;
+            transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+        }
+        .ex-entry-btn:hover {
+            border-color: #a5b4fc;
+            color: #4338ca;
+            background: #eef2ff;
+            opacity: 1;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+        .ex-entry-btn span[aria-hidden] { font-size: 0.95rem; opacity: 0.85; }
+        .ex-entry-btn:hover span[aria-hidden] { opacity: 1; }
+        #exchange-hub-view {
+            display: none;
+            max-width: 42rem;
+            margin: 0 auto;
+        }
+        #exchange-hub-view.is-open { display: block; }
+        .ex-topbar {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .ex-topbar h2 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.25;
+        }
+        .ex-topbar p {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-top: 0.2rem;
+            line-height: 1.4;
+            max-width: 28rem;
+        }
+        .ex-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 1rem;
+        }
+        .ex-tool-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.45rem 0.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #334155;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .ex-tool-btn:hover { background: #f8fafc; border-color: #c7d2fe; }
+        .ex-tool-btn.primary {
+            background: #4f46e5;
+            border-color: #4f46e5;
+            color: #fff;
+        }
+        .ex-tool-btn.primary:hover { background: #4338ca; }
+        .ex-catalog-box {
+            margin-bottom: 1rem;
+            padding: 0.85rem 0.95rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+        }
+        .ex-catalog-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            align-items: center;
+            margin-top: 0.35rem;
+        }
+        .ex-catalog-row .ex-input { flex: 1 1 12rem; min-width: 0; margin: 0; }
+        .ex-catalog-hint {
+            margin-top: 0.45rem;
+            font-size: 0.72rem;
+            color: #64748b;
+            line-height: 1.35;
+        }
+        .ex-pack-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+        .ex-pack-card {
+            display: grid;
+            grid-template-columns: 4.25rem 1fr auto;
+            gap: 0.85rem;
+            align-items: center;
+            padding: 0.85rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .ex-pack-card:hover { border-color: #a5b4fc; box-shadow: 0 6px 18px rgba(99, 102, 241, 0.08); }
+        .ex-pack-cover {
+            width: 4.25rem;
+            height: 4.25rem;
+            border-radius: 0.85rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #eef2ff, #f8fafc);
+            font-size: 1.85rem;
+            flex-shrink: 0;
+        }
+        .ex-pack-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .ex-pack-meta { min-width: 0; }
+        .ex-pack-title {
+            font-size: 0.98rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.25;
+        }
+        .ex-pack-sub {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-top: 0.2rem;
+            font-weight: 600;
+        }
+        .ex-pack-levels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin-top: 0.45rem;
+        }
+        .ex-level-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.28rem;
+            padding: 0.18rem 0.45rem;
+            border-radius: 0.45rem;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #475569;
+        }
+        .ex-level-chip .cefr-bars { gap: 2px; }
+        .ex-level-chip .cefr-bars span { width: 3px; border-radius: 1px; background: #c7d2fe; }
+        .ex-level-chip .cefr-bars span.off { background: #e2e8f0; }
+        .ex-badge {
+            font-size: 0.62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.2rem 0.45rem;
+            border-radius: 9999px;
+            background: #eef2ff;
+            color: #4338ca;
+            white-space: nowrap;
+        }
+        .ex-badge.proposed { background: #fff7ed; color: #c2410c; }
+        .ex-empty {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .ex-panel {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.15rem;
+            padding: 1rem 1.05rem 1.15rem;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+        .ex-field-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+            margin-bottom: 0.35rem;
+        }
+        .ex-input {
+            width: 100%;
+            padding: 0.7rem 0.85rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            color: #0f172a;
+            outline: none;
+            background: #fff;
+        }
+        .ex-input:focus { border-color: #818cf8; }
+        .ex-textarea {
+            min-height: 5rem;
+            resize: vertical;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .ex-cover-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 0.35rem;
+        }
+        .ex-cover-preview {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef2ff;
+            font-size: 1.6rem;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .ex-cover-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .ex-emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+        }
+        .ex-emoji-grid button {
+            aspect-ratio: 1;
+            border-radius: 0.45rem;
+            border: 1px solid transparent;
+            background: #f8fafc;
+            font-size: 1.15rem;
+        }
+        .ex-emoji-grid button:hover,
+        .ex-emoji-grid button.is-on { border-color: #818cf8; background: #eef2ff; }
+        .ex-word-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            max-height: min(50vh, 22rem);
+            overflow-y: auto;
+        }
+        .ex-word-row {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.65rem;
+            align-items: center;
+            padding: 0.55rem 0.65rem;
+            border-radius: 0.75rem;
+            border: 1px solid #eef2f7;
+            background: #f8fafc;
+        }
+        .ex-word-row.is-on { border-color: #a5b4fc; background: #eef2ff; }
+        .ex-word-row strong { color: #3730a3; font-size: 0.92rem; }
+        .ex-word-row span { display: block; color: #64748b; font-size: 0.75rem; font-weight: 600; }
+        .ex-level-pickers { margin: 0.75rem 0 0.25rem; }
+        .ex-level-pickers .cefr-bar-group { flex-wrap: wrap; }
+        .ex-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.65rem;
+            border-radius: 0.65rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #475569;
+        }
+        .ex-back-btn:hover { background: #f8fafc; }
         .settings-panel-learn .settings-panel-sublabel {
             color: #818cf8;
             font-size: 0.72rem;
@@ -10277,6 +10567,13 @@
         <section id="view-library" class="fade-in hidden max-w-3xl mx-auto">
             <!-- List Mode -->
             <div id="library-list-view" class="block">
+                <div class="ex-entry-row">
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider" data-i18n="ex.ownLibHint">Your library</p>
+                    <button type="button" class="ex-entry-btn" onclick="openExchangeHub()" title="Shared catalog" data-i18n-title="ex.openTitle">
+                        <span aria-hidden="true">&#127760;</span>
+                        <span data-i18n="ex.open">Exchange</span>
+                    </button>
+                </div>
                 <button onclick="showAddTextForm()" class="w-full bg-white border-2 border-dashed border-indigo-300 text-indigo-600 font-bold py-5 rounded-2xl mb-5 hover:bg-indigo-50 transition shadow-sm text-lg flex items-center justify-center gap-2">
                     <span class="text-2xl">+</span> <span data-i18n="lib.add">Додати новий матеріал</span>
                 </button>
@@ -10289,6 +10586,102 @@
                 </div>
             </div>
 
+
+            <!-- Exchange / shared catalog (full page inside Library) -->
+            <div id="exchange-hub-view">
+                <div id="ex-screen-list">
+                    <div class="ex-topbar">
+                        <div>
+                            <button type="button" class="ex-back-btn mb-2" onclick="closeExchangeHub()">&larr; <span data-i18n="ex.backOwn">Back to your library</span></button>
+                            <h2 data-i18n="ex.title">Exchange library</h2>
+                            <p data-i18n="ex.sub">Shared packs from the teacher’s Firebase. Each student’s dictionary stays in their own project. Create a pack — students see it in Exchange right away.</p>
+                        </div>
+                    </div>
+                    <div class="ex-toolbar">
+                        <button type="button" class="ex-tool-btn primary" onclick="exShowCreate()">+ <span data-i18n="ex.create">New pack</span></button>
+                        <button type="button" class="ex-tool-btn" onclick="exCopyJson()"><span data-i18n="ex.copyJson">Copy JSON</span></button>
+                        <button type="button" class="ex-tool-btn" onclick="exShowPasteJson()"><span data-i18n="ex.pasteJson">Paste JSON</span></button>
+                        <button type="button" class="ex-tool-btn" onclick="exExportJson()"><span data-i18n="ex.export">Download JSON</span></button>
+                        <button type="button" class="ex-tool-btn" onclick="document.getElementById('ex-import-file').click()"><span data-i18n="ex.import">Import file</span></button>
+                        <input type="file" id="ex-import-file" accept="application/json,.json" class="hidden" onchange="exImportJsonFile(event)">
+                    </div>
+                    <div id="ex-paste-panel" class="ex-panel space-y-3 hidden mb-4">
+                        <label class="ex-field-label" for="ex-paste-json" data-i18n="ex.pasteJsonLabel">Paste JSON here</label>
+                        <textarea id="ex-paste-json" class="ex-input ex-textarea" style="min-height:10rem;font-family:ui-monospace,monospace;font-size:0.75rem;font-weight:600" data-i18n-placeholder="ex.pasteJsonPh" placeholder='{"packs":[…]}'></textarea>
+                        <div class="ex-toolbar" style="margin-bottom:0">
+                            <button type="button" class="ex-tool-btn primary" onclick="exImportPastedJson()"><span data-i18n="ex.pasteImport">Import pasted</span></button>
+                            <button type="button" class="ex-tool-btn" onclick="exHidePasteJson()"><span data-i18n="common.back">Back</span></button>
+                        </div>
+                    </div>
+                    <div id="ex-pack-grid" class="ex-pack-grid"></div>
+                </div>
+
+                <div id="ex-screen-create" class="hidden">
+                    <button type="button" class="ex-back-btn mb-3" onclick="exShowList()">&larr; <span data-i18n="common.back">Back</span></button>
+                    <div class="ex-panel space-y-4">
+                        <div>
+                            <label class="ex-field-label" data-i18n="ex.packTitle">Pack title</label>
+                            <input type="text" id="ex-create-title" class="ex-input" maxlength="120" data-i18n-placeholder="ex.packTitlePh" placeholder="e.g. Travel B1">
+                        </div>
+                        <div>
+                            <label class="ex-field-label" data-i18n="ex.packDesc">Description (optional)</label>
+                            <textarea id="ex-create-desc" class="ex-input ex-textarea" maxlength="500" data-i18n-placeholder="ex.packDescPh" placeholder="Who it is for"></textarea>
+                        </div>
+                        <div>
+                            <label class="ex-field-label" data-i18n="ex.cover">Cover</label>
+                            <div class="ex-cover-row">
+                                <div id="ex-cover-preview" class="ex-cover-preview">&#128218;</div>
+                                <button type="button" class="ex-tool-btn" onclick="exSetCoverEmoji(String.fromCodePoint(0x1F4DA))">Emoji</button>
+                                <button type="button" class="ex-tool-btn" onclick="exPickCoverImage()"><span data-i18n="ex.coverImg">Image</span></button>
+                            </div>
+                            <div id="ex-emoji-grid" class="ex-emoji-grid"></div>
+                            <input type="text" id="ex-cover-img-url" class="ex-input mt-2 hidden" placeholder="https://" oninput="exOnCoverUrlInput()">
+                        </div>
+                        <div class="ex-level-pickers">
+                            <div class="cefr-bar-row mb-3">
+                                <label data-i18n="ex.levelVocab">Vocab level (optional)</label>
+                                <div id="ex-create-vocab-bars" class="cefr-bar-group" role="group"></div>
+                            </div>
+                            <div class="cefr-bar-row">
+                                <label data-i18n="ex.levelGrammar">Grammar level (optional)</label>
+                                <div id="ex-create-grammar-bars" class="cefr-bar-group" role="group"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="ex-field-label" data-i18n="ex.wordsBulk">Words (word — translation, one per line)</label>
+                            <textarea id="ex-create-words" class="ex-input ex-textarea" style="min-height:9rem;font-family:ui-monospace,monospace;font-size:0.8rem;font-weight:600" data-i18n-placeholder="ex.wordsBulkPh" placeholder="apple — translation"></textarea>
+                        </div>
+                        <label class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+                            <input type="checkbox" id="ex-create-propose" class="accent-indigo-600">
+                            <span data-i18n="ex.proposeOnly">Propose only (needs review)</span>
+                        </label>
+                        <button type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold shadow-sm" onclick="exSavePack()" data-i18n="ex.savePack">Save pack</button>
+                    </div>
+                </div>
+
+                <div id="ex-screen-detail" class="hidden">
+                    <button type="button" class="ex-back-btn mb-3" onclick="exShowList()">&larr; <span data-i18n="common.back">Back</span></button>
+                    <div class="ex-panel">
+                        <div class="flex gap-3 items-start mb-4">
+                            <div id="ex-detail-cover" class="ex-pack-cover">&#128218;</div>
+                            <div class="min-w-0 flex-1">
+                                <h3 id="ex-detail-title" class="ex-pack-title text-lg"></h3>
+                                <p id="ex-detail-desc" class="ex-pack-sub mt-1"></p>
+                                <div id="ex-detail-levels" class="ex-pack-levels"></div>
+                            </div>
+                        </div>
+                        <div class="ex-toolbar">
+                            <button type="button" class="ex-tool-btn" onclick="exCopyPackLink()"><span data-i18n="ex.copyLink">Copy link</span></button>
+                            <button type="button" class="ex-tool-btn" onclick="exSelectAllWords(true)" data-i18n="ex.selectAll">All</button>
+                            <button type="button" class="ex-tool-btn" onclick="exSelectAllWords(false)" data-i18n="ex.selectNone">None</button>
+                            <button type="button" class="ex-tool-btn primary" onclick="exImportSelectedWords()"><span data-i18n="ex.importWords">Add selected to me</span></button>
+                            <button type="button" class="ex-tool-btn" id="ex-btn-publish" onclick="exPublishCurrent()" data-i18n="ex.publish">Publish</button>
+                            <button type="button" class="ex-tool-btn" onclick="exDeleteCurrent()" data-i18n="common.delete">Delete</button>
+                        </div>
+                        <div id="ex-detail-words" class="ex-word-list mt-3"></div>
+                    </div>
+                </div>
+            </div>
             <div id="library-add-view" class="hidden bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
                 <input type="text" id="material-title" placeholder="Назва матеріалу" class="add-title-input" data-i18n-placeholder="lib.titlePh">
 
@@ -11089,6 +11482,25 @@
             appId: "1:398593728951:web:d566edfbbcb92a5be9c832"
         };
 
+        // ═══════════════════════════════════════════════════════════════════
+        // SHARED EXCHANGE CATALOG (teacher's Firebase)
+        // ───────────────────────────────────────────────────────────────────
+        // Personal dictionaries use firebaseConfig above (can be a student project).
+        // Obmin packs always live in THIS project so every student build sees the
+        // same catalog in realtime — even when their firebaseConfig is different.
+        //
+        // When you clone a student file: change firebaseConfig to THEIR project,
+        // leave SHARED_EXCHANGE_FIREBASE as the teacher's (this) project.
+        // ═══════════════════════════════════════════════════════════════════
+        const SHARED_EXCHANGE_FIREBASE = {
+            apiKey: "AIzaSyARJpUlEfJ53Q1a9qd9fyYC6gmHY58AKfI",
+            authDomain: "my-english-vocab-training.firebaseapp.com",
+            projectId: "my-english-vocab-training",
+            storageBucket: "my-english-vocab-training.firebasestorage.app",
+            messagingSenderId: "398593728951",
+            appId: "1:398593728951:web:d566edfbbcb92a5be9c832"
+        };
+
         // Auth v2: Google landing is available, but the old anonymous + profile-ID flow still works.
         // Flip AUTH_REQUIRE_LOGIN to true later when you want the gate for everyone.
         const AUTH_LANDING_ENABLED = true;
@@ -11244,6 +11656,10 @@
                 'auth.googleError': 'Не вдалося увійти через Google. Перевірте, чи увімкнено провайдер у Firebase.',
                 'auth.popupBlocked': 'Вікно Google заблоковано браузером. Дозвольте спливаючі вікна.',
                 'auth.working': 'Зачекайте…',
+                'auth.migrateAsk': 'Перенести словник і матеріали з гостьового режиму в цей Google-акаунт?',
+                'auth.migrateDone': 'Перенесено. Документів: {n}',
+                'auth.migrateFail': 'Не вдалося перенести дані. Словник Google може бути порожнім.',
+                'auth.migrating': 'Переносимо дані…',
                 'tabs.dictionary': 'Словник', 'tabs.library': 'Бібліотека', 'tabs.training': 'Тренування',
                 'profile.title': 'Профіль / Налаштування',
                 'profile.hint': 'Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.',
@@ -11663,7 +12079,67 @@
                 'bulk.processing': 'Обробка та переклад...', 'bulk.processingProgress': 'Обробка {n} / {total}…', 'bulk.process': 'Обробити список', 'bulk.save': 'Зберегти вибрані',
                 'bulk.saving': 'Зберігаємо...',
                 'bulk.savingProgress': 'Зберігаємо {n} / {total}…',
-                'lib.add': 'Додати новий матеріал', 'lib.addLead': 'Додайте текст, статтю або відео — і читайте з підсвіткою слів зі словника.', 'common.back': 'Назад', 'common.next': 'Вперед',
+                'lib.add': 'Додати новий матеріал',
+                'ex.open': 'Обмін',
+                'ex.openTitle': 'Спільна / обмінна бібліотека',
+                'ex.ownLibHint': 'Ваша бібліотека',
+                'ex.backOwn': 'До своєї бібліотеки',
+                'ex.title': 'Обмінна бібліотека',
+                'ex.sub': 'Спільні набори з бази вчителя. Словник кожного лишається у своїй Firebase. Створюєш набір — учні бачать його одразу в Обміні.',
+                'ex.create': 'Новий набір',
+                'ex.export': 'Завантажити JSON',
+                'ex.import': 'Файл JSON',
+                'ex.copyJson': 'Копіювати JSON',
+                'ex.pasteJson': 'Вставити JSON',
+                'ex.pasteJsonLabel': 'Вставте JSON сюди',
+                'ex.pasteJsonPh': '{"packs":[…]}',
+                'ex.pasteImport': 'Імпортувати з буфера',
+                'ex.catalogUrl': 'URL каталогу',
+                'ex.catalogUrlPh': 'https://…/packs.json',
+                'ex.catalogSave': 'Зберегти',
+                'ex.catalogRefresh': 'Оновити',
+                'ex.catalogHint': 'Вчитель публікує один JSON-файл; учні один раз вказують цей URL — без ручного імпорту щоразу.',
+                'ex.catalogSaved': 'URL каталогу збережено',
+                'ex.catalogNeedUrl': 'Вкажіть URL каталогу',
+                'ex.catalogOk': 'Каталог: додано {added}, оновлено {updated}',
+                'ex.catalogEmpty': 'У каталозі немає наборів',
+                'ex.catalogFail': 'Не вдалося завантажити каталог',
+                'ex.jsonCopied': 'JSON скопійовано',
+                'ex.jsonPasteEmpty': 'Немає JSON для імпорту',
+                'ex.jsonBad': 'Невірний JSON',
+                'ex.permission': 'Немає доступу до каталогу вчителя (exchangeCatalog). У Firebase проєкті вчителя в Rules дозвольте read/write для exchangeCatalog.',
+                'ex.packTitle': 'Назва набору',
+                'ex.packTitlePh': 'Напр. Travel B1',
+                'ex.packDesc': 'Опис (необовʼязково)',
+                'ex.packDescPh': 'Для кого цей набір',
+                'ex.cover': 'Обкладинка',
+                'ex.coverImg': 'Картинка',
+                'ex.levelVocab': 'Рівень словника (можна не вибирати)',
+                'ex.levelGrammar': 'Рівень граматики (можна не вибирати)',
+                'ex.wordsBulk': 'Слова (слово — переклад, по рядку)',
+                'ex.wordsBulkPh': 'apple — яблуко',
+                'ex.proposeOnly': 'Лише запропонувати (на модерацію)',
+                'ex.savePack': 'Зберегти набір',
+                'ex.copyLink': 'Посилання',
+                'ex.selectAll': 'Усі',
+                'ex.selectNone': 'Жодного',
+                'ex.importWords': 'Додати вибрані собі',
+                'ex.publish': 'Опублікувати',
+                'ex.empty': 'Поки немає наборів. Натисніть «Новий набір» — і він з’явиться в усіх.',
+                'ex.saved': 'Набір збережено',
+                'ex.exported': 'JSON експортовано',
+                'ex.imported': 'Імпортовано наборів: {n}',
+                'ex.wordsAdded': 'Додано слів: {n}',
+                'ex.pickWords': 'Оберіть хоча б одне слово',
+                'ex.needTitle': 'Вкажіть назву набору',
+                'ex.needWords': 'Додайте хоча б одне слово',
+                'ex.published': 'Опубліковано',
+                'ex.proposed': 'Пропозиція',
+                'ex.wordsN': '{n} слів',
+                'ex.linkCopied': 'Посилання на набір скопійовано',
+                'ex.packMissing': 'Набір не знайдено',
+                'ex.deleted': 'Набір видалено',
+ 'lib.addLead': 'Додайте текст, статтю або відео — і читайте з підсвіткою слів зі словника.', 'common.back': 'Назад', 'common.next': 'Вперед',
                 'page': 'Сторінка {n} з {total}',
                 'reader.pageWord': 'Сторінка',
                 'reader.pageOf': 'з',
@@ -11996,6 +12472,10 @@
                 'auth.googleError': 'Google sign-in failed. Check that the Google provider is enabled in Firebase.',
                 'auth.popupBlocked': 'The Google popup was blocked. Allow pop-ups for this site.',
                 'auth.working': 'Please wait…',
+                'auth.migrateAsk': 'Move your dictionary and materials from guest mode into this Google account?',
+                'auth.migrateDone': 'Migrated. Documents: {n}',
+                'auth.migrateFail': 'Could not migrate data. The Google dictionary may be empty.',
+                'auth.migrating': 'Migrating data…',
                 'tabs.dictionary': 'Dictionary', 'tabs.library': 'Library', 'tabs.training': 'Training',
                 'profile.title': 'Profile / Settings',
                 'profile.hint': 'Your dictionary is tied to this account ID. Most users can leave it unchanged.',
@@ -12411,7 +12891,66 @@
                 'bulk.processing': 'Processing and translating...', 'bulk.processingProgress': 'Processing {n} / {total}…', 'bulk.process': 'Process list', 'bulk.save': 'Save selected',
                 'bulk.saving': 'Saving...',
                 'bulk.savingProgress': 'Saving {n} / {total}…',
-                'lib.add': 'Add new material', 'lib.addLead': 'Add text, an article, or a video — then read with your dictionary words highlighted.', 'common.back': 'Back', 'common.next': 'Next',
+                'lib.add': 'Add new material',
+                'ex.open': 'Exchange',
+                'ex.openTitle': 'Shared / exchange library',
+                'ex.ownLibHint': 'Your library',
+                'ex.backOwn': 'Back to your library',
+                'ex.title': 'Exchange library',
+                'ex.sub': 'Shared packs from the teacher’s Firebase. Each student’s dictionary stays in their own project. Create a pack — students see it in Exchange right away.',
+                'ex.create': 'New pack',
+                'ex.export': 'Download JSON',
+                'ex.import': 'JSON file',
+                'ex.copyJson': 'Copy JSON',
+                'ex.pasteJson': 'Paste JSON',
+                'ex.pasteJsonLabel': 'Paste JSON here',
+                'ex.pasteJsonPh': '{"packs":[…]}',
+                'ex.pasteImport': 'Import pasted',
+                'ex.catalogUrl': 'Catalog URL',
+                'ex.catalogUrlPh': 'https://…/packs.json',
+                'ex.catalogSave': 'Save',
+                'ex.catalogRefresh': 'Refresh',
+                'ex.catalogHint': 'Teacher hosts one JSON file; students set this URL once — no manual import each time.',
+                'ex.catalogSaved': 'Catalog URL saved',
+                'ex.catalogNeedUrl': 'Enter a catalog URL',
+                'ex.catalogOk': 'Catalog: added {added}, updated {updated}',
+                'ex.catalogEmpty': 'Catalog has no packs',
+                'ex.catalogFail': 'Could not load catalog',
+                'ex.jsonCopied': 'JSON copied',
+                'ex.jsonPasteEmpty': 'Nothing to import',
+                'ex.jsonBad': 'Invalid JSON',
+                'ex.permission': 'No access to the teacher catalog (exchangeCatalog). In the teacher’s Firebase Rules allow read/write on exchangeCatalog.',
+                'ex.packTitle': 'Pack title',
+                'ex.packTitlePh': 'e.g. Travel B1',
+                'ex.packDesc': 'Description (optional)',
+                'ex.packDescPh': 'Who it is for',
+                'ex.cover': 'Cover',
+                'ex.coverImg': 'Image',
+                'ex.levelVocab': 'Vocab level (optional)',
+                'ex.levelGrammar': 'Grammar level (optional)',
+                'ex.wordsBulk': 'Words (word — translation, one per line)',
+                'ex.wordsBulkPh': 'apple — translation',
+                'ex.proposeOnly': 'Propose only (needs review)',
+                'ex.savePack': 'Save pack',
+                'ex.copyLink': 'Copy link',
+                'ex.selectAll': 'All',
+                'ex.selectNone': 'None',
+                'ex.importWords': 'Add selected to me',
+                'ex.publish': 'Publish',
+                'ex.empty': 'No packs yet. Create one — it appears for everyone.',
+                'ex.saved': 'Pack saved',
+                'ex.exported': 'JSON exported',
+                'ex.imported': 'Imported packs: {n}',
+                'ex.wordsAdded': 'Words added: {n}',
+                'ex.pickWords': 'Pick at least one word',
+                'ex.needTitle': 'Enter a pack title',
+                'ex.needWords': 'Add at least one word',
+                'ex.published': 'Published',
+                'ex.proposed': 'Proposed',
+                'ex.wordsN': '{n} words',
+                'ex.linkCopied': 'Pack link copied',
+                'ex.packMissing': 'Pack not found',
+                'ex.deleted': 'Pack deleted', 'lib.addLead': 'Add text, an article, or a video — then read with your dictionary words highlighted.', 'common.back': 'Back', 'common.next': 'Next',
                 'page': 'Page {n} of {total}',
                 'reader.pageWord': 'Page',
                 'reader.pageOf': 'of',
@@ -12739,6 +13278,10 @@
                 'auth.googleError': 'No se pudo iniciar sesión con Google. Comprueba que el proveedor esté activo en Firebase.',
                 'auth.popupBlocked': 'El navegador bloqueó la ventana de Google. Permite ventanas emergentes.',
                 'auth.working': 'Espera…',
+                'auth.migrateAsk': '¿Pasar el diccionario y materiales del modo invitado a esta cuenta de Google?',
+                'auth.migrateDone': 'Migrado. Documentos: {n}',
+                'auth.migrateFail': 'No se pudo migrar. El diccionario de Google puede estar vacío.',
+                'auth.migrating': 'Migrando datos…',
                 'tabs.dictionary': 'Diccionario', 'tabs.library': 'Biblioteca', 'tabs.training': 'Entrenamiento',
                 'profile.title': 'Perfil / Ajustes',
                 'profile.hint': 'Tu diccionario está vinculado a este ID de cuenta. La mayoría puede dejarlo como está.',
@@ -13154,7 +13697,67 @@
                 'bulk.processing': 'Procesando y traduciendo...', 'bulk.processingProgress': 'Procesando {n} / {total}…', 'bulk.process': 'Procesar lista', 'bulk.save': 'Guardar seleccionadas',
                 'bulk.saving': 'Guardando...',
                 'bulk.savingProgress': 'Guardando {n} / {total}…',
-                'lib.add': 'Añadir material nuevo', 'lib.addLead': 'Añade texto, un artículo o un vídeo — y lee con las palabras del diccionario resaltadas.', 'common.back': 'Atrás', 'common.next': 'Siguiente',
+                'lib.add': 'Añadir material nuevo',
+                'ex.open': 'Intercambio',
+                'ex.openTitle': 'Biblioteca compartida',
+                'ex.ownLibHint': 'Tu biblioteca',
+                'ex.backOwn': 'Volver a tu biblioteca',
+                'ex.title': 'Biblioteca de intercambio',
+                'ex.sub': 'Packs compartidos desde el Firebase del profesor. El diccionario de cada alumno sigue en su propio proyecto. Crea un pack — lo ven al momento en Intercambio.',
+                'ex.create': 'Nuevo pack',
+                'ex.export': 'Descargar JSON',
+                'ex.import': 'Archivo JSON',
+                'ex.copyJson': 'Copiar JSON',
+                'ex.pasteJson': 'Pegar JSON',
+                'ex.pasteJsonLabel': 'Pega el JSON aquí',
+                'ex.pasteJsonPh': '{"packs":[…]}',
+                'ex.pasteImport': 'Importar pegado',
+                'ex.catalogUrl': 'URL del catálogo',
+                'ex.catalogUrlPh': 'https://…/packs.json',
+                'ex.catalogSave': 'Guardar',
+                'ex.catalogRefresh': 'Actualizar',
+                'ex.catalogHint': 'El profesor publica un JSON; los alumnos ponen esta URL una vez — sin importar a mano cada vez.',
+                'ex.catalogSaved': 'URL del catálogo guardada',
+                'ex.catalogNeedUrl': 'Indica la URL del catálogo',
+                'ex.catalogOk': 'Catálogo: añadidos {added}, actualizados {updated}',
+                'ex.catalogEmpty': 'El catálogo no tiene packs',
+                'ex.catalogFail': 'No se pudo cargar el catálogo',
+                'ex.jsonCopied': 'JSON copiado',
+                'ex.jsonPasteEmpty': 'No hay JSON para importar',
+                'ex.jsonBad': 'JSON no válido',
+                'ex.permission': 'Sin acceso al catálogo del profesor (exchangeCatalog). En las Rules del Firebase del profesor permite read/write en exchangeCatalog.',
+                'ex.packTitle': 'Título del pack',
+                'ex.packTitlePh': 'p. ej. Travel B1',
+                'ex.packDesc': 'Descripción (opcional)',
+                'ex.packDescPh': 'Para quién es',
+                'ex.cover': 'Portada',
+                'ex.coverImg': 'Imagen',
+                'ex.levelVocab': 'Nivel de vocabulario (opcional)',
+                'ex.levelGrammar': 'Nivel de gramática (opcional)',
+                'ex.wordsBulk': 'Palabras (palabra — traducción)',
+                'ex.wordsBulkPh': 'apple — manzana',
+                'ex.proposeOnly': 'Solo proponer (revisión)',
+                'ex.savePack': 'Guardar pack',
+                'ex.copyLink': 'Enlace',
+                'ex.selectAll': 'Todas',
+                'ex.selectNone': 'Ninguna',
+                'ex.importWords': 'Añadir seleccionadas',
+                'ex.publish': 'Publicar',
+                'ex.empty': 'Aún no hay packs. Crea uno — aparece para todos.',
+                'ex.saved': 'Pack guardado',
+                'ex.exported': 'JSON exportado',
+                'ex.imported': 'Packs importados: {n}',
+                'ex.wordsAdded': 'Palabras añadidas: {n}',
+                'ex.pickWords': 'Elige al menos una palabra',
+                'ex.needTitle': 'Escribe un título',
+                'ex.needWords': 'Añade al menos una palabra',
+                'ex.published': 'Publicado',
+                'ex.proposed': 'Propuesto',
+                'ex.wordsN': '{n} palabras',
+                'ex.linkCopied': 'Enlace del pack copiado',
+                'ex.packMissing': 'Pack no encontrado',
+                'ex.deleted': 'Pack eliminado',
+ 'lib.addLead': 'Añade texto, un artículo o un vídeo — y lee con las palabras del diccionario resaltadas.', 'common.back': 'Atrás', 'common.next': 'Siguiente',
                 'page': 'Página {n} de {total}',
                 'reader.pageWord': 'Página',
                 'reader.pageOf': 'de',
@@ -16305,6 +16908,7 @@
         sprintGongAudio.preload = "auto"; sprintGongAudio.load();
 
         let app, auth, db;
+        let exchangeDb = null; // may point at teacher's project while db is the student's
         let activeUid = null;
         function isLegacyTrack(id = activeTrackId) { return id === LEGACY_TRACK_ID; }
         function trackSegments() {
@@ -16312,6 +16916,41 @@
         }
         function colRef(...parts) { return collection(db, ...trackSegments(), ...parts); }
         function docRef(...parts) { return doc(db, ...trackSegments(), ...parts); }
+
+        function initExchangeFirestore() {
+            try {
+                const cfg = SHARED_EXCHANGE_FIREBASE;
+                if (!cfg?.projectId || !db) {
+                    exchangeDb = db;
+                    return;
+                }
+                if (cfg.projectId === firebaseConfig.projectId) {
+                    exchangeDb = db;
+                    return;
+                }
+                const exApp = initializeApp(cfg, 'lsExchangeCatalog');
+                exchangeDb = getFirestore(exApp);
+                try {
+                    const exAuth = getAuth(exApp);
+                    signInAnonymously(exAuth).catch((err) => console.warn('exchange auth', err));
+                } catch (e) { console.warn('exchange auth init', e); }
+            } catch (e) {
+                console.warn('initExchangeFirestore', e);
+                exchangeDb = db;
+            }
+        }
+
+        /** Shared Obmin catalog — teacher's Firebase (see SHARED_EXCHANGE_FIREBASE) */
+        function exchangeTrackKey() {
+            return String(activeTrackId || `${learningLanguage}-${translationLanguage}` || 'en-uk');
+        }
+        function exDb() { return exchangeDb || db; }
+        function exColRef() {
+            return collection(exDb(), 'exchangeCatalog', exchangeTrackKey(), 'packs');
+        }
+        function exDocRef(packId) {
+            return doc(exDb(), 'exchangeCatalog', exchangeTrackKey(), 'packs', packId);
+        }
 
         const appUndoStack = [];
         const APP_UNDO_MAX = 40;
@@ -17618,68 +18257,9 @@
             };
         };
 
-        /** Pull-down at top of page → confirm before reload (blocks accidental mobile PTR). */
-        (function wireReloadConfirmOnPull() {
-            let startY = 0;
-            let armed = false;
-            let asking = false;
-            const TOP_EPS = 2;
-            const PULL_PX = 72;
+        /* Pull-to-reload confirm removed — it interfered with page scroll. */
 
-            function atPageTop() {
-                return (window.scrollY || document.documentElement.scrollTop || 0) <= TOP_EPS;
-            }
-
-            function shouldIgnorePull(target) {
-                if (!target || !target.closest) return false;
-                if (target.closest('#library-read-view, #bs-workspace, #custom-modal, #sync-modal, #settings-modal, .settings-body, #inline-popup')) {
-                    return true;
-                }
-                let n = target;
-                while (n && n !== document.body && n !== document.documentElement) {
-                    if (n.scrollTop > TOP_EPS) return true;
-                    n = n.parentElement;
-                }
-                return false;
-            }
-
-            function askReloadConfirm() {
-                if (asking) return;
-                asking = true;
-                window.showModal(t('msg.reloadConfirm'), true, () => {
-                    asking = false;
-                    location.reload();
-                }, {
-                    okLabel: t('common.yes'),
-                    cancelLabel: t('common.no'),
-                    onCancel: () => { asking = false; }
-                });
-            }
-
-            document.addEventListener('touchstart', (e) => {
-                const t0 = e.touches && e.touches[0];
-                if (!t0) return;
-                startY = t0.clientY;
-                armed = atPageTop() && !shouldIgnorePull(e.target);
-            }, { passive: true, capture: true });
-
-            document.addEventListener('touchmove', (e) => {
-                if (!armed || asking) return;
-                const t0 = e.touches && e.touches[0];
-                if (!t0) return;
-                const dy = t0.clientY - startY;
-                if (dy > PULL_PX && atPageTop()) {
-                    armed = false;
-                    try { e.preventDefault(); } catch (_) {}
-                    askReloadConfirm();
-                }
-            }, { passive: false, capture: true });
-
-            document.addEventListener('touchend', () => { armed = false; }, { passive: true, capture: true });
-            document.addEventListener('touchcancel', () => { armed = false; }, { passive: true, capture: true });
-        })();
-
-        window.imgError = (img) => { img.onerror = null; img.src = UNSPLASH_FALLBACK; };
+                window.imgError = (img) => { img.onerror = null; img.src = UNSPLASH_FALLBACK; };
 
         function setSystemStatus(msg, type = 'info') {
             const status = document.getElementById('system-status');
@@ -17837,13 +18417,18 @@
             const btn = document.getElementById('btn-auth-google');
             if (btn) btn.disabled = true;
             setAuthGateStatus(t('auth.working'));
+            const prevUid = (() => {
+                try { return localStorage.getItem(LOCAL_UID_KEY) || activeUid || DEFAULT_SHARED_UID; }
+                catch (_) { return activeUid || DEFAULT_SHARED_UID; }
+            })();
             try {
                 const result = await signInWithPopup(auth, googleAuthProvider);
                 authUser = result.user;
                 setAuthMode('google');
-                await enterAppWithUid(result.user.uid);
+                const googleUid = result.user.uid;
+                await enterAppWithUid(googleUid);
                 try {
-                    await setDoc(doc(db, 'users', result.user.uid), {
+                    await setDoc(doc(db, 'users', googleUid), {
                         authProvider: 'google',
                         email: result.user.email || '',
                         displayName: result.user.displayName || '',
@@ -17851,6 +18436,9 @@
                         updatedAt: serverTimestamp()
                     }, { merge: true });
                 } catch (_) {}
+                if (prevUid && prevUid !== googleUid) {
+                    tryOfferGuestToGoogleMigration(prevUid, googleUid);
+                }
             } catch (e) {
                 console.error('signInWithGoogle', e);
                 const code = e?.code || '';
@@ -17861,6 +18449,87 @@
                 if (btn) btn.disabled = false;
             }
         };
+
+        async function copyFirestoreCollection(fromParts, toParts) {
+            const snap = await getDocs(collection(db, ...fromParts));
+            let n = 0;
+            for (const d of snap.docs) {
+                await setDoc(doc(db, ...toParts, d.id), d.data(), { merge: true });
+                n++;
+            }
+            return n;
+        }
+
+        async function migrateUserDataBetweenUids(fromUid, toUid) {
+            if (!db || !fromUid || !toUid || fromUid === toUid) return { ok: false, n: 0 };
+            let n = 0;
+            try {
+                const userSnap = await getDoc(doc(db, 'users', fromUid));
+                if (userSnap.exists()) {
+                    const data = { ...userSnap.data(), migratedFrom: fromUid, updatedAt: serverTimestamp() };
+                    await setDoc(doc(db, 'users', toUid), data, { merge: true });
+                    n++;
+                }
+                for (const col of ['words', 'materials', 'folders', 'stats', 'storyArchive']) {
+                    n += await copyFirestoreCollection(['users', fromUid, col], ['users', toUid, col]);
+                }
+                const tracksSnap = await getDocs(collection(db, 'users', fromUid, 'tracks'));
+                for (const trackDoc of tracksSnap.docs) {
+                    await setDoc(doc(db, 'users', toUid, 'tracks', trackDoc.id), trackDoc.data(), { merge: true });
+                    n++;
+                    for (const col of ['words', 'materials', 'folders', 'stats', 'storyArchive']) {
+                        n += await copyFirestoreCollection(
+                            ['users', fromUid, 'tracks', trackDoc.id, col],
+                            ['users', toUid, 'tracks', trackDoc.id, col]
+                        );
+                    }
+                }
+                return { ok: true, n };
+            } catch (e) {
+                console.error('migrateUserDataBetweenUids', e);
+                return { ok: false, n };
+            }
+        }
+
+        async function guestUidHasData(uid) {
+            if (!db || !uid) return false;
+            try {
+                const words = await getDocs(collection(db, 'users', uid, 'words'));
+                if (!words.empty) return true;
+                const tracks = await getDocs(collection(db, 'users', uid, 'tracks'));
+                for (const t of tracks.docs) {
+                    const tw = await getDocs(collection(db, 'users', uid, 'tracks', t.id, 'words'));
+                    if (!tw.empty) return true;
+                }
+                const mats = await getDocs(collection(db, 'users', uid, 'materials'));
+                return !mats.empty;
+            } catch (_) { return false; }
+        }
+
+        async function tryOfferGuestToGoogleMigration(fromUid, toUid) {
+            try {
+                const has = await guestUidHasData(fromUid);
+                if (!has) return;
+                window.showModal(t('auth.migrateAsk'), true, async () => {
+                    try {
+                        setAuthGateStatus(t('auth.migrating'));
+                        showAppToast?.(t('auth.migrating'), 2400);
+                        const r = await migrateUserDataBetweenUids(fromUid, toUid);
+                        if (r.ok) {
+                            showAppToast?.(t('auth.migrateDone', { n: r.n }), 3600);
+                            try { loadData(); } catch (_) {}
+                        } else {
+                            showAppToast?.(t('auth.migrateFail'), 3600);
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        showAppToast?.(t('auth.migrateFail'), 3600);
+                    } finally {
+                        setAuthGateStatus('');
+                    }
+                });
+            } catch (e) { console.warn('tryOfferGuestToGoogleMigration', e); }
+        }
 
         window.signOutAccount = () => {
             window.showModal(t('auth.signOut') + '?', true, async () => {
@@ -17934,10 +18603,21 @@
             });
         };
 
+        // Exchange library state — module scope (NOT inside try; handlers below need these)
+        let exchangePacks = [];
+        let unsubscribeExchangePacks = null;
+        let exCurrentPackId = null;
+        let exSelectedWordKeys = new Set();
+        let exDraft = { coverType: 'emoji', coverValue: String.fromCodePoint(0x1F4DA), vocabLevel: '', grammarLevel: '' };
+        const EX_EMOJI_PRESET = [0x1F4DA,0x2708,0x1F3B5,0x1F4AC,0x1F9E0,0x1F30D,0x1F52C,0x1F3AD,0x1F4BC,0x1F3C3,0x1F34E,0x1F4DD,0x1F3AC,0x1F9ED,0x1F4A1,0x1F525].map((c) => String.fromCodePoint(c));
+        let pendingExchangeDeepLink = null;
+        const EX_CATALOG_URL_KEY = 'ls_exchange_catalog_url';
+
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
+            initExchangeFirestore();
             setSystemStatus(t('status.connecting'), 'info');
             normalizeAuthPathToHash();
 
@@ -17958,7 +18638,7 @@
                     hideAuthGate();
                     setSystemStatus(t('status.connected'), 'success');
                     await loadUserPrefs();
-                    loadData();
+                    try { loadData(); } catch (e) { console.error('loadData', e); setSystemStatus(t('status.dbError'), 'error'); }
                     if (parseAppAuthRoute() === 'account') {
                         try { openSyncModal(); switchSettingsTab('account'); } catch (_) {}
                     }
@@ -17976,6 +18656,13 @@
                 if (parseAppAuthRoute() === 'account') {
                     try { openSyncModal(); switchSettingsTab('account'); } catch (_) {}
                 }
+                try {
+                    const x = typeof parseExchangeDeepLink === 'function' ? parseExchangeDeepLink() : null;
+                    if (x?.packId) {
+                        pendingExchangeDeepLink = x;
+                        tryOpenExchangeDeepLink();
+                    }
+                } catch (_) {}
             });
         } catch (e) { setSystemStatus(t('status.firebaseError'), "error"); }
 
@@ -17996,6 +18683,7 @@
             if (!window.__lsDataLoadGen) window.__lsDataLoadGen = 0;
             const loadGen = ++window.__lsDataLoadGen;
             const trackAtSubscribe = activeTrackId;
+            try { if (typeof bindExchangePacksListener === 'function') bindExchangePacksListener(loadGen, trackAtSubscribe); } catch (_) {}
 
             // Drop previous track immediately so the UI doesn't show stale words
             vocabulary = [];
@@ -18007,23 +18695,31 @@
             } catch (_) {}
 
             unsubscribeWords = onSnapshot(wordsPath, (snap) => {
-                if (loadGen !== window.__lsDataLoadGen || activeTrackId !== trackAtSubscribe) return;
-                vocabulary = [];
-                snap.forEach(d => vocabulary.push(normalizeWordFromFirestore(d.id, d.data())));
-                vocabulary.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
-                readerLexiconCache = { key: '', lex: null };
-                seedIpaCacheFromVocabulary();
-                updateDictContextUI();
-                renderDictContextDropdown();
-                renderDictionary();
-                updateTrainSources();
-                rememberActiveTrackIfHasWords();
-                if (currentMaterial && !document.getElementById('library-read-view').classList.contains('hidden')) {
-                    refreshReaderContentAfterVocabChange();
+                if (loadGen !== window.__lsDataLoadGen) return;
+                try {
+                    vocabulary = [];
+                    snap.forEach(d => vocabulary.push(normalizeWordFromFirestore(d.id, d.data())));
+                    vocabulary.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                    readerLexiconCache = { key: '', lex: null };
+                    try { seedIpaCacheFromVocabulary(); } catch (e) { console.warn('seedIpaCache', e); }
+                    try { updateDictContextUI(); } catch (_) {}
+                    try { renderDictContextDropdown(); } catch (_) {}
+                    renderDictionary();
+                    try { updateTrainSources(); } catch (_) {}
+                    try { rememberActiveTrackIfHasWords(); } catch (_) {}
+                    if (currentMaterial && !document.getElementById('library-read-view').classList.contains('hidden')) {
+                        try { refreshReaderContentAfterVocabChange(); } catch (_) {}
+                    }
+                } catch (err) {
+                    console.error('words snapshot', err);
+                    try { renderDictionary(); } catch (_) {
+                        const grid = document.getElementById('words-grid');
+                        if (grid) grid.innerHTML = `<p class="text-slate-500 font-bold col-span-full text-center py-8">${escapeHtmlText(t('status.dbError') || 'Error')}</p>`;
+                    }
                 }
                 // Defer heavy sync so the dictionary paints first
                 setTimeout(() => {
-                    if (loadGen !== window.__lsDataLoadGen || activeTrackId !== trackAtSubscribe) return;
+                    if (loadGen !== window.__lsDataLoadGen) return;
                     try { scheduleWordMediaCache(); } catch (_) {}
                     try { seedYearActivityFromVocabulary(); } catch (_) {}
                     try { reconcileYearActivityFromSources(); } catch (_) {}
@@ -18037,7 +18733,13 @@
                     }
                     try { updateTrainDueBadges?.(); } catch (_) {}
                 }, 0);
-            }, (error) => { setSystemStatus(t('status.dbError'), "error"); });
+            }, (error) => {
+                setSystemStatus(t('status.dbError'), "error");
+                try {
+                    const grid = document.getElementById('words-grid');
+                    if (grid) grid.innerHTML = `<p class="text-slate-500 font-bold col-span-full text-center py-8">${escapeHtmlText(t('status.dbError') || 'Error')}</p>`;
+                } catch (_) {}
+            });
 
             unsubscribeMaterials = onSnapshot(materialsPath, (snap) => {
                 if (loadGen !== window.__lsDataLoadGen || activeTrackId !== trackAtSubscribe) return;
@@ -18194,9 +18896,14 @@
                 }
             });
             if (changed) {
-                localStorage.setItem(IPA_CACHE_LS_KEY, JSON.stringify(ipaCacheStore));
+                try {
+                    localStorage.setItem(IPA_CACHE_LS_KEY, JSON.stringify(ipaCacheStore));
+                } catch (e) {
+                    // Opera / tight mobile quotas must not block dictionary paint
+                    console.warn('ipa cache persist skipped', e);
+                }
                 ipaCacheDirty = true;
-                scheduleIpaCacheFirestoreSync();
+                try { scheduleIpaCacheFirestoreSync(); } catch (_) {}
             }
         }
 
@@ -23502,6 +24209,7 @@
 
         let addMaterialMode = 'text'; 
         window.showAddTextForm = () => { 
+            document.getElementById('exchange-hub-view')?.classList.remove('is-open');
             document.getElementById('library-list-view').classList.add('hidden'); 
             document.getElementById('library-add-view').classList.remove('hidden'); 
             setAddMode('text'); 
@@ -24570,8 +25278,7 @@
         let pendingMaterialDeepLink = null;
         let deepLinkOpenInProgress = false;
         let deepLinkHandled = false; // consumed for this page load (don't re-force track from hash)
-        let materialsSnapshotReady = false;
-        let deepLinkMissingNotified = false;
+        let materialsSnapshotReady = false;        let deepLinkMissingNotified = false;
 
         function parseAppDeepLink(fromHash = location.hash, fromSearch = location.search) {
             let materialId = null;
@@ -42304,11 +43011,20 @@
             ctxEl.innerHTML = `"${inner}"`;
             ctxEl.classList.toggle('bs-success-context-expandable', truncated);
             ctxEl.classList.toggle('bs-success-context-peekable', !truncated && hasMat);
+            // Ignore the same tap/click that just revealed the answer (ghost open).
+            // Do not re-arm after expand — second tap should open material immediately.
+            if (!expanded) successCtxInteractUntil = Date.now() + 480;
             if (tappable) {
                 ctxEl.setAttribute('role', 'button');
                 ctxEl.tabIndex = 0;
                 ctxEl.title = truncated ? t('train.successCtxTap') : t('train.successCtxOpenMat');
-                ctxEl.onclick = () => onSuccessRevealContextTap();
+                ctxEl.onclick = (ev) => {
+                    if (Date.now() < successCtxInteractUntil) {
+                        try { ev.preventDefault(); ev.stopPropagation(); } catch (_) {}
+                        return;
+                    }
+                    onSuccessRevealContextTap();
+                };
                 ctxEl.onkeydown = (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -42336,7 +43052,10 @@
             return null;
         }
 
+        let successCtxInteractUntil = 0;
+
         window.onSuccessRevealContextTap = () => {
+            if (Date.now() < successCtxInteractUntil) return;
             const word = bsWords[bsCurrentWordIdx];
             if (!word?._successCtxMeta) return;
             const meta = word._successCtxMeta;
@@ -42345,13 +43064,10 @@
                 word._successCtxExpanded = true;
                 const failed = !!word.failed && !word.contextZeroPass;
                 renderSuccessRevealContext(word, failed);
-                // After expand, title becomes “open material” if linked
                 return;
             }
             openTrainContextPeek(word);
-        };
-
-        window.expandSuccessRevealContext = () => onSuccessRevealContextTap();
+        };window.expandSuccessRevealContext = () => onSuccessRevealContextTap();
 
         function closeTrainContextPeek() {
             const modal = document.getElementById('train-ctx-peek-modal');
@@ -42371,7 +43087,7 @@
             }
         });
 
-        function pickTrainContextPeekParas(plain, wordStr, contextHint) {
+                function pickTrainContextPeekParas(plain, wordStr, contextHint) {
             const paras = String(plain || '')
                 .split(/\n\s*\n+/)
                 .map((s) => s.replace(/\s+/g, ' ').trim())
@@ -42380,109 +43096,122 @@
                 const flat = String(plain || contextHint || '').replace(/\s+/g, ' ').trim();
                 return flat ? [flat] : [];
             }
-            const hint = String(contextHint || '').replace(/\s+/g, ' ').trim().toLowerCase();
-            const hintBit = hint.slice(0, 36);
+            const hint = String(contextHint || '').replace(/\s+/g, ' ').trim();
+            const hintLow = hint.toLowerCase();
+            const hintBit = hintLow.slice(0, 36);
             let best = -1;
             let bestScore = -1;
             for (let i = 0; i < paras.length; i++) {
-                if (!contextHasWholeWord(paras[i], wordStr)) continue;
-                let score = 1;
                 const pl = paras[i].toLowerCase();
+                let score = 0;
+                if (contextHasWholeWord(paras[i], wordStr)) score += 2;
                 if (hintBit && pl.includes(hintBit)) score += 5;
-                else if (hint.length > 12 && pl.includes(hint.slice(0, 18))) score += 3;
+                else if (hintLow.length > 12 && pl.includes(hintLow.slice(0, 18))) score += 3;
+                else if (hintLow.length > 24 && pl.includes(hintLow.slice(0, 24))) score += 2;
                 if (score > bestScore) {
                     bestScore = score;
                     best = i;
                 }
             }
+            if (best < 0 || bestScore <= 0) {
+                if (hintBit) {
+                    for (let i = 0; i < paras.length; i++) {
+                        if (paras[i].toLowerCase().includes(hintBit.slice(0, 16))) {
+                            best = i;
+                            break;
+                        }
+                    }
+                }
+            }
             if (best < 0) {
-                if (hint) return [String(contextHint || '').replace(/\s+/g, ' ').trim()].filter(Boolean);
-                return paras.slice(0, 2);
+                for (let i = 0; i < paras.length; i++) {
+                    if (contextHasWholeWord(paras[i], wordStr)) { best = i; break; }
+                }
+            }
+            if (best < 0) {
+                return hint ? [hint] : paras.slice(0, 2);
             }
             const from = Math.max(0, best - 1);
             const to = Math.min(paras.length, best + 2);
             return paras.slice(from, to);
         }
-
         function wrapTrainPeekExcerpt(text, excerpt, wordStr) {
             const raw = String(text || '');
             const ex = String(excerpt || '').replace(/\s+/g, ' ').trim();
             const w = String(wordStr || '').trim();
             const wordHl = '<mark class="train-ctx-peek-word">$1</mark>';
-
-            // Plain text in → highlightWholeWordInText escapes + wraps
             const applyWord = (s) => highlightWholeWordInText(s, w, wordHl);
-
-            if (!ex || ex.length < 8) {
-                return raw.split(/\n\s*\n+/).map((p) => `<p>${applyWord(p)}</p>`).join('');
+            const paras = raw.split(/\n\s*\n+/).map((s) => s.replace(/\s+/g, ' ').trim()).filter(Boolean);
+            if (!paras.length) {
+                const flat = raw.replace(/\s+/g, ' ').trim();
+                return flat ? `<p>${applyWord(flat)}</p>` : '';
             }
 
-            // Find excerpt in plain text (case-insensitive, flexible whitespace)
             const norm = (s) => s.toLowerCase().replace(/\s+/g, ' ');
-            const hay = norm(raw);
             const needle = norm(ex);
-            let idx = hay.indexOf(needle);
-            if (idx < 0 && needle.length > 24) idx = hay.indexOf(needle.slice(0, 24));
-            if (idx < 0) {
-                return raw.split(/\n\s*\n+/).map((p) => `<p>${applyWord(p)}</p>`).join('');
-            }
 
-            // Map normalized index roughly back by scanning original with collapsed spaces
-            let oi = 0;
-            let ni = 0;
-            const target = idx;
-            while (oi < raw.length && ni < target) {
-                if (/\s/.test(raw[oi])) {
-                    while (oi < raw.length && /\s/.test(raw[oi])) oi++;
-                    ni++;
-                } else {
-                    oi++;
-                    ni++;
+            const mapNormToOrig = (orig, normIdx, normLen) => {
+                let oi = 0;
+                let ni = 0;
+                while (oi < orig.length && ni < normIdx) {
+                    if (/\s/.test(orig[oi])) {
+                        while (oi < orig.length && /\s/.test(orig[oi])) oi++;
+                        ni++;
+                    } else {
+                        oi++;
+                        ni++;
+                    }
                 }
-            }
-            const start = oi;
-            let needLen = needle.length;
-            let end = start;
-            let counted = 0;
-            while (end < raw.length && counted < needLen) {
-                if (/\s/.test(raw[end])) {
-                    while (end < raw.length && /\s/.test(raw[end])) end++;
-                    counted++;
-                } else {
-                    end++;
-                    counted++;
+                const start = oi;
+                let end = start;
+                let counted = 0;
+                const need = Math.max(1, normLen || 1);
+                while (end < orig.length && counted < need) {
+                    if (/\s/.test(orig[end])) {
+                        while (end < orig.length && /\s/.test(orig[end])) end++;
+                        counted++;
+                    } else {
+                        end++;
+                        counted++;
+                    }
                 }
-            }
-            end = Math.min(raw.length, Math.max(end, start + Math.min(ex.length, raw.length - start)));
-
-            const before = raw.slice(0, start);
-            const mid = raw.slice(start, end);
-            const after = raw.slice(end);
-
-            const paintChunk = (chunk, wrapExcerpt) => {
-                if (!chunk) return '';
-                const paras = chunk.split(/\n\s*\n+/);
-                return paras.map((p, i) => {
-                    const trimmed = p;
-                    if (!trimmed && i === paras.length - 1) return '';
-                    const body = wrapExcerpt
-                        ? `<mark class="train-ctx-peek-excerpt">${applyWord(trimmed)}</mark>`
-                        : applyWord(trimmed);
-                    return `<p>${body}</p>`;
-                }).join('');
+                return { start, end: Math.min(orig.length, Math.max(end, start + 1)) };
             };
 
-            // Simpler single-block render when no para breaks in window
-            if (!/\n\s*\n/.test(raw)) {
-                return `<p>${applyWord(before)}<mark class="train-ctx-peek-excerpt">${applyWord(mid)}</mark>${applyWord(after)}</p>`;
+            let hit = -1;
+            let span = null;
+            if (needle && needle.length >= 6) {
+                for (let i = 0; i < paras.length; i++) {
+                    const hay = norm(paras[i]);
+                    let idxN = hay.indexOf(needle);
+                    let usedLen = needle.length;
+                    if (idxN < 0 && needle.length > 20) {
+                        usedLen = Math.min(40, needle.length);
+                        idxN = hay.indexOf(needle.slice(0, usedLen));
+                    }
+                    if (idxN >= 0) {
+                        span = mapNormToOrig(paras[i], idxN, usedLen);
+                        hit = i;
+                        break;
+                    }
+                }
+            }
+            if (hit < 0 && w) {
+                for (let i = 0; i < paras.length; i++) {
+                    if (contextHasWholeWord(paras[i], w)) {
+                        hit = i;
+                        break;
+                    }
+                }
             }
 
-            // Paragraph-aware: rebuild with excerpt mark spanning mid only inside its para(s)
-            const parts = [];
-            if (before) parts.push(paintChunk(before, false));
-            if (mid) parts.push(paintChunk(mid, true));
-            if (after) parts.push(paintChunk(after, false));
-            return parts.join('');
+            return paras.map((p, i) => {
+                if (i !== hit || !span) return `<p>${applyWord(p)}</p>`;
+                const before = p.slice(0, span.start);
+                const mid = p.slice(span.start, span.end);
+                const after = p.slice(span.end);
+                return `<p>${applyWord(before)}<mark class="train-ctx-peek-excerpt">${applyWord(mid)}</mark>${applyWord(after)}</p>`;
+            }).join('');
         }
 
         function openTrainContextPeek(word) {
@@ -46840,6 +47569,591 @@
             finishBrainstorm();
         };
 
+        // ——— Exchange / shared library ———
+
+        function bindExchangePacksListener(loadGen, trackAtSubscribe) {
+            if (unsubscribeExchangePacks) {
+                try { unsubscribeExchangePacks(); } catch (_) {}
+                unsubscribeExchangePacks = null;
+            }
+            exchangePacks = [];
+            try {
+                const path = exColRef();
+                unsubscribeExchangePacks = onSnapshot(path, (snap) => {
+                    if (loadGen !== window.__lsDataLoadGen) return;
+                    exchangePacks = [];
+                    snap.forEach((d) => exchangePacks.push({ id: d.id, ...d.data() }));
+                    exchangePacks.sort((a, b) => (b.updatedAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0) - (a.updatedAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0));
+                    try { renderExchangePackList(); } catch (_) {}
+                    try { tryOpenExchangeDeepLink(); } catch (_) {}
+                }, (err) => {
+                    console.warn('exchangePacks', err);
+                    const denied = String(err?.code || err?.message || '').toLowerCase().includes('permission');
+                    if (denied) showAppToast?.(t('ex.permission'), 4200);
+                });
+            } catch (e) { console.warn('exchangePacks subscribe', e); }
+        }
+
+        function exLevelChipHtml(kind, level) {
+            const lv = String(level || '').toUpperCase();
+            if (!CEFR_LEVELS.includes(lv)) return '';
+            const idx = CEFR_LEVELS.indexOf(lv);
+            const label = kind === 'grammar' ? 'GR' : 'VOC';
+            return `<span class="ex-level-chip">${cefrBarsMarkup(idx)}<span>${label} ${lv}</span></span>`;
+        }
+
+        function exCoverHtml(pack, className = 'ex-pack-cover') {
+            const type = pack?.coverType || 'emoji';
+            const val = pack?.coverValue || '📚';
+            if (type === 'image' && val) {
+                return `<div class="${className}"><img src="${escapeHtmlText(val)}" alt="" onerror="this.parentElement.textContent='📚'"></div>`;
+            }
+            return `<div class="${className}">${escapeHtmlText(val)}</div>`;
+        }
+
+        function renderExchangePackList() {
+            const grid = document.getElementById('ex-pack-grid');
+            if (!grid) return;
+            const list = exchangePacks.slice();
+            if (!list.length) {
+                grid.innerHTML = `<div class="ex-empty">${escapeHtmlText(t('ex.empty'))}</div>`;
+                return;
+            }
+            grid.innerHTML = list.map((p) => {
+                const n = Array.isArray(p.words) ? p.words.length : 0;
+                const status = p.status === 'proposed'
+                    ? `<span class="ex-badge proposed">${escapeHtmlText(t('ex.proposed'))}</span>`
+                    : `<span class="ex-badge">${escapeHtmlText(t('ex.published'))}</span>`;
+                const levels = `${exLevelChipHtml('vocab', p.vocabLevel)}${exLevelChipHtml('grammar', p.grammarLevel)}`;
+                return `<button type="button" class="ex-pack-card" onclick="exOpenPack('${p.id}')">
+                    ${exCoverHtml(p)}
+                    <div class="ex-pack-meta">
+                        <div class="ex-pack-title truncate">${escapeHtmlText(p.title || '')}</div>
+                        <div class="ex-pack-sub">${escapeHtmlText(t('ex.wordsN', { n }))}</div>
+                        <div class="ex-pack-levels">${levels}</div>
+                    </div>
+                    ${status}
+                </button>`;
+            }).join('');
+        }
+
+        window.openExchangeHub = () => {
+            switchTab('library');
+            document.getElementById('library-list-view')?.classList.add('hidden');
+            document.getElementById('library-add-view')?.classList.add('hidden');
+            document.getElementById('library-read-view')?.classList.add('hidden');
+            const hub = document.getElementById('exchange-hub-view');
+            hub?.classList.add('is-open');
+            exShowList();
+            renderExchangePackList();
+            try { applyI18n(); } catch (_) {}
+        };
+
+        window.closeExchangeHub = () => {
+            document.getElementById('exchange-hub-view')?.classList.remove('is-open');
+            document.getElementById('library-list-view')?.classList.remove('hidden');
+            exCurrentPackId = null;
+        };
+
+        function exShowOnly(screen) {
+            ['ex-screen-list', 'ex-screen-create', 'ex-screen-detail'].forEach((id) => {
+                document.getElementById(id)?.classList.toggle('hidden', id !== screen);
+            });
+        }
+
+        window.exShowList = () => {
+            exCurrentPackId = null;
+            exShowOnly('ex-screen-list');
+            renderExchangePackList();
+        };
+
+        window.exShowCreate = () => {
+            exDraft = { coverType: 'emoji', coverValue: '📚', vocabLevel: '', grammarLevel: '' };
+            const title = document.getElementById('ex-create-title');
+            const desc = document.getElementById('ex-create-desc');
+            const words = document.getElementById('ex-create-words');
+            const propose = document.getElementById('ex-create-propose');
+            if (title) title.value = '';
+            if (desc) desc.value = '';
+            if (words) words.value = '';
+            if (propose) propose.checked = false;
+            document.getElementById('ex-cover-img-url')?.classList.add('hidden');
+            exRenderCoverPreview();
+            exRenderEmojiGrid();
+            const bindVocab = () => renderCefrBarPicker('ex-create-vocab-bars', exDraft.vocabLevel, (lv) => {
+                exDraft.vocabLevel = lv || '';
+                bindVocab();
+            });
+            const bindGrammar = () => renderCefrBarPicker('ex-create-grammar-bars', exDraft.grammarLevel, (lv) => {
+                exDraft.grammarLevel = lv || '';
+                bindGrammar();
+            });
+            bindVocab();
+            bindGrammar();
+            exShowOnly('ex-screen-create');
+        };
+
+        function exRenderCoverPreview() {
+            const el = document.getElementById('ex-cover-preview');
+            if (!el) return;
+            if (exDraft.coverType === 'image' && exDraft.coverValue) {
+                el.innerHTML = `<img src="${escapeHtmlText(exDraft.coverValue)}" alt="" onerror="this.parentElement.textContent='📚'">`;
+            } else {
+                el.textContent = exDraft.coverValue || '📚';
+            }
+        }
+
+        function exRenderEmojiGrid() {
+            const grid = document.getElementById('ex-emoji-grid');
+            if (!grid) return;
+            grid.innerHTML = EX_EMOJI_PRESET.map((e) =>
+                `<button type="button" class="${exDraft.coverType === 'emoji' && exDraft.coverValue === e ? 'is-on' : ''}" onclick="exSetCoverEmoji('${e}')">${e}</button>`
+            ).join('');
+        }
+
+        window.exSetCoverEmoji = (emoji) => {
+            exDraft.coverType = 'emoji';
+            exDraft.coverValue = emoji || '📚';
+            document.getElementById('ex-cover-img-url')?.classList.add('hidden');
+            exRenderCoverPreview();
+            exRenderEmojiGrid();
+        };
+
+        window.exPickCoverImage = () => {
+            const inp = document.getElementById('ex-cover-img-url');
+            if (!inp) return;
+            inp.classList.remove('hidden');
+            inp.focus();
+        };
+
+        window.exOnCoverUrlInput = () => {
+            const inp = document.getElementById('ex-cover-img-url');
+            const url = String(inp?.value || '').trim();
+            if (!url) return;
+            exDraft.coverType = 'image';
+            exDraft.coverValue = url;
+            exRenderCoverPreview();
+        };
+
+        function exParseBulkWords(raw) {
+            const lines = String(raw || '').split(/\n+/);
+            const out = [];
+            const seen = new Set();
+            for (const line of lines) {
+                const s = line.trim();
+                if (!s) continue;
+                let word = '';
+                let translation = '';
+                if (s.includes('—')) {
+                    const parts = s.split('—');
+                    word = parts[0].trim();
+                    translation = parts.slice(1).join('—').trim();
+                } else if (s.includes(' - ')) {
+                    const parts = s.split(' - ');
+                    word = parts[0].trim();
+                    translation = parts.slice(1).join(' - ').trim();
+                } else if (s.includes('\t')) {
+                    const parts = s.split('\t');
+                    word = parts[0].trim();
+                    translation = parts.slice(1).join('\t').trim();
+                } else if (s.includes(';')) {
+                    const parts = s.split(';');
+                    word = parts[0].trim();
+                    translation = parts.slice(1).join(';').trim();
+                } else {
+                    continue;
+                }
+                if (!word || !translation) continue;
+                const key = word.toLowerCase();
+                if (seen.has(key)) continue;
+                seen.add(key);
+                out.push({ word, translation, context: '', imageUrl: UNSPLASH_FALLBACK });
+            }
+            return out;
+        }
+
+        window.exSavePack = async () => {
+            if (!activeUid || !db) return;
+            const title = String(document.getElementById('ex-create-title')?.value || '').trim();
+            const description = String(document.getElementById('ex-create-desc')?.value || '').trim();
+            const words = exParseBulkWords(document.getElementById('ex-create-words')?.value || '');
+            if (!title) { showAppToast?.(t('ex.needTitle'), 2200); return; }
+            if (!words.length) { showAppToast?.(t('ex.needWords'), 2200); return; }
+            const propose = !!document.getElementById('ex-create-propose')?.checked;
+            const payload = {
+                title,
+                description,
+                coverType: exDraft.coverType || 'emoji',
+                coverValue: exDraft.coverValue || '📚',
+                vocabLevel: exDraft.vocabLevel || '',
+                grammarLevel: exDraft.grammarLevel || '',
+                words,
+                status: propose ? 'proposed' : 'published',
+                trackId: activeTrackId,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+                createdBy: activeUid
+            };
+            try {
+                await addDoc(exColRef(), payload);
+                showAppToast?.(t('ex.saved'), 2200);
+                exShowList();
+            } catch (e) {
+                console.error(e);
+                const denied = String(e?.code || e?.message || '').toLowerCase().includes('permission');
+                showAppToast?.(denied ? t('ex.permission') : t('status.dbError'), 3600);
+            }
+        };
+
+        window.exOpenPack = (id) => {
+            const pack = exchangePacks.find((p) => p.id === id);
+            if (!pack) { showAppToast?.(t('ex.packMissing'), 2200); return; }
+            exCurrentPackId = id;
+            exSelectedWordKeys = new Set((pack.words || []).map((w) => String(w.word || '').toLowerCase()));
+            const titleEl = document.getElementById('ex-detail-title');
+            const descEl = document.getElementById('ex-detail-desc');
+            const levelsEl = document.getElementById('ex-detail-levels');
+            const coverHost = document.getElementById('ex-detail-cover');
+            if (titleEl) titleEl.textContent = pack.title || '';
+            if (descEl) {
+                descEl.textContent = pack.description || '';
+                descEl.classList.toggle('hidden', !pack.description);
+            }
+            if (levelsEl) levelsEl.innerHTML = `${exLevelChipHtml('vocab', pack.vocabLevel)}${exLevelChipHtml('grammar', pack.grammarLevel)}`;
+            if (coverHost) {
+                coverHost.innerHTML = '';
+                if (pack.coverType === 'image' && pack.coverValue) {
+                    const img = document.createElement('img');
+                    img.src = pack.coverValue;
+                    img.alt = '';
+                    img.onerror = () => { coverHost.textContent = String.fromCodePoint(0x1F4DA); };
+                    coverHost.appendChild(img);
+                } else {
+                    coverHost.textContent = pack.coverValue || String.fromCodePoint(0x1F4DA);
+                }
+            }
+            const pubBtn = document.getElementById('ex-btn-publish');
+            if (pubBtn) pubBtn.classList.toggle('hidden', pack.status !== 'proposed');
+            exRenderDetailWords(pack);
+            exShowOnly('ex-screen-detail');
+            try {
+                const full = buildExchangeDeepLink(id);
+                const nextHash = new URL(full).hash;
+                if (location.hash !== nextHash) history.replaceState(null, '', `${location.pathname}${location.search}${nextHash}`);
+            } catch (_) {}
+        };
+
+        window.exToggleWord = (key, on) => {
+            const k = String(key || '').toLowerCase();
+            if (on) exSelectedWordKeys.add(k);
+            else exSelectedWordKeys.delete(k);
+            const pack = exchangePacks.find((p) => p.id === exCurrentPackId);
+            if (pack) exRenderDetailWords(pack);
+        };
+
+        window.exSelectAllWords = (all) => {
+            const pack = exchangePacks.find((p) => p.id === exCurrentPackId);
+            if (!pack) return;
+            if (all) exSelectedWordKeys = new Set((pack.words || []).map((w) => String(w.word || '').toLowerCase()));
+            else exSelectedWordKeys = new Set();
+            exRenderDetailWords(pack);
+        };
+
+        window.exImportSelectedWords = async () => {
+            const pack = exchangePacks.find((p) => p.id === exCurrentPackId);
+            if (!pack) return;
+            const picked = (pack.words || []).filter((w) => exSelectedWordKeys.has(String(w.word || '').toLowerCase()));
+            if (!picked.length) { showAppToast?.(t('ex.pickWords'), 2200); return; }
+            const sourceName = pack.title || 'Exchange';
+            let added = 0;
+            try {
+                for (const w of picked) {
+                    const word = String(w.word || '').trim();
+                    const translation = String(w.translation || '').trim();
+                    if (!word || !translation) continue;
+                    const exists = vocabulary.some((v) => String(v.word || '').toLowerCase() === word.toLowerCase()
+                        && String(v.translation || '').toLowerCase() === translation.toLowerCase());
+                    if (exists) continue;
+                    await addDoc(colRef('words'), {
+                        word,
+                        translation,
+                        context: w.context || '',
+                        imageUrl: w.imageUrl || UNSPLASH_FALLBACK,
+                        source: sourceName,
+                        srsLevel: 0,
+                        nextReviewTime: 0,
+                        createdAt: serverTimestamp(),
+                        bsHistory: []
+                    });
+                    added++;
+                }
+                showAppToast?.(t('ex.wordsAdded', { n: added }), 2600);
+            } catch (e) {
+                console.error(e);
+                showAppToast?.(t('status.dbError'), 2600);
+            }
+        };
+
+        window.exPublishCurrent = async () => {
+            if (!exCurrentPackId) return;
+            try {
+                await updateDoc(exDocRef(exCurrentPackId), { status: 'published', updatedAt: serverTimestamp() });
+                showAppToast?.(t('ex.published'), 2000);
+            } catch (e) { console.error(e); }
+        };
+
+        window.exDeleteCurrent = () => {
+            if (!exCurrentPackId) return;
+            window.showModal((t('common.delete') || 'Delete') + '?', true, async () => {
+                try {
+                    await deleteDoc(exDocRef(exCurrentPackId));
+                    showAppToast?.(t('ex.deleted'), 2000);
+                    exShowList();
+                } catch (e) { console.error(e); }
+            });
+        };
+
+        function buildExchangeDeepLink(packId, trackId = activeTrackId) {
+            const url = new URL(location.href);
+            url.search = '';
+            const tid = trackId || activeTrackId || '';
+            const idPart = encodeURIComponent(packId);
+            url.hash = tid ? `#/x/${idPart}?track=${encodeURIComponent(tid)}` : `#/x/${idPart}`;
+            return url.toString();
+        }
+
+        window.exCopyPackLink = async () => {
+            if (!exCurrentPackId) return;
+            try {
+                await writeTextToClipboard(buildExchangeDeepLink(exCurrentPackId));
+                showAppToast?.(t('ex.linkCopied'), 2000);
+            } catch (e) { console.error(e); }
+        };
+
+        function exBuildExportPayload() {
+            return {
+                type: 'linguaspace-exchange-packs',
+                version: 1,
+                trackId: activeTrackId,
+                exportedAt: new Date().toISOString(),
+                packs: exchangePacks.map(({ id, createdAt, updatedAt, ...rest }) => ({
+                    sourceId: rest.sourceId || id,
+                    ...rest
+                }))
+            };
+        }
+
+        function exNormalizeIncomingPacks(data) {
+            if (Array.isArray(data?.packs)) return data.packs;
+            if (Array.isArray(data)) return data;
+            return [];
+        }
+
+        function exPackFingerprint(p) {
+            const title = String(p?.title || '').trim().toLowerCase();
+            const words = (Array.isArray(p?.words) ? p.words : [])
+                .map((w) => String(w?.word || '').trim().toLowerCase())
+                .filter(Boolean)
+                .sort()
+                .join('|');
+            return `${title}::${words}`;
+        }
+
+        async function exUpsertPacksFromList(rawPacks, { fromCatalog = false } = {}) {
+            if (!activeUid || !db) return { added: 0, updated: 0, n: 0 };
+            let added = 0;
+            let updated = 0;
+            for (const p of rawPacks) {
+                const title = String(p.title || '').trim();
+                const words = Array.isArray(p.words) ? p.words : [];
+                if (!title || !words.length) continue;
+                const sourceId = String(p.sourceId || p.id || '').trim();
+                const payload = {
+                    title,
+                    description: p.description || '',
+                    coverType: p.coverType || 'emoji',
+                    coverValue: p.coverValue || String.fromCodePoint(0x1F4DA),
+                    vocabLevel: p.vocabLevel || '',
+                    grammarLevel: p.grammarLevel || '',
+                    words,
+                    status: p.status === 'proposed' ? 'proposed' : 'published',
+                    trackId: activeTrackId,
+                    updatedAt: serverTimestamp(),
+                    createdBy: activeUid,
+                    imported: true,
+                    fromCatalog: !!fromCatalog
+                };
+                if (sourceId) payload.sourceId = sourceId;
+
+                let existing = null;
+                if (sourceId) {
+                    existing = exchangePacks.find((x) => String(x.sourceId || '') === sourceId);
+                }
+                if (!existing) {
+                    const fp = exPackFingerprint(p);
+                    existing = exchangePacks.find((x) => exPackFingerprint(x) === fp);
+                }
+
+                if (existing?.id) {
+                    await updateDoc(exDocRef(existing.id), payload);
+                    updated++;
+                } else {
+                    payload.createdAt = serverTimestamp();
+                    await addDoc(exColRef(), payload);
+                    added++;
+                }
+            }
+            return { added, updated, n: added + updated };
+        }
+
+        window.exExportJson = () => {
+            const payload = exBuildExportPayload();
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `linguaspace-exchange-${activeTrackId || 'packs'}.json`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+            showAppToast?.(t('ex.exported'), 2000);
+        };
+
+        window.exCopyJson = async () => {
+            try {
+                await writeTextToClipboard(JSON.stringify(exBuildExportPayload(), null, 2));
+                showAppToast?.(t('ex.jsonCopied'), 2000);
+            } catch (e) {
+                console.error(e);
+                showAppToast?.(t('status.dbError'), 2600);
+            }
+        };
+
+        window.exShowPasteJson = async () => {
+            const panel = document.getElementById('ex-paste-panel');
+            const ta = document.getElementById('ex-paste-json');
+            panel?.classList.remove('hidden');
+            if (ta) {
+                ta.value = '';
+                try {
+                    const clip = await navigator.clipboard?.readText?.();
+                    if (clip && /\{[\s\S]*\}|\[[\s\S]*\]/.test(clip)) ta.value = clip;
+                } catch (_) {}
+                ta.focus();
+            }
+        };
+
+        window.exHidePasteJson = () => {
+            document.getElementById('ex-paste-panel')?.classList.add('hidden');
+            const ta = document.getElementById('ex-paste-json');
+            if (ta) ta.value = '';
+        };
+
+        window.exImportPastedJson = async () => {
+            const text = String(document.getElementById('ex-paste-json')?.value || '').trim();
+            if (!text) { showAppToast?.(t('ex.jsonPasteEmpty'), 2200); return; }
+            try {
+                const data = JSON.parse(text);
+                const packs = exNormalizeIncomingPacks(data);
+                const { n } = await exUpsertPacksFromList(packs, { fromCatalog: false });
+                showAppToast?.(t('ex.imported', { n }), 2600);
+                exHidePasteJson();
+                exShowList();
+            } catch (e) {
+                console.error(e);
+                showAppToast?.(e instanceof SyntaxError ? t('ex.jsonBad') : t('status.dbError'), 2600);
+            }
+        };
+
+        window.exImportJsonFile = async (event) => {
+            const file = event?.target?.files?.[0];
+            if (!file) return;
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                const packs = exNormalizeIncomingPacks(data);
+                const { n } = await exUpsertPacksFromList(packs, { fromCatalog: false });
+                showAppToast?.(t('ex.imported', { n }), 2600);
+                exShowList();
+            } catch (e) {
+                console.error(e);
+                showAppToast?.(e instanceof SyntaxError ? t('ex.jsonBad') : t('status.dbError'), 2600);
+            } finally {
+                if (event?.target) event.target.value = '';
+            }
+        };
+
+        window.exSaveCatalogUrl = () => {
+            const inp = document.getElementById('ex-catalog-url');
+            const url = String(inp?.value || '').trim();
+            try {
+                if (url) localStorage.setItem(EX_CATALOG_URL_KEY, url);
+                else localStorage.removeItem(EX_CATALOG_URL_KEY);
+            } catch (_) {}
+            showAppToast?.(t('ex.catalogSaved'), 2000);
+            if (url) exRefreshCatalog().catch(() => {});
+        };
+
+        window.exRefreshCatalog = async (opts = {}) => {
+            const quiet = !!opts.quiet;
+            const inp = document.getElementById('ex-catalog-url');
+            let url = String(inp?.value || '').trim();
+            if (!url) {
+                try { url = localStorage.getItem(EX_CATALOG_URL_KEY) || ''; } catch (_) { url = ''; }
+                if (inp && url) inp.value = url;
+            }
+            if (!url) {
+                if (!quiet) showAppToast?.(t('ex.catalogNeedUrl'), 2200);
+                return;
+            }
+            try {
+                localStorage.setItem(EX_CATALOG_URL_KEY, url);
+            } catch (_) {}
+            try {
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) throw new Error('http ' + res.status);
+                const data = await res.json();
+                const packs = exNormalizeIncomingPacks(data);
+                if (!packs.length) {
+                    if (!quiet) showAppToast?.(t('ex.catalogEmpty'), 2200);
+                    return;
+                }
+                const { added, updated } = await exUpsertPacksFromList(packs, { fromCatalog: true });
+                if (!quiet) showAppToast?.(t('ex.catalogOk', { added, updated }), 2800);
+            } catch (e) {
+                console.warn('exRefreshCatalog', e);
+                if (!quiet) showAppToast?.(t('ex.catalogFail'), 2800);
+            }
+        };
+
+        function parseExchangeDeepLink(fromHash = location.hash) {
+            const hash = String(fromHash || '');
+            const m = hash.match(/^#\/x\/([^/?#]+)(?:\?(.*))?$/i);
+            if (!m) return null;
+            let packId = m[1];
+            try { packId = decodeURIComponent(packId); } catch (_) {}
+            let track = null;
+            if (m[2]) {
+                try {
+                    const hp = new URLSearchParams(m[2]);
+                    track = hp.get('track') || hp.get('t');
+                } catch (_) {}
+            }
+            return { packId: String(packId).trim(), track: track ? String(track).trim() : null };
+        }
+
+        async function tryOpenExchangeDeepLink() {
+            const link = pendingExchangeDeepLink || parseExchangeDeepLink();
+            if (!link?.packId) return;
+            if (link.track && link.track !== activeTrackId) {
+                pendingExchangeDeepLink = link;
+                return;
+            }
+            const pack = exchangePacks.find((p) => p.id === link.packId);
+            if (!pack) return;
+            pendingExchangeDeepLink = null;
+            openExchangeHub();
+            exOpenPack(pack.id);
+        }
+
         window.switchTab = (tab) => {
             ['dictionary', 'library', 'training'].forEach(t => { 
                 document.getElementById(`view-${t}`).classList.add('hidden'); 
@@ -46851,7 +48165,10 @@
             if (tab === 'library') {
                 document.getElementById('library-add-view').classList.add('hidden');
                 document.getElementById('library-read-view').classList.add('hidden');
+                document.getElementById('exchange-hub-view')?.classList.remove('is-open');
                 document.getElementById('library-list-view').classList.remove('hidden');
+            } else {
+                document.getElementById('exchange-hub-view')?.classList.remove('is-open');
             }
 
             if(tab !== 'library') closeReader(); 
