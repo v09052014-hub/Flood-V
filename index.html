@@ -9708,6 +9708,9 @@
             line-height: 1.4;
         }
         .auth-account-card {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
             border: 1px solid #e2e8f0;
             border-radius: 1rem;
             padding: 0.9rem 1rem;
@@ -9715,6 +9718,17 @@
             margin-bottom: 1rem;
             text-align: left;
         }
+        .auth-account-avatar {
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 9999px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #e2e8f0;
+            border: 1px solid #e2e8f0;
+        }
+        .auth-account-avatar.is-empty { display: none; }
+        .auth-account-text { min-width: 0; flex: 1; }
         .auth-account-email { font-weight: 700; color: #0f172a; font-size: 0.9rem; word-break: break-all; }
         .auth-account-meta { font-size: 0.75rem; color: #64748b; margin-top: 0.2rem; }
         #system-status.is-dismissed {
@@ -10253,8 +10267,11 @@
                             <p class="settings-panel-label mb-2" data-i18n="auth.accountTitle">Акаунт</p>
                             <div id="auth-account-signed" class="hidden">
                                 <div class="auth-account-card">
-                                    <div class="auth-account-email" id="auth-account-email">—</div>
-                                    <div class="auth-account-meta" id="auth-account-meta" data-i18n="auth.signedGoogle">Увійшли через Google</div>
+                                    <img id="auth-account-avatar" class="auth-account-avatar is-empty" alt="" width="44" height="44" referrerpolicy="no-referrer">
+                                    <div class="auth-account-text">
+                                        <div class="auth-account-email" id="auth-account-email">—</div>
+                                        <div class="auth-account-meta" id="auth-account-meta" data-i18n="auth.signedGoogle">Увійшли через Google</div>
+                                    </div>
                                 </div>
                                 <button type="button" onclick="openAuthLanding()" class="w-full mb-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.openLogin">Екран входу</button>
                                 <button type="button" onclick="signOutAccount()" class="w-full mb-2 bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.signOut">Вийти</button>
@@ -11470,7 +11487,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, updateDoc, setDoc, getDoc, getDocs, writeBatch, arrayUnion, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -11660,6 +11677,7 @@
                 'auth.migrateDone': 'Перенесено. Документів: {n}',
                 'auth.migrateFail': 'Не вдалося перенести дані. Словник Google може бути порожнім.',
                 'auth.migrating': 'Переносимо дані…',
+                'auth.redirectFail': 'Вхід з телефону обірвався (sessionStorage). Відкрийте сайт у Chrome/Safari (не в Telegram/Instagram), бажано з домену *.web.app або *.firebaseapp.com, увімкніть cookies і спробуйте знову.',
                 'tabs.dictionary': 'Словник', 'tabs.library': 'Бібліотека', 'tabs.training': 'Тренування',
                 'profile.title': 'Профіль / Налаштування',
                 'profile.hint': 'Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.',
@@ -12476,6 +12494,7 @@
                 'auth.migrateDone': 'Migrated. Documents: {n}',
                 'auth.migrateFail': 'Could not migrate data. The Google dictionary may be empty.',
                 'auth.migrating': 'Migrating data…',
+                'auth.redirectFail': 'Phone sign-in lost session storage. Open the site in Chrome/Safari (not Telegram/Instagram), preferably on *.web.app or *.firebaseapp.com, allow cookies, and try again.',
                 'tabs.dictionary': 'Dictionary', 'tabs.library': 'Library', 'tabs.training': 'Training',
                 'profile.title': 'Profile / Settings',
                 'profile.hint': 'Your dictionary is tied to this account ID. Most users can leave it unchanged.',
@@ -13282,6 +13301,7 @@
                 'auth.migrateDone': 'Migrado. Documentos: {n}',
                 'auth.migrateFail': 'No se pudo migrar. El diccionario de Google puede estar vacío.',
                 'auth.migrating': 'Migrando datos…',
+                'auth.redirectFail': 'El inicio en el teléfono perdió sessionStorage. Abre el sitio en Chrome/Safari (no Telegram/Instagram), preferiblemente en *.web.app o *.firebaseapp.com, permite cookies e inténtalo de nuevo.',
                 'tabs.dictionary': 'Diccionario', 'tabs.library': 'Biblioteca', 'tabs.training': 'Entrenamiento',
                 'profile.title': 'Perfil / Ajustes',
                 'profile.hint': 'Tu diccionario está vinculado a este ID de cuenta. La mayoría puede dejarlo como está.',
@@ -18344,6 +18364,7 @@
             const signed = document.getElementById('auth-account-signed');
             const guest = document.getElementById('auth-account-guest');
             const emailEl = document.getElementById('auth-account-email');
+            const avatarEl = document.getElementById('auth-account-avatar');
             const legacyEdit = document.getElementById('auth-legacy-uid-edit');
             const legacyReset = document.getElementById('auth-legacy-reset-btn');
             const google = isGoogleSignedIn();
@@ -18353,6 +18374,22 @@
                 emailEl.textContent = google
                     ? (authUser.email || authUser.displayName || authUser.uid)
                     : '—';
+            }
+            if (avatarEl) {
+                const photo = google ? String(authUser?.photoURL || '').trim() : '';
+                if (photo) {
+                    avatarEl.src = photo;
+                    avatarEl.alt = authUser?.displayName || authUser?.email || '';
+                    avatarEl.classList.remove('is-empty');
+                    avatarEl.onerror = () => {
+                        avatarEl.removeAttribute('src');
+                        avatarEl.classList.add('is-empty');
+                    };
+                } else {
+                    avatarEl.removeAttribute('src');
+                    avatarEl.alt = '';
+                    avatarEl.classList.add('is-empty');
+                }
             }
             // Keep legacy ID tools available for migration / teacher linking, but quieter when Google is on
             if (legacyEdit) legacyEdit.classList.toggle('opacity-60', !!google);
@@ -18412,43 +18449,139 @@
             }
         };
 
+        const GOOGLE_AUTH_PREV_UID_KEY = 'ls_google_auth_prev_uid';
+
+        function isLikelyMobileAuthDevice() {
+            try {
+                const ua = navigator.userAgent || '';
+                if (/Android|iPhone|iPad|iPod|Mobile/i.test(ua)) return true;
+                if (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform || '')) return true;
+            } catch (_) {}
+            return false;
+        }
+
+        function isAuthFriendlyHost() {
+            try {
+                const h = String(location.hostname || '').toLowerCase();
+                if (!h || h === 'localhost' || h === '127.0.0.1') return true;
+                if (h.endsWith('.firebaseapp.com') || h.endsWith('.web.app')) return true;
+                // Same host as configured authDomain
+                const ad = String(firebaseConfig.authDomain || '').toLowerCase();
+                if (ad && h === ad) return true;
+            } catch (_) {}
+            return false;
+        }
+
+        function rememberGoogleAuthPrevUid() {
+            const prevUid = (() => {
+                try { return localStorage.getItem(LOCAL_UID_KEY) || activeUid || DEFAULT_SHARED_UID; }
+                catch (_) { return activeUid || DEFAULT_SHARED_UID; }
+            })();
+            try { localStorage.setItem(GOOGLE_AUTH_PREV_UID_KEY, prevUid || DEFAULT_SHARED_UID); } catch (_) {}
+            return prevUid;
+        }
+
+        function takeGoogleAuthPrevUid() {
+            try {
+                const v = localStorage.getItem(GOOGLE_AUTH_PREV_UID_KEY);
+                localStorage.removeItem(GOOGLE_AUTH_PREV_UID_KEY);
+                return v || DEFAULT_SHARED_UID;
+            } catch (_) {
+                return DEFAULT_SHARED_UID;
+            }
+        }
+
+        async function finishGoogleSignIn(user) {
+            if (!user || user.isAnonymous) return;
+            authUser = user;
+            setAuthMode('google');
+            const googleUid = user.uid;
+            const prevUid = takeGoogleAuthPrevUid();
+            await enterAppWithUid(googleUid);
+            try {
+                await setDoc(doc(db, 'users', googleUid), {
+                    authProvider: 'google',
+                    email: user.email || '',
+                    displayName: user.displayName || '',
+                    photoURL: user.photoURL || '',
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+            } catch (_) {}
+            if (prevUid && prevUid !== googleUid) {
+                tryOfferGuestToGoogleMigration(prevUid, googleUid);
+            }
+        }
+
+        function authErrorLooksLikeRedirectState(err) {
+            const msg = String(err?.message || err || '').toLowerCase();
+            const code = String(err?.code || '').toLowerCase();
+            return msg.includes('missing initial state')
+                || msg.includes('sessionstorage')
+                || code.includes('missing-initial-state')
+                || code === 'auth/missing-initial-state';
+        }
+
         window.signInWithGoogle = async () => {
             if (!auth) return;
             const btn = document.getElementById('btn-auth-google');
             if (btn) btn.disabled = true;
             setAuthGateStatus(t('auth.working'));
-            const prevUid = (() => {
-                try { return localStorage.getItem(LOCAL_UID_KEY) || activeUid || DEFAULT_SHARED_UID; }
-                catch (_) { return activeUid || DEFAULT_SHARED_UID; }
-            })();
+            rememberGoogleAuthPrevUid();
             try {
-                const result = await signInWithPopup(auth, googleAuthProvider);
-                authUser = result.user;
-                setAuthMode('google');
-                const googleUid = result.user.uid;
-                await enterAppWithUid(googleUid);
-                try {
-                    await setDoc(doc(db, 'users', googleUid), {
-                        authProvider: 'google',
-                        email: result.user.email || '',
-                        displayName: result.user.displayName || '',
-                        photoURL: result.user.photoURL || '',
-                        updatedAt: serverTimestamp()
-                    }, { merge: true });
-                } catch (_) {}
-                if (prevUid && prevUid !== googleUid) {
-                    tryOfferGuestToGoogleMigration(prevUid, googleUid);
+                // Mobile browsers often turn popup into a redirect and then lose sessionStorage
+                // when the app is not on firebaseapp.com / web.app. Prefer redirect on friendly hosts.
+                if (isLikelyMobileAuthDevice() && isAuthFriendlyHost()) {
+                    await signInWithRedirect(auth, googleAuthProvider);
+                    return; // navigation away
                 }
+                const result = await signInWithPopup(auth, googleAuthProvider);
+                await finishGoogleSignIn(result.user);
             } catch (e) {
                 console.error('signInWithGoogle', e);
                 const code = e?.code || '';
-                if (code === 'auth/popup-blocked') setAuthGateStatus(t('auth.popupBlocked'));
-                else if (code === 'auth/popup-closed-by-user') setAuthGateStatus('');
-                else setAuthGateStatus(t('auth.googleError'));
+                if (authErrorLooksLikeRedirectState(e)) {
+                    setAuthGateStatus(t('auth.redirectFail'));
+                } else if (code === 'auth/popup-blocked') {
+                    // Fallback: full-page redirect
+                    try {
+                        await signInWithRedirect(auth, googleAuthProvider);
+                        return;
+                    } catch (e2) {
+                        console.error(e2);
+                        setAuthGateStatus(authErrorLooksLikeRedirectState(e2) ? t('auth.redirectFail') : t('auth.popupBlocked'));
+                    }
+                } else if (code === 'auth/popup-closed-by-user') {
+                    setAuthGateStatus('');
+                } else if (isLikelyMobileAuthDevice()) {
+                    // Last resort on phone
+                    try {
+                        await signInWithRedirect(auth, googleAuthProvider);
+                        return;
+                    } catch (e2) {
+                        console.error(e2);
+                        setAuthGateStatus(authErrorLooksLikeRedirectState(e2) ? t('auth.redirectFail') : t('auth.googleError'));
+                    }
+                } else {
+                    setAuthGateStatus(t('auth.googleError'));
+                }
             } finally {
                 if (btn) btn.disabled = false;
             }
         };
+
+        async function completeGoogleRedirectIfAny() {
+            if (!auth) return;
+            try {
+                const result = await getRedirectResult(auth);
+                if (result?.user) await finishGoogleSignIn(result.user);
+            } catch (e) {
+                console.error('getRedirectResult', e);
+                if (authErrorLooksLikeRedirectState(e)) {
+                    setAuthGateStatus(t('auth.redirectFail'));
+                    try { showAuthGate(); } catch (_) {}
+                }
+            }
+        }
 
         async function copyFirestoreCollection(fromParts, toParts) {
             const snap = await getDocs(collection(db, ...fromParts));
@@ -18621,6 +18754,7 @@
             setSystemStatus(t('status.connecting'), 'info');
             normalizeAuthPathToHash();
 
+            const startAuthListener = () => {
             onAuthStateChanged(auth, async (user) => {
                 authUser = user || null;
                 if (user) {
@@ -18628,6 +18762,17 @@
                     activeUid = uid;
                     localStorage.setItem(LOCAL_UID_KEY, activeUid);
                     syncAuthAccountSettingsUi();
+
+                    // After mobile redirect, finishGoogleSignIn may already have run; still offer migration if pending
+                    if (!user.isAnonymous) {
+                        try {
+                            const pendingPrev = localStorage.getItem(GOOGLE_AUTH_PREV_UID_KEY);
+                            if (pendingPrev && pendingPrev !== uid) {
+                                tryOfferGuestToGoogleMigration(pendingPrev, uid);
+                                localStorage.removeItem(GOOGLE_AUTH_PREV_UID_KEY);
+                            }
+                        } catch (_) {}
+                    }
 
                     if (shouldShowAuthLanding()) {
                         showAuthGate();
@@ -18664,6 +18809,9 @@
                     }
                 } catch (_) {}
             });
+            };
+
+            completeGoogleRedirectIfAny().catch(() => {}).finally(() => startAuthListener());
         } catch (e) { setSystemStatus(t('status.firebaseError'), "error"); }
 
         function loadData() {
