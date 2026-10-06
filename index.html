@@ -61,6 +61,8 @@
             background-color: var(--app-bg);
             min-height: 100%;
             min-height: 100dvh;
+            /* Soften browser pull-to-refresh; JS confirms intentional reload */
+            overscroll-behavior-y: contain;
         }
         body {
             /* Clear Android gesture nav only (max inset). Do not invent a second "chin". */
@@ -71,6 +73,7 @@
             background-color: var(--app-bg);
             min-height: 100%;
             min-height: 100dvh;
+            overscroll-behavior-y: contain;
         }
         main {
             padding-bottom: 0.75rem;
@@ -1260,14 +1263,17 @@
         #library-read-view .text-reader .word-saved-phrase {
             background-color: rgba(209, 250, 229, 0.52);
         }
-        /* Mark-as-read: no long-press copy / callout */
+        /* Mark-as-read / Next: no long-press copy / callout */
         .reader-mark-read-btn,
-        .reader-mark-read-btn * {
+        .reader-mark-read-btn *,
+        #bs-btn-next,
+        #bs-btn-next * {
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
         }
-        .reader-mark-read-btn {
+        .reader-mark-read-btn,
+        #bs-btn-next {
             -webkit-touch-callout: none;
             touch-action: manipulation;
         }
@@ -1277,6 +1283,27 @@
         }
         #library-read-view:not(.reader-copy-mode):not(.reader-hl-mode) #reader-content .word-clickable {
             -webkit-touch-callout: none;
+        }
+        /* Kept look after native selection is cleared (hides OS copy toolbar) */
+        ::highlight(ls-reader-sel) {
+            background-color: rgba(165, 180, 252, 0.55);
+            color: inherit;
+        }
+        #library-read-view .word-clickable.reader-sel-kept {
+            background-color: rgba(165, 180, 252, 0.42);
+            border-radius: 0.15em;
+        }
+        #library-read-view.reader-theme-warm ::highlight(ls-reader-sel) {
+            background-color: rgba(214, 176, 120, 0.45);
+        }
+        #library-read-view.reader-theme-warm .word-clickable.reader-sel-kept {
+            background-color: rgba(214, 176, 120, 0.38);
+        }
+        #library-read-view.reader-theme-dark ::highlight(ls-reader-sel) {
+            background-color: rgba(129, 140, 248, 0.4);
+        }
+        #library-read-view.reader-theme-dark .word-clickable.reader-sel-kept {
+            background-color: rgba(129, 140, 248, 0.35);
         }
         #library-read-view.reader-tools-floated #reader-pagination {
             margin-bottom: 5.25rem;
@@ -1335,11 +1362,78 @@
         #bs-success-reveal.bs-reveal-missed #bs-success-word { color: #4338ca; }
         #bs-success-trans { color: #0f172a; font-weight: 600; }
         #bs-success-context { color: #64748b; font-style: italic; }
-        #bs-success-context.bs-success-context-expandable {
+        #bs-success-context.bs-success-context-expandable,
+        #bs-success-context.bs-success-context-peekable {
             cursor: pointer;
         }
-        #bs-success-context.bs-success-context-expandable:hover {
+        #bs-success-context.bs-success-context-expandable:hover,
+        #bs-success-context.bs-success-context-peekable:hover {
             color: #475569;
+        }
+
+        #train-ctx-peek-modal {
+            z-index: 220;
+        }
+        #train-ctx-peek-modal .train-ctx-peek-dialog {
+            max-width: 40rem;
+            max-height: min(86vh, 40rem);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            padding: 0;
+            overflow: hidden;
+        }
+        #train-ctx-peek-modal .train-ctx-peek-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 1rem 1.15rem 0.75rem;
+            border-bottom: 1px solid #eef2f7;
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+        #train-ctx-peek-modal .train-ctx-peek-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1.3;
+            min-width: 0;
+        }
+        #train-ctx-peek-modal .train-ctx-peek-sub {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-top: 0.2rem;
+        }
+        #train-ctx-peek-body {
+            padding: 1rem 1.15rem 1.25rem;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.02rem;
+            line-height: 1.7;
+            color: #334155;
+        }
+        #train-ctx-peek-body p {
+            margin: 0 0 0.85rem;
+        }
+        #train-ctx-peek-body p:last-child { margin-bottom: 0; }
+        mark.train-ctx-peek-excerpt {
+            background: rgba(199, 210, 254, 0.45);
+            color: inherit;
+            border-radius: 0.2em;
+            padding: 0.05em 0;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+        mark.train-ctx-peek-word {
+            background: rgba(129, 140, 248, 0.55);
+            color: #312e81;
+            font-weight: 800;
+            font-style: normal;
+            border-radius: 0.15em;
+            padding: 0.02em 0.08em;
         }
         
         /* Reader Styles - Baseline, dynamically overridden by JS */
@@ -2203,6 +2297,46 @@
             border-color: rgba(165, 180, 252, 0.38);
         }
         .train-osk-float:active { background: rgba(226, 232, 240, 0.45); }
+        .train-osk-float--caps {
+            min-width: 1.7rem;
+            font-size: 0.72rem;
+            letter-spacing: 0;
+        }
+        .bs-ctor-osk-btn {
+            display: none;
+            margin: 0.85rem auto 0;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            min-height: 2.55rem;
+            padding: 0.5rem 1.15rem;
+            border-radius: 0.9rem;
+            border: 1.5px solid #c7d2fe;
+            background: linear-gradient(180deg, #eef2ff 0%, #e0e7ff 100%);
+            color: #4338ca;
+            font-size: 0.88rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            box-shadow: 0 1px 0 #a5b4fc, 0 4px 12px rgba(99, 102, 241, 0.12);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+        }
+        .bs-ctor-osk-btn:active { transform: scale(0.97); }
+        .bs-ctor-osk-btn.is-on {
+            background: linear-gradient(180deg, #4f46e5 0%, #4338ca 100%);
+            border-color: #3730a3;
+            color: #fff;
+            box-shadow: 0 1px 0 #312e81, 0 4px 14px rgba(67, 56, 202, 0.28);
+        }
+        .bs-ctor-osk-btn-icon {
+            font-size: 1.05rem;
+            line-height: 1;
+            opacity: 0.9;
+        }
+        @media (pointer: coarse) {
+            .bs-ctor-osk-btn { display: inline-flex; }
+        }
         .train-osk-keys { width: 100%; }
         .train-osk-key.is-pressed {
             background: #c7d2fe;
@@ -3349,7 +3483,7 @@
             height: 3rem;
             border-bottom: 2px solid #cbd5e1;
             border-radius: 0.65rem;
-            transition: all 0.2s;
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .letter-tile {
             width: 2.85rem;
@@ -3359,6 +3493,54 @@
             cursor: pointer;
         }
         .letter-tile:active { transform: scale(0.92); }
+        /* Constructor: soft float into slot */
+        .letter-slot.ctor-letter-land {
+            animation: ctorLetterLand 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .letter-slot.ctor-letter-win {
+            animation: ctorLetterWin 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .letter-tile.ctor-tile-in {
+            animation: ctorTileIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @keyframes ctorLetterLand {
+            from { opacity: 0.35; transform: translateY(10px) scale(0.88); }
+            60% { transform: translateY(-2px) scale(1.04); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes ctorLetterWin {
+            from { transform: scale(1); }
+            45% { transform: scale(1.08); }
+            to { transform: scale(1); }
+        }
+        @keyframes ctorTileIn {
+            from { opacity: 0; transform: translateY(6px) scale(0.92); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        /* Soft enter when switching word / exercise stage */
+        #bs-interactive-area.bs-stage-enter {
+            animation: bsStageEnter 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @keyframes bsStageEnter {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #bs-success-reveal.bs-reveal-pop {
+            animation: bsRevealPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @keyframes bsRevealPop {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .letter-slot.ctor-letter-land,
+            .letter-slot.ctor-letter-win,
+            .letter-tile.ctor-tile-in,
+            #bs-interactive-area.bs-stage-enter,
+            #bs-success-reveal.bs-reveal-pop {
+                animation: none !important;
+            }
+        }
         /* Subtle article cues — constructor + dictionary (not shouty gender UI) */
         .letter-tile.is-article-m { opacity: 0.78; border-color: #93c5fd; color: #3b82f6; }
         .letter-tile.is-article-f { opacity: 0.78; border-color: #f9a8d4; color: #db2777; }
@@ -9295,6 +9477,20 @@
         </div>
     </div>
 
+    <!-- Modal: training context → material peek -->
+    <div id="train-ctx-peek-modal" class="hidden fixed inset-0 bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" onclick="if(event.target===this)closeTrainContextPeek()" role="dialog" aria-modal="true" aria-labelledby="train-ctx-peek-title">
+        <div class="bg-white rounded-2xl shadow-2xl train-ctx-peek-dialog">
+            <div class="train-ctx-peek-head">
+                <div class="min-w-0">
+                    <h3 id="train-ctx-peek-title" class="train-ctx-peek-title"></h3>
+                    <p id="train-ctx-peek-sub" class="train-ctx-peek-sub"></p>
+                </div>
+                <button type="button" onclick="closeTrainContextPeek()" class="flex-shrink-0 w-9 h-9 inline-flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 font-bold text-2xl leading-none" aria-label="Close">&times;</button>
+            </div>
+            <div id="train-ctx-peek-body" class="text-reader"></div>
+        </div>
+    </div>
+
     <!-- Modal: Order auto split choice -->
     <div id="order-auto-choice-modal" class="hidden fixed inset-0 z-[210] bg-slate-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeOrderAutoChoice()">
         <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-2xl max-w-md w-full relative text-left" role="dialog" aria-modal="true" aria-labelledby="order-auto-choice-title">
@@ -11240,7 +11436,7 @@
                 'train.echoBuilderSave': 'Зберегти', 'train.echoBuilderTrain': 'Зберегти й тренувати',
                 'train.echoBuilderSaveEdit': 'Зберегти зміни', 'train.echoBuilderTrainEdit': 'Зберегти зміни й тренувати',
                 'msg.echoMatRequired': 'Потрібен текст із фрагментами. Оберіть матеріал або створіть у білдері.',
-                'train.restoreSqueezeTip': 'Сховати абзаци без пропусків', 'train.restoreSqueezeOnTip': 'Показати всі абзаци',
+                'train.restoreSqueezeTip': 'Лише 3 речення навколо кожного пропуску', 'train.restoreSqueezeOnTip': 'Показати всі абзаци',
                 'train.restoreBatch10Tip': 'Режим 10: залишити лише 10 пропусків рівномірно по тексту. Банк слів теж скоротиться. Наступного разу — інші слова; коли нові закінчаться — суміш із уже тренованими.',
                 'train.textSmaller': 'Менший текст', 'train.textLarger': 'Більший текст',
                 'train.textNarrower': 'Вужче', 'train.textWider': 'Ширше',
@@ -11387,6 +11583,9 @@
                 'mode.trans-word.desc': 'Побачите переклад — оберіть правильне слово з чотирьох',
                 'train.transAmbigLabel': 'Кілька слів з таким перекладом',
                 'mode.constructor.desc': 'Зберіть слово з перемішаних літер',
+                'train.ctorOskShow': 'Клавіатура',
+                'train.ctorOskHide': 'Сховати клавіатуру',
+                'train.oskCaps': 'Caps Lock',
                 'mode.typing.desc': 'Побачите переклад і введіть слово самостійно',
                 'mode.listening.desc': 'Слухайте і введіть слово',
                 'mode.context.desc': 'Вставте слово в короткий уривок тексту на час',
@@ -11413,7 +11612,8 @@
                 'msg.defEnOnly': 'Вправа «Визначення» доступна, коли вивчаєте англійську.',
                 'msg.defDailyLimit': 'Сьогодні вже {n} сесій визначень. Поверніться завтра.',
                 'msg.defNone': 'Не вдалося знайти чіткі визначення для слів, готових зараз.',
-                'common.cancel': 'Скасувати', 'common.ok': 'OK',
+                'common.cancel': 'Скасувати', 'common.ok': 'OK', 'common.yes': 'Так', 'common.no': 'Ні',
+                'msg.reloadConfirm': 'Оновити сторінку?',
                 'status.connected': 'Підключено до хмари ☁️', 'status.authError': 'Помилка авторизації',
                 'status.firebaseError': 'Критична помилка Firebase', 'status.dbError': 'Помилка бази',
                 'msg.idCopied': 'Ваш ID скопійовано!', 'msg.badId': 'Вставте коректний ID.',
@@ -11474,7 +11674,7 @@
                 'reader.hlOnlyPage': 'стор. {n}',
                 'reader.hlPeek': 'Сторінка {n}',
                 'reader.copyMode': 'Режим копіювання',
-                'reader.copyModeOn': 'Копіювання увімкнено — виділяйте текст без перекладу',
+                'reader.copyModeOn': 'Копіювання увімкнено',
                 'reader.copyModeOff': 'Режим копіювання вимкнено',
                 'reader.copyPage': 'Копіювати поточну сторінку',
                 'reader.copyPageOk': 'Текст сторінки скопійовано',
@@ -11543,6 +11743,9 @@
                 'train.materialRemain': 'Залишилось {n} слів з матеріалу',
                 'train.stop': 'Стоп', 'train.dontKnow': 'Не знаю слово', 'train.next': 'Далі',
                 'train.successCtxTap': 'Натисніть, щоб побачити повний контекст',
+                'train.successCtxOpenMat': 'Натисніть, щоб відкрити місце в матеріалі',
+                'train.successCtxNoMat': 'Немає пов’язаного матеріалу для цього слова',
+                'train.ctxPeekWord': 'Слово в матеріалі',
                 'train.saving': 'Зберігаємо результати...', 'train.wait': 'Зачекайте кілька секунд',
                 'train.done': 'Завершено!', 'train.records': 'Рекорди:', 'train.backHub': 'До вибору тренувань',
                 'inline.searching': 'Шукаємо...', 'inline.enter': 'Натисніть ↵',
@@ -11985,7 +12188,7 @@
                 'train.echoBuilderSave': 'Save', 'train.echoBuilderTrain': 'Save & train',
                 'train.echoBuilderSaveEdit': 'Save changes', 'train.echoBuilderTrainEdit': 'Save changes & train',
                 'msg.echoMatRequired': 'Text with fragments required. Pick a material or create one in the builder.',
-                'train.restoreSqueezeTip': 'Hide paragraphs without gaps', 'train.restoreSqueezeOnTip': 'Show all paragraphs',
+                'train.restoreSqueezeTip': 'Only 3 sentences around each gap', 'train.restoreSqueezeOnTip': 'Show all paragraphs',
                 'train.restoreBatch10Tip': 'Mode 10: keep only 10 evenly spaced gaps. The word bank shrinks too. Next time: other words; when new ones run out — a mix with ones already practiced.',
                 'train.textSmaller': 'Smaller text', 'train.textLarger': 'Larger text',
                 'train.textNarrower': 'Narrower', 'train.textWider': 'Wider',
@@ -12128,6 +12331,9 @@
                 'mode.trans-word.desc': 'See the translation — pick the right word from four options',
                 'train.transAmbigLabel': 'Several words share this translation',
                 'mode.constructor.desc': 'Rebuild the word from scrambled letters',
+                'train.ctorOskShow': 'Keyboard',
+                'train.ctorOskHide': 'Hide keyboard',
+                'train.oskCaps': 'Caps Lock',
                 'mode.typing.desc': 'See the translation and type the word yourself',
                 'mode.listening.desc': 'Listen and type the word',
                 'mode.context.desc': 'Fill the word into a short text excerpt against the clock',
@@ -12154,7 +12360,8 @@
                 'msg.defEnOnly': 'Definitions is available when you are learning English.',
                 'msg.defDailyLimit': 'You have used {n} definition sessions today. Come back tomorrow.',
                 'msg.defNone': 'Could not find clear definitions for words that are due right now.',
-                'common.cancel': 'Cancel', 'common.ok': 'OK',
+                'common.cancel': 'Cancel', 'common.ok': 'OK', 'common.yes': 'Yes', 'common.no': 'No',
+                'msg.reloadConfirm': 'Refresh the page?',
                 'status.connected': 'Connected to the cloud ☁️', 'status.authError': 'Sign-in error',
                 'status.firebaseError': 'Critical Firebase error', 'status.dbError': 'Database error',
                 'msg.idCopied': 'Your ID has been copied!', 'msg.badId': 'Paste a valid ID.',
@@ -12215,7 +12422,7 @@
                 'reader.hlOnlyPage': 'p. {n}',
                 'reader.hlPeek': 'Page {n}',
                 'reader.copyMode': 'Copy mode',
-                'reader.copyModeOn': 'Copy mode on — select text without translation',
+                'reader.copyModeOn': 'Copy mode on',
                 'reader.copyModeOff': 'Copy mode off',
                 'reader.copyPage': 'Copy current page',
                 'reader.copyPageOk': 'Page text copied',
@@ -12284,6 +12491,9 @@
                 'train.materialRemain': '{n} words left from this material',
                 'train.stop': 'Stop', 'train.dontKnow': "I don't<br>know", 'train.next': 'Next',
                 'train.successCtxTap': 'Tap for full context',
+                'train.successCtxOpenMat': 'Tap to open this place in the material',
+                'train.successCtxNoMat': 'No linked material for this word',
+                'train.ctxPeekWord': 'Word in material',
                 'train.saving': 'Saving results...', 'train.wait': 'Please wait a few seconds',
                 'train.done': 'Done!', 'train.records': 'Records:', 'train.backHub': 'Back to training',
                 'inline.searching': 'Searching...', 'inline.enter': 'Press ↵',
@@ -12721,7 +12931,7 @@
                 'train.echoBuilderSave': 'Guardar', 'train.echoBuilderTrain': 'Guardar y entrenar',
                 'train.echoBuilderSaveEdit': 'Guardar cambios', 'train.echoBuilderTrainEdit': 'Guardar cambios y entrenar',
                 'msg.echoMatRequired': 'Se necesita texto con fragmentos. Elige un material o créalo en el constructor.',
-                'train.restoreSqueezeTip': 'Ocultar párrafos sin huecos', 'train.restoreSqueezeOnTip': 'Mostrar todos los párrafos',
+                'train.restoreSqueezeTip': 'Solo 3 oraciones alrededor de cada hueco', 'train.restoreSqueezeOnTip': 'Mostrar todos los párrafos',
                 'train.restoreBatch10Tip': 'Modo 10: solo 10 huecos repartidos por el texto. El banco también se reduce. La próxima vez: otras palabras; cuando no queden nuevas — mezcla con las ya practicadas.',
                 'train.textSmaller': 'Texto más pequeño', 'train.textLarger': 'Texto más grande',
                 'train.textNarrower': 'Más estrecho', 'train.textWider': 'Más ancho',
@@ -12864,6 +13074,9 @@
                 'mode.trans-word.desc': 'Ves la traducción — elige la palabra correcta entre cuatro',
                 'train.transAmbigLabel': 'Varias palabras comparten esta traducción',
                 'mode.constructor.desc': 'Forma la palabra con letras mezcladas',
+                'train.ctorOskShow': 'Teclado',
+                'train.ctorOskHide': 'Ocultar teclado',
+                'train.oskCaps': 'Bloq Mayús',
                 'mode.typing.desc': 'Ves la traducción y escribe la palabra tú mismo',
                 'mode.listening.desc': 'Escucha y escribe la palabra',
                 'mode.context.desc': 'Completa la palabra en un fragmento a contrarreloj',
@@ -12890,7 +13103,8 @@
                 'msg.defDailyLimit': 'Ya usaste {n} sesiones de definiciones hoy. Vuelve mañana.',
                 'msg.defNone': 'No se encontraron definiciones claras para las palabras listas ahora.',
                 'stage.review': 'Repaso',
-                'common.cancel': 'Cancelar', 'common.ok': 'OK',
+                'common.cancel': 'Cancelar', 'common.ok': 'OK', 'common.yes': 'Sí', 'common.no': 'No',
+                'msg.reloadConfirm': '¿Actualizar la página?',
                 'status.connected': 'Conectado a la nube ☁️', 'status.authError': 'Error de acceso',
                 'status.firebaseError': 'Error crítico de Firebase', 'status.dbError': 'Error de base de datos',
                 'msg.idCopied': '¡ID copiado!', 'msg.badId': 'Pega un ID válido.',
@@ -12951,7 +13165,7 @@
                 'reader.hlOnlyPage': 'pág. {n}',
                 'reader.hlPeek': 'Página {n}',
                 'reader.copyMode': 'Modo copiar',
-                'reader.copyModeOn': 'Modo copiar activo — selecciona texto sin traducción',
+                'reader.copyModeOn': 'Modo copiar activo',
                 'reader.copyModeOff': 'Modo copiar desactivado',
                 'reader.copyPage': 'Copiar página actual',
                 'reader.copyPageOk': 'Texto de la página copiado',
@@ -13020,6 +13234,9 @@
                 'train.materialRemain': 'Quedan {n} palabras del material',
                 'train.stop': 'Parar', 'train.dontKnow': 'No lo<br>sé', 'train.next': 'Siguiente',
                 'train.successCtxTap': 'Toca para ver el contexto completo',
+                'train.successCtxOpenMat': 'Toca para abrir el lugar en el material',
+                'train.successCtxNoMat': 'No hay material vinculado a esta palabra',
+                'train.ctxPeekWord': 'Palabra en el material',
                 'train.saving': 'Guardando resultados...', 'train.wait': 'Espera unos segundos',
                 'train.done': '¡Listo!', 'train.records': 'Récords:', 'train.backHub': 'Volver a los entrenamientos',
                 'inline.searching': 'Buscando...', 'inline.enter': 'Pulsa ↵',
@@ -13792,6 +14009,7 @@
         window.setLearningLanguage = async (code) => {
             if (STUDENT_EDITION) return;
             if (!CONTENT_LANGS.includes(code)) return;
+            if (code === learningLanguage) return;
             if (code === translationLanguage) translationLanguage = code === 'en' ? 'uk' : 'en';
             learningLanguage = code;
             await applyTrackChange({ fromDeepLink: false });
@@ -13799,6 +14017,7 @@
         window.setTranslationLanguage = async (code) => {
             if (STUDENT_EDITION) return;
             if (!CONTENT_LANGS.includes(code) || code === learningLanguage) return;
+            if (code === translationLanguage) return;
             translationLanguage = code;
             await applyTrackChange({ fromDeepLink: false });
         };
@@ -13848,8 +14067,9 @@
             applyReaderHighlightColor();
             storySelectedArchiveKey = loadStorySelectedArchiveKey();
             resetStoryHeadlinerForCurrentTrack();
-            await saveUserPrefs();
+            // Reload track data immediately — never block UI on slow Firestore prefs write
             if (typeof loadData === 'function') loadData();
+            try { saveUserPrefs(); } catch (_) {}
         }
         async function loadUserPrefs() {
             if (!activeUid || !db) {
@@ -17371,14 +17591,93 @@
             lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
         }, { passive: true });
 
-        window.showModal = (text, confirmMode = false, onConfirm = null) => {
-            document.getElementById('custom-modal').classList.remove('hidden');
+        window.showModal = (text, confirmMode = false, onConfirm = null, opts = {}) => {
+            const modal = document.getElementById('custom-modal');
+            modal.classList.remove('hidden');
             document.getElementById('modal-text').textContent = text;
+            const btnOk = document.getElementById('modal-btn-ok');
             const btnCancel = document.getElementById('modal-btn-cancel');
             btnCancel.classList.toggle('hidden', !confirmMode);
-            document.getElementById('modal-btn-ok').onclick = () => { document.getElementById('custom-modal').classList.add('hidden'); if(onConfirm) onConfirm(); };
-            btnCancel.onclick = () => document.getElementById('custom-modal').classList.add('hidden');
+            const okLabel = opts.okLabel || t('common.ok');
+            const cancelLabel = opts.cancelLabel || t('common.cancel');
+            btnOk.textContent = okLabel;
+            btnCancel.textContent = cancelLabel;
+            const resetLabels = () => {
+                btnOk.textContent = t('common.ok');
+                btnCancel.textContent = t('common.cancel');
+            };
+            btnOk.onclick = () => {
+                modal.classList.add('hidden');
+                resetLabels();
+                if (onConfirm) onConfirm();
+            };
+            btnCancel.onclick = () => {
+                modal.classList.add('hidden');
+                resetLabels();
+                if (typeof opts.onCancel === 'function') opts.onCancel();
+            };
         };
+
+        /** Pull-down at top of page → confirm before reload (blocks accidental mobile PTR). */
+        (function wireReloadConfirmOnPull() {
+            let startY = 0;
+            let armed = false;
+            let asking = false;
+            const TOP_EPS = 2;
+            const PULL_PX = 72;
+
+            function atPageTop() {
+                return (window.scrollY || document.documentElement.scrollTop || 0) <= TOP_EPS;
+            }
+
+            function shouldIgnorePull(target) {
+                if (!target || !target.closest) return false;
+                if (target.closest('#library-read-view, #bs-workspace, #custom-modal, #sync-modal, #settings-modal, .settings-body, #inline-popup')) {
+                    return true;
+                }
+                let n = target;
+                while (n && n !== document.body && n !== document.documentElement) {
+                    if (n.scrollTop > TOP_EPS) return true;
+                    n = n.parentElement;
+                }
+                return false;
+            }
+
+            function askReloadConfirm() {
+                if (asking) return;
+                asking = true;
+                window.showModal(t('msg.reloadConfirm'), true, () => {
+                    asking = false;
+                    location.reload();
+                }, {
+                    okLabel: t('common.yes'),
+                    cancelLabel: t('common.no'),
+                    onCancel: () => { asking = false; }
+                });
+            }
+
+            document.addEventListener('touchstart', (e) => {
+                const t0 = e.touches && e.touches[0];
+                if (!t0) return;
+                startY = t0.clientY;
+                armed = atPageTop() && !shouldIgnorePull(e.target);
+            }, { passive: true, capture: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!armed || asking) return;
+                const t0 = e.touches && e.touches[0];
+                if (!t0) return;
+                const dy = t0.clientY - startY;
+                if (dy > PULL_PX && atPageTop()) {
+                    armed = false;
+                    try { e.preventDefault(); } catch (_) {}
+                    askReloadConfirm();
+                }
+            }, { passive: false, capture: true });
+
+            document.addEventListener('touchend', () => { armed = false; }, { passive: true, capture: true });
+            document.addEventListener('touchcancel', () => { armed = false; }, { passive: true, capture: true });
+        })();
 
         window.imgError = (img) => { img.onerror = null; img.src = UNSPLASH_FALLBACK; };
 
@@ -27502,7 +27801,7 @@
             if (currentMaterial.isRead) {
                 return `<div data-reader-ui="1" class="mt-10 text-center p-4 bg-slate-100 rounded-xl border border-slate-200 text-slate-500 font-bold flex items-center justify-center gap-2 shadow-sm font-sans text-base"><span>✅</span> ${t('lib.readDone')}</div>`;
             }
-            return `<button data-reader-ui="1" onclick="markCurrentAsRead()" class="reader-mark-read-btn mt-10 w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold font-sans shadow-md text-base sm:text-lg transition flex justify-center items-center gap-2 active:scale-95"><span>✅ ${t('lib.markRead')}</span></button>`;
+            return `<button data-reader-ui="1" onclick="markCurrentAsRead()" class="reader-mark-read-btn mt-10 w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold font-sans shadow-md text-base sm:text-lg transition flex justify-center items-center gap-2 active:scale-95"><span>${t('lib.markRead')}</span></button>`;
         }
 
         function getReaderTtsLang(preferred) {
@@ -28611,6 +28910,42 @@
             } catch (_) {}
         }
 
+        function clearReaderKeptSelection() {
+            try {
+                if (window.CSS?.highlights) CSS.highlights.delete('ls-reader-sel');
+            } catch (_) {}
+            try {
+                document.querySelectorAll('#reader-content .word-clickable.reader-sel-kept')
+                    .forEach((el) => el.classList.remove('reader-sel-kept'));
+            } catch (_) {}
+        }
+
+        /** Keep a visual selection after clearing native ranges (blocks OS copy toolbar). */
+        function keepReaderSelectionLook(range) {
+            clearReaderKeptSelection();
+            if (!range) return;
+            let kept = false;
+            try {
+                if (window.CSS?.highlights && typeof Highlight === 'function') {
+                    CSS.highlights.set('ls-reader-sel', new Highlight(range.cloneRange()));
+                    kept = true;
+                }
+            } catch (_) {}
+            if (kept) return;
+            const root = document.getElementById('reader-content');
+            if (!root) return;
+            root.querySelectorAll('.word-clickable').forEach((el) => {
+                try {
+                    if (range.intersectsNode(el)) el.classList.add('reader-sel-kept');
+                } catch (_) {}
+            });
+        }
+
+        function clearNativeSelectionKeepLook(range) {
+            if (range) keepReaderSelectionLook(range);
+            clearNativeReaderSelection();
+        }
+
         function renderReaderContent(opts = {}) {
             if (!currentMaterial) return;
             const container = document.getElementById('reader-content');
@@ -28947,6 +29282,7 @@
             // Move popup immediately while the user extends or adjusts the selection
             setInlinePopupSelectionAdjusting(true);
             scheduleInlinePopupReposition(rect);
+            clearReaderKeptSelection();
 
             clearTimeout(selectionFetchTimeout);
             const commitMs = selLineCount >= 2 ? 950 : 780;
@@ -28960,7 +29296,7 @@
                 if (stableText.length === 0 || stableText.length > maxChars || stableText.includes('\n\n') || lines > 4) return;
                 if (stableText === lastSelectedText) {
                     scheduleInlinePopupReposition(latest.rect);
-                    clearNativeReaderSelection();
+                    clearNativeSelectionKeepLook(latest.range);
                     return;
                 }
 
@@ -28978,8 +29314,9 @@
                     lineContext,
                     multiLineSelection
                 });
-                // Drop native selection so Android/iOS copy-translate toolbar doesn't cover our popup
-                clearNativeReaderSelection();
+                // Drop native selection so Android/iOS copy-translate toolbar doesn't cover our popup,
+                // but keep a visual highlight of what was selected
+                clearNativeSelectionKeepLook(latest.range);
             }, commitMs);
         });
 
@@ -29001,6 +29338,7 @@
         window.closeInlinePopup = () => {
             clearTimeout(selectionFetchTimeout);
             setInlinePopupSelectionAdjusting(false);
+            clearReaderKeptSelection();
             clearInlineTtsHold?.();
             inlineTtsHoldFired = false;
             document.getElementById('inline-popup-tts')?.classList.remove('is-listen-queued');
@@ -29843,8 +30181,12 @@
             }
             if (!pool.length) return null;
             pool.sort((a, b) => b.score - a.score);
-            // Skip senses the learner marked as wrong (persisted locally)
-            pool = pool.filter((c) => !isDefSenseBanned(head, c.def));
+            // Skip senses the learner marked as wrong (persisted + this session)
+            const excluded = Array.isArray(wordObj?._defExcludedDefs) ? wordObj._defExcludedDefs : [];
+            pool = pool.filter((c) => {
+                if (isDefSenseBanned(head, c.def)) return false;
+                return !excluded.some((ex) => defSenseKey(head, ex) === defSenseKey(head, c.def));
+            });
             if (!pool.length) return null;
             const best = pool[0];
             // Final safety: related-but-wrong POS still too weak
@@ -31443,14 +31785,67 @@
         }
 
         function contextLooksLikeCommaList(text, idx, sStart, sEnd) {
-            const from = Math.max(sStart, idx - 90);
-            const to = Math.min(sEnd, idx + 140);
+            const from = Math.max(sStart, idx - 140);
+            const to = Math.min(sEnd, idx + 200);
             const window = text.slice(from, to);
             const commas = (window.match(/,/g) || []).length;
             if (commas < 2) return false;
             // word, word, word — at least two comma-separated tokens near the hit
-            const listy = /[\p{L}\p{M}][\p{L}\p{M}'’-]{0,24}\s*,\s*[\p{L}\p{M}][\p{L}\p{M}'’-]{0,24}\s*,/u;
+            const listy = /[\p{L}\p{M}][\p{L}\p{M}'’-]{0,32}\s*,\s*[\p{L}\p{M}][\p{L}\p{M}'’-]{0,32}\s*,/u;
             return listy.test(window);
+        }
+
+        /** Word sits in (or right after) a comma-separated run — keep preamble before the list. */
+        function wordInCommaListRegion(text, idx, sStart, sEnd) {
+            if (!text || idx < sStart || idx >= sEnd) return false;
+            let commaBefore = -1;
+            for (let i = idx - 1; i >= sStart; i--) {
+                if (text[i] === ',') { commaBefore = i; break; }
+                if (/[.!?;:—]/.test(text[i])) break;
+            }
+            let commaAfter = -1;
+            for (let i = idx; i < sEnd; i++) {
+                if (text[i] === ',') { commaAfter = i; break; }
+                if (/[.!?]/.test(text[i]) && !(text[i] === '.' && isContextAbbreviationDot(text, i))) break;
+            }
+            if (commaBefore >= 0 && commaAfter >= 0) return true;
+            if (commaBefore >= 0) {
+                const tail = text.slice(commaBefore + 1, sEnd);
+                if (/(^|\s)(and|or|y|e|und|ou|et)\s+[\p{L}\p{M}]/iu.test(tail)) return true;
+            }
+            if (commaAfter >= 0) {
+                const head = text.slice(sStart, commaAfter);
+                if (/,/.test(head)) return true;
+            }
+            return false;
+        }
+
+        /** Start of clip for a comma list — include text before the first list comma, not from mid-list. */
+        function findListPreambleStart(text, idx, sStart, sEnd) {
+            let firstListComma = -1;
+            for (let i = idx - 1; i >= sStart; i--) {
+                if (text[i] !== ',') continue;
+                if (text.slice(i + 1, sEnd).includes(',')) {
+                    firstListComma = i;
+                    break;
+                }
+            }
+            if (firstListComma < 0) {
+                for (let i = idx; i < sEnd; i++) {
+                    if (text[i] !== ',') continue;
+                    if (text.slice(sStart, i).includes(',')) {
+                        firstListComma = text.slice(sStart, i).lastIndexOf(',') + sStart;
+                        break;
+                    }
+                }
+            }
+            if (firstListComma < 0) return sStart;
+            let clipStart = sStart;
+            for (let i = firstListComma - 1; i >= sStart; i--) {
+                if (/[;:—]/.test(text[i])) { clipStart = i + 1; break; }
+            }
+            while (clipStart < firstListComma && /\s/.test(text[clipStart])) clipStart++;
+            return clipStart;
         }
 
         function findWordOccurrenceInText(pureText, query, occurrenceIndex = 0) {
@@ -31558,20 +31953,10 @@
             const idx = wordMatch.index;
             const wordEnd = idx + wordMatch.length;
             const { sStart, sEnd } = findContextUnitBounds(pureText, idx, wordEnd);
-            const commaBreak = /,/;
             const otherClauseBreak = /[;:—–]/;
-            // After a comma, keep a short following window so discourse markers
-            // like "to make matters worse, …" still get clarifying context for GT.
-            const AFTER_COMMA_BUDGET = 55;
-
-            // Comma lists (a, b, c, …): keep through the sentence so GT sees the list
-            if (contextLooksLikeCommaList(pureText, idx, sStart, sEnd)) {
-                let listStart = sStart;
-                for (let i = idx - 1; i >= sStart; i--) {
-                    if (/[;:—–]/.test(pureText[i])) { listStart = i + 1; break; }
-                }
-                return sliceContextClipWithWordMatch(pureText, listStart, sEnd, wordMatch);
-            }
+            const maxClipLen = 300;
+            const preferShortClip = 220;
+            const fullInSentence = pureText.slice(sStart, sEnd).trim();
 
             const findBreakBefore = (pattern) => {
                 for (let i = idx - 1; i >= sStart; i--) {
@@ -31579,40 +31964,41 @@
                 }
                 return sStart;
             };
-            const findBreakAfter = (pattern, { softComma = false } = {}) => {
+            const findBreakAfter = (pattern) => {
                 for (let i = wordEnd; i < sEnd; i++) {
-                    if (!pattern.test(pureText[i])) continue;
-                    if (softComma && pureText[i] === ',') {
-                        let j = i + 1;
-                        const cap = Math.min(sEnd, j + AFTER_COMMA_BUDGET);
-                        while (j < cap) {
-                            const ch = pureText[j];
-                            if (ch === '.' && isContextAbbreviationDot(pureText, j)) { j++; continue; }
-                            if (/[.!?;:—…]/.test(ch)) { j++; break; }
-                            if (ch === ',') break;
-                            j++;
-                        }
-                        while (j < sEnd && /\p{L}/u.test(pureText[j])) j++;
-                        return j;
-                    }
-                    return i + 1;
+                    if (pattern.test(pureText[i])) return i + 1;
                 }
                 return sEnd;
             };
 
-            let clipStart = findBreakBefore(commaBreak);
-            let clipEnd = findBreakAfter(commaBreak, { softComma: true });
-            if (clipStart === sStart && clipEnd === sEnd) {
-                clipStart = findBreakBefore(otherClauseBreak);
-                clipEnd = findBreakAfter(otherClauseBreak);
+            // Comma lists (a, b, c, …): keep preamble + list — never start clip after the first comma
+            if (contextLooksLikeCommaList(pureText, idx, sStart, sEnd)
+                || wordInCommaListRegion(pureText, idx, sStart, sEnd)) {
+                const listStart = findListPreambleStart(pureText, idx, sStart, sEnd);
+                let sliced = sliceContextClipWithWordMatch(pureText, listStart, sEnd, wordMatch);
+                if (sliced.clip.length > Math.floor(maxClipLen * 1.4)) {
+                    const centered = buildWordCenteredContextClip(pureText, idx, wordEnd, sStart, sEnd, maxClipLen);
+                    sliced = sliceContextClipWithWordMatch(pureText, centered.clipStart, centered.clipEnd, wordMatch);
+                }
+                return sliced;
             }
 
-            let sliced = sliceContextClipWithWordMatch(pureText, clipStart, clipEnd, wordMatch);
-            const fullInSentence = pureText.slice(sStart, sEnd).trim();
-            const maxClipLen = 180;
-            const preferShortClip = 120;
+            // Whole sentence when it fits — avoids chopping at incidental commas
+            if (fullInSentence.length <= maxClipLen) {
+                return sliceContextClipWithWordMatch(pureText, sStart, sEnd, wordMatch);
+            }
 
-            if ((sliced.clip === fullInSentence || sliced.clip.length > maxClipLen) && fullInSentence.length > preferShortClip) {
+            // Long sentence: clause breaks (; : —), not commas
+            let clipStart = findBreakBefore(otherClauseBreak);
+            let clipEnd = findBreakAfter(otherClauseBreak);
+            let sliced = sliceContextClipWithWordMatch(pureText, clipStart, clipEnd, wordMatch);
+
+            if (sliced.clip.length > maxClipLen || (clipStart === sStart && clipEnd === sEnd)) {
+                const centered = buildWordCenteredContextClip(pureText, idx, wordEnd, sStart, sEnd, maxClipLen);
+                sliced = sliceContextClipWithWordMatch(pureText, centered.clipStart, centered.clipEnd, wordMatch);
+            }
+
+            if (sliced.clip.length > maxClipLen && fullInSentence.length > preferShortClip) {
                 const centered = buildWordCenteredContextClip(pureText, idx, wordEnd, sStart, sEnd, maxClipLen);
                 sliced = sliceContextClipWithWordMatch(pureText, centered.clipStart, centered.clipEnd, wordMatch);
             }
@@ -39205,6 +39591,7 @@
 
         window.endSession = () => { 
             hideTrainOsk();
+            try { closeTrainContextPeek(); } catch (_) {}
             try { refundDefinitionSessionIfUnused(); } catch (_) {}
             if (activeSessionMode === 'story' && storyState?.story?.paragraphs?.length) {
                 persistStorySessionProgress();
@@ -39902,8 +40289,14 @@
             // Free vertical space on phone (esp. multiple-choice) so context stays on-screen
             collapseWrongTestOptions(word);
 
-            reveal.classList.remove('bs-reveal-success', 'bs-reveal-missed', 'hidden');
+            reveal.classList.remove('bs-reveal-success', 'bs-reveal-missed', 'bs-reveal-pop', 'hidden');
             reveal.classList.add(failed ? 'bs-reveal-missed' : 'bs-reveal-success');
+            try {
+                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    void reveal.offsetWidth;
+                    reveal.classList.add('bs-reveal-pop');
+                }
+            } catch (_) {}
 
             const badge = document.getElementById('bs-reveal-badge');
             if (badge) {
@@ -39957,6 +40350,17 @@
             wrongSenseBtn.disabled = true;
         }
 
+        function playBsStageEnter(area) {
+            if (!area) return;
+            try {
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            } catch (_) {}
+            area.classList.remove('bs-stage-enter');
+            // Retrigger CSS animation after DOM wipe
+            void area.offsetWidth;
+            area.classList.add('bs-stage-enter');
+        }
+
         function renderBsStage() {
             clearContextRoundTimer();
             const area = document.getElementById('bs-interactive-area'); const btnNext = document.getElementById('bs-btn-next'), feedback = document.getElementById('bs-feedback');
@@ -39971,7 +40375,7 @@
             const reveal = document.getElementById('bs-success-reveal');
             if (!keepStoryReveal) {
                 reveal.classList.add('hidden');
-                reveal.classList.remove('bs-reveal-success', 'bs-reveal-missed', 'story-answer-reveal');
+                reveal.classList.remove('bs-reveal-success', 'bs-reveal-missed', 'story-answer-reveal', 'bs-reveal-pop');
                 const img = document.getElementById('bs-success-img');
                 if (img) img.classList.remove('hidden');
             }
@@ -39979,10 +40383,10 @@
             document.removeEventListener('keydown', handleConstructorKeyboard); document.removeEventListener('keydown', handleGlobalKeyboard); document.addEventListener('keydown', handleGlobalKeyboard);
             document.removeEventListener('keydown', handleSprintKeyboard);
 
-            if (bsCurrentStage === 11) { renderStageRestore(area, btnNext, feedback); document.getElementById('bs-btn-dont-know').classList.add('hidden'); preserveTrainingFocusState(); return; }
-            if (bsCurrentStage === 12) { renderStageOrder(area, btnNext, feedback); document.getElementById('bs-btn-dont-know').classList.add('hidden'); preserveTrainingFocusState(); return; }
-            if (bsCurrentStage === 13) { renderStageStory(area, btnNext, feedback); preserveTrainingFocusState(); return; }
-            if (bsCurrentStage === 14) { renderStageEcho(area, btnNext, feedback); document.getElementById('bs-btn-dont-know').classList.add('hidden'); preserveTrainingFocusState(); return; }
+            if (bsCurrentStage === 11) { renderStageRestore(area, btnNext, feedback); document.getElementById('bs-btn-dont-know').classList.add('hidden'); preserveTrainingFocusState(); playBsStageEnter(area); return; }
+            if (bsCurrentStage === 12) { renderStageOrder(area, btnNext, feedback); document.getElementById('bs-btn-dont-know').classList.add('hidden'); preserveTrainingFocusState(); playBsStageEnter(area); return; }
+            if (bsCurrentStage === 13) { renderStageStory(area, btnNext, feedback); preserveTrainingFocusState(); playBsStageEnter(area); return; }
+            if (bsCurrentStage === 14) { renderStageEcho(area, btnNext, feedback); document.getElementById('bs-btn-dont-know').classList.add('hidden'); preserveTrainingFocusState(); playBsStageEnter(area); return; }
 
             const word = bsWords[bsCurrentWordIdx];
             if (!word) return;
@@ -40005,6 +40409,7 @@
             if (bsCurrentStage === 0 || bsCurrentStage === 1) mountTrainingPronunciation(area, word);
 
             preserveTrainingFocusState();
+            playBsStageEnter(area);
 
             if (bsCurrentStage === 0 && !isGlobalAudioMuted) playAudioWord(word.word);
             if (bsCurrentStage === 5) initListenStage(word);
@@ -40675,12 +41080,21 @@
             let ctorLastLen = 0;
             let ctorFreeUsed = false;
             let ctorBusy = false;
+            let ctorFirstPaint = true;
             window._bsCtorBusy = false;
             const promptHtml = blind
                 ? `<p class="text-sm text-slate-400 font-bold mb-6 uppercase tracking-wider">${t('stage.2')}</p>`
                 : `<p class="text-xl text-indigo-600 font-bold mb-6 uppercase tracking-wider">${escapeHtmlText(word.translation)}</p>`;
-            area.innerHTML = `${promptHtml}<div id="bs-c-slots" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 min-h-[3.5rem]"></div><div id="bs-c-pool" class="flex flex-wrap justify-center gap-2 sm:gap-2.5 min-h-[3.5rem]"></div>`;
+            const oskToggleHtml = isTrainingTouchDevice()
+                ? `<button type="button" id="bs-ctor-osk-btn" class="bs-ctor-osk-btn" onclick="toggleConstructorOsk()" aria-pressed="false" title="${escapeHtmlText(t('train.ctorOskShow'))}">
+                        <span class="bs-ctor-osk-btn-icon" aria-hidden="true">⌨️</span>
+                        <span data-ctor-osk-label>${escapeHtmlText(t('train.ctorOskShow'))}</span>
+                   </button>`
+                : '';
+            area.innerHTML = `${promptHtml}<div id="bs-c-slots" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 min-h-[3.5rem]"></div><div id="bs-c-pool" class="flex flex-wrap justify-center gap-2 sm:gap-2.5 min-h-[3.5rem]"></div>${oskToggleHtml}`;
             document.addEventListener('keydown', handleConstructorKeyboard);
+            try { hideTrainOsk(); } catch (_) {}
+            syncConstructorOskBtn();
 
             const markMismatchSlots = (slots) => {
                 slots.classList.add('animate-shake');
@@ -40726,6 +41140,11 @@
                 if (bsCtorWrongFlashTimer) { clearTimeout(bsCtorWrongFlashTimer); bsCtorWrongFlashTimer = null; }
                 const slots = document.getElementById('bs-c-slots'), pool = document.getElementById('bs-c-pool');
                 if (!slots || !pool) return;
+                const landedIdx = bsSelectedLetters.length > ctorLastLen
+                    ? bsSelectedLetters.length - 1
+                    : -1;
+                const firstPaint = ctorFirstPaint;
+                ctorFirstPaint = false;
                 slots.classList.remove('animate-shake');
                 slots.innerHTML = ''; pool.innerHTML = '';
                 for(let i=0; i<expectedWordStr.length; i++) {
@@ -40735,7 +41154,8 @@
                     const el = document.createElement('div');
                     el.className = 'letter-slot flex items-center justify-center text-2xl font-bold uppercase cursor-pointer '
                         + (filled ? 'filled bg-indigo-600 text-white shadow-md border-b-0' : 'bg-slate-100 text-slate-300')
-                        + (g === 'm' ? ' is-article-m' : g === 'f' ? ' is-article-f' : g === 'n' ? ' is-article-n' : '');
+                        + (g === 'm' ? ' is-article-m' : g === 'f' ? ' is-article-f' : g === 'n' ? ' is-article-n' : '')
+                        + (filled && i === landedIdx ? ' ctor-letter-land' : '');
                     if(filled) { el.textContent = bsSelectedLetters[i].char; el.onclick = () => { if (ctorBusy) return; bsLetterPool.push(bsSelectedLetters.splice(i, 1)[0]); _renderBsC(); }; }
                     slots.appendChild(el);
                 }
@@ -40744,7 +41164,9 @@
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = 'bg-white border-2 border-slate-200 shadow-sm text-2xl font-bold uppercase text-slate-700 hover:border-indigo-400 hover:text-indigo-600 letter-tile'
-                        + (g === 'm' ? ' is-article-m' : g === 'f' ? ' is-article-f' : g === 'n' ? ' is-article-n' : '');
+                        + (g === 'm' ? ' is-article-m' : g === 'f' ? ' is-article-f' : g === 'n' ? ' is-article-n' : '')
+                        + (firstPaint ? ' ctor-tile-in' : '');
+                    if (firstPaint) btn.style.animationDelay = `${Math.min(idx, 12) * 22}ms`;
                     btn.textContent = item.char;
                     btn.onclick = () => { if (ctorBusy) return; bsSelectedLetters.push(bsLetterPool.splice(idx, 1)[0]); _renderBsC(); };
                     pool.appendChild(btn);
@@ -40762,12 +41184,14 @@
 
                 if(bsLetterPool.length === 0) {
                     if(bsSelectedLetters.map(x=>x.char).join('') === expectedWordStr) {
-                        document.querySelectorAll('#bs-c-slots .letter-slot.filled').forEach(e => {
-                            e.classList.remove('bg-indigo-600', 'constructor-wrong');
-                            e.classList.add('bg-emerald-500');
+                        document.querySelectorAll('#bs-c-slots .letter-slot.filled').forEach((e, i) => {
+                            e.classList.remove('bg-indigo-600', 'constructor-wrong', 'ctor-letter-land');
+                            e.classList.add('bg-emerald-500', 'ctor-letter-win');
+                            e.style.animationDelay = `${i * 40}ms`;
                         });
                         clearBsCtorAccentHold();
                         document.removeEventListener('keydown', handleConstructorKeyboard);
+                        try { hideTrainOsk(); } catch (_) {}
                         triggerSuccessReveal(word);
                     } else if (oneFree && !ctorFreeUsed) {
                         // Етап 1: one free mistake — show wrong letters in red, then clear
@@ -40802,12 +41226,14 @@
 
         let trainOskEl = null;
         let trainOskActiveInput = null;
+        let trainOskCtorMode = false;
         let trainOskPreviewEl = null;
         let trainOskPressedBtn = null;
         let trainOskAccentHold = null;
         let trainOskBsRepeat = null;
         let trainOskNumbersOpen = false;
         let trainOskAccentOpen = false;
+        let trainOskCapsLock = false;
         let trainOskExpanded = localStorage.getItem(TRAIN_OSK_EXPANDED_KEY) !== '0';
         let trainOskTapStart = null;
         let trainOskPreviewHideTimer = null;
@@ -40815,6 +41241,72 @@
         let trainOskPointerDown = false;
 
         const TRAIN_OSK_ACCENT = { a: 'á', e: 'é', i: 'í', o: 'ó', u: 'ú', n: 'ñ' };
+
+        function getTrainOskCtorLang() {
+            if (learningLanguage === 'uk') return 'uk';
+            if (learningLanguage === 'es') return 'es';
+            return 'en';
+        }
+
+        function isTrainOskLive() {
+            return !!(trainOskActiveInput || trainOskCtorMode);
+        }
+
+        function trainOskDisplayKey(key) {
+            const k = String(key || '');
+            if (!trainOskCapsLock || !k) return k;
+            if (/^[\p{L}]$/u.test(k)) return k.toLocaleUpperCase(LANG_META[learningLanguage]?.locale || 'en');
+            return k;
+        }
+
+        function trainOskEmitCase(key) {
+            const k = String(key || '');
+            if (!trainOskCapsLock || !k) return k;
+            if (/^[\p{L}]$/u.test(k)) return k.toLocaleUpperCase(LANG_META[learningLanguage]?.locale || 'en');
+            return k;
+        }
+
+        function syncConstructorOskBtn() {
+            const btn = document.getElementById('bs-ctor-osk-btn');
+            if (!btn) return;
+            const on = trainOskCtorMode && document.body.classList.contains('train-osk-open');
+            btn.classList.toggle('is-on', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            const label = on ? t('train.ctorOskHide') : t('train.ctorOskShow');
+            btn.setAttribute('title', label);
+            const span = btn.querySelector('[data-ctor-osk-label]');
+            if (span) span.textContent = label;
+        }
+
+        window.toggleConstructorOsk = () => {
+            if (!isTrainingTouchDevice() || bsCurrentStage !== 2) return;
+            if (trainOskCtorMode && document.body.classList.contains('train-osk-open')) {
+                hideTrainOsk();
+            } else {
+                showTrainOskForConstructor();
+            }
+            syncConstructorOskBtn();
+        };
+
+        function applyCtorOskChar(char) {
+            return tryPlaceConstructorLetter(String(char || '').toLowerCase());
+        }
+
+        function applyCtorOskBackspace() {
+            if (window._bsCtorBusy) return;
+            if (!bsSelectedLetters.length) return;
+            bsLetterPool.push(bsSelectedLetters.pop());
+            if (typeof window._renderBsC === 'function') window._renderBsC();
+        }
+
+        function refreshTrainOskLayout() {
+            if (trainOskActiveInput) {
+                renderTrainOsk(getTrainOskLang(trainOskActiveInput));
+                syncTrainInputCaret(trainOskActiveInput);
+            } else if (trainOskCtorMode) {
+                renderTrainOsk(getTrainOskCtorLang());
+            }
+        }
 
         function applyTrainCaretMeasureFont(inp, measure) {
             if (!inp || !measure) return;
@@ -40938,6 +41430,7 @@
 
         function hideTrainOsk(fromPopstate = false) {
             trainOskActiveInput = null;
+            trainOskCtorMode = false;
             hideTrainOskKeyPreview(true);
             clearTrainOskAccentHold();
             stopTrainOskBackspaceRepeat();
@@ -40945,6 +41438,7 @@
             trainOskAccentOpen = false;
             document.body.classList.remove('train-osk-open', 'train-osk-tall', 'train-osk-numbers-open', 'train-osk-accent-open');
             trainOskEl?.classList.add('hidden');
+            syncConstructorOskBtn();
             if (trainOskHistoryPushed && !fromPopstate) {
                 trainOskHistoryPushed = false;
                 try { history.back(); } catch (_) {}
@@ -40978,10 +41472,20 @@
             keys.forEach((key) => {
                 const base = typeof key === 'string' ? key : key.key;
                 const accent = accentable && typeof key === 'string' && 'aeioun'.includes(base);
-                html += `<button type="button" class="train-osk-key${accent ? ' train-osk-key--accentable' : ''}" data-key="${base}" data-base="${base}">${base}</button>`;
+                const shown = trainOskDisplayKey(base);
+                html += `<button type="button" class="train-osk-key${accent ? ' train-osk-key--accentable' : ''}" data-key="${base}" data-base="${base}">${shown}</button>`;
             });
             if (!leaveOpen) html += '</div>';
             return html;
+        }
+
+        function emitTrainOskChar(rawKey) {
+            const key = trainOskEmitCase(rawKey);
+            if (trainOskCtorMode) {
+                applyCtorOskChar(key);
+                return;
+            }
+            if (trainOskActiveInput) insertTrainOskText(trainOskActiveInput, key);
         }
 
         function insertTrainOskText(inp, text) {
@@ -41013,6 +41517,21 @@
 
         function startTrainOskBackspaceRepeat() {
             stopTrainOskBackspaceRepeat();
+            if (trainOskCtorMode) {
+                applyCtorOskBackspace();
+                let delay = 200;
+                const tick = () => {
+                    if (!trainOskCtorMode) {
+                        stopTrainOskBackspaceRepeat();
+                        return;
+                    }
+                    applyCtorOskBackspace();
+                    delay = Math.max(20, delay * 0.7);
+                    trainOskBsRepeat = setTimeout(tick, delay);
+                };
+                trainOskBsRepeat = setTimeout(tick, delay);
+                return;
+            }
             const inp = trainOskActiveInput;
             if (!inp || inp.disabled) return;
             backspaceTrainOskInput(inp);
@@ -41030,6 +41549,10 @@
         }
 
         function submitTrainOskEnter(inp) {
+            if (trainOskCtorMode) {
+                hideTrainOsk();
+                return;
+            }
             if (!inp || inp.disabled) return;
             inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
         }
@@ -41046,8 +41569,8 @@
             }
             localStorage.setItem(TRAIN_OSK_EXPANDED_KEY, trainOskExpanded ? '1' : '0');
             syncTrainOskSize();
+            refreshTrainOskLayout();
             if (trainOskActiveInput) {
-                renderTrainOsk(getTrainOskLang(trainOskActiveInput));
                 requestAnimationFrame(() => {
                     syncTrainInputCaret(trainOskActiveInput);
                     try { trainOskActiveInput.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
@@ -41055,22 +41578,21 @@
             }
         }
 
+        function toggleTrainOskCaps() {
+            trainOskCapsLock = !trainOskCapsLock;
+            refreshTrainOskLayout();
+        }
+
         function toggleTrainOskAccent() {
             trainOskAccentOpen = !trainOskAccentOpen;
             syncTrainOskSize();
-            if (trainOskActiveInput) {
-                renderTrainOsk(getTrainOskLang(trainOskActiveInput));
-                syncTrainInputCaret(trainOskActiveInput);
-            }
+            refreshTrainOskLayout();
         }
 
         function toggleTrainOskNumbers() {
             trainOskNumbersOpen = !trainOskNumbersOpen;
             syncTrainOskSize();
-            if (trainOskActiveInput) {
-                renderTrainOsk(getTrainOskLang(trainOskActiveInput));
-                syncTrainInputCaret(trainOskActiveInput);
-            }
+            refreshTrainOskLayout();
         }
 
         function ensureTrainOskPreview() {
@@ -41147,22 +41669,27 @@
             el.addEventListener('pointerdown', (e) => {
                 trainOskPointerDown = true;
                 const btn = e.target.closest('.train-osk-key, .train-osk-float');
-                if (!btn || !trainOskActiveInput) return;
+                if (!btn || !isTrainOskLive()) return;
                 e.preventDefault();
                 const inp = trainOskActiveInput;
-                inp.focus({ preventScroll: true });
+                if (inp) inp.focus({ preventScroll: true });
 
                 const action = btn.dataset.action;
                 if (action === 'toggle-expand') { toggleTrainOskExpanded(); return; }
                 if (action === 'toggle-numbers') { toggleTrainOskNumbers(); return; }
                 if (action === 'toggle-accent') { toggleTrainOskAccent(); return; }
+                if (action === 'toggle-caps') { toggleTrainOskCaps(); return; }
 
                 if (btn.classList.contains('train-osk-key')) {
-                    const previewLabel = btn.dataset.key || btn.textContent.trim();
+                    const previewLabel = trainOskDisplayKey(btn.dataset.key || btn.textContent.trim());
                     showTrainOskKeyPreview(btn, previewLabel);
                 }
 
-                if (action === 'space') { insertTrainOskText(inp, ' '); return; }
+                if (action === 'space') {
+                    if (trainOskCtorMode) applyCtorOskChar(' ');
+                    else if (inp) insertTrainOskText(inp, ' ');
+                    return;
+                }
                 if (action === 'backspace') { startTrainOskBackspaceRepeat(); return; }
                 if (action === 'enter') { submitTrainOskEnter(inp); return; }
 
@@ -41177,14 +41704,19 @@
                             if (!trainOskAccentHold || trainOskAccentHold.btn !== btn) return;
                             const acc = TRAIN_OSK_ACCENT[base];
                             if (acc) {
-                                insertTrainOskText(inp, acc);
-                                showTrainOskKeyPreview(btn, acc);
+                                const out = trainOskEmitCase(acc);
+                                if (trainOskCtorMode) {
+                                    tryUpgradeConstructorAccent(base);
+                                } else if (inp) {
+                                    insertTrainOskText(inp, out);
+                                }
+                                showTrainOskKeyPreview(btn, trainOskDisplayKey(acc));
                             }
                             trainOskAccentHold.fired = true;
                         }, TRAIN_OSK_ACCENT_HOLD_MS)
                     };
                 } else {
-                    insertTrainOskText(inp, key);
+                    emitTrainOskChar(key);
                 }
             });
 
@@ -41195,8 +41727,8 @@
                 if (!trainOskAccentHold) return;
                 const { key, fired } = trainOskAccentHold;
                 clearTrainOskAccentHold();
-                if (fired || !trainOskActiveInput) return;
-                insertTrainOskText(trainOskActiveInput, key);
+                if (fired || !isTrainOskLive()) return;
+                emitTrainOskChar(key);
             });
             el.addEventListener('pointercancel', () => {
                 trainOskPointerDown = false;
@@ -41226,12 +41758,14 @@
             const expandActive = trainOskExpanded ? ' is-active' : '';
             const numsActive = trainOskNumbersOpen ? ' is-active' : '';
             const accentActive = trainOskAccentOpen ? ' is-active' : '';
+            const capsActive = trainOskCapsLock ? ' is-active' : '';
             const accentBtn = lang === 'es'
                 ? `<button type="button" class="train-osk-float${accentActive}" data-action="toggle-accent" aria-label="Accents" aria-pressed="${trainOskAccentOpen ? 'true' : 'false'}">áñ</button>`
                 : '';
             return `<div class="train-osk-floats">
                 <button type="button" class="train-osk-float${numsActive}" data-action="toggle-numbers" aria-label="Numbers">123</button>
                 ${accentBtn}
+                <button type="button" class="train-osk-float train-osk-float--caps${capsActive}" data-action="toggle-caps" aria-label="${escapeHtmlText(t('train.oskCaps'))}" aria-pressed="${trainOskCapsLock ? 'true' : 'false'}" title="${escapeHtmlText(t('train.oskCaps'))}">⇪</button>
                 <button type="button" class="train-osk-float${expandActive}" data-action="toggle-expand" aria-label="Tall keyboard">⛶</button>
             </div>`;
         }
@@ -41254,7 +41788,8 @@
             if (lang !== 'es' || !trainOskAccentOpen) return '';
             let html = '<div class="train-osk-accents"><div class="train-osk-row">';
             ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡'].forEach((key) => {
-                html += `<button type="button" class="train-osk-key" data-key="${key}">${key}</button>`;
+                const shown = trainOskDisplayKey(key);
+                html += `<button type="button" class="train-osk-key" data-key="${key}">${shown}</button>`;
             });
             html += '</div></div>';
             return html;
@@ -41272,7 +41807,7 @@
                 html = appendTrainOskKeyRow(html, ['ф', 'і', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'є'], { dense: true });
                 html += '<div class="train-osk-row train-osk-row--uk-dense">';
                 ['я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', 'ґ'].forEach((key) => {
-                    html += `<button type="button" class="train-osk-key" data-key="${key}">${key}</button>`;
+                    html += `<button type="button" class="train-osk-key" data-key="${key}">${trainOskDisplayKey(key)}</button>`;
                 });
                 html += `<button type="button" class="train-osk-key train-osk-key--backspace" data-action="backspace" aria-label="Backspace">⌫</button>`;
                 html += '</div>';
@@ -41298,6 +41833,7 @@
 
         function showTrainOsk(inp) {
             if (!inp || inp.disabled || !isTrainingTouchDevice()) return;
+            trainOskCtorMode = false;
             trainOskActiveInput = inp;
             ensureTrainOskCaretWrap(inp);
             renderTrainOsk(getTrainOskLang(inp));
@@ -41312,9 +41848,34 @@
                 } catch (_) {}
             }
             syncTrainOskSize();
+            syncConstructorOskBtn();
             requestAnimationFrame(() => {
                 syncTrainInputCaret(inp);
                 try { inp.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
+            });
+        }
+
+        function showTrainOskForConstructor() {
+            if (!isTrainingTouchDevice() || bsCurrentStage !== 2) return;
+            trainOskActiveInput = null;
+            trainOskCtorMode = true;
+            renderTrainOsk(getTrainOskCtorLang());
+            const osk = ensureTrainOsk();
+            osk.classList.remove('hidden');
+            osk.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('train-osk-open');
+            if (!trainOskHistoryPushed) {
+                try {
+                    history.pushState({ linguaspaceOsk: 1 }, '');
+                    trainOskHistoryPushed = true;
+                } catch (_) {}
+            }
+            syncTrainOskSize();
+            syncConstructorOskBtn();
+            requestAnimationFrame(() => {
+                try {
+                    document.getElementById('bs-c-pool')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                } catch (_) {}
             });
         }
 
@@ -41542,7 +42103,12 @@
             word.failed = false;
             word._defAttempted = false;
 
+            const bannedDef = String(prompt.def || '').trim();
             banAndReportDefSense(word, prompt);
+            if (!Array.isArray(word._defExcludedDefs)) word._defExcludedDefs = [];
+            if (bannedDef && !word._defExcludedDefs.includes(bannedDef)) {
+                word._defExcludedDefs.push(bannedDef);
+            }
             clearDefinitionPromptForWord(word);
             hideDefWrongSenseButton();
             if (reveal) {
@@ -41558,7 +42124,9 @@
 
             try {
                 const nextPrompt = await ensureDefinitionPrompt(word, { forceRebuild: true });
-                if (nextPrompt) {
+                const sameAsBanned = nextPrompt?.def
+                    && defSenseKey(word.word, nextPrompt.def) === defSenseKey(word.word, bannedDef);
+                if (nextPrompt && !sameAsBanned) {
                     renderStageDefinition(word, area, btnNext, feedback);
                     return;
                 }
@@ -41567,6 +42135,7 @@
             word.failed = false;
             word._defSkipped = true;
             word._defAttempted = false;
+            word._defPrompt = null;
             window.nextBrainstormStep();
         };
 
@@ -41614,8 +42183,8 @@
             return Math.min(15, Math.max(7, Math.round(len / 25) || 10));
         }
 
-        const REVEAL_CTX_AFTER = 70;
-        const REVEAL_CTX_BEFORE = 45;
+        const REVEAL_CTX_AFTER = 130;
+        const REVEAL_CTX_BEFORE = 90;
         const CONTEXT_TAIL_STOPWORDS = new Set([
             'a', 'an', 'the', 'and', 'or', 'but', 'nor', 'so', 'yet', 'for', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as',
             'is', 'am', 'are', 'was', 'were', 'be', 'been', 'being', 'it', 'its', 'if', 'than', 'then', 'that', 'this',
@@ -41639,13 +42208,18 @@
         }
 
         function findRevealPunctCut(str, from, maxEnd) {
-            let best = -1;
+            let sentenceEnd = -1;
+            let softComma = -1;
             const limit = Math.min(str.length, maxEnd);
             for (let i = from; i < limit; i++) {
-                if (/[.!?…]/.test(str[i])) best = i + 1;
-                else if (/[,;:]/.test(str[i]) && i - from <= REVEAL_CTX_AFTER + 12) best = i + 1;
+                if (/[.!?…]/.test(str[i])) {
+                    sentenceEnd = i + 1;
+                    break;
+                }
+                // Commas only as a distant soft cut — avoid clipping right after the word
+                if (/[,;:]/.test(str[i]) && i - from >= 56) softComma = i + 1;
             }
-            return best;
+            return sentenceEnd > 0 ? sentenceEnd : softComma;
         }
 
         function truncateContextForSuccessReveal(contextStr, word) {
@@ -41707,7 +42281,7 @@
             const fullRaw = resolveWordContextForDisplay(word.context, word.word);
             if (!fullRaw.trim()) {
                 ctxEl.textContent = '';
-                ctxEl.classList.remove('bs-success-context-expandable');
+                ctxEl.classList.remove('bs-success-context-expandable', 'bs-success-context-peekable');
                 ctxEl.removeAttribute('role');
                 ctxEl.removeAttribute('title');
                 ctxEl.onclick = null;
@@ -41720,6 +42294,8 @@
             const expanded = !!word._successCtxExpanded;
             const displayText = expanded ? meta.full : meta.text;
             const truncated = !expanded && (meta.leading || meta.trailing);
+            const hasMat = !!resolveWordMaterial(word);
+            const tappable = truncated || hasMat;
             const hl = failed
                 ? '<b class="text-indigo-700 not-italic font-extrabold underline decoration-indigo-300 decoration-2 underline-offset-2">$1</b>'
                 : '<b class="text-indigo-700 not-italic font-extrabold">$1</b>';
@@ -41727,15 +42303,16 @@
             if (truncated) inner = decorateContextEllipses(inner, meta.leading, meta.trailing);
             ctxEl.innerHTML = `"${inner}"`;
             ctxEl.classList.toggle('bs-success-context-expandable', truncated);
-            if (truncated) {
+            ctxEl.classList.toggle('bs-success-context-peekable', !truncated && hasMat);
+            if (tappable) {
                 ctxEl.setAttribute('role', 'button');
                 ctxEl.tabIndex = 0;
-                ctxEl.title = t('train.successCtxTap');
-                ctxEl.onclick = () => expandSuccessRevealContext();
+                ctxEl.title = truncated ? t('train.successCtxTap') : t('train.successCtxOpenMat');
+                ctxEl.onclick = () => onSuccessRevealContextTap();
                 ctxEl.onkeydown = (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        expandSuccessRevealContext();
+                        onSuccessRevealContextTap();
                     }
                 };
             } else {
@@ -41747,14 +42324,205 @@
             }
         }
 
-        window.expandSuccessRevealContext = () => {
+        function resolveWordMaterial(word) {
+            if (!word) return null;
+            if (word.materialId) {
+                const byId = materials.find((x) => x.id === word.materialId);
+                if (byId) return byId;
+            }
+            if (word.source) {
+                return getMaterialForSource(word.source) || getMaterialByTitle(word.source) || null;
+            }
+            return null;
+        }
+
+        window.onSuccessRevealContextTap = () => {
             const word = bsWords[bsCurrentWordIdx];
             if (!word?._successCtxMeta) return;
-            if (!word._successCtxMeta.leading && !word._successCtxMeta.trailing) return;
-            word._successCtxExpanded = true;
-            const failed = !!word.failed && !word.contextZeroPass;
-            renderSuccessRevealContext(word, failed);
+            const meta = word._successCtxMeta;
+            const truncated = !word._successCtxExpanded && (meta.leading || meta.trailing);
+            if (truncated) {
+                word._successCtxExpanded = true;
+                const failed = !!word.failed && !word.contextZeroPass;
+                renderSuccessRevealContext(word, failed);
+                // After expand, title becomes “open material” if linked
+                return;
+            }
+            openTrainContextPeek(word);
         };
+
+        window.expandSuccessRevealContext = () => onSuccessRevealContextTap();
+
+        function closeTrainContextPeek() {
+            const modal = document.getElementById('train-ctx-peek-modal');
+            if (modal) modal.classList.add('hidden');
+            const body = document.getElementById('train-ctx-peek-body');
+            if (body) body.innerHTML = '';
+        }
+
+        window.closeTrainContextPeek = closeTrainContextPeek;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            const modal = document.getElementById('train-ctx-peek-modal');
+            if (modal && !modal.classList.contains('hidden')) {
+                e.preventDefault();
+                closeTrainContextPeek();
+            }
+        });
+
+        function pickTrainContextPeekParas(plain, wordStr, contextHint) {
+            const paras = String(plain || '')
+                .split(/\n\s*\n+/)
+                .map((s) => s.replace(/\s+/g, ' ').trim())
+                .filter(Boolean);
+            if (!paras.length) {
+                const flat = String(plain || contextHint || '').replace(/\s+/g, ' ').trim();
+                return flat ? [flat] : [];
+            }
+            const hint = String(contextHint || '').replace(/\s+/g, ' ').trim().toLowerCase();
+            const hintBit = hint.slice(0, 36);
+            let best = -1;
+            let bestScore = -1;
+            for (let i = 0; i < paras.length; i++) {
+                if (!contextHasWholeWord(paras[i], wordStr)) continue;
+                let score = 1;
+                const pl = paras[i].toLowerCase();
+                if (hintBit && pl.includes(hintBit)) score += 5;
+                else if (hint.length > 12 && pl.includes(hint.slice(0, 18))) score += 3;
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = i;
+                }
+            }
+            if (best < 0) {
+                if (hint) return [String(contextHint || '').replace(/\s+/g, ' ').trim()].filter(Boolean);
+                return paras.slice(0, 2);
+            }
+            const from = Math.max(0, best - 1);
+            const to = Math.min(paras.length, best + 2);
+            return paras.slice(from, to);
+        }
+
+        function wrapTrainPeekExcerpt(text, excerpt, wordStr) {
+            const raw = String(text || '');
+            const ex = String(excerpt || '').replace(/\s+/g, ' ').trim();
+            const w = String(wordStr || '').trim();
+            const wordHl = '<mark class="train-ctx-peek-word">$1</mark>';
+
+            // Plain text in → highlightWholeWordInText escapes + wraps
+            const applyWord = (s) => highlightWholeWordInText(s, w, wordHl);
+
+            if (!ex || ex.length < 8) {
+                return raw.split(/\n\s*\n+/).map((p) => `<p>${applyWord(p)}</p>`).join('');
+            }
+
+            // Find excerpt in plain text (case-insensitive, flexible whitespace)
+            const norm = (s) => s.toLowerCase().replace(/\s+/g, ' ');
+            const hay = norm(raw);
+            const needle = norm(ex);
+            let idx = hay.indexOf(needle);
+            if (idx < 0 && needle.length > 24) idx = hay.indexOf(needle.slice(0, 24));
+            if (idx < 0) {
+                return raw.split(/\n\s*\n+/).map((p) => `<p>${applyWord(p)}</p>`).join('');
+            }
+
+            // Map normalized index roughly back by scanning original with collapsed spaces
+            let oi = 0;
+            let ni = 0;
+            const target = idx;
+            while (oi < raw.length && ni < target) {
+                if (/\s/.test(raw[oi])) {
+                    while (oi < raw.length && /\s/.test(raw[oi])) oi++;
+                    ni++;
+                } else {
+                    oi++;
+                    ni++;
+                }
+            }
+            const start = oi;
+            let needLen = needle.length;
+            let end = start;
+            let counted = 0;
+            while (end < raw.length && counted < needLen) {
+                if (/\s/.test(raw[end])) {
+                    while (end < raw.length && /\s/.test(raw[end])) end++;
+                    counted++;
+                } else {
+                    end++;
+                    counted++;
+                }
+            }
+            end = Math.min(raw.length, Math.max(end, start + Math.min(ex.length, raw.length - start)));
+
+            const before = raw.slice(0, start);
+            const mid = raw.slice(start, end);
+            const after = raw.slice(end);
+
+            const paintChunk = (chunk, wrapExcerpt) => {
+                if (!chunk) return '';
+                const paras = chunk.split(/\n\s*\n+/);
+                return paras.map((p, i) => {
+                    const trimmed = p;
+                    if (!trimmed && i === paras.length - 1) return '';
+                    const body = wrapExcerpt
+                        ? `<mark class="train-ctx-peek-excerpt">${applyWord(trimmed)}</mark>`
+                        : applyWord(trimmed);
+                    return `<p>${body}</p>`;
+                }).join('');
+            };
+
+            // Simpler single-block render when no para breaks in window
+            if (!/\n\s*\n/.test(raw)) {
+                return `<p>${applyWord(before)}<mark class="train-ctx-peek-excerpt">${applyWord(mid)}</mark>${applyWord(after)}</p>`;
+            }
+
+            // Paragraph-aware: rebuild with excerpt mark spanning mid only inside its para(s)
+            const parts = [];
+            if (before) parts.push(paintChunk(before, false));
+            if (mid) parts.push(paintChunk(mid, true));
+            if (after) parts.push(paintChunk(after, false));
+            return parts.join('');
+        }
+
+        function openTrainContextPeek(word) {
+            if (!word) return;
+            const mat = resolveWordMaterial(word);
+            const ctxFull = resolveWordContextForDisplay(word.context, word.word) || String(word.context || '').trim();
+            const excerpt = word._successCtxMeta?.text || ctxFull;
+            if (!mat && !ctxFull) {
+                showAppToast?.(t('train.successCtxNoMat'), 2600);
+                return;
+            }
+            const titleEl = document.getElementById('train-ctx-peek-title');
+            const subEl = document.getElementById('train-ctx-peek-sub');
+            const body = document.getElementById('train-ctx-peek-body');
+            const modal = document.getElementById('train-ctx-peek-modal');
+            if (!body || !modal) return;
+
+            const matTitle = mat
+                ? (typeof materialDisplayTitle === 'function' ? materialDisplayTitle(mat) : mat.title)
+                : t('train.ctxPeekWord');
+            if (titleEl) titleEl.textContent = matTitle || t('train.ctxPeekWord');
+            if (subEl) {
+                subEl.textContent = word.word
+                    ? `${word.word}${word.translation ? ' — ' + word.translation : ''}`
+                    : '';
+            }
+
+            const plain = mat ? getMaterialPlainText(mat) : ctxFull;
+            const paras = pickTrainContextPeekParas(plain, word.word, ctxFull);
+            const joined = paras.join('\n\n') || ctxFull;
+            body.innerHTML = wrapTrainPeekExcerpt(joined, excerpt || ctxFull, word.word);
+
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                const mark = body.querySelector('mark.train-ctx-peek-word, mark.train-ctx-peek-excerpt');
+                try { mark?.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
+            });
+        }
+
+        window.openTrainContextPeek = openTrainContextPeek;
 
         function findContextWordMatch(contextStr, word) {
             const cleanWord = String(word || '').toLowerCase().trim();
@@ -42358,6 +43126,29 @@
             triggerSuccessReveal(word);
         }
 
+        function findRestoreGapSentenceIndex(sentences, phrase) {
+            for (let i = 0; i < sentences.length; i++) {
+                if (contextHasRestorePhrase(sentences[i], phrase)) return i;
+            }
+            return -1;
+        }
+
+        /** Squeeze mode: prev sentence + gap sentence + next sentence (merged if gaps overlap). */
+        function buildRestoreSqueezedPara(para, paraGaps) {
+            const sentences = splitIntoSentences(para);
+            if (!sentences.length) return para;
+            const include = new Set();
+            (paraGaps || []).forEach((g) => {
+                const si = findRestoreGapSentenceIndex(sentences, g.word);
+                if (si < 0) return;
+                if (si > 0) include.add(si - 1);
+                include.add(si);
+                if (si < sentences.length - 1) include.add(si + 1);
+            });
+            if (!include.size) return para;
+            return [...include].sort((a, b) => a - b).map((i) => sentences[i]).join(' ');
+        }
+
         function renderRestoreParagraphsHtml() {
             if (!restoreState) return '';
             const gapParaSet = new Set(restoreState.gaps.map((g) => g.paraIdx));
@@ -42368,18 +43159,20 @@
             });
             return restoreState.paras.map((para, pi) => {
                 if (restoreState.squeeze && !gapParaSet.has(pi)) return '';
-                let html = para;
                 const paraGaps = (gapByPara[pi] || []).slice().sort((a, b) => {
                     const ia = para.toLowerCase().indexOf(String(a.word || '').toLowerCase());
                     const ib = para.toLowerCase().indexOf(String(b.word || '').toLowerCase());
                     return (ia < 0 ? 1e9 : ia) - (ib < 0 ? 1e9 : ib) || ((a.ord ?? 0) - (b.ord ?? 0));
                 });
+                let sourcePara = restoreState.squeeze
+                    ? buildRestoreSqueezedPara(para, paraGaps)
+                    : para;
+                let html = sourcePara;
                 paraGaps.forEach((g) => {
                     html = blankWordForRestoreSlot(html, g.word, g.id);
                 });
                 if (!html.trim()) return '';
-                const hiddenCls = restoreState.squeeze && !gapParaSet.has(pi) ? ' is-squeezed-hidden' : '';
-                return `<p class="restore-para${hiddenCls}" data-pi="${pi}">${html}</p>`;
+                return `<p class="restore-para" data-pi="${pi}">${html}</p>`;
             }).filter(Boolean).join('');
         }
 
