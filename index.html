@@ -11677,7 +11677,7 @@
                 'auth.migrateDone': 'Перенесено. Документів: {n}',
                 'auth.migrateFail': 'Не вдалося перенести дані. Словник Google може бути порожнім.',
                 'auth.migrating': 'Переносимо дані…',
-                'auth.redirectFail': 'Вхід з телефону обірвався (sessionStorage). Відкрийте сайт у Chrome/Safari (не в Telegram/Instagram), бажано з домену *.web.app або *.firebaseapp.com, увімкніть cookies і спробуйте знову.',
+                'auth.redirectFail': 'Вхід з телефону обірвався (sessionStorage). Відкрийте сайт у Chrome/Safari (не в Telegram/Instagram/Opera Mini), бажано з домену *.web.app або *.firebaseapp.com, увімкніть cookies і спробуйте знову.',
                 'tabs.dictionary': 'Словник', 'tabs.library': 'Бібліотека', 'tabs.training': 'Тренування',
                 'profile.title': 'Профіль / Налаштування',
                 'profile.hint': 'Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.',
@@ -12494,7 +12494,7 @@
                 'auth.migrateDone': 'Migrated. Documents: {n}',
                 'auth.migrateFail': 'Could not migrate data. The Google dictionary may be empty.',
                 'auth.migrating': 'Migrating data…',
-                'auth.redirectFail': 'Phone sign-in lost session storage. Open the site in Chrome/Safari (not Telegram/Instagram), preferably on *.web.app or *.firebaseapp.com, allow cookies, and try again.',
+                'auth.redirectFail': 'Phone sign-in lost session storage. Open the site in Chrome/Safari (not Telegram/Instagram/Opera Mini), preferably on *.web.app or *.firebaseapp.com, allow cookies, and try again.',
                 'tabs.dictionary': 'Dictionary', 'tabs.library': 'Library', 'tabs.training': 'Training',
                 'profile.title': 'Profile / Settings',
                 'profile.hint': 'Your dictionary is tied to this account ID. Most users can leave it unchanged.',
@@ -18460,12 +18460,19 @@
             return false;
         }
 
+        /** Opera / some Chromium forks break Firebase redirect (lost sessionStorage). */
+        function isBrokenRedirectBrowser() {
+            try {
+                const ua = navigator.userAgent || '';
+                return /OPR\/|OPT\/|Opera Mini|Opera Mobi|HeyTapBrowser|SamsungBrowser/i.test(ua);
+            } catch (_) { return false; }
+        }
+
         function isAuthFriendlyHost() {
             try {
                 const h = String(location.hostname || '').toLowerCase();
                 if (!h || h === 'localhost' || h === '127.0.0.1') return true;
                 if (h.endsWith('.firebaseapp.com') || h.endsWith('.web.app')) return true;
-                // Same host as configured authDomain
                 const ad = String(firebaseConfig.authDomain || '').toLowerCase();
                 if (ad && h === ad) return true;
             } catch (_) {}
@@ -18527,10 +18534,12 @@
             if (btn) btn.disabled = true;
             setAuthGateStatus(t('auth.working'));
             rememberGoogleAuthPrevUid();
+            const preferRedirect = isLikelyMobileAuthDevice() && isAuthFriendlyHost() && !isBrokenRedirectBrowser();
             try {
                 // Mobile browsers often turn popup into a redirect and then lose sessionStorage
                 // when the app is not on firebaseapp.com / web.app. Prefer redirect on friendly hosts.
-                if (isLikelyMobileAuthDevice() && isAuthFriendlyHost()) {
+                // Opera / Samsung Internet: redirect is unreliable — stay on popup.
+                if (preferRedirect) {
                     await signInWithRedirect(auth, googleAuthProvider);
                     return; // navigation away
                 }
@@ -18542,18 +18551,20 @@
                 if (authErrorLooksLikeRedirectState(e)) {
                     setAuthGateStatus(t('auth.redirectFail'));
                 } else if (code === 'auth/popup-blocked') {
-                    // Fallback: full-page redirect
-                    try {
-                        await signInWithRedirect(auth, googleAuthProvider);
-                        return;
-                    } catch (e2) {
-                        console.error(e2);
-                        setAuthGateStatus(authErrorLooksLikeRedirectState(e2) ? t('auth.redirectFail') : t('auth.popupBlocked'));
+                    if (isBrokenRedirectBrowser()) {
+                        setAuthGateStatus(t('auth.redirectFail'));
+                    } else {
+                        try {
+                            await signInWithRedirect(auth, googleAuthProvider);
+                            return;
+                        } catch (e2) {
+                            console.error(e2);
+                            setAuthGateStatus(authErrorLooksLikeRedirectState(e2) ? t('auth.redirectFail') : t('auth.popupBlocked'));
+                        }
                     }
                 } else if (code === 'auth/popup-closed-by-user') {
                     setAuthGateStatus('');
-                } else if (isLikelyMobileAuthDevice()) {
-                    // Last resort on phone
+                } else if (isLikelyMobileAuthDevice() && !isBrokenRedirectBrowser()) {
                     try {
                         await signInWithRedirect(auth, googleAuthProvider);
                         return;
@@ -18562,7 +18573,7 @@
                         setAuthGateStatus(authErrorLooksLikeRedirectState(e2) ? t('auth.redirectFail') : t('auth.googleError'));
                     }
                 } else {
-                    setAuthGateStatus(t('auth.googleError'));
+                    setAuthGateStatus(isBrokenRedirectBrowser() ? t('auth.redirectFail') : t('auth.googleError'));
                 }
             } finally {
                 if (btn) btn.disabled = false;
@@ -18776,6 +18787,8 @@
 
                     if (shouldShowAuthLanding()) {
                         showAuthGate();
+                        // Don't leave the blue "Connecting..." bar stuck on the login screen
+                        try { document.getElementById('system-status')?.classList.add('is-dismissed'); } catch (_) {}
                         authBootstrapped = true;
                         return;
                     }
@@ -48311,29 +48324,47 @@
             document.getElementById(`tab-${tab}`).className = 'flex-1 py-3.5 text-indigo-600 border-b-[3px] border-indigo-600 transition-colors font-bold';
             
             if (tab === 'library') {
-                document.getElementById('library-add-view').classList.add('hidden');
-                document.getElementById('library-read-view').classList.add('hidden');
+                document.getElementById('library-add-view')?.classList.add('hidden');
+                document.getElementById('library-read-view')?.classList.add('hidden');
                 document.getElementById('exchange-hub-view')?.classList.remove('is-open');
-                document.getElementById('library-list-view').classList.remove('hidden');
+                document.getElementById('library-list-view')?.classList.remove('hidden');
             } else {
                 document.getElementById('exchange-hub-view')?.classList.remove('is-open');
             }
 
-            if(tab !== 'library') closeReader(); 
-            if(tab !== 'training') {
+            // Only tear down reader / training when they are actually open (big win on mobile)
+            if (tab !== 'library') {
+                const readView = document.getElementById('library-read-view');
+                if (readView && !readView.classList.contains('hidden')) {
+                    try { closeReader(); } catch (_) {}
+                }
+            }
+            if (tab !== 'training') {
                 try { closeTrainSettings(); } catch (_) {}
-                endSession();
-                closeReviewSetup();
-                if (storyHeadlinerState.generating) stopStoryHeadlinerFillAnim();
+                if (typeof trainingSessionActive !== 'undefined' && trainingSessionActive) {
+                    try { endSession(); } catch (_) {}
+                } else {
+                    try { closeReviewSetup(); } catch (_) {}
+                }
+                try {
+                    if (storyHeadlinerState?.generating) stopStoryHeadlinerFillAnim();
+                } catch (_) {}
             }
             if (tab === 'training') {
-                try { updateTrainDueWaves(); } catch (_) {}
-                try { syncTextExerciseLockUi(); } catch (_) {}
-                try { syncStoryHeadlinerUi(); } catch (_) {}
-                if (storyHeadlinerState.generating) startStoryHeadlinerFillAnim();
-                requestAnimationFrame(() => {
-                    try { playTrainDueWaveAnimation(); } catch (_) {}
-                });
+                // Defer non-critical training chrome so the tab paints first
+                const runTrainUi = () => {
+                    try { updateTrainDueWaves(); } catch (_) {}
+                    try { syncTextExerciseLockUi(); } catch (_) {}
+                    try { syncStoryHeadlinerUi(); } catch (_) {}
+                    try {
+                        if (storyHeadlinerState?.generating) startStoryHeadlinerFillAnim();
+                    } catch (_) {}
+                    requestAnimationFrame(() => {
+                        try { playTrainDueWaveAnimation(); } catch (_) {}
+                    });
+                };
+                if (typeof requestIdleCallback === 'function') requestIdleCallback(runTrainUi, { timeout: 180 });
+                else setTimeout(runTrainUi, 0);
             }
         };
     </script>
