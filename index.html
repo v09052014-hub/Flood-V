@@ -9755,7 +9755,7 @@
             <div class="auth-gate-divider"><span data-i18n="auth.or">або</span></div>
             <button type="button" id="btn-auth-guest" class="auth-guest-btn" onclick="continueAsGuest()" data-i18n="auth.guest">Продовжити без акаунта</button>
             <p id="auth-gate-status" class="auth-gate-status" role="status" aria-live="polite"></p>
-            <p class="auth-gate-hint" data-i18n="auth.consoleHint">Якщо Google не відкривається — у Firebase Console увімкніть провайдер Google і додайте домен сайту в Authorized domains.</p>
+            <p class="auth-gate-hint" data-i18n="auth.consoleHint">Вхід відкривається в окремому вікні. Якщо Opera його блокує — дозвольте спливаючі вікна для цього сайту.</p>
         </div>
     </div>
     <div id="mat-actions-scrim" onclick="closeMatCardActions()" aria-hidden="true"></div>
@@ -11485,6 +11485,38 @@
     <!-- YouTube API Script -->
     <script src="https://www.youtube.com/iframe_api"></script>
 
+    <!-- Firebase redirect state lives in sessionStorage and Opera drops it on the way back from Google. -->
+    <script>
+        (function () {
+            var PREFIXES = ['firebase:pendingRedirect:', 'firebase:redirectUser:'];
+            function isRedirectKey(k) {
+                k = String(k || '');
+                for (var i = 0; i < PREFIXES.length; i++) {
+                    if (k.indexOf(PREFIXES[i]) === 0) return true;
+                }
+                return false;
+            }
+            try {
+                for (var i = 0; i < localStorage.length; i++) {
+                    var k = localStorage.key(i);
+                    if (!isRedirectKey(k)) continue;
+                    if (sessionStorage.getItem(k) == null) sessionStorage.setItem(k, localStorage.getItem(k));
+                }
+            } catch (e) {}
+            try {
+                var setItem = sessionStorage.setItem.bind(sessionStorage);
+                var removeItem = sessionStorage.removeItem.bind(sessionStorage);
+                sessionStorage.setItem = function (k, v) {
+                    setItem(k, v);
+                    try { if (isRedirectKey(k)) localStorage.setItem(k, v); } catch (e) {}
+                };
+                sessionStorage.removeItem = function (k) {
+                    removeItem(k);
+                    try { if (isRedirectKey(k)) localStorage.removeItem(k); } catch (e) {}
+                };
+            } catch (e) {}
+        })();
+    </script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -11499,8 +11531,9 @@
             appId: "1:398593728951:web:d566edfbbcb92a5be9c832"
         };
 
-        // Google Identity Services — primary login (works on Opera / GitHub Pages / mobile).
-        // Firebase Console → Authentication → Google → Web SDK configuration → Web client ID
+        // GIS token client only on origins listed in the OAuth client (auth domain, *.web.app, localhost).
+        // GitHub Pages is a Firebase authorized domain but not an OAuth JavaScript origin —
+        // GIS there shows Google Error 400: origin_mismatch. Those hosts use the Firebase popup.
         const GOOGLE_WEB_CLIENT_ID = '398593728951-cs0icobsfro49aohkm5qb9qf6gos13o3.apps.googleusercontent.com';
         const GOOGLE_WEB_CLIENT_ID_KEY = 'ls_google_web_client_id';
 
@@ -11665,7 +11698,7 @@
                 'auth.google': 'Увійти через Google',
                 'auth.or': 'або',
                 'auth.guest': 'Продовжити без акаунта',
-                'auth.consoleHint': 'Якщо Google не відкривається — у Firebase Console увімкніть провайдер Google і додайте домен сайту в Authorized domains.',
+                'auth.consoleHint': 'Вхід відкривається в окремому вікні. Якщо Opera його блокує — дозвольте спливаючі вікна для цього сайту.',
                 'auth.accountTitle': 'Акаунт',
                 'auth.signedGoogle': 'Увійшли через Google',
                 'auth.guestHint': 'Зараз ви без Google-акаунта. Дані зберігаються за локальним ID (як раніше).',
@@ -11676,16 +11709,17 @@
                 'auth.deleted': 'Акаунт видалено.',
                 'auth.signedOut': 'Ви вийшли з акаунта.',
                 'auth.googleError': 'Не вдалося увійти через Google. Перевірте, чи увімкнено провайдер у Firebase.',
-                'auth.popupBlocked': 'Вікно Google заблоковано браузером. Дозвольте спливаючі вікна.',
+                'auth.popupBlocked': 'Вікно Google заблоковано. Дозвольте спливаючі вікна для цього сайту й спробуйте ще раз.',
                 'auth.working': 'Зачекайте…',
                 'auth.migrateAsk': 'Перенести словник і матеріали з гостьового режиму в цей Google-акаунт?',
                 'auth.migrateDone': 'Перенесено. Документів: {n}',
                 'auth.migrateFail': 'Не вдалося перенести дані. Словник Google може бути порожнім.',
                 'auth.migrating': 'Переносимо дані…',
-                'auth.redirectFail': 'Вхід з телефону обірвався: браузер втратив тимчасовий стан Google-логіну. Спробуйте ще раз у Chrome.',
-                'auth.operaHint': 'Opera ріже старий Firebase-логін. Потрібен Web client ID (див. підказку) або Chrome.',
-                'auth.needWebClientId': 'Щоб Google працював в Opera, вставте Web client ID з Firebase (Authentication → Google → Web SDK configuration).',
-                'auth.gisFail': 'Не вдалося увійти через Google Identity. Перевірте Web client ID.',
+                'auth.redirectFail': 'Браузер стер тимчасовий стан входу. Дозвольте спливаючі вікна і cookie для цього сайту, потім увійдіть ще раз.',
+                'auth.operaHint': 'В Opera вхід іде через спливаюче вікно Firebase, без перевірки JavaScript origin.',
+                'auth.needWebClientId': 'Щоб Google працював в Opera, дозвольте спливаючі вікна для цього сайту.',
+                'auth.unauthorizedDomain': 'Цей домен не доданий у Firebase → Authentication → Authorized domains.',
+                'auth.gisFail': 'Не вдалося увійти через Google. Дозвольте спливаючі вікна і cookie, потім спробуйте ще раз.',
                 'tabs.dictionary': 'Словник', 'tabs.library': 'Бібліотека', 'tabs.training': 'Тренування',
                 'profile.title': 'Профіль / Налаштування',
                 'profile.hint': 'Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.',
@@ -12485,7 +12519,7 @@
                 'auth.google': 'Continue with Google',
                 'auth.or': 'or',
                 'auth.guest': 'Continue without an account',
-                'auth.consoleHint': 'If Google fails to open, enable the Google provider in Firebase Console and add this site domain under Authorized domains.',
+                'auth.consoleHint': 'Sign-in opens in a separate window. If Opera blocks it, allow pop-ups for this site.',
                 'auth.accountTitle': 'Account',
                 'auth.signedGoogle': 'Signed in with Google',
                 'auth.guestHint': 'You are not using a Google account. Data is stored under the local profile ID (as before).',
@@ -12496,16 +12530,17 @@
                 'auth.deleted': 'Account deleted.',
                 'auth.signedOut': 'Signed out.',
                 'auth.googleError': 'Google sign-in failed. Check that the Google provider is enabled in Firebase.',
-                'auth.popupBlocked': 'The Google popup was blocked. Allow pop-ups for this site.',
+                'auth.popupBlocked': 'The Google window was blocked. Allow pop-ups for this site and try again.',
                 'auth.working': 'Please wait…',
                 'auth.migrateAsk': 'Move your dictionary and materials from guest mode into this Google account?',
                 'auth.migrateDone': 'Migrated. Documents: {n}',
                 'auth.migrateFail': 'Could not migrate data. The Google dictionary may be empty.',
                 'auth.migrating': 'Migrating data…',
-                'auth.redirectFail': 'Phone sign-in broke: the browser lost Google login state. Try again in Chrome.',
-                'auth.operaHint': 'Opera breaks classic Firebase login. Add the Web client ID (see prompt) or use Chrome.',
-                'auth.needWebClientId': 'For Google in Opera, paste the Web client ID from Firebase (Authentication → Google → Web SDK configuration).',
-                'auth.gisFail': 'Google Identity sign-in failed. Check the Web client ID.',
+                'auth.redirectFail': 'The browser cleared the temporary sign-in state. Allow pop-ups and cookies for this site, then sign in again.',
+                'auth.operaHint': 'In Opera, sign-in uses the Firebase popup and does not check the JavaScript origin.',
+                'auth.needWebClientId': 'For Google in Opera, allow pop-ups for this site.',
+                'auth.unauthorizedDomain': 'This domain is not listed in Firebase → Authentication → Authorized domains.',
+                'auth.gisFail': 'Google sign-in failed. Allow pop-ups and cookies, then try again.',
                 'tabs.dictionary': 'Dictionary', 'tabs.library': 'Library', 'tabs.training': 'Training',
                 'profile.title': 'Profile / Settings',
                 'profile.hint': 'Your dictionary is tied to this account ID. Most users can leave it unchanged.',
@@ -13295,7 +13330,7 @@
                 'auth.google': 'Continuar con Google',
                 'auth.or': 'o',
                 'auth.guest': 'Continuar sin cuenta',
-                'auth.consoleHint': 'Si Google no abre, activa el proveedor Google en Firebase Console y añade el dominio del sitio en Authorized domains.',
+                'auth.consoleHint': 'El inicio se abre en una ventana aparte. Si Opera la bloquea, permite ventanas emergentes para este sitio.',
                 'auth.accountTitle': 'Cuenta',
                 'auth.signedGoogle': 'Sesión iniciada con Google',
                 'auth.guestHint': 'No estás usando una cuenta de Google. Los datos se guardan con el ID de perfil local (como antes).',
@@ -13306,16 +13341,17 @@
                 'auth.deleted': 'Cuenta eliminada.',
                 'auth.signedOut': 'Sesión cerrada.',
                 'auth.googleError': 'No se pudo iniciar sesión con Google. Comprueba que el proveedor esté activo en Firebase.',
-                'auth.popupBlocked': 'El navegador bloqueó la ventana de Google. Permite ventanas emergentes.',
+                'auth.popupBlocked': 'La ventana de Google está bloqueada. Permite ventanas emergentes para este sitio y vuelve a intentarlo.',
                 'auth.working': 'Espera…',
                 'auth.migrateAsk': '¿Pasar el diccionario y materiales del modo invitado a esta cuenta de Google?',
                 'auth.migrateDone': 'Migrado. Documentos: {n}',
                 'auth.migrateFail': 'No se pudo migrar. El diccionario de Google puede estar vacío.',
                 'auth.migrating': 'Migrando datos…',
-                'auth.redirectFail': 'El inicio en el teléfono falló: el navegador perdió el estado de Google. Prueba otra vez en Chrome.',
-                'auth.operaHint': 'Opera rompe el login clásico de Firebase. Añade el Web client ID o usa Chrome.',
-                'auth.needWebClientId': 'Para Google en Opera, pega el Web client ID de Firebase (Authentication → Google → Web SDK configuration).',
-                'auth.gisFail': 'Falló Google Identity. Revisa el Web client ID.',
+                'auth.redirectFail': 'El navegador borró el estado temporal del inicio. Permite ventanas emergentes y cookies para este sitio, y entra de nuevo.',
+                'auth.operaHint': 'En Opera el inicio usa la ventana de Firebase y no comprueba el origen JavaScript.',
+                'auth.needWebClientId': 'Para Google en Opera, permite ventanas emergentes para este sitio.',
+                'auth.unauthorizedDomain': 'Este dominio no está en Firebase → Authentication → Authorized domains.',
+                'auth.gisFail': 'No se pudo entrar con Google. Permite ventanas emergentes y cookies, y vuelve a intentarlo.',
                 'tabs.dictionary': 'Diccionario', 'tabs.library': 'Biblioteca', 'tabs.training': 'Entrenamiento',
                 'profile.title': 'Perfil / Ajustes',
                 'profile.hint': 'Tu diccionario está vinculado a este ID de cuenta. La mayoría puede dejarlo como está.',
@@ -18494,6 +18530,28 @@
             return false;
         }
 
+        /**
+         * OAuth "Authorized JavaScript origins" — not the same list as Firebase Authorized domains.
+         * GitHub Pages is allowed by Firebase but GIS from there returns Error 400 origin_mismatch.
+         */
+        function googleIdentityOriginAllowed() {
+            try {
+                const origin = String(location.origin || '').toLowerCase();
+                const allowed = new Set([
+                    'http://localhost',
+                    'http://localhost:5000',
+                    'http://127.0.0.1',
+                    'http://127.0.0.1:5000',
+                    'https://my-english-vocab-training.firebaseapp.com',
+                    'https://my-english-vocab-training.web.app'
+                ]);
+                const authHost = String(firebaseConfig.authDomain || '').toLowerCase();
+                if (authHost) allowed.add(`https://${authHost}`);
+                return allowed.has(origin);
+            } catch (_) {}
+            return false;
+        }
+
         function rememberGoogleAuthPrevUid() {
             const prevUid = (() => {
                 try { return localStorage.getItem(LOCAL_UID_KEY) || activeUid || DEFAULT_SHARED_UID; }
@@ -18552,7 +18610,19 @@
             return msg.includes('missing initial state')
                 || msg.includes('sessionstorage')
                 || code.includes('missing-initial-state')
-                || code === 'auth/missing-initial-state';
+                || code === 'auth/missing-initial-state'
+                || code === 'auth/web-storage-unsupported';
+        }
+
+        function isUserDismissedAuthError(err) {
+            const code = String(err?.code || '').toLowerCase();
+            const msg = String(err?.type || err?.message || err || '').toLowerCase();
+            return code === 'auth/popup-closed-by-user'
+                || code === 'auth/cancelled-popup-request'
+                || code === 'auth/user-cancelled'
+                || msg.includes('popup_closed')
+                || msg.includes('popup_closed_by_user')
+                || msg === 'access_denied';
         }
 
         function getGoogleWebClientId() {
@@ -18584,7 +18654,7 @@
             });
         }
 
-        /** Universal Google login: token returns to this page — no Firebase redirect/sessionStorage. */
+        /** GIS token flow. Only call when googleIdentityOriginAllowed() is true. */
         function signInWithGoogleIdentityServices(clientId) {
             return new Promise(async (resolve, reject) => {
                 try {
@@ -18622,25 +18692,43 @@
             setAuthGateStatus(t('auth.working'));
             rememberGoogleAuthPrevUid();
             const clientId = getGoogleWebClientId();
+            let redirected = false;
             try {
-                // Primary path for ALL browsers (Opera, Chrome, Safari, GitHub Pages, mobile)
-                if (clientId) {
+                // GIS checks this page's origin. GitHub Pages is not on that list and Google
+                // shows Error 400 origin_mismatch (Opera included). Firebase popup uses the
+                // already-registered auth handler instead, so Opera never hits that error.
+                if (clientId && googleIdentityOriginAllowed()) {
                     try {
                         const result = await signInWithGoogleIdentityServices(clientId);
                         await finishGoogleSignIn(result.user);
                         return;
                     } catch (gisErr) {
                         console.warn('GIS sign-in failed, falling back', gisErr);
-                        const gMsg = String(gisErr?.type || gisErr?.message || gisErr || '').toLowerCase();
-                        if (gMsg.includes('popup_closed') || gMsg.includes('closed')) {
+                        if (isUserDismissedAuthError(gisErr)) {
+                            clearGoogleAuthPending();
                             setAuthGateStatus('');
                             return;
                         }
                     }
                 }
-                // Fallback: classic Firebase popup (desktop Chrome etc.)
-                const result = await signInWithPopup(auth, googleAuthProvider);
-                await finishGoogleSignIn(result.user);
+                try {
+                    const result = await signInWithPopup(auth, googleAuthProvider);
+                    await finishGoogleSignIn(result.user);
+                    return;
+                } catch (popupErr) {
+                    if (isUserDismissedAuthError(popupErr)) {
+                        clearGoogleAuthPending();
+                        setAuthGateStatus('');
+                        return;
+                    }
+                    // Full-page redirect loses sessionStorage in Opera. Ask for a popup instead.
+                    if (popupErr?.code === 'auth/popup-blocked' && !isBrokenRedirectBrowser()) {
+                        redirected = true;
+                        await signInWithRedirect(auth, googleAuthProvider);
+                        return;
+                    }
+                    throw popupErr;
+                }
             } catch (e) {
                 console.error('signInWithGoogle', e);
                 clearGoogleAuthPending();
@@ -18649,15 +18737,15 @@
                     setAuthGateStatus(t('auth.redirectFail'));
                 } else if (code === 'auth/popup-blocked') {
                     setAuthGateStatus(t('auth.popupBlocked'));
-                } else if (code === 'auth/popup-closed-by-user') {
-                    setAuthGateStatus('');
-                } else if (String(e?.type || e?.message || '').toLowerCase().includes('popup_closed')) {
+                } else if (code === 'auth/unauthorized-domain') {
+                    setAuthGateStatus(t('auth.unauthorizedDomain'));
+                } else if (isUserDismissedAuthError(e)) {
                     setAuthGateStatus('');
                 } else {
                     setAuthGateStatus(t('auth.gisFail'));
                 }
             } finally {
-                if (btn) btn.disabled = false;
+                if (!redirected && btn) btn.disabled = false;
             }
         };
         async function completeGoogleRedirectIfAny() {
