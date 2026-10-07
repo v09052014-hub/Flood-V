@@ -10283,8 +10283,12 @@
                                         <div class="auth-account-meta" id="auth-account-meta" data-i18n="auth.signedGoogle">Увійшли через Google</div>
                                     </div>
                                 </div>
-                                <button type="button" onclick="openAuthLanding()" class="w-full mb-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.openLogin">Екран входу</button>
-                                <button type="button" onclick="remigrateGuestDataToGoogle()" class="w-full mb-2 bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-700 py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.remigrate">Догрузити мови з гостьового ID</button>
+                                <div class="mb-3 p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-left">
+                                    <p class="text-xs font-bold text-indigo-950 mb-1" data-i18n="auth.remigrateTitle">Не вистачає мови (напр. іспанська)?</p>
+                                    <p class="text-[11px] text-indigo-900/80 leading-relaxed mb-2" data-i18n="auth.remigrateHow">Встав СТАРИЙ гостьовий ID у це синє поле (не Google-ID). Потім натисни кнопку під ним. Блок «Змінити ID» нижче — не для цього.</p>
+                                    <input type="text" id="remigrate-guest-uid" autocomplete="off" spellcheck="false" placeholder="Старий гостьовий ID…" class="w-full p-2.5 mb-2 border border-indigo-200 rounded-xl outline-none focus:border-indigo-500 font-mono text-xs bg-white" data-i18n-placeholder="auth.remigratePh">
+                                    <button type="button" onclick="remigrateGuestDataToGoogle()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.remigrateGo">Перенести в цей Google-акаунт</button>
+                                </div>
                                 <button type="button" onclick="signOutAccount()" class="w-full mb-2 bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.signOut">Вийти</button>
                                 <button type="button" onclick="deleteAccountWithData()" class="w-full text-rose-500 hover:text-rose-600 font-bold text-sm py-2 transition" data-i18n="auth.deleteAccount">Видалити акаунт і всі дані</button>
                             </div>
@@ -11706,6 +11710,7 @@
                 'auth.migrateAsk': 'Перенести словник і матеріали з гостьового режиму в цей Google-акаунт?',
                 'auth.migrateDone': 'Перенесено. Документів: {n}',
                 'auth.migrateFail': 'Не вдалося перенести дані. Словник Google може бути порожнім.',
+                'auth.migrateDenied': 'Немає доступу до гостьового ID (Firestore Rules). Відкрий firestore.rules з робочого столу → Firebase Console → Firestore → Rules → встав → Publish. Потім знову «Догрузити мови».',
                 'auth.migrating': 'Переносимо дані…',
                 'auth.redirectFail': 'Вхід з телефону обірвався: браузер втратив тимчасовий стан Google-логіну. Спробуйте ще раз у Chrome.',
                 'auth.operaHint': 'Opera ріже старий Firebase-логін. Потрібен Web client ID (див. підказку) або Chrome.',
@@ -11718,9 +11723,14 @@
                 'auth.gisLoading': 'Завантаження Google…',
                 'auth.useGoogleBtn': 'Натисніть «Увійти через Google».',
                 'auth.remigrate': 'Догрузити мови з гостьового ID',
-                'auth.remigrateAsk': 'Скопіювати всі мовні пари (слова й матеріали) з попереднього гостьового ID у цей Google-акаунт? Уже наявні дані не зітруться.',
-                'auth.remigrateNeedId': 'Немає збереженого гостьового ID. Вставте старий ID у поле нижче й натисніть «Застосувати ID», або увійдіть знову з того самого браузера.',
-                'auth.remigrateDone': 'Перенесено. Пар/документів: {n}. Перемкніть мову в налаштуваннях, якщо треба.',
+                'auth.remigrateTitle': 'Не вистачає мови (напр. іспанська)?',
+                'auth.remigrateHow': 'Встав СТАРИЙ гостьовий ID у це синє поле (не Google-ID). Потім натисни кнопку під ним. Блок «Змінити ID» нижче — не для цього.',
+                'auth.remigratePh': 'Старий гостьовий ID…',
+                'auth.remigrateGo': 'Перенести в цей Google-акаунт',
+                'auth.remigrateAsk': 'Скопіювати всі слова й матеріали зі старого гостьового ID «{id}» у цей Google-акаунт? Уже наявне не зітреться.',
+                'auth.remigrateNeedId': 'Спочатку встав старий гостьовий ID у синє поле вище (блок «Не вистачає мови»), потім натисни «Перенести в цей Google-акаунт».',
+                'auth.remigrateDone': 'Перенесено. Документів: {n}. У налаштуваннях мов перемкни пару, якщо треба.',
+                'auth.remigrateSame': 'Це той самий ID, що й зараз у Google. Потрібен ІНШИЙ — старий гостьовий.',
                 'tabs.dictionary': 'Словник', 'tabs.library': 'Бібліотека', 'tabs.training': 'Тренування',
                 'profile.title': 'Профіль / Налаштування',
                 'profile.hint': 'Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.',
@@ -12536,6 +12546,7 @@
                 'auth.migrateAsk': 'Move your dictionary and materials from guest mode into this Google account?',
                 'auth.migrateDone': 'Migrated. Documents: {n}',
                 'auth.migrateFail': 'Could not migrate data. The Google dictionary may be empty.',
+                'auth.migrateDenied': 'No access to the guest ID (Firestore Rules). In Firebase → Firestore → Rules allow signed-in users to read users/{uid} (see firestore.rules on the Desktop), Publish, then tap Import languages again.',
                 'auth.migrating': 'Migrating data…',
                 'auth.redirectFail': 'Phone sign-in broke: the browser lost Google login state. Try again in Chrome.',
                 'auth.operaHint': 'Opera breaks classic Firebase login. Add the Web client ID (see prompt) or use Chrome.',
@@ -12548,9 +12559,14 @@
                 'auth.gisLoading': 'Loading Google…',
                 'auth.useGoogleBtn': 'Tap “Sign in with Google”.',
                 'auth.remigrate': 'Import languages from guest ID',
-                'auth.remigrateAsk': 'Copy all language pairs (words & materials) from the previous guest ID into this Google account? Existing data will not be wiped.',
-                'auth.remigrateNeedId': 'No saved guest ID. Paste the old ID below and tap Apply ID, or sign in again from the same browser.',
-                'auth.remigrateDone': 'Imported. Pairs/docs: {n}. Switch language in settings if needed.',
+                'auth.remigrateTitle': 'Missing a language (e.g. Spanish)?',
+                'auth.remigrateHow': 'Paste the OLD guest ID in this blue field (not your Google ID). Then tap the button under it. The “Change ID” block below is not for this.',
+                'auth.remigratePh': 'Old guest ID…',
+                'auth.remigrateGo': 'Import into this Google account',
+                'auth.remigrateAsk': 'Copy all words & materials from old guest ID “{id}” into this Google account? Existing data stays.',
+                'auth.remigrateNeedId': 'First paste the old guest ID in the blue box above (“Missing a language?”), then tap Import.',
+                'auth.remigrateDone': 'Imported. Docs: {n}. Switch language pair in settings if needed.',
+                'auth.remigrateSame': 'That is your current Google ID. You need a DIFFERENT one — the old guest ID.',
                 'tabs.dictionary': 'Dictionary', 'tabs.library': 'Library', 'tabs.training': 'Training',
                 'profile.title': 'Profile / Settings',
                 'profile.hint': 'Your dictionary is tied to this account ID. Most users can leave it unchanged.',
@@ -13356,6 +13372,7 @@
                 'auth.migrateAsk': '¿Pasar el diccionario y materiales del modo invitado a esta cuenta de Google?',
                 'auth.migrateDone': 'Migrado. Documentos: {n}',
                 'auth.migrateFail': 'No se pudo migrar. El diccionario de Google puede estar vacío.',
+                'auth.migrateDenied': 'Sin acceso al ID de invitado (Firestore Rules). En Firebase → Firestore → Rules permite read de users/{uid} a usuarios autenticados (ver firestore.rules en el Escritorio), Publish, y vuelve a Importar idiomas.',
                 'auth.migrating': 'Migrando datos…',
                 'auth.redirectFail': 'El inicio en el teléfono falló: el navegador perdió el estado de Google. Prueba otra vez en Chrome.',
                 'auth.operaHint': 'Opera rompe el login clásico de Firebase. Añade el Web client ID o usa Chrome.',
@@ -13368,9 +13385,14 @@
                 'auth.gisLoading': 'Cargando Google…',
                 'auth.useGoogleBtn': 'Pulsa “Iniciar sesión con Google”.',
                 'auth.remigrate': 'Importar idiomas desde ID de invitado',
-                'auth.remigrateAsk': '¿Copiar todos los pares de idiomas (palabras y materiales) del ID de invitado anterior a esta cuenta de Google? No se borrarán datos existentes.',
-                'auth.remigrateNeedId': 'No hay ID de invitado guardado. Pega el ID antiguo abajo y pulsa Aplicar ID, o inicia sesión de nuevo en el mismo navegador.',
-                'auth.remigrateDone': 'Importado. Pares/docs: {n}. Cambia el idioma en ajustes si hace falta.',
+                'auth.remigrateTitle': '¿Falta un idioma (p. ej. español)?',
+                'auth.remigrateHow': 'Pega el ID de invitado ANTIGUO en este campo azul (no el de Google). Luego pulsa el botón de debajo. El bloque “Cambiar ID” de abajo no es para esto.',
+                'auth.remigratePh': 'ID de invitado antiguo…',
+                'auth.remigrateGo': 'Importar a esta cuenta de Google',
+                'auth.remigrateAsk': '¿Copiar palabras y materiales del ID de invitado “{id}” a esta cuenta de Google? Lo existente no se borra.',
+                'auth.remigrateNeedId': 'Primero pega el ID antiguo en la caja azul de arriba, luego pulsa Importar.',
+                'auth.remigrateDone': 'Importado. Docs: {n}. Cambia el par de idiomas en ajustes si hace falta.',
+                'auth.remigrateSame': 'Ese es tu ID actual de Google. Necesitas OTRO: el ID de invitado antiguo.',
                 'tabs.dictionary': 'Diccionario', 'tabs.library': 'Biblioteca', 'tabs.training': 'Entrenamiento',
                 'profile.title': 'Perfil / Ajustes',
                 'profile.hint': 'Tu diccionario está vinculado a este ID de cuenta. La mayoría puede dejarlo como está.',
@@ -18487,6 +18509,11 @@
             // Keep legacy ID tools available for migration / teacher linking, but quieter when Google is on
             if (legacyEdit) legacyEdit.classList.toggle('opacity-60', !!google);
             if (legacyReset) legacyReset.classList.toggle('hidden', !!google);
+            const remigrateInp = document.getElementById('remigrate-guest-uid');
+            if (remigrateInp && google && !String(remigrateInp.value || '').trim()) {
+                const last = getLastGuestUid();
+                if (last && last !== authUser?.uid) remigrateInp.value = last;
+            }
         }
 
         function readGoogleSessionLock() {
@@ -18884,12 +18911,24 @@
             return n;
         }
 
+        function isPermissionDeniedError(e) {
+            const code = String(e?.code || '').toLowerCase();
+            const msg = String(e?.message || e || '').toLowerCase();
+            return code.includes('permission-denied') || msg.includes('permission-denied') || msg.includes('missing or insufficient permissions');
+        }
+
         async function migrateUserDataBetweenUids(fromUid, toUid) {
             if (!db || !fromUid || !toUid || fromUid === toUid) return { ok: false, n: 0 };
             let n = 0;
             const trackIds = new Set();
             try {
-                const userSnap = await getDoc(doc(db, 'users', fromUid));
+                let userSnap;
+                try {
+                    userSnap = await getDoc(doc(db, 'users', fromUid));
+                } catch (e) {
+                    if (isPermissionDeniedError(e)) return { ok: false, n: 0, denied: true };
+                    throw e;
+                }
                 const src = userSnap.exists() ? (userSnap.data() || {}) : {};
                 const destSnap = await getDoc(doc(db, 'users', toUid));
                 const dest = destSnap.exists() ? (destSnap.data() || {}) : {};
@@ -18903,20 +18942,25 @@
                 }
 
                 // Legacy root collections (pre-track layout) + every language track
-                for (const col of ['words', 'materials', 'folders', 'stats', 'storyArchive']) {
-                    n += await copyFirestoreCollection(['users', fromUid, col], ['users', toUid, col]);
-                }
-                const tracksSnap = await getDocs(collection(db, 'users', fromUid, 'tracks'));
-                for (const trackDoc of tracksSnap.docs) {
-                    trackIds.add(trackDoc.id);
-                    await setDoc(doc(db, 'users', toUid, 'tracks', trackDoc.id), trackDoc.data(), { merge: true });
-                    n++;
+                try {
                     for (const col of ['words', 'materials', 'folders', 'stats', 'storyArchive']) {
-                        n += await copyFirestoreCollection(
-                            ['users', fromUid, 'tracks', trackDoc.id, col],
-                            ['users', toUid, 'tracks', trackDoc.id, col]
-                        );
+                        n += await copyFirestoreCollection(['users', fromUid, col], ['users', toUid, col]);
                     }
+                    const tracksSnap = await getDocs(collection(db, 'users', fromUid, 'tracks'));
+                    for (const trackDoc of tracksSnap.docs) {
+                        trackIds.add(trackDoc.id);
+                        await setDoc(doc(db, 'users', toUid, 'tracks', trackDoc.id), trackDoc.data(), { merge: true });
+                        n++;
+                        for (const col of ['words', 'materials', 'folders', 'stats', 'storyArchive']) {
+                            n += await copyFirestoreCollection(
+                                ['users', fromUid, 'tracks', trackDoc.id, col],
+                                ['users', toUid, 'tracks', trackDoc.id, col]
+                            );
+                        }
+                    }
+                } catch (e) {
+                    if (isPermissionDeniedError(e)) return { ok: false, n, denied: true };
+                    throw e;
                 }
 
                 // Discover tracks that have words even if the track doc / knownTracks was missing
@@ -18960,6 +19004,7 @@
                 return { ok: true, n, tracks: mergedKnown.length };
             } catch (e) {
                 console.error('migrateUserDataBetweenUids', e);
+                if (isPermissionDeniedError(e)) return { ok: false, n, denied: true };
                 return { ok: false, n };
             }
         }
@@ -18979,7 +19024,12 @@
                     if (!tm.empty) return true;
                 }
                 return false;
-            } catch (_) { return false; }
+            } catch (e) {
+                if (isPermissionDeniedError(e)) {
+                    console.warn('guestUidHasData permission-denied', uid);
+                }
+                return false;
+            }
         }
 
         async function tryOfferGuestToGoogleMigration(fromUid, toUid) {
@@ -18996,12 +19046,15 @@
                             showAppToast?.(t('auth.remigrateDone', { n: r.n }), 4200);
                             try { await loadUserPrefs(); } catch (_) {}
                             try { loadData(); } catch (_) {}
+                        } else if (r.denied) {
+                            window.showModal(t('auth.migrateDenied'));
                         } else {
                             showAppToast?.(t('auth.migrateFail'), 3600);
                         }
                     } catch (e) {
                         console.error(e);
-                        showAppToast?.(t('auth.migrateFail'), 3600);
+                        if (isPermissionDeniedError(e)) window.showModal(t('auth.migrateDenied'));
+                        else showAppToast?.(t('auth.migrateFail'), 3600);
                     } finally {
                         setAuthGateStatus('');
                     }
@@ -19013,13 +19066,19 @@
             if (!isGoogleSignedIn()) {
                 return window.showModal(t('auth.googleError'));
             }
-            const fromUid = getLastGuestUid();
-            const inputUid = String(document.getElementById('sync-input-uid')?.value || '').trim();
-            const source = inputUid || fromUid;
-            if (!source || source === activeUid) {
+            const box = document.getElementById('remigrate-guest-uid');
+            const typed = String(box?.value || '').trim();
+            const source = typed || getLastGuestUid();
+            if (!source) {
+                try { box?.focus(); } catch (_) {}
                 return window.showModal(t('auth.remigrateNeedId'));
             }
-            window.showModal(t('auth.remigrateAsk'), true, async () => {
+            if (source === activeUid || source === authUser?.uid) {
+                try { box?.focus(); } catch (_) {}
+                return window.showModal(t('auth.remigrateSame'));
+            }
+            if (box && !typed) box.value = source;
+            window.showModal(t('auth.remigrateAsk', { id: source }), true, async () => {
                 try {
                     showAppToast?.(t('auth.migrating'), 2400);
                     const r = await migrateUserDataBetweenUids(source, activeUid);
@@ -19029,12 +19088,15 @@
                         try { await loadUserPrefs(); } catch (_) {}
                         try { loadData(); } catch (_) {}
                         try { renderLanguagePickers?.(); syncSettingsPanelUi?.(); } catch (_) {}
+                    } else if (r.denied) {
+                        window.showModal(t('auth.migrateDenied'));
                     } else {
                         showAppToast?.(t('auth.migrateFail'), 3600);
                     }
                 } catch (e) {
                     console.error(e);
-                    showAppToast?.(t('auth.migrateFail'), 3600);
+                    if (isPermissionDeniedError(e)) window.showModal(t('auth.migrateDenied'));
+                    else showAppToast?.(t('auth.migrateFail'), 3600);
                 }
             });
         };
