@@ -11686,6 +11686,7 @@
                 'auth.operaHint': 'Opera ріже старий Firebase-логін. Потрібен Web client ID (див. підказку) або Chrome.',
                 'auth.needWebClientId': 'Щоб Google працював в Opera, вставте Web client ID з Firebase (Authentication → Google → Web SDK configuration).',
                 'auth.gisFail': 'Не вдалося увійти через Google Identity. Перевірте Web client ID.',
+                'auth.originFail': 'Цей домен не в Authorized JavaScript origins у Google Cloud (Credentials → Web client). Додай точну адресу сайту (GitHub Pages / Netlify).',
                 'tabs.dictionary': 'Словник', 'tabs.library': 'Бібліотека', 'tabs.training': 'Тренування',
                 'profile.title': 'Профіль / Налаштування',
                 'profile.hint': 'Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.',
@@ -12506,6 +12507,7 @@
                 'auth.operaHint': 'Opera breaks classic Firebase login. Add the Web client ID (see prompt) or use Chrome.',
                 'auth.needWebClientId': 'For Google in Opera, paste the Web client ID from Firebase (Authentication → Google → Web SDK configuration).',
                 'auth.gisFail': 'Google Identity sign-in failed. Check the Web client ID.',
+                'auth.originFail': 'This domain is not in Authorized JavaScript origins (Google Cloud → Credentials → Web client). Add your exact site URL (GitHub Pages / Netlify).',
                 'tabs.dictionary': 'Dictionary', 'tabs.library': 'Library', 'tabs.training': 'Training',
                 'profile.title': 'Profile / Settings',
                 'profile.hint': 'Your dictionary is tied to this account ID. Most users can leave it unchanged.',
@@ -13316,6 +13318,7 @@
                 'auth.operaHint': 'Opera rompe el login clásico de Firebase. Añade el Web client ID o usa Chrome.',
                 'auth.needWebClientId': 'Para Google en Opera, pega el Web client ID de Firebase (Authentication → Google → Web SDK configuration).',
                 'auth.gisFail': 'Falló Google Identity. Revisa el Web client ID.',
+                'auth.originFail': 'Este dominio no está en Authorized JavaScript origins (Google Cloud → Credentials → Web client). Añade la URL exacta del sitio.',
                 'tabs.dictionary': 'Diccionario', 'tabs.library': 'Biblioteca', 'tabs.training': 'Entrenamiento',
                 'profile.title': 'Perfil / Ajustes',
                 'profile.hint': 'Tu diccionario está vinculado a este ID de cuenta. La mayoría puede dejarlo como está.',
@@ -18584,7 +18587,7 @@
             });
         }
 
-        /** Universal Google login: token returns to this page — no Firebase redirect/sessionStorage. */
+        /** Universal Google login: token returns to this page — never touches firebaseapp.com redirect. */
         function signInWithGoogleIdentityServices(clientId) {
             return new Promise(async (resolve, reject) => {
                 try {
@@ -18623,36 +18626,21 @@
             rememberGoogleAuthPrevUid();
             const clientId = getGoogleWebClientId();
             try {
-                // Primary path for ALL browsers (Opera, Chrome, Safari, GitHub Pages, mobile)
-                if (clientId) {
-                    try {
-                        const result = await signInWithGoogleIdentityServices(clientId);
-                        await finishGoogleSignIn(result.user);
-                        return;
-                    } catch (gisErr) {
-                        console.warn('GIS sign-in failed, falling back', gisErr);
-                        const gMsg = String(gisErr?.type || gisErr?.message || gisErr || '').toLowerCase();
-                        if (gMsg.includes('popup_closed') || gMsg.includes('closed')) {
-                            setAuthGateStatus('');
-                            return;
-                        }
-                    }
+                if (!clientId) {
+                    setAuthGateStatus(t('auth.gisFail'));
+                    return;
                 }
-                // Fallback: classic Firebase popup (desktop Chrome etc.)
-                const result = await signInWithPopup(auth, googleAuthProvider);
+                // ONLY GIS — never fall back to Firebase popup/redirect (that opens firebaseapp.com and breaks Opera/mobile)
+                const result = await signInWithGoogleIdentityServices(clientId);
                 await finishGoogleSignIn(result.user);
             } catch (e) {
                 console.error('signInWithGoogle', e);
                 clearGoogleAuthPending();
-                const code = e?.code || '';
-                if (authErrorLooksLikeRedirectState(e)) {
-                    setAuthGateStatus(t('auth.redirectFail'));
-                } else if (code === 'auth/popup-blocked') {
-                    setAuthGateStatus(t('auth.popupBlocked'));
-                } else if (code === 'auth/popup-closed-by-user') {
+                const msg = String(e?.type || e?.message || e?.error || e || '').toLowerCase();
+                if (msg.includes('popup_closed') || msg.includes('closed')) {
                     setAuthGateStatus('');
-                } else if (String(e?.type || e?.message || '').toLowerCase().includes('popup_closed')) {
-                    setAuthGateStatus('');
+                } else if (msg.includes('origin') || msg.includes('unauthorized')) {
+                    setAuthGateStatus(t('auth.originFail'));
                 } else {
                     setAuthGateStatus(t('auth.gisFail'));
                 }
