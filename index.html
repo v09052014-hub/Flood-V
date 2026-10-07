@@ -31,6 +31,27 @@
         document.documentElement.setAttribute('data-viewport-content', DESIRED);
     })();
     </script>
+    <!--
+      Opera Mobile / Data Saver often STRIPS #id_token=… after Google redirect (hash never
+      reaches the app). Capture hash + ?code= into localStorage SYNCHRONOUSLY before any
+      later navigation or deferred script can wipe location.hash.
+    -->
+    <script>
+    (function () {
+        try {
+            var h = String(location.hash || '');
+            if (h && (h.indexOf('id_token=') >= 0 || h.indexOf('access_token=') >= 0 || (h.indexOf('error=') >= 0 && h.indexOf('id_token') < 0 && h.length < 500))) {
+                localStorage.setItem('ls_oauth_hash_backup', h.charAt(0) === '#' ? h : ('#' + h));
+                localStorage.setItem('ls_oauth_hash_backup_at', String(Date.now()));
+            }
+            var q = String(location.search || '');
+            if (q && (q.indexOf('code=') >= 0 || q.indexOf('error=') >= 0)) {
+                localStorage.setItem('ls_oauth_query_backup', q.charAt(0) === '?' ? q : ('?' + q));
+                localStorage.setItem('ls_oauth_query_backup_at', String(Date.now()));
+            }
+        } catch (e) {}
+    })();
+    </script>
     <meta name="theme-color" content="#f8fafc">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -63,6 +84,8 @@
             background-color: var(--app-bg);
             min-height: 100%;
             min-height: 100dvh;
+            /* Stop Chrome/Opera native pull-to-refresh on the main page (menu already had its own scrollport) */
+            overscroll-behavior-y: contain;
         }
         body {
             /* Clear Android gesture nav only (max inset). Do not invent a second "chin". */
@@ -74,6 +97,7 @@
             background-color: var(--app-bg);
             min-height: 100%;
             min-height: 100dvh;
+            overscroll-behavior-y: contain;
         }
         main {
             padding-bottom: 0.75rem;
@@ -9765,7 +9789,7 @@
             <div class="auth-gate-divider"><span data-i18n="auth.or">або</span></div>
             <button type="button" id="btn-auth-guest" class="auth-guest-btn" onclick="continueAsGuest()" data-i18n="auth.guest">Продовжити без акаунта</button>
             <p id="auth-gate-status" class="auth-gate-status" role="status" aria-live="polite"></p>
-            <p class="auth-gate-hint" data-i18n="auth.consoleHint">Вхід іде через Google на цьому сайті (без firebaseapp.com). Redirect URI в Web client: https://v09052014-hub.github.io/Flood-V/ — firebaseapp.com з Redirect URIs не прибирай.</p>
+            <p class="auth-gate-hint" data-i18n="auth.consoleHint">Opera: логін через ?code= (не hash). Потрібен Worker google-oauth-proxy + секрет GOOGLE_CLIENT_SECRET. Redirect URI: https://v09052014-hub.github.io/Flood-V/</p>
         </div>
     </div>
     <div id="mat-actions-scrim" onclick="closeMatCardActions()" aria-hidden="true"></div>
@@ -11540,6 +11564,12 @@
         const GOOGLE_WEB_CLIENT_ID_KEY = 'ls_google_web_client_id';
         const GOOGLE_OAUTH_NONCE_KEY = 'ls_google_oauth_nonce';
         const GOOGLE_OAUTH_REDIRECT_KEY = 'ls_google_oauth_redirect';
+        const GOOGLE_OAUTH_VERIFIER_KEY = 'ls_google_oauth_verifier';
+        const GOOGLE_OAUTH_STATE_KEY = 'ls_google_oauth_state';
+        const GOOGLE_OAUTH_HASH_BACKUP_KEY = 'ls_oauth_hash_backup';
+        const GOOGLE_OAUTH_QUERY_BACKUP_KEY = 'ls_oauth_query_backup';
+        /** Exchanges ?code= + PKCE → id_token (Opera drops #id_token hash). Deploy google-oauth-proxy-worker.js */
+        const GOOGLE_OAUTH_PROXY = 'https://google-oauth-proxy.v09052014.workers.dev';
         /** Survives Opera auth flicker after successful Google sign-in (uid + timestamp). */
         const GOOGLE_SESSION_LOCK_KEY = 'ls_google_session_lock_v1';
 
@@ -11704,7 +11734,7 @@
                 'auth.google': 'Увійти через Google',
                 'auth.or': 'або',
                 'auth.guest': 'Продовжити без акаунта',
-                'auth.consoleHint': 'Вхід іде через Google на цьому сайті (без firebaseapp.com). Redirect URI в Web client: https://v09052014-hub.github.io/Flood-V/ — firebaseapp.com з Redirect URIs не прибирай.',
+                'auth.consoleHint': 'Opera: логін через ?code= (не hash). Потрібен Worker google-oauth-proxy + секрет GOOGLE_CLIENT_SECRET. Redirect URI: https://v09052014-hub.github.io/Flood-V/',
                 'auth.accountTitle': 'Акаунт',
                 'auth.signedGoogle': 'Увійшли через Google',
                 'auth.guestHint': 'Зараз ви без Google-акаунта. Дані зберігаються за локальним ID (як раніше).',
@@ -12544,7 +12574,7 @@
                 'auth.google': 'Continue with Google',
                 'auth.or': 'or',
                 'auth.guest': 'Continue without an account',
-                'auth.consoleHint': 'Once in Google Cloud → Web client add Redirect URI: https://v09052014-hub.github.io/Flood-V/ (Origins already https://v09052014-hub.github.io). Without it, mobile Opera sign-in cannot finish.',
+                'auth.consoleHint': 'Opera needs the google-oauth-proxy Worker + GOOGLE_CLIENT_SECRET. Redirect URI: https://v09052014-hub.github.io/Flood-V/',
                 'auth.accountTitle': 'Account',
                 'auth.signedGoogle': 'Signed in with Google',
                 'auth.guestHint': 'You are not using a Google account. Data is stored under the local profile ID (as before).',
@@ -13374,7 +13404,7 @@
                 'auth.google': 'Continuar con Google',
                 'auth.or': 'o',
                 'auth.guest': 'Continuar sin cuenta',
-                'auth.consoleHint': 'Una vez en Google Cloud → Web client añade Redirect URI: https://v09052014-hub.github.io/Flood-V/ (Origins ya https://v09052014-hub.github.io). Sin eso, Opera móvil no termina el login.',
+                'auth.consoleHint': 'Opera: Worker google-oauth-proxy + GOOGLE_CLIENT_SECRET. Redirect URI: https://v09052014-hub.github.io/Flood-V/',
                 'auth.accountTitle': 'Cuenta',
                 'auth.signedGoogle': 'Sesión iniciada con Google',
                 'auth.guestHint': 'No estás usando una cuenta de Google. Los datos se guardan con el ID de perfil local (como antes).',
@@ -18390,7 +18420,7 @@
             };
         };
 
-        /* Pull-to-reload: touch only (never touch mouse-wheel / desktop scroll). */
+        /* Pull-to-reload: touch only. Also block native Chrome/Opera PTR while pulling from top. */
         (function initPullToReloadConfirm() {
             let startY = 0;
             let armed = false;
@@ -18401,10 +18431,15 @@
                 startY = e.touches?.[0]?.clientY ?? 0;
                 armed = true;
             }, { passive: true });
-            window.addEventListener('touchmove', () => {
+            window.addEventListener('touchmove', (e) => {
                 if (!armed) return;
-                if (scrollTop() > 2) armed = false;
-            }, { passive: true });
+                if (scrollTop() > 2) { armed = false; return; }
+                const y = e.touches?.[0]?.clientY ?? startY;
+                // At top + pulling down → stop browser reload; our touchend confirm handles it
+                if (y - startY > 12) {
+                    try { e.preventDefault(); } catch (_) {}
+                }
+            }, { passive: false });
             window.addEventListener('touchend', (e) => {
                 if (!armed) return;
                 armed = false;
@@ -18882,93 +18917,220 @@
             } catch (_) { return null; }
         }
 
-        /** Leave github.io → Google → back to github.io with #id_token=… (never firebaseapp.com). */
-        function startGoogleIdTokenRedirect(clientId) {
+        function randomOAuthString(bytes = 32) {
+            const arr = crypto.getRandomValues(new Uint8Array(bytes));
+            return [...arr].map((b) => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function base64UrlFromBuffer(buf) {
+            const bytes = new Uint8Array(buf);
+            let s = '';
+            for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+            return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+        }
+
+        async function makePkceChallenge(verifier) {
+            const data = new TextEncoder().encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return base64UrlFromBuffer(digest);
+        }
+
+        function takeOAuthHashParams() {
+            const live = String(location.hash || '');
+            const backup = String(lsGet(GOOGLE_OAUTH_HASH_BACKUP_KEY) || '');
+            const raw = (live && (live.includes('id_token=') || live.includes('error=')))
+                ? live
+                : backup;
+            if (!raw) return null;
+            const hash = raw.replace(/^#/, '');
+            if (!hash || hash.startsWith('/')) return null;
+            if (!hash.includes('id_token=') && !hash.includes('error=')) return null;
+            try { lsDel(GOOGLE_OAUTH_HASH_BACKUP_KEY); } catch (_) {}
+            try { localStorage.removeItem('ls_oauth_hash_backup_at'); } catch (_) {}
+            return new URLSearchParams(hash);
+        }
+
+        function takeOAuthQueryParams() {
+            const live = String(location.search || '');
+            const backup = String(lsGet(GOOGLE_OAUTH_QUERY_BACKUP_KEY) || '');
+            const raw = (live && (live.includes('code=') || live.includes('error=')))
+                ? live
+                : backup;
+            if (!raw) return null;
+            const q = raw.replace(/^\?/, '');
+            if (!q.includes('code=') && !q.includes('error=')) return null;
+            try { lsDel(GOOGLE_OAUTH_QUERY_BACKUP_KEY); } catch (_) {}
+            try { localStorage.removeItem('ls_oauth_query_backup_at'); } catch (_) {}
+            return new URLSearchParams(q);
+        }
+
+        function clearOAuthUrlResidue() {
+            try { history.replaceState(null, '', location.pathname); } catch (_) {}
+        }
+
+        /**
+         * Opera-safe Google login:
+         * Prefer authorization CODE in ?query= (survives Opera Data Saver / redirects).
+         * Hash #id_token is a fallback only — Opera often strips it.
+         */
+        async function startGooglePkceRedirect(clientId) {
             const redirectUri = getGoogleOAuthRedirectUri();
-            const nonce = [...crypto.getRandomValues(new Uint8Array(16))]
-                .map((b) => b.toString(16).padStart(2, '0')).join('');
-            // localStorage — Opera often clears sessionStorage across the Google hop
+            const verifier = base64UrlFromBuffer(crypto.getRandomValues(new Uint8Array(32)));
+            const challenge = await makePkceChallenge(verifier);
+            const state = randomOAuthString(16);
+            const nonce = randomOAuthString(16);
+            lsSet(GOOGLE_OAUTH_VERIFIER_KEY, verifier);
+            lsSet(GOOGLE_OAUTH_STATE_KEY, state);
             lsSet(GOOGLE_OAUTH_NONCE_KEY, nonce);
             lsSet(GOOGLE_OAUTH_REDIRECT_KEY, redirectUri);
             const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
             url.searchParams.set('client_id', clientId);
             url.searchParams.set('redirect_uri', redirectUri);
-            url.searchParams.set('response_type', 'id_token');
+            url.searchParams.set('response_type', 'code');
+            url.searchParams.set('response_mode', 'query');
             url.searchParams.set('scope', 'openid email profile');
+            url.searchParams.set('state', state);
             url.searchParams.set('nonce', nonce);
+            url.searchParams.set('code_challenge', challenge);
+            url.searchParams.set('code_challenge_method', 'S256');
             url.searchParams.set('prompt', 'select_account');
             location.assign(url.toString());
         }
 
-        /**
-         * Parse #id_token=… after Google returns. Must run BEFORE onAuthStateChanged
-         * installs anonymous sign-in (otherwise Opera races guest vs Google).
-         * @returns {Promise<boolean>} true if an OAuth response was handled
-         */
-        async function consumeGoogleOAuthIdTokenIfPresent() {
-            const hash = String(location.hash || '').replace(/^#/, '');
-            let idToken = null;
-            let oauthError = null;
-            if (hash && !hash.startsWith('/') && (hash.includes('id_token=') || hash.includes('error='))) {
-                const params = new URLSearchParams(hash);
-                idToken = params.get('id_token');
-                oauthError = params.get('error');
+        async function exchangeGoogleAuthCode(code) {
+            const redirectUri = lsGet(GOOGLE_OAUTH_REDIRECT_KEY) || getGoogleOAuthRedirectUri();
+            const verifier = lsGet(GOOGLE_OAUTH_VERIFIER_KEY);
+            const clientId = getGoogleWebClientId();
+            if (!verifier) throw new Error('oauth missing code_verifier');
+            const res = await fetch(`${GOOGLE_OAUTH_PROXY.replace(/\/$/, '')}/token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code,
+                    code_verifier: verifier,
+                    redirect_uri: redirectUri,
+                    client_id: clientId
+                })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data?.id_token) {
+                const detail = data?.hint || data?.detail || data?.error || res.status;
+                throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail).slice(0, 180));
             }
-            if (!idToken && !oauthError) return false;
+            return String(data.id_token);
+        }
 
-            try { history.replaceState(null, '', location.pathname + (location.search || '')); } catch (_) {}
-
-            if (oauthError) {
-                clearGoogleAuthPending();
-                lsDel(GOOGLE_OAUTH_NONCE_KEY);
-                const errMsg = String(oauthError);
-                setAuthGateStatus(errMsg.includes('redirect_uri')
-                    ? `${t('auth.redirectUriFail')} ${getGoogleOAuthRedirectUri()}`
-                    : formatGoogleSignInError({ error: errMsg }));
-                try { showAuthGate(); } catch (_) {}
-                return true;
-            }
-
+        async function signInFirebaseWithGoogleIdToken(idToken) {
             const payload = decodeJwtPayload(idToken);
             const clientId = getGoogleWebClientId();
             if (payload?.aud && clientId && String(payload.aud) !== clientId) {
-                clearGoogleAuthPending();
-                lsDel(GOOGLE_OAUTH_NONCE_KEY);
-                setAuthGateStatus(t('auth.credFail'));
-                try { showAuthGate(); } catch (_) {}
+                throw new Error('aud mismatch');
+            }
+            const expectedNonce = lsGet(GOOGLE_OAUTH_NONCE_KEY);
+            // Soft check — Opera may wipe nonce storage; don't hard-fail if missing
+            if (expectedNonce && payload?.nonce && payload.nonce !== expectedNonce) {
+                throw new Error('oauth nonce mismatch');
+            }
+            try {
+                if (auth.currentUser?.isAnonymous) await signOut(auth);
+            } catch (_) {}
+            const cred = GoogleAuthProvider.credential(idToken);
+            const result = await signInWithCredential(auth, cred);
+            await finishGoogleSignIn(result.user);
+        }
+
+        function clearGoogleOAuthTransientKeys() {
+            lsDel(GOOGLE_OAUTH_NONCE_KEY);
+            lsDel(GOOGLE_OAUTH_VERIFIER_KEY);
+            lsDel(GOOGLE_OAUTH_STATE_KEY);
+            lsDel(GOOGLE_OAUTH_REDIRECT_KEY);
+            lsDel(GOOGLE_OAUTH_HASH_BACKUP_KEY);
+            lsDel(GOOGLE_OAUTH_QUERY_BACKUP_KEY);
+        }
+
+        /**
+         * Parse Google return: prefer ?code= (Opera-safe), else #id_token= / localStorage backup.
+         * Must run BEFORE onAuthStateChanged installs anonymous sign-in.
+         */
+        async function consumeGoogleOAuthIdTokenIfPresent() {
+            const query = takeOAuthQueryParams();
+            const hash = takeOAuthHashParams();
+
+            if (query) {
+                clearOAuthUrlResidue();
+                const oauthError = query.get('error');
+                const code = query.get('code');
+                const state = query.get('state');
+                const expectedState = lsGet(GOOGLE_OAUTH_STATE_KEY);
+                if (oauthError) {
+                    clearGoogleAuthPending();
+                    clearGoogleOAuthTransientKeys();
+                    setAuthGateStatus(String(oauthError).includes('redirect_uri')
+                        ? `${t('auth.redirectUriFail')} ${getGoogleOAuthRedirectUri()}`
+                        : formatGoogleSignInError({ error: oauthError }));
+                    try { showAuthGate(); } catch (_) {}
+                    return true;
+                }
+                if (!code) return false;
+                if (expectedState && state && state !== expectedState) {
+                    clearGoogleAuthPending();
+                    clearGoogleOAuthTransientKeys();
+                    setAuthGateStatus(formatGoogleSignInError(new Error('oauth state mismatch')));
+                    try { showAuthGate(); } catch (_) {}
+                    return true;
+                }
+                setAuthGateStatus(t('auth.working'));
+                try {
+                    const idToken = await exchangeGoogleAuthCode(code);
+                    lsDel(GOOGLE_OAUTH_VERIFIER_KEY);
+                    lsDel(GOOGLE_OAUTH_STATE_KEY);
+                    await signInFirebaseWithGoogleIdToken(idToken);
+                    clearGoogleOAuthTransientKeys();
+                } catch (e) {
+                    console.error('consumeGoogleOAuth code', e);
+                    clearGoogleAuthPending();
+                    clearGoogleSessionLock();
+                    clearGoogleOAuthTransientKeys();
+                    const msg = String(e?.message || e || '');
+                    setAuthGateStatus(msg.includes('GOOGLE_CLIENT_SECRET') || msg.includes('client_secret') || msg.includes('token_exchange')
+                        ? `${t('auth.gisFail')} (${msg.slice(0, 140)})`
+                        : (formatGoogleSignInError(e) || t('auth.gisFail')));
+                    try { showAuthGate(); } catch (_) {}
+                }
                 return true;
             }
 
-            const expectedNonce = lsGet(GOOGLE_OAUTH_NONCE_KEY);
-            lsDel(GOOGLE_OAUTH_NONCE_KEY);
-            // Only enforce nonce when we still have it (Opera may wipe storage; don't hard-fail)
-            if (expectedNonce && payload?.nonce && payload.nonce !== expectedNonce) {
+            if (!hash) return false;
+            clearOAuthUrlResidue();
+            const idToken = hash.get('id_token');
+            const oauthError = hash.get('error');
+            if (oauthError) {
                 clearGoogleAuthPending();
-                setAuthGateStatus(formatGoogleSignInError(new Error('oauth nonce mismatch')));
+                clearGoogleOAuthTransientKeys();
+                setAuthGateStatus(String(oauthError).includes('redirect_uri')
+                    ? `${t('auth.redirectUriFail')} ${getGoogleOAuthRedirectUri()}`
+                    : formatGoogleSignInError({ error: oauthError }));
                 try { showAuthGate(); } catch (_) {}
                 return true;
             }
+            if (!idToken) return false;
 
             setAuthGateStatus(t('auth.working'));
             try {
-                // Drop anonymous session first — on Opera it otherwise wins the next auth tick
-                try {
-                    if (auth.currentUser?.isAnonymous) await signOut(auth);
-                } catch (_) {}
-                const cred = GoogleAuthProvider.credential(idToken);
-                const result = await signInWithCredential(auth, cred);
-                await finishGoogleSignIn(result.user);
+                await signInFirebaseWithGoogleIdToken(idToken);
+                clearGoogleOAuthTransientKeys();
             } catch (e) {
-                console.error('consumeGoogleOAuthIdToken', e);
+                console.error('consumeGoogleOAuth id_token', e);
                 clearGoogleAuthPending();
                 clearGoogleSessionLock();
+                clearGoogleOAuthTransientKeys();
                 setAuthGateStatus(formatGoogleSignInError(e) || t('auth.gisFail'));
                 try { showAuthGate(); } catch (_) {}
             }
             return true;
         }
 
-        /** Only Google path: OpenID id_token on this origin. No popup/redirect via firebaseapp.com. */
+        /** Only Google path on this origin (never firebaseapp.com). Opera uses ?code= + worker. */
         window.signInWithGoogle = async () => {
             if (!auth) return;
             const btn = document.getElementById('btn-auth-google');
@@ -18991,7 +19153,7 @@
                     authGateVisible = true;
                     document.body.classList.add('auth-gate-open');
                 }
-                startGoogleIdTokenRedirect(clientId);
+                await startGooglePkceRedirect(clientId);
             } catch (e) {
                 console.error('signInWithGoogle', e);
                 clearGoogleAuthPending();
