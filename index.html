@@ -9764,7 +9764,7 @@
             <div class="auth-gate-divider"><span data-i18n="auth.or">або</span></div>
             <button type="button" id="btn-auth-guest" class="auth-guest-btn" onclick="continueAsGuest()" data-i18n="auth.guest">Продовжити без акаунта</button>
             <p id="auth-gate-status" class="auth-gate-status" role="status" aria-live="polite"></p>
-            <p class="auth-gate-hint" data-i18n="auth.consoleHint">У Web client потрібні: Origins → https://v09052014-hub.github.io  і Redirect URIs → https://v09052014-hub.github.io/Flood-V/  (саме зі слешем). Firebase → Google: Web client ID має збігатися з тим, що в коді.</p>
+            <p class="auth-gate-hint" data-i18n="auth.consoleHint">Один раз у Google Cloud → Web client додайте Redirect URI: https://v09052014-hub.github.io/Flood-V/  (Origins уже https://v09052014-hub.github.io). Без Redirect URI вхід у мобільній Opera не завершиться.</p>
         </div>
     </div>
     <div id="mat-actions-scrim" onclick="closeMatCardActions()" aria-hidden="true"></div>
@@ -11508,12 +11508,22 @@
             appId: "1:398593728951:web:d566edfbbcb92a5be9c832"
         };
 
-        // Google Identity Services — primary login (works on Opera / GitHub Pages / mobile).
-        // Firebase Console → Authentication → Google → Web SDK configuration → Web client ID
-        // Must be the Web client from the SAME Google Cloud project as Firebase (398593728951),
-        // not a client created in a different GCP project — otherwise Google/Firebase bounce to firebaseapp.com.
+        // ── Google Sign-In architecture (GitHub Pages + Opera) ───────────────
+        // App origin:  https://v09052014-hub.github.io
+        // authDomain:  my-english-vocab-training.firebaseapp.com  (DIFFERENT origin)
+        //
+        // Firebase signInWithPopup / signInWithRedirect always hop through authDomain.
+        // Opera (and storage-partitioned Chrome) then lose sessionStorage →
+        // "missing initial state" and the user looks logged out.
+        // Official fix: obtain a Google ID token on THIS origin, then
+        // GoogleAuthProvider.credential(idToken) + signInWithCredential.
+        // https://firebase.google.com/docs/auth/web/redirect-best-practices
+        //
+        // Web client ID must be from the SAME GCP project as Firebase (398593728951).
         const GOOGLE_WEB_CLIENT_ID = '398593728951-cs0icobsfro49aohkm5qb9qf6gos13o3.apps.googleusercontent.com';
         const GOOGLE_WEB_CLIENT_ID_KEY = 'ls_google_web_client_id';
+        const GOOGLE_OAUTH_NONCE_KEY = 'ls_google_oauth_nonce';
+        const GOOGLE_OAUTH_REDIRECT_KEY = 'ls_google_oauth_redirect';
 
         // ═══════════════════════════════════════════════════════════════════
         // SHARED EXCHANGE CATALOG (teacher's Firebase)
@@ -11676,7 +11686,7 @@
                 'auth.google': 'Увійти через Google',
                 'auth.or': 'або',
                 'auth.guest': 'Продовжити без акаунта',
-                'auth.consoleHint': 'У Web client: Origins → https://v09052014-hub.github.io  і Redirect URIs → https://v09052014-hub.github.io/Flood-V/ (зі слешем). У Firebase → Google Web client ID має = 398593…cs0icobs…',
+                'auth.consoleHint': 'Один раз у Google Cloud → Web client додайте Redirect URI: https://v09052014-hub.github.io/Flood-V/  (Origins уже https://v09052014-hub.github.io). Без Redirect URI вхід у мобільній Opera не завершиться.',
                 'auth.accountTitle': 'Акаунт',
                 'auth.signedGoogle': 'Увійшли через Google',
                 'auth.guestHint': 'Зараз ви без Google-акаунта. Дані зберігаються за локальним ID (як раніше).',
@@ -12502,7 +12512,7 @@
                 'auth.google': 'Continue with Google',
                 'auth.or': 'or',
                 'auth.guest': 'Continue without an account',
-                'auth.consoleHint': 'Web client: Origins → https://v09052014-hub.github.io and Redirect URIs → https://v09052014-hub.github.io/Flood-V/ (with slash). Firebase → Google Web client ID must be 398593…cs0icobs…',
+                'auth.consoleHint': 'Once in Google Cloud → Web client add Redirect URI: https://v09052014-hub.github.io/Flood-V/ (Origins already https://v09052014-hub.github.io). Without it, mobile Opera sign-in cannot finish.',
                 'auth.accountTitle': 'Account',
                 'auth.signedGoogle': 'Signed in with Google',
                 'auth.guestHint': 'You are not using a Google account. Data is stored under the local profile ID (as before).',
@@ -13318,7 +13328,7 @@
                 'auth.google': 'Continuar con Google',
                 'auth.or': 'o',
                 'auth.guest': 'Continuar sin cuenta',
-                'auth.consoleHint': 'Web client: Origins → https://v09052014-hub.github.io y Redirect URIs → https://v09052014-hub.github.io/Flood-V/ (con barra). Firebase → Google Web client ID = 398593…cs0icobs…',
+                'auth.consoleHint': 'Una vez en Google Cloud → Web client añade Redirect URI: https://v09052014-hub.github.io/Flood-V/ (Origins ya https://v09052014-hub.github.io). Sin eso, Opera móvil no termina el login.',
                 'auth.accountTitle': 'Cuenta',
                 'auth.signedGoogle': 'Sesión iniciada con Google',
                 'auth.guestHint': 'No estás usando una cuenta de Google. Los datos se guardan con el ID de perfil local (como antes).',
@@ -18393,8 +18403,6 @@
             if (gate) gate.setAttribute('aria-hidden', 'false');
             setAuthGateStatus('');
             try { applyI18n(); } catch (_) {}
-            // Warm GIS script in background (custom button drives sign-in)
-            loadGoogleIdentityScript().catch(() => {});
         }
 
         function hideAuthGate() {
@@ -18588,7 +18596,6 @@
 
         function getGoogleWebClientId() {
             const hard = String(GOOGLE_WEB_CLIENT_ID || '').trim();
-            // Drop a stale Client ID saved from a different Google Cloud project
             try {
                 const saved = String(localStorage.getItem(GOOGLE_WEB_CLIENT_ID_KEY) || '').trim();
                 if (saved && hard && saved !== hard) localStorage.removeItem(GOOGLE_WEB_CLIENT_ID_KEY);
@@ -18601,100 +18608,47 @@
             return '';
         }
 
-        function currentPageOrigin() {
-            try { return String(location.origin || ''); } catch (_) { return ''; }
+        function lsGet(key) {
+            try { return localStorage.getItem(key); } catch (_) { return null; }
+        }
+        function lsSet(key, val) {
+            try { localStorage.setItem(key, val); } catch (_) {}
+        }
+        function lsDel(key) {
+            try { localStorage.removeItem(key); } catch (_) {}
         }
 
-        function waitForGisReady(timeoutMs = 10000) {
-            return new Promise((resolve, reject) => {
-                const t0 = Date.now();
-                const tick = () => {
-                    if (window.google?.accounts?.oauth2 || window.google?.accounts?.id) {
-                        resolve();
-                        return;
-                    }
-                    if (Date.now() - t0 > timeoutMs) {
-                        reject(new Error('gis missing'));
-                        return;
-                    }
-                    setTimeout(tick, 40);
-                };
-                tick();
-            });
-        }
-
-        function loadGoogleIdentityScript() {
-            return new Promise((resolve, reject) => {
-                const done = () => waitForGisReady().then(resolve).catch(reject);
-                if (window.google?.accounts?.oauth2 || window.google?.accounts?.id) {
-                    resolve();
-                    return;
-                }
-                const existing = document.querySelector('script[data-ls-gis="1"]');
-                if (existing) {
-                    existing.addEventListener('load', done);
-                    existing.addEventListener('error', () => reject(new Error('gis script')));
-                    done();
-                    return;
-                }
-                const s = document.createElement('script');
-                s.src = 'https://accounts.google.com/gsi/client';
-                s.async = true;
-                s.defer = true;
-                s.dataset.lsGis = '1';
-                s.onload = done;
-                s.onerror = () => reject(new Error('gis script'));
-                document.head.appendChild(s);
-            });
+        /**
+         * Canonical redirect URI for OpenID id_token return.
+         * MUST be listed under Google Cloud → Web client → Authorized redirect URIs.
+         * Fixed path (not dynamic) so Opera / GH Pages slash variants cannot drift.
+         */
+        function getGoogleOAuthRedirectUri() {
+            return 'https://v09052014-hub.github.io/Flood-V/';
         }
 
         function formatGoogleSignInError(err) {
-            const origin = currentPageOrigin();
             const redirectUri = getGoogleOAuthRedirectUri();
             let code = err?.code ?? err?.type ?? err?.error;
             if (typeof code === 'number') code = String(code);
             code = String(code || '').trim();
             const msg = String(err?.message || err?.error_description || err?.details || '').trim();
-            const low = `${code} ${msg} ${String(err || '')}`.toLowerCase();
-            if (!code && !msg && (err === undefined || err === null || err === '')) return t('auth.gisFail');
-            if (low.includes('popup_closed') || low.includes('popup-closed') || low.includes('user_cancelled') || low.includes('access_denied')) {
-                return '';
+            const low = `${code} ${msg}`.toLowerCase();
+            if (low.includes('access_denied') || low.includes('user_cancelled')) return '';
+            if (low.includes('redirect_uri')) return `${t('auth.redirectUriFail')} ${redirectUri}`;
+            if (low.includes('invalid-credential') || low.includes('audience') || low.includes('idp')) return t('auth.credFail');
+            if (low.includes('origin') || low.includes('unauthorized')) {
+                return `${t('auth.originFail')} ${currentPageOrigin()}`;
             }
-            if (low.includes('api_key_http_referrer') || (low.includes('referrer') && low.includes('api'))) {
-                return `${t('auth.apiKeyFail')} ${origin}/*`;
-            }
-            if (low.includes('redirect_uri') || low.includes('redirect uri')) {
-                return `${t('auth.redirectUriFail')} ${redirectUri}`;
-            }
-            if (low.includes('origin') || low.includes('unauthorized') || low.includes('idpiframe')
-                || low.includes('allowed for the given client')) {
-                return `${t('auth.originFail')} ${origin}`;
-            }
-            if (low.includes('invalid-credential') || low.includes('invalid_idp') || low.includes('audience')
-                || low.includes('idp response')) {
-                return t('auth.credFail');
-            }
-            // Prefer readable text over bare numeric codes like (22)
+            const detail = [code, msg].filter(Boolean).join(' — ').slice(0, 200);
             if (/^\d+$/.test(code) && !msg) {
-                return `${t('auth.gisFail')} (code ${code}). ${t('auth.redirectUriFail')} ${redirectUri}`;
+                return `${t('auth.gisFail')} ${t('auth.redirectUriFail')} ${redirectUri}`;
             }
-            const detail = [code, msg].filter(Boolean).join(' — ').slice(0, 220);
             return detail ? `${t('auth.gisFail')} (${detail})` : t('auth.gisFail');
         }
 
-        /** Exact redirect URI for Google OAuth id_token (must be listed in Authorized redirect URIs). */
-        function getGoogleOAuthRedirectUri() {
-            try {
-                let path = String(location.pathname || '/');
-                path = path.replace(/\/index\.html$/i, '/');
-                if (!path.endsWith('/')) {
-                    const last = path.split('/').pop() || '';
-                    if (!last.includes('.')) path += '/';
-                }
-                return `${location.origin}${path}`;
-            } catch (_) {
-                return 'https://v09052014-hub.github.io/Flood-V/';
-            }
+        function currentPageOrigin() {
+            try { return String(location.origin || ''); } catch (_) { return ''; }
         }
 
         function decodeJwtPayload(jwt) {
@@ -18702,24 +18656,20 @@
                 const part = String(jwt || '').split('.')[1];
                 if (!part) return null;
                 const b64 = part.replace(/-/g, '+').replace(/_/g, '/');
-                const json = decodeURIComponent(atob(b64).split('').map((c) =>
-                    `%${c.charCodeAt(0).toString(16).padStart(2, '0')}`).join(''));
+                const padded = b64 + '==='.slice((b64.length + 3) % 4);
+                const json = atob(padded);
                 return JSON.parse(json);
             } catch (_) { return null; }
         }
 
-        /**
-         * Full-page Google OAuth → id_token back to this GitHub Pages URL.
-         * Never touches firebaseapp.com (fixes Opera / mobile Chrome sessionStorage).
-         */
+        /** Leave github.io → Google → back to github.io with #id_token=… (never firebaseapp.com). */
         function startGoogleIdTokenRedirect(clientId) {
             const redirectUri = getGoogleOAuthRedirectUri();
             const nonce = [...crypto.getRandomValues(new Uint8Array(16))]
                 .map((b) => b.toString(16).padStart(2, '0')).join('');
-            try {
-                sessionStorage.setItem('ls_google_oauth_nonce', nonce);
-                sessionStorage.setItem('ls_google_oauth_redirect', redirectUri);
-            } catch (_) {}
+            // localStorage — Opera often clears sessionStorage across the Google hop
+            lsSet(GOOGLE_OAUTH_NONCE_KEY, nonce);
+            lsSet(GOOGLE_OAUTH_REDIRECT_KEY, redirectUri);
             const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
             url.searchParams.set('client_id', clientId);
             url.searchParams.set('redirect_uri', redirectUri);
@@ -18730,12 +18680,15 @@
             location.assign(url.toString());
         }
 
-        /** After Google redirects back with #id_token=... */
+        /**
+         * Parse #id_token=… after Google returns. Must run BEFORE onAuthStateChanged
+         * installs anonymous sign-in (otherwise Opera races guest vs Google).
+         * @returns {Promise<boolean>} true if an OAuth response was handled
+         */
         async function consumeGoogleOAuthIdTokenIfPresent() {
             const hash = String(location.hash || '').replace(/^#/, '');
             let idToken = null;
             let oauthError = null;
-            // OAuth implicit returns #id_token=... (not our #/login routes)
             if (hash && !hash.startsWith('/') && (hash.includes('id_token=') || hash.includes('error='))) {
                 const params = new URLSearchParams(hash);
                 idToken = params.get('id_token');
@@ -18743,45 +18696,39 @@
             }
             if (!idToken && !oauthError) return false;
 
-            // Strip OAuth fragment so the hash router stays clean
             try { history.replaceState(null, '', location.pathname + (location.search || '')); } catch (_) {}
 
             if (oauthError) {
                 clearGoogleAuthPending();
+                lsDel(GOOGLE_OAUTH_NONCE_KEY);
                 const errMsg = String(oauthError);
-                if (errMsg.includes('redirect_uri')) {
-                    setAuthGateStatus(`${t('auth.redirectUriFail')} ${getGoogleOAuthRedirectUri()}`);
-                } else {
-                    setAuthGateStatus(formatGoogleSignInError({ error: errMsg }));
-                }
+                setAuthGateStatus(errMsg.includes('redirect_uri')
+                    ? `${t('auth.redirectUriFail')} ${getGoogleOAuthRedirectUri()}`
+                    : formatGoogleSignInError({ error: errMsg }));
                 try { showAuthGate(); } catch (_) {}
                 return true;
             }
 
             const payload = decodeJwtPayload(idToken);
             const clientId = getGoogleWebClientId();
-            if (payload?.aud && clientId && payload.aud !== clientId) {
+            if (payload?.aud && clientId && String(payload.aud) !== clientId) {
                 clearGoogleAuthPending();
+                lsDel(GOOGLE_OAUTH_NONCE_KEY);
                 setAuthGateStatus(t('auth.credFail'));
                 try { showAuthGate(); } catch (_) {}
                 return true;
             }
-            try {
-                const expectedNonce = sessionStorage.getItem('ls_google_oauth_nonce');
-                sessionStorage.removeItem('ls_google_oauth_nonce');
-                if (expectedNonce && payload?.nonce && payload.nonce !== expectedNonce) {
-                    throw new Error('oauth nonce mismatch');
-                }
-            } catch (e) {
-                if (String(e?.message || '').includes('nonce')) {
-                    clearGoogleAuthPending();
-                    setAuthGateStatus(formatGoogleSignInError(e));
-                    try { showAuthGate(); } catch (_) {}
-                    return true;
-                }
+
+            const expectedNonce = lsGet(GOOGLE_OAUTH_NONCE_KEY);
+            lsDel(GOOGLE_OAUTH_NONCE_KEY);
+            // Only enforce nonce when we still have it (Opera may wipe storage; don't hard-fail)
+            if (expectedNonce && payload?.nonce && payload.nonce !== expectedNonce) {
+                clearGoogleAuthPending();
+                setAuthGateStatus(formatGoogleSignInError(new Error('oauth nonce mismatch')));
+                try { showAuthGate(); } catch (_) {}
+                return true;
             }
 
-            rememberGoogleAuthPrevUid();
             setAuthGateStatus(t('auth.working'));
             try {
                 const cred = GoogleAuthProvider.credential(idToken);
@@ -18796,10 +18743,7 @@
             return true;
         }
 
-        /**
-         * Google login: OAuth id_token on this origin (no firebaseapp.com).
-         * Requires Authorized redirect URI = https://v09052014-hub.github.io/Flood-V/
-         */
+        /** Only Google path: OpenID id_token on this origin. No popup/redirect via firebaseapp.com. */
         window.signInWithGoogle = async () => {
             if (!auth) return;
             if (!authGateVisible) {
@@ -18812,10 +18756,11 @@
             const clientId = getGoogleWebClientId();
             try {
                 if (!clientId) {
+                    clearGoogleAuthPending();
                     setAuthGateStatus(t('auth.gisFail'));
+                    if (btn) btn.disabled = false;
                     return;
                 }
-                // Full-page Google → back here with id_token (works Opera + mobile Chrome)
                 startGoogleIdTokenRedirect(clientId);
             } catch (e) {
                 console.error('signInWithGoogle', e);
@@ -18824,20 +18769,10 @@
                 if (btn) btn.disabled = false;
             }
         };
+
+        /** Intentionally a no-op on GitHub Pages — Firebase redirect is what breaks Opera. */
         async function completeGoogleRedirectIfAny() {
-            if (!auth) return;
-            try {
-                const result = await getRedirectResult(auth);
-                if (result?.user) await finishGoogleSignIn(result.user);
-                else clearGoogleAuthPending();
-            } catch (e) {
-                console.error('getRedirectResult', e);
-                if (hadGoogleAuthPending() && authErrorLooksLikeRedirectState(e)) {
-                    setAuthGateStatus(t('auth.redirectFail'));
-                    try { showAuthGate(); } catch (_) {}
-                }
-                clearGoogleAuthPending();
-            }
+            return;
         }
         async function copyFirestoreCollection(fromParts, toParts) {
             const snap = await getDocs(collection(db, ...fromParts));
@@ -19047,7 +18982,14 @@
                     }
                     authBootstrapped = true;
                 } else {
-                    // Session gone (expired / signed out) — guest transport only; never treat as Google
+                    // CRITICAL (Opera): while Google OAuth round-trip is pending, do NOT
+                    // signInAnonymously — that race replaces Google with guest ("logged out").
+                    if (hadGoogleAuthPending()) {
+                        syncAuthAccountSettingsUi();
+                        setAuthGateStatus(t('auth.working'));
+                        try { showAuthGate(); } catch (_) {}
+                        return;
+                    }
                     if (getAuthMode() === 'google') setAuthMode('guest');
                     syncAuthAccountSettingsUi();
                     signInAnonymously(auth).catch((err) => { setSystemStatus(t('status.authError'), "error"); });
@@ -19071,11 +19013,20 @@
             });
             };
 
+            // 1) Consume Google id_token from hash FIRST
+            // 2) Only then attach auth listener (anonymous guest must not race Google)
             (async () => {
-                try { await consumeGoogleOAuthIdTokenIfPresent(); } catch (e) {
+                let handledOauth = false;
+                try {
+                    handledOauth = await consumeGoogleOAuthIdTokenIfPresent();
+                } catch (e) {
                     console.error('oauth id_token consume', e);
                 }
-                try { await completeGoogleRedirectIfAny(); } catch (_) {}
+                // User backed out of Google, or hash was lost — drop stale pending flag
+                if (!handledOauth && hadGoogleAuthPending() && !auth?.currentUser) {
+                    clearGoogleAuthPending();
+                    lsDel(GOOGLE_OAUTH_NONCE_KEY);
+                }
                 startAuthListener();
             })();
         } catch (e) { setSystemStatus(t('status.firebaseError'), "error"); }
