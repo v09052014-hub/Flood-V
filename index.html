@@ -10275,7 +10275,9 @@
                     <div id="settings-pane-account" class="settings-pane hidden">
                         <div class="settings-panel mb-4">
                             <p class="settings-panel-label mb-2" data-i18n="auth.accountTitle">Акаунт</p>
-                            <div id="auth-account-signed" class="hidden">
+
+                            <!-- Google signed in -->
+                            <div id="auth-account-signed" class="hidden space-y-4">
                                 <div class="auth-account-card">
                                     <img id="auth-account-avatar" class="auth-account-avatar is-empty" alt="" width="44" height="44" referrerpolicy="no-referrer">
                                     <div class="auth-account-text">
@@ -10283,37 +10285,45 @@
                                         <div class="auth-account-meta" id="auth-account-meta" data-i18n="auth.signedGoogle">Увійшли через Google</div>
                                     </div>
                                 </div>
-                                <div class="mb-3 p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-left">
-                                    <p class="text-xs font-bold text-indigo-950 mb-1" data-i18n="auth.remigrateTitle">Не вистачає мови (напр. іспанська)?</p>
-                                    <p class="text-[11px] text-indigo-900/80 leading-relaxed mb-2" data-i18n="auth.remigrateHow">Встав СТАРИЙ гостьовий ID у це синє поле (не Google-ID). Потім натисни кнопку під ним. Блок «Змінити ID» нижче — не для цього.</p>
-                                    <input type="text" id="remigrate-guest-uid" autocomplete="off" spellcheck="false" placeholder="Старий гостьовий ID…" class="w-full p-2.5 mb-2 border border-indigo-200 rounded-xl outline-none focus:border-indigo-500 font-mono text-xs bg-white" data-i18n-placeholder="auth.remigratePh">
-                                    <button type="button" onclick="remigrateGuestDataToGoogle()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.remigrateGo">Перенести в цей Google-акаунт</button>
+
+                                <div class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-left">
+                                    <p class="text-sm font-bold text-amber-950 mb-1" data-i18n="auth.remigrateTitle">Перенести старий словник</p>
+                                    <p class="text-xs text-amber-950/80 leading-relaxed mb-3" data-i18n="auth.remigrateHow">Якщо після входу в Google немає іспанської (чи іншої мови) — встав сюди ID зі СТАРОГО гостьового режиму й натисни «Перенести». Це окреме поле: сюди не копіюй поточний Google-ID.</p>
+                                    <label class="text-[10px] font-bold uppercase tracking-wide text-amber-900/70 block mb-1" data-i18n="auth.remigrateLabel">Старий гостьовий ID</label>
+                                    <input type="text" id="remigrate-guest-uid" autocomplete="off" spellcheck="false" placeholder="наприклад: abc123…" class="w-full p-3 mb-2 border border-amber-300 rounded-xl outline-none focus:border-amber-500 font-mono text-xs bg-white text-slate-800" data-i18n-placeholder="auth.remigratePh">
+                                    <button type="button" onclick="remigrateGuestDataToGoogle()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.remigrateGo">Перенести в Google-акаунт</button>
                                 </div>
-                                <button type="button" onclick="signOutAccount()" class="w-full mb-2 bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.signOut">Вийти</button>
-                                <button type="button" onclick="deleteAccountWithData()" class="w-full text-rose-500 hover:text-rose-600 font-bold text-sm py-2 transition" data-i18n="auth.deleteAccount">Видалити акаунт і всі дані</button>
+
+                                <div class="pt-1 space-y-2">
+                                    <button type="button" onclick="signOutAccount()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-xl font-bold text-sm transition" data-i18n="auth.signOut">Вийти</button>
+                                    <button type="button" onclick="deleteAccountWithData()" class="w-full text-rose-500 hover:text-rose-600 font-bold text-sm py-2 transition" data-i18n="auth.deleteAccount">Видалити акаунт і всі дані</button>
+                                </div>
                             </div>
+
+                            <!-- Guest -->
                             <div id="auth-account-guest">
-                                <p class="text-xs text-slate-500 mb-3 leading-relaxed" data-i18n="auth.guestHint">Зараз ви без Google-акаунта. Дані зберігаються за локальним ID (як раніше).</p>
-                                <button type="button" onclick="openAuthLanding()" class="w-full mb-2 auth-google-btn"><span data-i18n="auth.google">Увійти через Google</span></button>
-                                <button type="button" onclick="openAuthLanding()" class="w-full text-indigo-600 hover:text-indigo-700 font-bold text-sm py-2 transition" data-i18n="auth.openLogin">Відкрити екран входу</button>
+                                <p class="text-xs text-slate-500 mb-3 leading-relaxed" data-i18n="auth.guestHint">Зараз ви без Google-акаунта. Дані зберігаються за локальним ID.</p>
+                                <button type="button" onclick="openAuthLanding()" class="w-full auth-google-btn"><span data-i18n="auth.google">Увійти через Google</span></button>
                             </div>
                         </div>
-                        <div class="settings-panel" id="auth-legacy-sync-panel">
+
+                        <!-- Advanced / guest-only ID tools — hidden when Google is on -->
+                        <div class="settings-panel hidden" id="auth-legacy-sync-panel">
                             <p class="settings-panel-label mb-2" data-i18n="profile.sync">Синхронізація словника</p>
-                            <p class="text-xs text-slate-500 mb-4 leading-relaxed" data-i18n="profile.hint">Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.</p>
+                            <p class="text-xs text-slate-500 mb-4 leading-relaxed" data-i18n="profile.hint">Словник зберігається за цим ID. Зазвичай нічого змінювати не потрібно.</p>
                             <div class="mb-4">
                                 <label class="text-xs font-bold text-slate-500 uppercase block mb-1" data-i18n="profile.currentId">Поточний ID:</label>
                                 <div class="flex">
                                     <input type="text" id="sync-current-uid" readonly class="w-full p-2 bg-slate-50 border border-slate-300 border-r-0 rounded-l-xl font-mono text-xs font-bold text-slate-700 outline-none">
-                                    <button onclick="copyUid()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-r-xl font-bold text-sm transition" data-i18n="profile.copy">Копіювати</button>
+                                    <button type="button" onclick="copyUid()" class="bg-slate-700 hover:bg-slate-800 text-white px-4 rounded-r-xl font-bold text-sm transition" data-i18n="profile.copy">Копіювати</button>
                                 </div>
                             </div>
                             <div class="mb-3" id="auth-legacy-uid-edit">
-                                <label class="text-xs font-bold text-slate-500 uppercase block mb-1" data-i18n="profile.changeId">Змінити ID (для іншого словника):</label>
+                                <label class="text-xs font-bold text-slate-500 uppercase block mb-1" data-i18n="profile.changeId">Змінити ID:</label>
                                 <input type="text" id="sync-input-uid" placeholder="Вставте інший ID..." class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-mono text-xs mb-3" data-i18n-placeholder="profile.pasteId">
-                                <button onclick="applyUid()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold shadow-sm transition" data-i18n="profile.applyId">Застосувати ID</button>
+                                <button type="button" onclick="applyUid()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold shadow-sm transition" data-i18n="profile.applyId">Застосувати ID</button>
                             </div>
-                            <button onclick="resetUid()" id="auth-legacy-reset-btn" class="w-full text-rose-500 hover:text-rose-600 font-bold text-sm py-2 transition" data-i18n="profile.resetId">Повернутись до спільного ID</button>
+                            <button type="button" onclick="resetUid()" id="auth-legacy-reset-btn" class="w-full text-rose-500 hover:text-rose-600 font-bold text-sm py-2 transition" data-i18n="profile.resetId">Повернутись до спільного ID</button>
                         </div>
                     </div>
                 </div>
@@ -11707,6 +11717,7 @@
                 'auth.googleError': 'Не вдалося увійти через Google. Перевірте, чи увімкнено провайдер у Firebase.',
                 'auth.popupBlocked': 'Вікно Google заблоковано браузером. Дозвольте спливаючі вікна.',
                 'auth.working': 'Зачекайте…',
+                'auth.restoring': 'Відновлюємо Google-сесію…',
                 'auth.migrateAsk': 'Перенести словник і матеріали з гостьового режиму в цей Google-акаунт?',
                 'auth.migrateDone': 'Перенесено. Документів: {n}',
                 'auth.migrateFail': 'Не вдалося перенести дані. Словник Google може бути порожнім.',
@@ -11723,14 +11734,17 @@
                 'auth.gisLoading': 'Завантаження Google…',
                 'auth.useGoogleBtn': 'Натисніть «Увійти через Google».',
                 'auth.remigrate': 'Догрузити мови з гостьового ID',
-                'auth.remigrateTitle': 'Не вистачає мови (напр. іспанська)?',
-                'auth.remigrateHow': 'Встав СТАРИЙ гостьовий ID у це синє поле (не Google-ID). Потім натисни кнопку під ним. Блок «Змінити ID» нижче — не для цього.',
-                'auth.remigratePh': 'Старий гостьовий ID…',
-                'auth.remigrateGo': 'Перенести в цей Google-акаунт',
-                'auth.remigrateAsk': 'Скопіювати всі слова й матеріали зі старого гостьового ID «{id}» у цей Google-акаунт? Уже наявне не зітреться.',
-                'auth.remigrateNeedId': 'Спочатку встав старий гостьовий ID у синє поле вище (блок «Не вистачає мови»), потім натисни «Перенести в цей Google-акаунт».',
-                'auth.remigrateDone': 'Перенесено. Документів: {n}. У налаштуваннях мов перемкни пару, якщо треба.',
-                'auth.remigrateSame': 'Це той самий ID, що й зараз у Google. Потрібен ІНШИЙ — старий гостьовий.',
+                'auth.remigrateTitle': 'Перенести старий словник',
+                'auth.remigrateHow': 'Якщо після входу в Google немає іспанської (чи іншої мови) — встав сюди ID зі СТАРОГО гостьового режиму й натисни «Перенести». Сюди не вставляй поточний Google-ID.',
+                'auth.remigrateLabel': 'Старий гостьовий ID',
+                'auth.remigratePh': 'наприклад: abc123…',
+                'auth.remigrateGo': 'Перенести в Google-акаунт',
+                'auth.remigrateAsk': 'Перенести всі слова й матеріали зі старого ID «{id}» у цей Google-акаунт? Уже наявне не зітреться.',
+                'auth.remigrateNeedId': 'Встав старий гостьовий ID у жовте поле «Старий гостьовий ID», потім натисни «Перенести».',
+                'auth.remigrateDone': 'Готово. Документів: {n}. У мовах перемкни пару на іспанську, якщо треба.',
+                'auth.remigrateDetail': 'Перенесено {n} док. Англійська (корінь): {root} слів. Треки: {tracks}. Якщо є es-uk / es-en — у Мовах обери Іспанську.',
+                'auth.remigrateNoEs': 'Перенесено {n} док., але в цьому гостьовому ID немає іспанського треку (лише EN: {root} слів). Іспанська могла бути під ІНШИМ гостьовим ID (інший браузер/телефон).',
+                'auth.remigrateSame': 'Ти вставив ПОТОЧНИЙ Google-ID. Потрібен ІНШИЙ — той, що був у гостьовому режимі до входу.',
                 'tabs.dictionary': 'Словник', 'tabs.library': 'Бібліотека', 'tabs.training': 'Тренування',
                 'profile.title': 'Профіль / Налаштування',
                 'profile.hint': 'Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.',
@@ -12543,6 +12557,7 @@
                 'auth.googleError': 'Google sign-in failed. Check that the Google provider is enabled in Firebase.',
                 'auth.popupBlocked': 'The Google popup was blocked. Allow pop-ups for this site.',
                 'auth.working': 'Please wait…',
+                'auth.restoring': 'Restoring Google session…',
                 'auth.migrateAsk': 'Move your dictionary and materials from guest mode into this Google account?',
                 'auth.migrateDone': 'Migrated. Documents: {n}',
                 'auth.migrateFail': 'Could not migrate data. The Google dictionary may be empty.',
@@ -12559,14 +12574,17 @@
                 'auth.gisLoading': 'Loading Google…',
                 'auth.useGoogleBtn': 'Tap “Sign in with Google”.',
                 'auth.remigrate': 'Import languages from guest ID',
-                'auth.remigrateTitle': 'Missing a language (e.g. Spanish)?',
-                'auth.remigrateHow': 'Paste the OLD guest ID in this blue field (not your Google ID). Then tap the button under it. The “Change ID” block below is not for this.',
-                'auth.remigratePh': 'Old guest ID…',
-                'auth.remigrateGo': 'Import into this Google account',
-                'auth.remigrateAsk': 'Copy all words & materials from old guest ID “{id}” into this Google account? Existing data stays.',
-                'auth.remigrateNeedId': 'First paste the old guest ID in the blue box above (“Missing a language?”), then tap Import.',
-                'auth.remigrateDone': 'Imported. Docs: {n}. Switch language pair in settings if needed.',
-                'auth.remigrateSame': 'That is your current Google ID. You need a DIFFERENT one — the old guest ID.',
+                'auth.remigrateTitle': 'Import old dictionary',
+                'auth.remigrateHow': 'If Spanish (or another language) is missing after Google sign-in, paste the OLD guest ID here and tap Import. Do not paste your current Google ID.',
+                'auth.remigrateLabel': 'Old guest ID',
+                'auth.remigratePh': 'e.g. abc123…',
+                'auth.remigrateGo': 'Import into Google account',
+                'auth.remigrateAsk': 'Import all words & materials from old ID “{id}” into this Google account? Existing data stays.',
+                'auth.remigrateNeedId': 'Paste the old guest ID in the yellow “Old guest ID” field, then tap Import.',
+                'auth.remigrateDone': 'Done. Docs: {n}. Switch to Spanish in language settings if needed.',
+                'auth.remigrateDetail': 'Migrated {n} docs. English (root): {root} words. Tracks: {tracks}. If you see es-uk / es-en — switch Learning to Spanish.',
+                'auth.remigrateNoEs': 'Migrated {n} docs, but this guest ID has no Spanish track (only EN: {root} words). Spanish may live under a DIFFERENT guest ID (other browser/phone).',
+                'auth.remigrateSame': 'You pasted your CURRENT Google ID. You need a DIFFERENT one — the guest ID from before sign-in.',
                 'tabs.dictionary': 'Dictionary', 'tabs.library': 'Library', 'tabs.training': 'Training',
                 'profile.title': 'Profile / Settings',
                 'profile.hint': 'Your dictionary is tied to this account ID. Most users can leave it unchanged.',
@@ -13369,6 +13387,7 @@
                 'auth.googleError': 'No se pudo iniciar sesión con Google. Comprueba que el proveedor esté activo en Firebase.',
                 'auth.popupBlocked': 'El navegador bloqueó la ventana de Google. Permite ventanas emergentes.',
                 'auth.working': 'Espera…',
+                'auth.restoring': 'Restaurando sesión de Google…',
                 'auth.migrateAsk': '¿Pasar el diccionario y materiales del modo invitado a esta cuenta de Google?',
                 'auth.migrateDone': 'Migrado. Documentos: {n}',
                 'auth.migrateFail': 'No se pudo migrar. El diccionario de Google puede estar vacío.',
@@ -13385,14 +13404,17 @@
                 'auth.gisLoading': 'Cargando Google…',
                 'auth.useGoogleBtn': 'Pulsa “Iniciar sesión con Google”.',
                 'auth.remigrate': 'Importar idiomas desde ID de invitado',
-                'auth.remigrateTitle': '¿Falta un idioma (p. ej. español)?',
-                'auth.remigrateHow': 'Pega el ID de invitado ANTIGUO en este campo azul (no el de Google). Luego pulsa el botón de debajo. El bloque “Cambiar ID” de abajo no es para esto.',
-                'auth.remigratePh': 'ID de invitado antiguo…',
-                'auth.remigrateGo': 'Importar a esta cuenta de Google',
-                'auth.remigrateAsk': '¿Copiar palabras y materiales del ID de invitado “{id}” a esta cuenta de Google? Lo existente no se borra.',
-                'auth.remigrateNeedId': 'Primero pega el ID antiguo en la caja azul de arriba, luego pulsa Importar.',
-                'auth.remigrateDone': 'Importado. Docs: {n}. Cambia el par de idiomas en ajustes si hace falta.',
-                'auth.remigrateSame': 'Ese es tu ID actual de Google. Necesitas OTRO: el ID de invitado antiguo.',
+                'auth.remigrateTitle': 'Importar diccionario antiguo',
+                'auth.remigrateHow': 'Si falta el español u otro idioma tras Google, pega aquí el ID de invitado ANTIGUO y pulsa Importar. No pegues tu ID actual de Google.',
+                'auth.remigrateLabel': 'ID de invitado antiguo',
+                'auth.remigratePh': 'p. ej. abc123…',
+                'auth.remigrateGo': 'Importar a la cuenta de Google',
+                'auth.remigrateAsk': '¿Importar palabras y materiales del ID antiguo “{id}” a esta cuenta de Google? Lo existente se conserva.',
+                'auth.remigrateNeedId': 'Pega el ID antiguo en el campo amarillo y pulsa Importar.',
+                'auth.remigrateDone': 'Listo. Docs: {n}. Cambia al español en idiomas si hace falta.',
+                'auth.remigrateDetail': 'Migrados {n} docs. Inglés (raíz): {root} palabras. Pistas: {tracks}. Si ves es-uk / es-en — elige Español en Idiomas.',
+                'auth.remigrateNoEs': 'Migrados {n} docs, pero este ID de invitado no tiene pista de español (solo EN: {root} palabras). El español puede estar en OTRO ID (otro navegador/móvil).',
+                'auth.remigrateSame': 'Pegaste tu ID ACTUAL de Google. Necesitas OTRO: el ID de invitado de antes.',
                 'tabs.dictionary': 'Diccionario', 'tabs.library': 'Biblioteca', 'tabs.training': 'Entrenamiento',
                 'profile.title': 'Perfil / Ajustes',
                 'profile.hint': 'Tu diccionario está vinculado a este ID de cuenta. La mayoría puede dejarlo como está.',
@@ -18480,11 +18502,12 @@
             const guest = document.getElementById('auth-account-guest');
             const emailEl = document.getElementById('auth-account-email');
             const avatarEl = document.getElementById('auth-account-avatar');
-            const legacyEdit = document.getElementById('auth-legacy-uid-edit');
-            const legacyReset = document.getElementById('auth-legacy-reset-btn');
+            const legacyPanel = document.getElementById('auth-legacy-sync-panel');
             const google = isGoogleSignedIn();
             if (signed) signed.classList.toggle('hidden', !google);
             if (guest) guest.classList.toggle('hidden', !!google);
+            // Hide confusing legacy ID copy/apply UI while on Google — remigrate has its own field
+            if (legacyPanel) legacyPanel.classList.toggle('hidden', !!google);
             if (emailEl) {
                 emailEl.textContent = google
                     ? (authUser.email || authUser.displayName || authUser.uid)
@@ -18506,13 +18529,12 @@
                     avatarEl.classList.add('is-empty');
                 }
             }
-            // Keep legacy ID tools available for migration / teacher linking, but quieter when Google is on
-            if (legacyEdit) legacyEdit.classList.toggle('opacity-60', !!google);
-            if (legacyReset) legacyReset.classList.toggle('hidden', !!google);
             const remigrateInp = document.getElementById('remigrate-guest-uid');
-            if (remigrateInp && google && !String(remigrateInp.value || '').trim()) {
-                const last = getLastGuestUid();
-                if (last && last !== authUser?.uid) remigrateInp.value = last;
+            if (remigrateInp && google) {
+                const cur = String(remigrateInp.value || '').trim();
+                const googleUid = String(authUser?.uid || activeUid || '');
+                // Never leave Google/current uid sitting in the import box (that re-copied English)
+                if (cur && (cur === googleUid || cur === activeUid)) remigrateInp.value = '';
             }
         }
 
@@ -18543,11 +18565,20 @@
             return (Date.now() - Number(o.at || 0)) < maxAgeMs;
         }
 
+        function stripLoginHashFromUrl() {
+            try {
+                if (parseAppAuthRoute() === 'login' || parseAppAuthRoute() === 'account') {
+                    history.replaceState(null, '', `${location.pathname}${location.search || ''}`);
+                }
+            } catch (_) {}
+        }
+
         function shouldShowAuthLanding() {
             if (!AUTH_LANDING_ENABLED) return false;
             if (isGoogleSignedIn()) return false;
-            // Do not yank Opera users back to login right after a successful Google hop
-            if (hasFreshGoogleSessionLock(5 * 60 * 1000)) return false;
+            // Opera: mode/lock stay google while Firebase briefly emits null/anonymous
+            if (getAuthMode() === 'google') return false;
+            if (hasFreshGoogleSessionLock(10 * 60 * 1000)) return false;
             const route = parseAppAuthRoute();
             if (route === 'login') return true;
             if (AUTH_REQUIRE_LOGIN && getAuthMode() !== 'guest') return true;
@@ -18565,19 +18596,91 @@
             return uid;
         }
 
+        let __lsAppLoadToken = 0;
+        let __lsGoogleRestoreInflight = null;
+
         async function enterAppWithUid(uid, { reload = true } = {}) {
             activeUid = uid;
             localStorage.setItem(LOCAL_UID_KEY, activeUid);
             hideAuthGate();
-            if (parseAppAuthRoute() === 'login' || parseAppAuthRoute() === 'account') {
-                history.replaceState(null, '', `${location.pathname}${location.search}`);
-            }
+            stripLoginHashFromUrl();
             setSystemStatus(t('status.connected'), 'success');
             syncAuthAccountSettingsUi();
-            if (reload) {
+            if (!reload) return;
+            const token = ++__lsAppLoadToken;
+            try {
                 await loadUserPrefs();
-                loadData();
+            } catch (e) {
+                console.warn('loadUserPrefs', e);
             }
+            // Prefs must never block dictionary — Opera was stuck on «Підключення» when getDoc hung/threw path skipped loadData
+            if (token !== __lsAppLoadToken) return;
+            try { loadData(); } catch (e) {
+                console.error('loadData', e);
+                setSystemStatus(t('status.dbError'), 'error');
+            }
+        }
+
+        function waitForNonAnonymousUser(timeoutMs = 8000) {
+            return new Promise((resolve) => {
+                const started = Date.now();
+                const tick = () => {
+                    const u = auth?.currentUser;
+                    if (u && !u.isAnonymous) {
+                        resolve(u);
+                        return;
+                    }
+                    if (Date.now() - started >= timeoutMs) {
+                        resolve(null);
+                        return;
+                    }
+                    setTimeout(tick, 200);
+                };
+                tick();
+            });
+        }
+
+        /**
+         * Opera: after Google hop / refresh, auth often emits null or anonymous while the
+         * real Google user is still restoring. Old code hid the gate and returned without
+         * loadData → forever «Підключення». Wait for Google, then load the app.
+         */
+        async function recoverGoogleSessionAfterFlicker(reason) {
+            if (__lsGoogleRestoreInflight) return __lsGoogleRestoreInflight;
+            __lsGoogleRestoreInflight = (async () => {
+                try {
+                    hideAuthGate();
+                    stripLoginHashFromUrl();
+                    setAuthMode('google');
+                    setSystemStatus(t('auth.restoring'), 'info');
+                    // Drop stale anonymous so it cannot win over restoring Google
+                    try {
+                        if (auth?.currentUser?.isAnonymous) await signOut(auth);
+                    } catch (_) {}
+                    const lock = readGoogleSessionLock();
+                    const user = await waitForNonAnonymousUser(9000);
+                    if (user && !user.isAnonymous) {
+                        authUser = user;
+                        setGoogleSessionLock(user.uid);
+                        clearGoogleAuthPending();
+                        await enterAppWithUid(user.uid);
+                        return true;
+                    }
+                    // Persistence lost — clear lock so we don't loop forever
+                    console.warn('google restore timeout', reason, lock?.uid);
+                    clearGoogleSessionLock();
+                    if (getAuthMode() === 'google') setAuthMode('guest');
+                    setSystemStatus(t('status.connecting'), 'info');
+                    if (shouldShowAuthLanding()) showAuthGate();
+                    else {
+                        try { await signInAnonymously(auth); } catch (_) {}
+                    }
+                    return false;
+                } finally {
+                    __lsGoogleRestoreInflight = null;
+                }
+            })();
+            return __lsGoogleRestoreInflight;
         }
 
         window.openAuthLanding = () => {
@@ -18917,10 +19020,56 @@
             return code.includes('permission-denied') || msg.includes('permission-denied') || msg.includes('missing or insufficient permissions');
         }
 
+        /** All language-pair track ids the app can use (es-uk, en-es, …). */
+        function allContentTrackIds() {
+            const langs = (typeof CONTENT_LANGS_ALL !== 'undefined' && CONTENT_LANGS_ALL.length)
+                ? CONTENT_LANGS_ALL
+                : (CONTENT_LANGS || ['en', 'es', 'uk']);
+            const ids = [];
+            for (const a of langs) {
+                for (const b of langs) {
+                    if (a !== b) ids.push(`${a}-${b}`);
+                }
+            }
+            return ids;
+        }
+
+        /**
+         * Firestore can store words at users/{uid}/tracks/es-uk/words/… WITHOUT a parent
+         * document at users/{uid}/tracks/es-uk. Listing the tracks/ collection then misses
+         * Spanish entirely — only English at the legacy root (users/{uid}/words) shows up.
+         * Always probe every language-pair path + knownTracks + any real track docs.
+         */
+        async function discoverSourceTrackIds(fromUid, srcKnown) {
+            const trackIds = new Set();
+            (Array.isArray(srcKnown) ? srcKnown : []).forEach((id) => {
+                const p = typeof parseTrackId === 'function' ? parseTrackId(id) : null;
+                if (p?.id) trackIds.add(p.id);
+                else if (typeof id === 'string' && id.includes('-')) trackIds.add(id);
+            });
+            allContentTrackIds().forEach((id) => trackIds.add(id));
+            try {
+                const tracksSnap = await getDocs(collection(db, 'users', fromUid, 'tracks'));
+                tracksSnap.docs.forEach((d) => trackIds.add(d.id));
+            } catch (_) {}
+            return [...trackIds];
+        }
+
+        async function countColDocs(pathParts) {
+            try {
+                const snap = await getDocs(collection(db, ...pathParts));
+                return snap.size;
+            } catch (_) {
+                return -1;
+            }
+        }
+
         async function migrateUserDataBetweenUids(fromUid, toUid) {
             if (!db || !fromUid || !toUid || fromUid === toUid) return { ok: false, n: 0 };
             let n = 0;
             const trackIds = new Set();
+            const trackReport = [];
+            let rootWords = 0;
             try {
                 let userSnap;
                 try {
@@ -18933,48 +19082,69 @@
                 const destSnap = await getDoc(doc(db, 'users', toUid));
                 const dest = destSnap.exists() ? (destSnap.data() || {}) : {};
 
-                if (Array.isArray(src.knownTracks)) {
-                    src.knownTracks.forEach((id) => {
-                        const p = typeof parseTrackId === 'function' ? parseTrackId(id) : null;
-                        if (p?.id) trackIds.add(p.id);
-                        else if (typeof id === 'string' && id.includes('-')) trackIds.add(id);
-                    });
-                }
-
-                // Legacy root collections (pre-track layout) + every language track
+                // Legacy root = English (en-uk) lives here, not under tracks/
                 try {
                     for (const col of ['words', 'materials', 'folders', 'stats', 'storyArchive']) {
-                        n += await copyFirestoreCollection(['users', fromUid, col], ['users', toUid, col]);
-                    }
-                    const tracksSnap = await getDocs(collection(db, 'users', fromUid, 'tracks'));
-                    for (const trackDoc of tracksSnap.docs) {
-                        trackIds.add(trackDoc.id);
-                        await setDoc(doc(db, 'users', toUid, 'tracks', trackDoc.id), trackDoc.data(), { merge: true });
-                        n++;
-                        for (const col of ['words', 'materials', 'folders', 'stats', 'storyArchive']) {
-                            n += await copyFirestoreCollection(
-                                ['users', fromUid, 'tracks', trackDoc.id, col],
-                                ['users', toUid, 'tracks', trackDoc.id, col]
-                            );
-                        }
+                        const copied = await copyFirestoreCollection(['users', fromUid, col], ['users', toUid, col]);
+                        n += copied;
+                        if (col === 'words') rootWords = copied;
                     }
                 } catch (e) {
                     if (isPermissionDeniedError(e)) return { ok: false, n, denied: true };
                     throw e;
                 }
 
-                // Discover tracks that have words even if the track doc / knownTracks was missing
-                for (const tid of [...trackIds]) {
+                let candidates;
+                try {
+                    candidates = await discoverSourceTrackIds(fromUid, src.knownTracks);
+                } catch (e) {
+                    if (isPermissionDeniedError(e)) return { ok: false, n, denied: true };
+                    throw e;
+                }
+
+                for (const tid of candidates) {
                     try {
-                        const tw = await getDocs(collection(db, 'users', fromUid, 'tracks', tid, 'words'));
-                        if (!tw.empty) trackIds.add(tid);
-                    } catch (_) {}
+                        const wordCount = await countColDocs(['users', fromUid, 'tracks', tid, 'words']);
+                        const matCount = await countColDocs(['users', fromUid, 'tracks', tid, 'materials']);
+                        const folderCount = await countColDocs(['users', fromUid, 'tracks', tid, 'folders']);
+                        const statsCount = await countColDocs(['users', fromUid, 'tracks', tid, 'stats']);
+                        const storyCount = await countColDocs(['users', fromUid, 'tracks', tid, 'storyArchive']);
+                        const hasAnything = wordCount > 0 || matCount > 0 || folderCount > 0 || statsCount > 0 || storyCount > 0;
+                        if (!hasAnything) continue;
+
+                        trackIds.add(tid);
+                        trackReport.push({ id: tid, words: Math.max(0, wordCount), materials: Math.max(0, matCount) });
+
+                        // Ensure parent track doc exists on destination (listing needs it later)
+                        let trackData = {};
+                        try {
+                            const td = await getDoc(doc(db, 'users', fromUid, 'tracks', tid));
+                            if (td.exists()) trackData = td.data() || {};
+                        } catch (_) {}
+                        await setDoc(doc(db, 'users', toUid, 'tracks', tid), {
+                            ...trackData,
+                            id: tid,
+                            migratedAt: serverTimestamp()
+                        }, { merge: true });
+                        n++;
+
+                        for (const col of ['words', 'materials', 'folders', 'stats', 'storyArchive']) {
+                            n += await copyFirestoreCollection(
+                                ['users', fromUid, 'tracks', tid, col],
+                                ['users', toUid, 'tracks', tid, col]
+                            );
+                        }
+                    } catch (e) {
+                        if (isPermissionDeniedError(e)) return { ok: false, n, denied: true, trackReport, rootWords };
+                        console.warn('migrate track skip', tid, e);
+                    }
                 }
 
                 const mergedKnown = [...new Set([
                     ...(Array.isArray(dest.knownTracks) ? dest.knownTracks : []),
                     ...(Array.isArray(src.knownTracks) ? src.knownTracks : []),
-                    ...trackIds
+                    ...trackIds,
+                    ...(rootWords > 0 ? [LEGACY_TRACK_ID] : [])
                 ].map((id) => {
                     const p = typeof parseTrackId === 'function' ? parseTrackId(id) : null;
                     return p?.id || (typeof id === 'string' ? id : null);
@@ -18993,7 +19163,6 @@
                 }, { merge: true });
                 n++;
 
-                // Refresh in-memory pairs so Spanish etc. appear immediately
                 try {
                     knownTracks = [...new Set([...(knownTracks || []), ...mergedKnown])];
                     persistKnownTracksLocal?.();
@@ -19001,11 +19170,18 @@
                     syncSettingsPanelUi?.();
                 } catch (_) {}
 
-                return { ok: true, n, tracks: mergedKnown.length };
+                return {
+                    ok: true,
+                    n,
+                    tracks: mergedKnown.length,
+                    trackReport,
+                    rootWords,
+                    hasSpanish: trackReport.some((t) => String(t.id || '').startsWith('es-') && t.words > 0)
+                };
             } catch (e) {
                 console.error('migrateUserDataBetweenUids', e);
-                if (isPermissionDeniedError(e)) return { ok: false, n, denied: true };
-                return { ok: false, n };
+                if (isPermissionDeniedError(e)) return { ok: false, n, denied: true, trackReport, rootWords };
+                return { ok: false, n, trackReport, rootWords };
             }
         }
 
@@ -19016,12 +19192,17 @@
                 if (!words.empty) return true;
                 const mats = await getDocs(collection(db, 'users', uid, 'materials'));
                 if (!mats.empty) return true;
-                const tracks = await getDocs(collection(db, 'users', uid, 'tracks'));
-                for (const t of tracks.docs) {
-                    const tw = await getDocs(collection(db, 'users', uid, 'tracks', t.id, 'words'));
-                    if (!tw.empty) return true;
-                    const tm = await getDocs(collection(db, 'users', uid, 'tracks', t.id, 'materials'));
-                    if (!tm.empty) return true;
+                let known = [];
+                try {
+                    const u = await getDoc(doc(db, 'users', uid));
+                    if (u.exists() && Array.isArray(u.data()?.knownTracks)) known = u.data().knownTracks;
+                } catch (_) {}
+                const ids = await discoverSourceTrackIds(uid, known);
+                for (const tid of ids) {
+                    const tw = await countColDocs(['users', uid, 'tracks', tid, 'words']);
+                    if (tw > 0) return true;
+                    const tm = await countColDocs(['users', uid, 'tracks', tid, 'materials']);
+                    if (tm > 0) return true;
                 }
                 return false;
             } catch (e) {
@@ -19030,6 +19211,24 @@
                 }
                 return false;
             }
+        }
+
+        function formatMigrateTrackReport(r) {
+            const list = Array.isArray(r?.trackReport) ? r.trackReport : [];
+            if (!list.length) return '—';
+            return list.map((row) => `${row.id}: ${row.words}w / ${row.materials}m`).join(', ');
+        }
+
+        function showRemigrateResult(r) {
+            const tracks = formatMigrateTrackReport(r);
+            const root = Number(r?.rootWords || 0);
+            const n = Number(r?.n || 0);
+            if (r?.hasSpanish) {
+                window.showModal(t('auth.remigrateDetail', { n, root, tracks }));
+            } else {
+                window.showModal(t('auth.remigrateNoEs', { n, root }));
+            }
+            showAppToast?.(t('auth.remigrateDone', { n }), 3200);
         }
 
         async function tryOfferGuestToGoogleMigration(fromUid, toUid) {
@@ -19043,7 +19242,7 @@
                         showAppToast?.(t('auth.migrating'), 2400);
                         const r = await migrateUserDataBetweenUids(fromUid, toUid);
                         if (r.ok) {
-                            showAppToast?.(t('auth.remigrateDone', { n: r.n }), 4200);
+                            showRemigrateResult(r);
                             try { await loadUserPrefs(); } catch (_) {}
                             try { loadData(); } catch (_) {}
                         } else if (r.denied) {
@@ -19067,24 +19266,26 @@
                 return window.showModal(t('auth.googleError'));
             }
             const box = document.getElementById('remigrate-guest-uid');
-            const typed = String(box?.value || '').trim();
-            const source = typed || getLastGuestUid();
+            const source = String(box?.value || '').trim();
+            const googleUid = String(authUser?.uid || activeUid || '');
             if (!source) {
                 try { box?.focus(); } catch (_) {}
                 return window.showModal(t('auth.remigrateNeedId'));
             }
-            if (source === activeUid || source === authUser?.uid) {
-                try { box?.focus(); } catch (_) {}
+            if (source === googleUid || source === activeUid) {
+                try {
+                    if (box) box.value = '';
+                    box?.focus();
+                } catch (_) {}
                 return window.showModal(t('auth.remigrateSame'));
             }
-            if (box && !typed) box.value = source;
             window.showModal(t('auth.remigrateAsk', { id: source }), true, async () => {
                 try {
                     showAppToast?.(t('auth.migrating'), 2400);
                     const r = await migrateUserDataBetweenUids(source, activeUid);
                     if (r.ok) {
                         rememberLastGuestUid(source);
-                        showAppToast?.(t('auth.remigrateDone', { n: r.n }), 4200);
+                        showRemigrateResult(r);
                         try { await loadUserPrefs(); } catch (_) {}
                         try { loadData(); } catch (_) {}
                         try { renderLanguagePickers?.(); syncSettingsPanelUi?.(); } catch (_) {}
@@ -19197,12 +19398,10 @@
             onAuthStateChanged(auth, async (user) => {
                 authUser = user || null;
                 if (user) {
-                    // Opera: after Google hop, a stale anonymous session can fire next — do not open login gate
-                    if (user.isAnonymous && hasFreshGoogleSessionLock()) {
-                        hideAuthGate();
-                        setAuthMode('google');
-                        syncAuthAccountSettingsUi();
+                    // Opera: stale anonymous can fire while Google is restoring — recover, don't limbo
+                    if (user.isAnonymous && (hasFreshGoogleSessionLock() || getAuthMode() === 'google' || hadGoogleAuthPending())) {
                         authBootstrapped = true;
+                        recoverGoogleSessionAfterFlicker('anonymous-vs-google');
                         return;
                     }
 
@@ -19213,6 +19412,8 @@
 
                     if (!user.isAnonymous) {
                         setGoogleSessionLock(user.uid);
+                        clearGoogleAuthPending();
+                        stripLoginHashFromUrl();
                         try {
                             const pendingPrev = localStorage.getItem(GOOGLE_AUTH_PREV_UID_KEY);
                             if (pendingPrev && pendingPrev !== uid) {
@@ -19229,10 +19430,7 @@
                         return;
                     }
 
-                    hideAuthGate();
-                    setSystemStatus(t('status.connected'), 'success');
-                    await loadUserPrefs();
-                    try { loadData(); } catch (e) { console.error('loadData', e); setSystemStatus(t('status.dbError'), 'error'); }
+                    await enterAppWithUid(uid);
                     if (parseAppAuthRoute() === 'account') {
                         try { openSyncModal(); switchSettingsTab('account'); } catch (_) {}
                     }
@@ -19242,18 +19440,19 @@
                     // signInAnonymously — that race replaces Google with guest ("logged out").
                     if (hadGoogleAuthPending()) {
                         syncAuthAccountSettingsUi();
-                        // Stay on gate only if we never finished Google; do not fight a successful hop
-                        if (!hasFreshGoogleSessionLock()) {
-                            setAuthGateStatus(t('auth.working'));
-                            try { showAuthGate(); } catch (_) {}
+                        if (hasFreshGoogleSessionLock() || getAuthMode() === 'google') {
+                            authBootstrapped = true;
+                            recoverGoogleSessionAfterFlicker('pending-null');
+                            return;
                         }
+                        setAuthGateStatus(t('auth.working'));
+                        try { showAuthGate(); } catch (_) {}
                         return;
                     }
-                    // Opera often emits null right after a successful Google credential — ignore briefly
-                    if (hasFreshGoogleSessionLock()) {
-                        authUser = null;
-                        syncAuthAccountSettingsUi();
-                        hideAuthGate();
+                    // Opera emits null right after Google / on refresh before persistence catches up
+                    if (hasFreshGoogleSessionLock() || getAuthMode() === 'google') {
+                        authBootstrapped = true;
+                        recoverGoogleSessionAfterFlicker('null-flicker');
                         return;
                     }
                     if (getAuthMode() === 'google') setAuthMode('guest');
@@ -19264,6 +19463,13 @@
 
             window.addEventListener('hashchange', () => {
                 if (!AUTH_LANDING_ENABLED) return;
+                // Opera restores #/login from history after Google — strip it when session is google
+                if ((isGoogleSignedIn() || getAuthMode() === 'google' || hasFreshGoogleSessionLock())
+                    && parseAppAuthRoute() === 'login') {
+                    stripLoginHashFromUrl();
+                    hideAuthGate();
+                    return;
+                }
                 if (shouldShowAuthLanding()) showAuthGate();
                 else if (authGateVisible && parseAppAuthRoute() === 'app') hideAuthGate();
                 if (parseAppAuthRoute() === 'account') {
@@ -19282,10 +19488,14 @@
             // 1) Persistence + consume Google id_token FIRST
             // 2) Only then attach auth listener (anonymous guest must not race Google)
             (async () => {
+                const withTimeout = (p, ms) => Promise.race([
+                    p,
+                    new Promise((resolve) => setTimeout(resolve, ms))
+                ]);
                 try {
-                    await setPersistence(auth, indexedDBLocalPersistence);
+                    await withTimeout(setPersistence(auth, indexedDBLocalPersistence), 2500);
                 } catch (_) {
-                    try { await setPersistence(auth, browserLocalPersistence); } catch (__) {}
+                    try { await withTimeout(setPersistence(auth, browserLocalPersistence), 1500); } catch (__) {}
                 }
                 let handledOauth = false;
                 try {
@@ -19295,10 +19505,23 @@
                 }
                 // User backed out of Google, or hash was lost — drop stale pending flag
                 if (!handledOauth && hadGoogleAuthPending() && !auth?.currentUser) {
-                    clearGoogleAuthPending();
-                    lsDel(GOOGLE_OAUTH_NONCE_KEY);
+                    // Keep pending briefly if lock says Google just finished on another tick
+                    if (!hasFreshGoogleSessionLock()) {
+                        clearGoogleAuthPending();
+                        lsDel(GOOGLE_OAUTH_NONCE_KEY);
+                    }
                 }
                 startAuthListener();
+                // If we already have Google from OAuth consume, make sure dictionary is loading
+                try {
+                    const u = auth?.currentUser;
+                    if (u && !u.isAnonymous && activeUid === u.uid) {
+                        const st = document.getElementById('system-status');
+                        const stuck = st && !st.classList.contains('is-dismissed')
+                            && /підключ|connect|conect/i.test(String(st.textContent || ''));
+                        if (stuck) await enterAppWithUid(u.uid);
+                    }
+                } catch (_) {}
             })();
         } catch (e) { setSystemStatus(t('status.firebaseError'), "error"); }
 
