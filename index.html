@@ -9645,6 +9645,14 @@
             line-height: 1.45;
             margin-bottom: 1.35rem;
         }
+        .google-gis-btn-host {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 44px;
+        }
+        .google-gis-btn-host > div { margin: 0 auto; }
         .auth-google-btn {
             width: 100%;
             display: inline-flex;
@@ -9748,14 +9756,15 @@
             <div class="auth-gate-brand"><span aria-hidden="true">🌌</span> LinguaSpace</div>
             <h2 id="auth-gate-title" class="auth-gate-title" data-i18n="auth.welcomeTitle">Вітаємо</h2>
             <p class="auth-gate-sub" data-i18n="auth.welcomeSub">Увійдіть, щоб зберегти свій словник і прогрес на будь-якому пристрої.</p>
-            <button type="button" id="btn-auth-google" class="auth-google-btn" onclick="signInWithGoogle()">
+            <div id="google-gis-btn-host" class="google-gis-btn-host"></div>
+            <button type="button" id="btn-auth-google" class="auth-google-btn hidden" onclick="signInWithGoogle()" aria-hidden="true">
                 <svg class="auth-google-icon" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.1 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.1 29.4 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 10-2 13.6-5.2l-6.3-5.2C29.3 35.3 26.8 36 24 36c-5.3 0-9.7-3.3-11.3-8H6.2C9.6 38.3 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l.1.1 6.3 5.2C39.4 37.3 44 31.5 44 24c0-1.3-.1-2.5-.4-3.5z"/></svg>
                 <span data-i18n="auth.google">Увійти через Google</span>
             </button>
             <div class="auth-gate-divider"><span data-i18n="auth.or">або</span></div>
             <button type="button" id="btn-auth-guest" class="auth-guest-btn" onclick="continueAsGuest()" data-i18n="auth.guest">Продовжити без акаунта</button>
             <p id="auth-gate-status" class="auth-gate-status" role="status" aria-live="polite"></p>
-            <p class="auth-gate-hint" data-i18n="auth.consoleHint">Якщо Google не відкривається — у Firebase Console увімкніть провайдер Google і додайте домен сайту в Authorized domains.</p>
+            <p class="auth-gate-hint" data-i18n="auth.consoleHint">Якщо Google не відкривається — у Google Cloud → Credentials → Web client додайте цей сайт в Authorized JavaScript origins (наприклад https://v09052014-hub.github.io), а в Firebase → Authentication → Settings → Authorized domains — той самий домен.</p>
         </div>
     </div>
     <div id="mat-actions-scrim" onclick="closeMatCardActions()" aria-hidden="true"></div>
@@ -11501,7 +11510,9 @@
 
         // Google Identity Services — primary login (works on Opera / GitHub Pages / mobile).
         // Firebase Console → Authentication → Google → Web SDK configuration → Web client ID
-        const GOOGLE_WEB_CLIENT_ID = '532808406199-22olmav506j1flmht03np5nttonier19.apps.googleusercontent.com';
+        // Must be the Web client from the SAME Google Cloud project as Firebase (398593728951),
+        // not a client created in a different GCP project — otherwise Google/Firebase bounce to firebaseapp.com.
+        const GOOGLE_WEB_CLIENT_ID = '398593728951-cs0icobsfro49aohkm5qb9qf6gos13o3.apps.googleusercontent.com';
         const GOOGLE_WEB_CLIENT_ID_KEY = 'ls_google_web_client_id';
 
         // ═══════════════════════════════════════════════════════════════════
@@ -11665,7 +11676,7 @@
                 'auth.google': 'Увійти через Google',
                 'auth.or': 'або',
                 'auth.guest': 'Продовжити без акаунта',
-                'auth.consoleHint': 'Якщо Google не відкривається — у Firebase Console увімкніть провайдер Google і додайте домен сайту в Authorized domains.',
+                'auth.consoleHint': 'Якщо Google не відкривається — у Google Cloud → Credentials → Web client додайте цей сайт в Authorized JavaScript origins (напр. https://v09052014-hub.github.io), і той самий домен у Firebase → Authentication → Authorized domains.',
                 'auth.accountTitle': 'Акаунт',
                 'auth.signedGoogle': 'Увійшли через Google',
                 'auth.guestHint': 'Зараз ви без Google-акаунта. Дані зберігаються за локальним ID (як раніше).',
@@ -11685,8 +11696,10 @@
                 'auth.redirectFail': 'Вхід з телефону обірвався: браузер втратив тимчасовий стан Google-логіну. Спробуйте ще раз у Chrome.',
                 'auth.operaHint': 'Opera ріже старий Firebase-логін. Потрібен Web client ID (див. підказку) або Chrome.',
                 'auth.needWebClientId': 'Щоб Google працював в Opera, вставте Web client ID з Firebase (Authentication → Google → Web SDK configuration).',
-                'auth.gisFail': 'Не вдалося увійти через Google Identity. Перевірте Web client ID.',
+                'auth.gisFail': 'Не вдалося увійти через Google. Спробуйте ще раз.',
                 'auth.originFail': 'Цей домен не в Authorized JavaScript origins у Google Cloud (Credentials → Web client). Додай точну адресу сайту (GitHub Pages / Netlify).',
+                'auth.gisLoading': 'Завантаження кнопки Google…',
+                'auth.useGoogleBtn': 'Натисніть кнопку Google нижче.',
                 'tabs.dictionary': 'Словник', 'tabs.library': 'Бібліотека', 'tabs.training': 'Тренування',
                 'profile.title': 'Профіль / Налаштування',
                 'profile.hint': 'Словник зберігається за цим ID облікового запису. Зазвичай нічого змінювати не потрібно.',
@@ -12486,7 +12499,7 @@
                 'auth.google': 'Continue with Google',
                 'auth.or': 'or',
                 'auth.guest': 'Continue without an account',
-                'auth.consoleHint': 'If Google fails to open, enable the Google provider in Firebase Console and add this site domain under Authorized domains.',
+                'auth.consoleHint': 'If Google fails: add this site to Authorized JavaScript origins on the Web client (e.g. https://v09052014-hub.github.io), and the same domain under Firebase → Authentication → Authorized domains.',
                 'auth.accountTitle': 'Account',
                 'auth.signedGoogle': 'Signed in with Google',
                 'auth.guestHint': 'You are not using a Google account. Data is stored under the local profile ID (as before).',
@@ -12506,8 +12519,10 @@
                 'auth.redirectFail': 'Phone sign-in broke: the browser lost Google login state. Try again in Chrome.',
                 'auth.operaHint': 'Opera breaks classic Firebase login. Add the Web client ID (see prompt) or use Chrome.',
                 'auth.needWebClientId': 'For Google in Opera, paste the Web client ID from Firebase (Authentication → Google → Web SDK configuration).',
-                'auth.gisFail': 'Google Identity sign-in failed. Check the Web client ID.',
+                'auth.gisFail': 'Google sign-in failed. Please try again.',
                 'auth.originFail': 'This domain is not in Authorized JavaScript origins (Google Cloud → Credentials → Web client). Add your exact site URL (GitHub Pages / Netlify).',
+                'auth.gisLoading': 'Loading Google button…',
+                'auth.useGoogleBtn': 'Tap the Google button below.',
                 'tabs.dictionary': 'Dictionary', 'tabs.library': 'Library', 'tabs.training': 'Training',
                 'profile.title': 'Profile / Settings',
                 'profile.hint': 'Your dictionary is tied to this account ID. Most users can leave it unchanged.',
@@ -13297,7 +13312,7 @@
                 'auth.google': 'Continuar con Google',
                 'auth.or': 'o',
                 'auth.guest': 'Continuar sin cuenta',
-                'auth.consoleHint': 'Si Google no abre, activa el proveedor Google en Firebase Console y añade el dominio del sitio en Authorized domains.',
+                'auth.consoleHint': 'Si Google falla: añade este sitio en Authorized JavaScript origins del Web client (p. ej. https://v09052014-hub.github.io) y el mismo dominio en Firebase → Authentication → Authorized domains.',
                 'auth.accountTitle': 'Cuenta',
                 'auth.signedGoogle': 'Sesión iniciada con Google',
                 'auth.guestHint': 'No estás usando una cuenta de Google. Los datos se guardan con el ID de perfil local (como antes).',
@@ -13317,8 +13332,10 @@
                 'auth.redirectFail': 'El inicio en el teléfono falló: el navegador perdió el estado de Google. Prueba otra vez en Chrome.',
                 'auth.operaHint': 'Opera rompe el login clásico de Firebase. Añade el Web client ID o usa Chrome.',
                 'auth.needWebClientId': 'Para Google en Opera, pega el Web client ID de Firebase (Authentication → Google → Web SDK configuration).',
-                'auth.gisFail': 'Falló Google Identity. Revisa el Web client ID.',
+                'auth.gisFail': 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.',
                 'auth.originFail': 'Este dominio no está en Authorized JavaScript origins (Google Cloud → Credentials → Web client). Añade la URL exacta del sitio.',
+                'auth.gisLoading': 'Cargando el botón de Google…',
+                'auth.useGoogleBtn': 'Pulsa el botón de Google abajo.',
                 'tabs.dictionary': 'Diccionario', 'tabs.library': 'Biblioteca', 'tabs.training': 'Entrenamiento',
                 'profile.title': 'Perfil / Ajustes',
                 'profile.hint': 'Tu diccionario está vinculado a este ID de cuenta. La mayoría puede dejarlo como está.',
@@ -18367,6 +18384,10 @@
             if (gate) gate.setAttribute('aria-hidden', 'false');
             setAuthGateStatus('');
             try { applyI18n(); } catch (_) {}
+            mountGoogleIdentityButton().catch((e) => {
+                console.error('mountGoogleIdentityButton', e);
+                setAuthGateStatus(t('auth.gisFail'));
+            });
         }
 
         function hideAuthGate() {
@@ -18560,6 +18581,11 @@
 
         function getGoogleWebClientId() {
             const hard = String(GOOGLE_WEB_CLIENT_ID || '').trim();
+            // Drop a stale Client ID saved from a different Google Cloud project
+            try {
+                const saved = String(localStorage.getItem(GOOGLE_WEB_CLIENT_ID_KEY) || '').trim();
+                if (saved && hard && saved !== hard) localStorage.removeItem(GOOGLE_WEB_CLIENT_ID_KEY);
+            } catch (_) {}
             if (hard.includes('googleusercontent.com')) return hard;
             try {
                 const saved = String(localStorage.getItem(GOOGLE_WEB_CLIENT_ID_KEY) || '').trim();
@@ -18568,84 +18594,117 @@
             return '';
         }
 
+        function waitForGoogleAccountsId(timeoutMs = 8000) {
+            return new Promise((resolve, reject) => {
+                const t0 = Date.now();
+                const tick = () => {
+                    if (window.google?.accounts?.id) {
+                        resolve();
+                        return;
+                    }
+                    if (Date.now() - t0 > timeoutMs) {
+                        reject(new Error('gis id missing'));
+                        return;
+                    }
+                    setTimeout(tick, 40);
+                };
+                tick();
+            });
+        }
+
         function loadGoogleIdentityScript() {
             return new Promise((resolve, reject) => {
-                if (window.google?.accounts?.oauth2) { resolve(); return; }
+                const done = () => waitForGoogleAccountsId().then(resolve).catch(reject);
+                if (window.google?.accounts?.id) { resolve(); return; }
                 const existing = document.querySelector('script[data-ls-gis="1"]');
                 if (existing) {
-                    existing.addEventListener('load', () => resolve());
+                    existing.addEventListener('load', done);
                     existing.addEventListener('error', () => reject(new Error('gis script')));
+                    done();
                     return;
                 }
                 const s = document.createElement('script');
                 s.src = 'https://accounts.google.com/gsi/client';
                 s.async = true;
+                s.defer = true;
                 s.dataset.lsGis = '1';
-                s.onload = () => resolve();
+                s.onload = done;
                 s.onerror = () => reject(new Error('gis script'));
                 document.head.appendChild(s);
             });
         }
 
-        /** Universal Google login: token returns to this page — never touches firebaseapp.com redirect. */
-        function signInWithGoogleIdentityServices(clientId) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    await loadGoogleIdentityScript();
-                    if (!window.google?.accounts?.oauth2) {
-                        reject(new Error('gis missing'));
-                        return;
-                    }
-                    const client = google.accounts.oauth2.initTokenClient({
-                        client_id: clientId,
-                        scope: 'openid email profile',
-                        prompt: 'select_account',
-                        callback: async (resp) => {
-                            try {
-                                if (!resp || resp.error || !resp.access_token) {
-                                    reject(resp?.error || new Error('gis no token'));
-                                    return;
-                                }
-                                const cred = GoogleAuthProvider.credential(null, resp.access_token);
-                                const result = await signInWithCredential(auth, cred);
-                                resolve(result);
-                            } catch (e) { reject(e); }
-                        },
-                        error_callback: (err) => reject(err || new Error('gis error'))
-                    });
-                    client.requestAccessToken();
-                } catch (e) { reject(e); }
-            });
-        }
-
-        window.signInWithGoogle = async () => {
-            if (!auth) return;
-            const btn = document.getElementById('btn-auth-google');
-            if (btn) btn.disabled = true;
-            setAuthGateStatus(t('auth.working'));
-            rememberGoogleAuthPrevUid();
-            const clientId = getGoogleWebClientId();
+        async function handleGoogleIdCredential(response) {
             try {
-                if (!clientId) {
-                    setAuthGateStatus(t('auth.gisFail'));
-                    return;
-                }
-                // ONLY GIS — never fall back to Firebase popup/redirect (that opens firebaseapp.com and breaks Opera/mobile)
-                const result = await signInWithGoogleIdentityServices(clientId);
+                setAuthGateStatus(t('auth.working'));
+                rememberGoogleAuthPrevUid();
+                if (!response?.credential) throw new Error('gis no id token');
+                // ID token (JWT) — official Firebase + GIS path; stays on this origin (no firebaseapp.com hop)
+                const cred = GoogleAuthProvider.credential(response.credential);
+                const result = await signInWithCredential(auth, cred);
                 await finishGoogleSignIn(result.user);
             } catch (e) {
-                console.error('signInWithGoogle', e);
+                console.error('handleGoogleIdCredential', e);
                 clearGoogleAuthPending();
-                const msg = String(e?.type || e?.message || e?.error || e || '').toLowerCase();
+                const msg = String(e?.code || e?.message || e?.type || e || '').toLowerCase();
                 if (msg.includes('popup_closed') || msg.includes('closed')) {
                     setAuthGateStatus('');
-                } else if (msg.includes('origin') || msg.includes('unauthorized')) {
+                } else if (msg.includes('origin') || msg.includes('unauthorized') || msg.includes('idpiframe')) {
                     setAuthGateStatus(t('auth.originFail'));
                 } else {
-                    setAuthGateStatus(t('auth.gisFail'));
+                    const detail = String(e?.code || e?.message || e?.type || '').trim();
+                    setAuthGateStatus(detail ? `${t('auth.gisFail')} (${detail})` : t('auth.gisFail'));
                 }
-            } finally {
-                if (btn) btn.disabled = false;
+            }
+        }
+
+        let gisButtonMountGen = 0;
+
+        async function mountGoogleIdentityButton() {
+            const host = document.getElementById('google-gis-btn-host');
+            if (!host) return;
+            const clientId = getGoogleWebClientId();
+            if (!clientId) {
+                host.innerHTML = '';
+                setAuthGateStatus(t('auth.gisFail'));
+                return;
+            }
+            const gen = ++gisButtonMountGen;
+            setAuthGateStatus(t('auth.gisLoading'));
+            await loadGoogleIdentityScript();
+            if (gen !== gisButtonMountGen) return;
+            google.accounts.id.initialize({
+                client_id: clientId,
+                callback: (response) => { handleGoogleIdCredential(response); },
+                auto_select: false,
+                cancel_on_tap_outside: true,
+                context: 'signin',
+                ux_mode: 'popup',
+                itp_support: true
+            });
+            host.innerHTML = '';
+            google.accounts.id.renderButton(host, {
+                type: 'standard',
+                theme: 'outline',
+                size: 'large',
+                text: 'signin_with',
+                shape: 'pill',
+                width: Math.min(320, Math.max(240, (host.clientWidth || 280))),
+                locale: (typeof interfaceLanguage !== 'undefined' && interfaceLanguage) || 'uk'
+            });
+            setAuthGateStatus('');
+        }
+
+        /** Settings / legacy button: open gate with official Google button (no access-token / firebaseapp flow). */
+        window.signInWithGoogle = async () => {
+            if (!auth) return;
+            try {
+                if (!authGateVisible) window.openAuthLanding();
+                else await mountGoogleIdentityButton();
+                setAuthGateStatus(t('auth.useGoogleBtn'));
+            } catch (e) {
+                console.error('signInWithGoogle', e);
+                setAuthGateStatus(t('auth.gisFail'));
             }
         };
         async function completeGoogleRedirectIfAny() {
@@ -18871,7 +18930,9 @@
                     }
                     authBootstrapped = true;
                 } else {
-                    // Keep Firestore rules happy; anonymous is still the guest transport
+                    // Session gone (expired / signed out) — guest transport only; never treat as Google
+                    if (getAuthMode() === 'google') setAuthMode('guest');
+                    syncAuthAccountSettingsUi();
                     signInAnonymously(auth).catch((err) => { setSystemStatus(t('status.authError'), "error"); });
                 }
             });
